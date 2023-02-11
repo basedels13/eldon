@@ -1,0 +1,148 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>エルドン</title>
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+　　<link rel="icon" href="./favicon.ico">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/js/fontawesome.min.js">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.1.3/howler.min.js"></script>
+<script src="howler.js"></script>
+<script src="donsword0.5.js"></script>
+  <style>
+        body {
+             background: #fff;
+            color: #444;
+            font-size: 16px;
+            font-family: 'メイリオ', Meiryo, 'ヒラギノ角ゴ Pro W3', 'Hiragino Kaku Gothic Pro', Helvetica, Arial, 'ＭＳ Ｐゴシック', sans-serif;
+        }
+    .main{
+    margin: 250px 0 0 0;
+      text-align: center;
+    }
+    .canvas-wrapper{
+  position: relative;
+      width: 800px;
+    margin: 0 auto;
+    }
+    .canvas-wrapper canvas{
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+        .article{
+       margin: 40px 0 12px 0;
+      text-align: start;
+    }
+        .parent{
+       margin: 640px 0 12px 0;
+      text-align: center;
+    }
+        .child{
+       margin: 640px 0 12px 0;
+      text-align: center;
+    }
+</style>
+
+  </head>
+<body>
+  <div class="main">
+  <p>エルドンv0.5</p>
+   </div>
+    <div class="canvas-wrapper" WIDTH="800"; HEIGHT="600">
+       <canvas id="canvas6" WIDTH="800"; HEIGHT="600"></canvas>
+       <canvas id="canvas0" style="background-color: #eee;" WIDTH="800"; HEIGHT="600"></canvas>
+       <canvas id="canvas1" WIDTH="800"; HEIGHT="600"></canvas>
+       <canvas id="canvas2" WIDTH="800"; HEIGHT="600"></canvas>
+       <canvas id="canvas3" WIDTH="800"; HEIGHT="600"></canvas>
+       <canvas id="canvas4" WIDTH="800"; HEIGHT="600"></canvas>
+       <canvas id="canvas5" WIDTH="800"; HEIGHT="600"></canvas>
+   </div>
+<div class="parent">
+  <span id="child"><h1>"エルコレドンジャラ・ロナン"</h1></span>
+   </div>
+    <div class="article">
+      <p><b><font size="4">「エルコレクションシナジー効果を元にしたドンジャラみたいなゲーム！」</font></b></p>
+      <p><font size="4">【遊び方】</font><br>
+      　9枚のパイで特定の組み合わせを揃えるゲームです。役の組み合わせは以下の3種類です。<br><br>
+      ①3ペア：同じキャラ（エルス、アイシャなど）を3枚1組として、3組（3キャラ）を揃える。<br>
+        　一般的なドンジャラの組み合わせです。<br>
+      ②ライン通貫：職ライン（1,2,3）が同じパイを9枚揃える。<br>
+      ③国士無双：エピックラインで全て異なるキャラクターのパイを9枚揃える。<br><br>
+      　あと1枚で揃うと思ったら、リーチしましょう。<br>
+      　オールマイティのパイは何にでも代用可能です。<br>
+      　パイの組み合わせによってシナジー効果がつきます。シナジーが多いほど高得点になりますです。<br>
+      　誰かのライフが0になるかオーラスまで対局が続くと終了します。大抵誰かが理不尽に飛びます。<br><br>
+</p>
+      <p><font size="4">【操作】</font><br>
+          ・基本的にクリックだけで遊べます。<br>
+        　・ロードが終了して画面が切り替わったら画面をクリックするとスタート。<br>
+        　・BGM,SEが鳴ります。右上の「SOUND」付近をクリックすると音をミュートできます。<br><br>
+      ・Escキー：タイトルに戻る<br>
+      ・クリック：<br>
+      　・パイを切る・・・手札のパイをクリック。<br>
+      　・リーチ・・・リーチボタンをクリックしてからパイを切る。<br>
+      　・スキル・・・スキルボタンをクリック。その後、スキルの種類により、プレイヤーを選んだりパイを選んだりする。<br>
+      　・ポン・・・ポンボタンを押す。ポンしない場合はポンボタン以外の場所をクリック。<br>
+      　・ツモ、ロン・・・ツモやロンが可能な場合は画面中央やや下にツモ・ロンのボタンが表示される。ボタンをクリック。<br>     　 ・ＳＯＲＴ・・・手札のパイを並べ替えられます。キャラ順⇔職ライン順<br>
+　・残パイリスト・・・まだ場に出ていないパイを表示します。<br></p><br>
+
+      <p><b><font size="4">【注意】</font></b><br>
+　・このゲームはエルソード（ELSWORD）の二次創作です。原作　ELSWORD（KOG Corporation）<br>
+　・ただし名無しさんは上記と一切関係ありません。<br>
+　・ロナン君は出ません。<br>
+　・bgmはDOVA-SYNDROME様からお借りしました。<br>
+　・効果音は効果音ラボ様からお借りしました。<br>
+</p><br>
+      <p><font size="4">【バグ・不具合】</font><br>
+       　・見つかったら書き足します。
+        <br>
+　・処理が重い、突然対局が止まる、などの事故が起こる可能性があります。<br></p><br>
+
+      <p><font size="4">【細かい仕様（上級者向け）】</font><br>
+ 　パイの内訳：各キャラ3ライン、ロゼのみ4ラインまで2枚ずつ。それに加えてアリエル、ルリエルが1枚ずつ。<br>
+　　13キャラ×6枚+1キャラ×8枚+オールマイティ2枚。合計88枚。<br>
+        　　嶺上牌を7個取り除きその中からドラを表示、<br>
+　　残り山81枚を8枚ずつ配り、親が1枚引いてスタート。<br><br>
+     　万が一全員生き残ったら第8局がオーラス。<br>ダブロンあり。<br>
+      <br>
+ 　アガリ形：同じキャラを6枚集めても意味がない。（6+3の形では上がれない）<br>
+ 　リーチ：「リーチ」役は無し。リーチで上がると裏ドラ追加。<br>
+      　　「リーチ」ボタンを押してから捨てるパイを選ぶ。<br>
+      　　リーチしなければロンできない。ツモは可。<br>
+ 　ポン：現在はプレイヤーのみ使用可。<br>
+      　　自分の一つ前のプレイヤーからのみ行える。<br>
+      　　同キャラを3枚以上持っている場合は職ラインが若い順に2枚勝手に選ばれる。<br>
+      　　ポンした後もリーチができる。<br>
+ 　シナジー：構成キャラクターは原作準拠。<br>
+      　　同じキャラクターを複数持っていても、重複しない。<br>
+      　　1枚しかないもの（アラ3職、ニーシャ）は1翻。<br>
+      　　それ以外は、キャラの枚数ごとに点数が変わる。<br>
+      　　2枚で1翻、3・4枚で2翻、,5・6枚で3翻。<br>
+ 　得点計算：持ち点150000でスタート。符（裏で計算）と翻によって決定する。満貫ブロックあり。<br>
+      　　満貫が50000点、跳満、二倍満、三倍満、数え役満が220000点。親はさらに1.5倍。<br>
+      　　符は30～60くらいで変動するため同じ翻数でも得点は変わる。<br>
+      　　基本30符として、同じキャラを3枚揃えることで+10符（ポンは除く）される。<br></p>
+
+      <p><font size="4">【今後の実装予定】</font><br>
+ ・キャラクターの追加、実績、セーブ機能の追加。(v0.6)<br>・特殊ルール（マスターロード）の追加。(v0.7)<br>・パイのグラフィック書き直し。（やる気あれば）<br>・点数計算見直し。（やる気あれば）<br>・カン、嶺上開花の追加。（やる気あれば）<br>
+
+      </p>
+      <p><font size="4">【更新履歴】</font><br>
+・製作開始 (2022/7/25)<br>
+・v0.1動作テスト (2022/8/2)<br>
+・v0.5公開 (2022/8/11)<br>
+      </p>
+   </div>
+  <footer>
+<a href="http://azurelsword.web.fc2.com/" target="_blank"><img border=0
+src="bannerHome200.png" width=200 height=80 alt="あか煉瓦の秘密基地"></a>
+<a href="http://azurelsword.web.fc2.com/musicbox1.0.html" target="_blank"><img border=0
+src="bnEltear200.png" width=200 height=80 alt="エルティア麻雀"></a>
+  </footer>
+<script>
+
+  </script>
+</body>
