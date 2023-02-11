@@ -1,6 +1,8 @@
 <!DOCTYPE html> 
 <html>
 <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>エルドンオンライン</title>
   <style>
     body {
          background: #fff;
@@ -37,7 +39,9 @@ margin: 0 auto;
 </style>
 </head>
 <body>
-</div>
+    <div class="main">
+  <p>エルドン　オンライン版</p>
+   </div>
 <div class="canvas-wrapper" WIDTH="800"; HEIGHT="600">
    <canvas id="canvas6" WIDTH="800"; HEIGHT="600"></canvas>
    <canvas id="canvas0" style="background-color: #eee;" WIDTH="800"; HEIGHT="600"></canvas>
@@ -45,22 +49,51 @@ margin: 0 auto;
    <canvas id="canvas2" WIDTH="800"; HEIGHT="600"></canvas>
    <canvas id="canvas3" WIDTH="800"; HEIGHT="600"></canvas>
    <canvas id="canvas4" WIDTH="800"; HEIGHT="600"></canvas>
+   <canvas id="canvas7" WIDTH="800"; HEIGHT="600"></canvas>
    <canvas id="canvas5" WIDTH="800"; HEIGHT="600"></canvas>
 </div>
 <div class="parent">
   <span id="child"><h1>"エルコレドンジャラ・ロナン"</h1></span>
    </div>
-   <div class="parent">
-    <span id="child"><h1>"エルコレドンジャラ・ロナン"</h1></span>
-     </div>
-      <div class="article">
-        　
-        </div>
+    <div class="article">
+      <p><b><font size="4">「エルコレシナジーも覚えられるドンジャラ！」</font></b></p>
+      <p><font size="4">【遊び方】</font><br>
+      　9枚のパイで特定の組み合わせを揃えるゲームです。役の組み合わせは以下の3種類です。<br><br>
+      ①3ペア：同じキャラ（エルス、アイシャなど）を3枚1組として、3組（3キャラ）を揃える。<br>
+        　一般的なドンジャラの組み合わせです。<br>
+      ②ライン通貫：職ライン（1,2,3）が同じパイを9枚揃える。<br>
+      ③国士無双：エピックラインで全て異なるキャラクターのパイを9枚揃える。<br><br>
+      　あと1枚で揃うと思ったら、リーチしましょう。<br>
+      　オールマイティのパイは何にでも代用可能です。<br>
+      　パイの組み合わせによってシナジー効果がつきます。シナジーが多いほど高得点になりますです。<br>
+      　誰かのライフが0になるかオーラスまで対局が続くと終了します。大抵誰かが理不尽に飛びます。<br><br>
+</p>
+      <p><font size="4">【操作】</font><br>
+          ・マウスだけで遊べます。<br>
+        　・ロードが終了して画面が切り替わったら画面をクリックするとスタート。<br>
+        　・BGM,SEが鳴ります。右上の「SOUND」付近をクリックすると音をミュートできます。<br><br>
+      ・Escキー：タイトルに戻る<br>
+      ・クリック：<br>
+      　・パイを切る・・・手札のパイをクリック。<br>
+      　・リーチ・・・リーチボタンをクリックしてからパイを切る。<br>
+      　・スキル・・・スキルボタンをクリック。その後、スキルの種類により、プレイヤーを選んだりパイを選んだりする。<br>
+      　・ポン・・・ポンボタンを押す。ポンしない場合はポンボタン以外の場所をクリック。<br>
+      　・ツモ、ロン・・・ツモやロンが可能な場合は画面中央やや下にツモ・ロンのボタンが表示される。ボタンをクリック。<br>
+        ・ＳＯＲＴ・・・手札のパイを並べ替えられます。キャラ順⇔職ライン順<br>
+　・残パイリスト・・・まだ場に出ていないパイを表示します。<br></p><br>
+
+      <p><b><font size="4">【注意】</font></b><br>
+　・このゲームはエルソード（ELSWORD）の二次創作です。原作　ELSWORD（KOG Corporation）<br>
+　・ただし名無しさんは上記と一切関係ありません。<br>
+　・bgmはDOVA-SYNDROME様からお借りしました。<br>
+　・効果音は効果音ラボ様からお借りしました。<br>
+</p><br>
+  </div>
 </body>
 <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.1.3/howler.min.js"></script>
+<script src="https://code.createjs.com/1.0.0/createjs.min.js"></script>
 <script src="socket.io/socket.io.js"></script>
 <script src="don/howler.js"></script>
-<script src="don/test.js"></script>
-<script src="don/donsword0.7.js"></script>
+<script src="don/donsword0.73.js"></script>
 </html>
