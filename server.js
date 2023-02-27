@@ -138,6 +138,18 @@ switch(data.ready){
 break;
 };
 });
+//Setup
+socket.on("setup_member", (data)=>{
+  //ホストが0番目、flag1が親
+  console.log(data.length,data);
+  io.to('room1').emit("member", data);
+  });
+  socket.on("deck_handler", (data)=>{
+    //ホストが0番目、flag1が親
+    console.log(data.length,data);
+    io.to('room1').emit("deck-handler", data);
+    });
+
  //ルーム退出
  socket.on("leave_to_room", (data)=>{
   console.log('leave', data.name,data.chr);

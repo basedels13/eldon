@@ -1,75 +1,11 @@
-//var0.7 つうしんたいせん
-//next:空きマスにCPUを入れて回すところまで
-//クリックを押した時⇒クリックしたときに変更？
-//ルーム1-3は工事中　
-//ルームで変動するもの：roomId='room1',IsHostのかっこ内;
+//var0.74 抜き追加　スキルなし
 window.onload = function(){
 draw();
 };
 
 function draw(){
-  //自分自身の情報を入れる箱
-var IAM = {
-  token: null,    // 戸別管理用のトークン
-  name: null,     // 名前
-  is_join: false,  // 入室中？
-  is_ready: 0 // 0 1レディ
-};
-// メンバー一覧を入れる箱
-var MEMBER = {
-  0: "マスター"
-};
-var Roomlist1=[];
-var Roomlist2=[];
-var Roomlist3=[];
-function IsHost(room=1){
-//リストIDが0の人をホストとする
-switch(room){
-  case 1:
-  var A=Roomlist1.findIndex(value =>value.token==IAM.token);
-  if(A==-1){
-    console.log('roomlist1 error!');
-  }else{
-    if(Roomlist1[A].id==0){
-      return true;
-    }else{
-      return false;
-    }
-  }
-break;
- default:
-  console.log('IsHost error!',room)
-  return false;
-  break;
-}};
-//接続
-const socket = io();
-socket.on('connect', () => {
-  console.log('connect');
-});
-/**
- * [イベント] トークンが発行されたら
- */
-socket.on("token", (data)=>{
-  // トークンを保存
-  IAM.token = data.token;
-});
 
-//接続人数を受け取る 変化していれば反映する
-socket.on('xxx', (data)=>{
-  //console.log(data);
-  var A=Usercount;
-  if(Usercount !== data.message){
-  Usercount=data.message;
-  if(pagestate==6 && msgstate==0){
-    cx2.fillStyle = "black";
-    cx2.font = "18px Arial";
-    cx2.clearRect(580,530,170,20)
-    cx2.fillText("現在の接続人数："+Usercount, 580, 550);
-  }}
-  });
-//var userName = '';
-var Usercount=0;
+
   var mouseX;
 	var mouseY;
   var Savetitle =new Array("This is savedata of <https://azurelsword.web.fc2.com/ronan.html>",0,0);
@@ -198,7 +134,7 @@ console.log(eltear_src.length);
 //expected 45
 //バフアイコン
 var donicon=new Image();
-var donicon_src= new Array("Don_b1.png","Don_b2.png","Don_b3.png","Don_b4.png","Don_b5.png","Don_b6.png")
+var donicon_src= new Array("don/Don_b1.png","don/Don_b2.png","don/Don_b3.png","don/Don_b4.png","don/Don_b5.png","don/Don_b6.png")
 var win_src= new Array("don/win1.png","don/win1.png","don/win2.png","don/win3.png","don/win4.png","don/win5.png","don/win6.png","don/wintumo.png","don/winron.png","don/winreach.png");
 var musiclistDT=[
 {title:"0",elia:"0",nod:"0"},
@@ -515,6 +451,9 @@ var reach =new Array(0,0,0,0,0)
 var ippatu =new Array(0,0,0,0,0)
 var rorder =new Array(0,0,0,0,0)
 var porder =new Array(0,0,0,0,0)
+var nuki =new Array(0,0,0,0,0);
+var nukiswitch =new Array(0,0,0,0,0);
+//0->抜き直後に1にして嶺上　抜き枚数チェック
 //捨て牌の座標
 var riverx=new Array(0,120,120,120,120)
 var rivery=new Array(0,400,100,200,300)
@@ -1171,30 +1110,6 @@ cx3.fillText( mute, 730, 42);
 //mousedown->mouseup->clickの順番に処理される
   function mouseDownHandler(e) {
     console.log("X座標：" + mouseX,"Y座標：" + mouseY);
-            //クリックした場所を教える
-            var r=30;
-            var alphaS=1;
-            cx5.lineWidth=3
-            cx5.strokeStyle = "#fff596";
-            var sx=mouseX
-            var sy=mouseY
-            window.requestAnimationFrame(circle)
-            function circle(){
-              if(alphaS > 0){
-                cx5.clearRect(0,0,800,600);
-                cx5.globalAlpha =alphaS
-                cx5.beginPath();
-                cx5.arc(sx,sy,r, 0, 2 * Math.PI, false)
-                cx5.stroke();
-                alphaS -= 3/60
-                r=r-2/r
-                window.requestAnimationFrame(circle)
-              }else{
-            cx5.clearRect(0,0,800,600);
-    }}
-  };
-  //mpmove
-  function mouseUpHandler(e) {
                 //クリックした場所を教える
                 var r=2;
                 var alphaS=1;
@@ -1216,6 +1131,10 @@ cx3.fillText( mute, 730, 42);
                   }else{
                 cx5.clearRect(0,0,800,600);
         }}
+  };
+  //mpmove
+  function mouseUpHandler(e) {
+
   };
 	function clickHandler(e) {
  		var rect = e.target.getBoundingClientRect();
@@ -1543,8 +1462,8 @@ if(LP[1] >0 && LP[2]>0 && LP[3] >0 && LP[4]>0){
   }}
   if(mouseY >440 && mouseY <480){
   if(mouseX >710 && mouseX <790){
-  //スキル選択？
-  //SpecialSkill(1,0);
+        //抜き
+        NukiSkill(1);
   }}
   if(mouseY >490 && mouseY < 590){
     var SX=Math.floor((mouseX+size-100)/size);
@@ -1621,7 +1540,6 @@ if(LP[1] >0 && LP[2]>0 && LP[3] >0 && LP[4]>0){
   hand1[0]=-1
   turn=turntemp;
   turnchecker();
-  //turnrole();
   }
   //ポン
   if(ponsw[1]==1 && turn !==0){
@@ -1921,13 +1839,7 @@ if(LP[1] >0 && LP[2]>0 && LP[3] >0 && LP[4]>0){
                     }
                   }
               if(mouseY >260 && mouseY <310){//pvpたいせん
-                cx2.clearRect(675,390,80,50)
-                cx3.clearRect(675,385,80,60)
-                pagestate=6;
-                msgstate=-1;
-                se5.play();
-                socket.emit("join", {name:Username});
-                Menu();
+                se2.play();
               }
             }
             if(mouseX >678 && mouseX <750){
@@ -2857,236 +2769,6 @@ if(LP[1] >0 && LP[2]>0 && LP[3] >0 && LP[4]>0){
               break;
             case 6:
               //たいせん画面
-              if(mouseX >700 && mouseX <750 && mouseY >50 && mouseY <100){
-                pagestate=0;
-                msgstate=0;
-                se2.play();
-                Menu();
-                return false;
-              }
-              switch(msgstate){
-                case 2:
-                  //case1は入場待機
-                  if(mouseX >420 && mouseX <590 && mouseY >520 && mouseY <580){
-                    //Readyボタン
-                    msgstate=1;
-                    var roomId='room1';
-                    if(IsHost(1)){
-                      //他のプレイヤーが全員レディならスタート
-                      socket.emit('ready_to_start',{token: IAM.token,ready:-1,room:roomId});
-                    }else{
-                      socket.emit('ready_to_start',{token: IAM.token,ready: IAM.is_ready,room:roomId});
-                      if(IAM.is_ready==1){IAM.is_ready=0}else{IAM.is_ready=1};
-                    }
-                    socket.on("start-result", (data)=>{
-                      if(data.status){
-                        if(IsHost(1)){
-                          console.log('setupへ')
-                          msgstate=2;
-                          //setupへ
-                        }else{
-                          console.log('ゲームロード待機')
-                          msgstate=2;
-                          //ゲームロード待機
-                        }
-                      }else{
-                        console.log('未準備のプレイヤーがいます')
-                        msgstate=2;
-                      }
-                    });
-                    socket.on("ready-result", (data)=>{
-                      console.log(data.status);
-                        msgstate=2;
-                    });
-                  }
-                  if(mouseX >600 && mouseX <770 && mouseY >520 && mouseY <580){
-                    //退出するボタン
-                    msgstate=-1;
-                    var clientId=Username;
-                    var clientChr=chara[1];
-                    var roomId='room1';
-                    socket.emit('leave_to_room',{token: IAM.token,name:clientId,chr:clientChr,room:roomId});
-                  Menu();
-                  }
-                  break;
-                case 0:
-                  //入場
-                  if(mouseX >90 && mouseX <290 && mouseY >80 && mouseY <280){
-                  msgstate=1;
-                  var clientId=Username;
-                  var clientChr=chara[1];
-                  var roomId='room1';
-                  socket.emit('join_to_room',{token: IAM.token,name:clientId,chr:clientChr,room:roomId});
-                  cx4.globalAlpha=1;
-                  se3.play();
-                  cx4.fillStyle = "rgba(20,20,20,0.7)";
-                  cx4.fillRect(0,0,800,600)
-                  cx4.font = "bold 26px 'メイリオ'";
-                  cx4.fillStyle = "black";
-                  cx4.strokeStyle ="rgba(250,250,250,0.9)";
-                  cx4.lineWidth=5;
-                  cx4.strokeText("入室しています",240,200);
-                  cx4.fillText("入室しています",240,200);   
-                  //入室
-                  socket.on('room-result', (data)=>{
-                    if(data.status){            
-                      console.log('入室成功');
-                      cx4.clearRect(0,0,800,600)
-                      msgstate=2;
-                    }else{
-                      console.log('入室失敗');
-                      msgstate=0;
-                      return false;
-                    }
-                    });
-                  //入室状態更新
-                  socket.on("room-update", (data)=>{
-                    if(data.status){
-                      Roomlist1=data.list.concat()
-                      cx1.fillStyle = "#001c0d";
-                      cx1.fillRect(0,0,800,600)
-                      cx2.clearRect(0,0,800,600)
-                      cx2.fillStyle = "#126e60"
-                      cx2.fillRect(11,100,148,300);
-                      cx2.fillRect(161,100,148,300);
-                      cx2.fillRect(311,100,148,300);
-                      cx2.fillRect(461,100,148,300);
-                      cx2.fillStyle = "white";
-                      cx2.font = "bold 30px Arial";
-                      cx2.fillText('CPU',50,270);
-                      cx2.fillText('CPU',200,270);
-                      cx2.fillText('CPU',350,270);
-                      cx2.fillText('CPU',500,270);
-                      cx2.fillText('4人　半荘　満貫ブロックあり',170,40);
-                      drawbuttom(10,10,"ルーム1",1,130,44);
-                      //console.log(Roomlist1);
-                      if(IsHost(1)){
-                      drawbuttom2(420,520,"対局開始",0);                        
-                      }else{
-                      drawbuttom2(420,520,"Ready",0);
-                      }
-                      drawbuttom2(600,520,"退出する",0);
-                      cx4.fillStyle='orange';
-                      drawstar(20,125);
-                      cx2.fillStyle = "white";
-                      cx2.font = "bold 26px Arial";
-                      switch(data.list.length){
-                        case 1:
-                          cx2.clearRect(10,100,150,300);
-                          cx2.fillText(data.list[0].name, 10, 430);
-                        e10.src=chrimg_src[data.list[0].chr]
-                        e10.onload=function(){
-                      cx2.drawImage(e10,400,0,300,600,10,100,150,300)
-                        }
-                          break;
-                        case 2:
-                          cx2.clearRect(10,100,300,300);
-                          cx2.fillText(data.list[0].name, 10, 430);
-                          cx2.fillText(data.list[1].name, 160, 430);
-                          cx2.fillStyle = "orange";
-                          cx2.font = "bold 26px Arial";
-                          if(data.list[1].ready){
-                            cx2.fillText("READY", 190, 460);
-                          }
-                        e10.src=chrimg_src[data.list[0].chr]
-                        e10.onload=function(){
-                        cx2.drawImage(e10,400,0,300,600,10,100,150,300)
-                          e10.src=chrimg_src[data.list[1].chr]
-                          e10.onload=function(){
-                          cx2.drawImage(e10,400,0,300,600,160,100,150,300)
-                        }}
-                          break;
-                        case 3:
-                          cx2.clearRect(10,100,450,300);
-                          cx2.fillText(data.list[0].name, 10, 430);
-                          cx2.fillText(data.list[1].name, 160, 430);
-                          cx2.fillText(data.list[2].name, 310, 430);
-                          cx2.fillStyle = "orange";
-                          cx2.font = "bold 26px Arial";
-                          if(data.list[1].ready){
-                            cx2.fillText("READY", 190, 460);
-                          };
-                          if(data.list[2].ready){
-                            cx2.fillText("READY", 340, 460);
-                          }
-                        e10.src=chrimg_src[data.list[0].chr]
-                        e10.onload=function(){
-                        cx2.drawImage(e10,400,0,300,600,10,100,150,300)
-                          e10.src=chrimg_src[data.list[1].chr]
-                          e10.onload=function(){
-                          cx2.drawImage(e10,400,0,300,600,160,100,150,300)
-                          e10.src=chrimg_src[data.list[2].chr]
-                          e10.onload=function(){
-                          cx2.drawImage(e10,400,0,300,600,310,100,150,300)
-                        }}}
-                          break;
-                        case 4:
-                          cx2.clearRect(10,100,600,300);
-                          cx2.fillText(data.list[0].name, 10, 430);
-                          cx2.fillText(data.list[1].name, 160, 430);
-                          cx2.fillText(data.list[2].name, 310, 430);
-                          cx2.fillText(data.list[3].name, 460, 430);
-                          cx2.fillStyle = "orange";
-                          cx2.font = "bold 26px Arial";
-                          if(data.list[1].ready){
-                            cx2.fillText("READY", 190, 460);
-                          };
-                          if(data.list[2].ready){
-                            cx2.fillText("READY", 340, 460);
-                          }
-                          if(data.list[3].ready){
-                            cx2.fillText("READY", 490, 460);
-                          }
-                        e10.src=chrimg_src[data.list[0].chr]
-                        e10.onload=function(){
-                        cx2.drawImage(e10,400,0,300,600,10,100,150,300)
-                          e10.src=chrimg_src[data.list[1].chr]
-                          e10.onload=function(){
-                          cx2.drawImage(e10,400,0,300,600,160,100,150,300)
-                          e10.src=chrimg_src[data.list[2].chr]
-                          e10.onload=function(){
-                          cx2.drawImage(e10,400,0,300,600,310,100,150,300)
-                          e10.src=chrimg_src[data.list[3].chr]
-                          e10.onload=function(){
-                          cx2.drawImage(e10,400,0,300,600,460,100,150,300)
-                        }}}}
-                          break;
-                      }
-                      console.log(Roomlist1);
-                    }
-                    console.log('room updated')
-                  });
-                  };
-                  break;
-                  case -1:
-                    epic.src=epic_src[0]
-                    epic.onload=function(){
-                      cx1.fillStyle = "rgba(20,20,20,0.7)";
-                      cx4.clearRect(0,0,800,600)
-                      cx2.clearRect(0,0,800,600)
-                      cx1.fillRect(0,0,800,510)
-                      cx1.drawImage(epic,50,50,350,460)
-                      cx1.drawImage(epic,400,50,350,460)
-                    cx2.fillStyle = "rgba(20,20,20,0.7)";
-                    cx2.fillRect(60,80,200,200)
-                    cx2.fillRect(280,80,200,200)
-                    cx2.fillRect(500,80,200,200)
-                    drawbuttom(90,80,"ルーム1",0,130,44);
-                    drawbuttom(310,80,"ルーム2",0,130,44);
-                    drawbuttom(530,80,"ルーム3",0,130,44);
-                  cx2.font = "32px 'Century Gothic'";
-                  cx2.fillStyle = "black";
-                  cx2.fillText("　×",680,80)
-                  cx2.clearRect(80,530,670,70)
-                  cx2.font = "18px Arial";
-                  cx2.fillText("ルーム選択", 80, 550);
-                  cx2.clearRect(580,530,170,20)
-                  cx2.fillText("現在の接続人数："+Usercount, 580, 550);
-                  msgstate=0;
-                    };
-                    break;
-              }
-
               break;
         }
       }
@@ -3152,7 +2834,7 @@ window.addEventListener("keyup", keyupHandler, false);
       //マナブレ
     }
     }
-    function Yakucheck(move=0){
+function Yakucheck(move=0){
       if(move!==0){
       //上下移動
       yakumapY+=move;
@@ -3303,12 +2985,13 @@ function AK(name){
       }
     }
   }
-function deckHandler(){
+function deckHandler(pvp=0){
   //ゲームスタート時の配牌と画面
   cx.clearRect(0,0,800,600)
   cx1.clearRect(0,0,800,600)
   cx2.clearRect(0,0,800,600)
   cx3.clearRect(0,0,800,600)
+  cx4.clearRect(0,0,800,600)
   alpha=1
   //背景
   cx.drawImage(BGimg,0,0,800,600);
@@ -3402,7 +3085,7 @@ switch (musicset[2]){
   //cx1.fillText("カン",720,425)
   cx1.fillText("リーチ",640,465)
   cx1.fillText("スキル",720,425)
-  //cx1.fillText("覚醒",730,465)
+  cx1.fillText("抜き",720,465)
   handsort=0;
   drawbuttom(10,550,"SORT");
   parentY =400
@@ -3522,6 +3205,8 @@ switch (musicset[2]){
   //clock0->反応させない　1以上->操作を許可 2->リーチからのパイ切り？ 3->スキルキーからのパイ切り
   han =new Array(0,0,0,0,0)
   reach =new Array(0,0,0,0,0)
+  nuki =new Array(0,0,0,0,0);
+  nukiswitch =new Array(0,0,0,0,0);
   ippatu =new Array(0,0,0,0,0)
   rorder =new Array(0,0,0,0,0)
   porder =new Array(0,0,0,0,0)
@@ -3530,7 +3215,7 @@ switch (musicset[2]){
   if(LP[i]<=0){rorder[i]=2}else{rorder[i]=0}
   if(cputype[i]==3){typerand[i]=Math.floor(Math.random()*3);}
   }
-  console.log(typerand);
+  //console.log(typerand);
   counter=new Array(0,0,0,0,0)
   riverx=new Array(0,120,120,120,120)
   rivery=new Array(0,400,100,200,300)
@@ -3540,7 +3225,11 @@ switch (musicset[2]){
   drawDP(3)
   drawDP(4)
   Buff =new Array(0,[],[],[],[])
-  //配牌
+  Buffdraw(1);
+  Buffdraw(2);
+  Buffdraw(3);
+  Buffdraw(4);
+  
   for(var i =0; i<43; i++){
   deck.push(i);
   deck.push(i);
@@ -3625,20 +3314,31 @@ switch (musicset[2]){
   hand2.push(100)
   hand3.push(100)
   hand4.push(100)
-
   console.log(king);//嶺上牌
   console.log(hand1);//自分の手札
   console.log(hand2);
   console.log(hand3);
   console.log(hand4);
-  
   dora.push(king[0])
-  console.log(dora)
-  dorax=60
-  
+console.log(dora)
+dorax=60
+handgraph(-1,1);
+decklength();
+turn =parent
+if(LP[turn+1]<=0){turn+=1;if(turn==4){turn=0}}
+if(LP[turn+1]<=0){turn+=1;if(turn==4){turn=0}}
+if(LP[turn+1]<=0){turn+=1;if(turn==4){turn=0}}
+parent +=1
+if(parent ==4){parent =0}
+ctl[turn+1]=0;
+;
+
+dora.push(king[0])
+console.log(dora)
+dorax=60
   handgraph(-1,1);
   decklength();
-  //最初ターン流詰みこみ
+
   //player1();
   turn =parent
   if(LP[turn+1]<=0){turn+=1;if(turn==4){turn=0}}
@@ -3647,14 +3347,141 @@ switch (musicset[2]){
   parent +=1
   if(parent ==4){parent =0}
   ctl[turn+1]=0
-  //turnrole();
   }}}}
   };
-
+  function Buffdraw(i=1){
+    //console.log('Buffdraw',i)
+   //バフアイコンを描画する
+   var x=[0,0,0,0,0];
+   var y=[0,400,100,200,300];
+   cx2.clearRect(x[i],y[i],150,20);
+  if(LP[i]<=0){
+    donicon.src=donicon_src[5];
+    donicon.onload=function(){
+      cx2.drawImage(donicon,x[i],y[i],20,20);
+      x[i]+=20;
+    };  
+  }
+   if(Buff[i].length>0){
+  var A=Buff[i].filter(value=>value==1);
+  var B=Buff[i].filter(value=>value==2);
+  var C=Buff[i].filter(value=>value==3);
+  var D=Buff[i].filter(value=>value==4);
+  var E=Buff[i].filter(value=>value==5);
+  var F=Buff[i].filter(value=>value==6);
+    donicon.src=donicon_src[0];
+    donicon.onload=function(){
+      if(A.length>0){
+      cx2.drawImage(donicon,x[i],y[i],20,20);
+      cx2.font = "8px Arial";
+      cx2.fillStyle = "white";
+      cx2.fillText(A.length, x[i]+12,y[i]+20);
+      x[i]+=20;
+    };
+      donicon.src=donicon_src[3];
+      donicon.onload=function(){
+        if(B.length>0){
+        cx2.drawImage(donicon,x[i],y[i],20,20);
+        cx2.font = "8px Arial";
+        cx2.fillStyle = "white";
+        cx2.fillText(B.length, x[i]+12,y[i]+20);
+        x[i]+=20;
+      };
+        donicon.src=donicon_src[2];
+        donicon.onload=function(){
+          if(C.length>0){
+          cx2.drawImage(donicon,x[i],y[i],20,20);
+          cx2.font = "8px Arial";
+          cx2.fillStyle = "white";
+          cx2.fillText(C.length, x[i]+12,y[i]+20);
+          x[i]+=20;
+        };
+        donicon.src=donicon_src[4];
+        donicon.onload=function(){
+          if(E.length>0){
+          cx2.drawImage(donicon,x[i],y[i],20,20);
+          cx2.font = "8px Arial";
+          cx2.fillStyle = "white";
+          cx2.fillText(E.length, x[i]+12,y[i]+20);
+          x[i]+=20;
+        };
+        donicon.src=donicon_src[1];
+        donicon.onload=function(){
+          if(F.length>0){
+          cx2.drawImage(donicon,x[i],y[i],20,20);
+          cx2.font = "8px Arial";
+          cx2.fillStyle = "white";
+          cx2.fillText(F.length, x[i]+12,y[i]+20);
+          x[i]+=20;
+        }}}}};
+        };
+  };
+  };  
   function turnchecker(){
     console.log('turnchecker'+turn)
+    //抜きの場合はロン判定のみ行う
+    if(nuki[0]>0){
+      var Fr1=Buff[1].findIndex(value=>value==6);
+      var Fr2=Buff[2].findIndex(value=>value==6);
+      var Fr3=Buff[3].findIndex(value=>value==6);
+      var Fr4=Buff[4].findIndex(value=>value==6);
+      if(rorder[1] !==2){
+      if(rorder[1]==0 && turn !==0 && Fr1==-1){ron(1)};
+      if(rorder[2]==0 && turn !==1 && Fr2==-1){ron(2)}
+      if(rorder[3]==0 && turn !==2 && Fr3==-1){ron(3)}
+      if(rorder[4]==0 && turn !==3 && Fr4==-1){ron(4)}
+      }
+      if(hand1[0]==-2){
+        se6.play();
+        //cx2.clearRect(630,400,80,40)
+        turntemp =turn
+        turn=4
+        e18.src=eltearB_src[3];
+        e18.onload=function(){
+          e19.src=eltearB_src[4];
+          e19.onload=function(){
+        cx3.drawImage(e18,326,348,148,142)
+        cLock=1;
+        corsor();
+        console.log('操作可',cLock)
+        }}
+      }else if(hand2[0]==-2){
+      //ron(2)
+      turntemp=turn
+      turn=5
+      cpu(2);
+      }else if(hand3[0]==-2){
+      //ron(3)
+      turntemp=turn
+      turn=6
+      cpu(3);
+      }else if(hand4[0]==-2){
+      //ron(4)
+      turntemp=turn
+      turn=7
+      cpu(4);
+      }else{
+        //ロン処理
+        if(Ronturn.length>0){
+          //var ronn=...になっていたが問題なかった？
+          setTimeout(function(){
+            TumoRon(Ronturn[0],turn+1);
+            Ronturn.shift();
+            }, 550);
+          return false;
+        }
+        //ターンを回す
+      turn =nuki[0]-1;
+      console.log(turn,Ronturn)
+      Buffdraw(1);
+      Buffdraw(2);
+      Buffdraw(3);
+      Buffdraw(4);
+      turnrole();
+      }
+      return false;
+    }
     //捨て牌で誰も上がらないならターンを回す
-    //ダブロン
     //ロン＞ポン
     //だれもロンしないなら隣の人がポンするか判定
     var Fr1=Buff[1].findIndex(value=>value==6);
@@ -3878,6 +3705,10 @@ switch (musicset[2]){
         break;
     }
     console.log(turn,Ronturn)
+    Buffdraw(1);
+    Buffdraw(2);
+    Buffdraw(3);
+    Buffdraw(4);
     turnrole();
     }
     }}
@@ -3982,7 +3813,6 @@ function handgraph(num,player){
     drawDP(player);
     turnchecker();
     }}
-    //turnrole();
     }
     if(num ==0){//*
     reachhand=[];
@@ -4137,11 +3967,10 @@ function handgraph(num,player){
     }
     if(num ==-1){//最初だけ
       //e1~e4を使って自分の手札を描画
-      //cx1.clearRect(0,480,800,580)
+      console.log(hand1);
       hand1x =100
       hand2x =hand1x+size*3
       hand3x =hand2x+size*3
-      //forが速すぎたので1個ずつonloadでかいていくよ
       var h=1
       var c=4
       var d=7
@@ -4216,7 +4045,8 @@ function handgraph(num,player){
       }
   
     }
-function Setup(){//デュエル開始の宣言をする
+function Setup(pvp=0){
+  //デュエル開始の宣言をする pvp時1に
   se1.play();
   navisw=0;
   DP =new Array(0,0,0,0,0)
@@ -4275,6 +4105,7 @@ hand1[hand1.length-1]=100
 console.log(tumotemp,hand1.length-1,hand1[num],hand1[hand1.length-1])
 if(turn ==0 && ctl[1]==0){
 if(ippatu[1]==1){ippatu[1]=2}
+if(nuki[0]==5){nuki[0]=0};
 if(reach[1] ==2){
 cx1.font = "bold 16px 'Century Gothic'";
 cx1.fillStyle = "orange";
@@ -4311,6 +4142,12 @@ cx2.clearRect(630,440,80,40)
 cx2.fillStyle = "rgba(20,20,20,0.5)";
 cx2.fillRect(630,440,80,40)
 }
+if(nukiswitch[1]>0){
+  nukiswitch[1]=0;
+    cx2.clearRect(710,440,80,40)
+    cx2.fillStyle = "rgba(20,20,20,0.5)";
+    cx2.fillRect(710,440,80,40)
+}
 if(chara[1]!==0){
   //スキル欄
 cx2.clearRect(710,400,80,40)
@@ -4344,8 +4181,10 @@ if(thinkTime >t*1000){
 PlayertoCpu(9);}
 }}
 
-  function turnrole(){
-    console.log('turnrole',turn)
+  function turnrole(pvp=0){
+    console.log('turnrole',pvp,turn)
+    //pvp=1モードの時は考える
+
     //ネクストバッターのctl[n]を0にしてターンを回す
     //player->ツモったら1にする
     //無限に呼び出し処理が終わったら2にする?
@@ -4460,12 +4299,24 @@ function drawstep(){
       //cx2.clearRect(710,400,80,40)
       drawbuttom(710,400,"スキル");
     }
+    var A=hand1.findIndex(value => value==42);
+    if(A!==-1 && deck.length > 0){
+      nukiswitch[1]=1;
+      se1.play();
+      drawbuttom(710,440,"抜き")
     }
+    }
+  if(nuki[0]==1){nuki[0]=5};
   if(judge(1)){hand1[0]=-3};
   if(deck.length==0 && reach[1]!==3){reach[1]=0};
   if(reach[1] ==1){
-    se1.play();
+    if(nukiswitch[1]!==1){se1.play()};//SE同時に鳴らないように
     drawbuttom(630,440,"リーチ")};
+  if(reach[1]==3 && tumo ==42 && deck.length > 0){
+    nukiswitch[1]=1;
+    se1.play();
+      drawbuttom(630,440,"抜き")
+    }
   if(hand1[0]==-3){
     se6.play();
     e18.src=eltearB_src[1];
@@ -5359,6 +5210,8 @@ function drawstep(){
       han[player]+=6;
     }
     if(num==0 && ponsw[player] ==0){han[player] +=1}//門前ツモ
+    han[player]+=nuki[player];
+    if(nuki[0]>0){han[player]+=1}//嶺上
     if(ippatu[player]==1){han[player] +=1}
     if(counter[player] ==0 && num==0){han[player] +=4}//天和 4翻
     if(deck.length ==0){han[player] +=1};//海底
@@ -5497,6 +5350,15 @@ function drawstep(){
         PB("国士無双");
         haiy +=25
       }
+    if(nuki[0]>0){
+      if(num==0){
+        cx2.fillText('嶺上開花 1翻',haix,haiy)
+    }else{
+        cx2.fillText('槍槓 1翻',haix,haiy);
+    }
+      //嶺上は記録しない
+      haiy +=25
+    }//嶺上
     if(num==0 && ponsw[player]==0){
     cx2.fillText('門前ツモ 1翻',haix,haiy)
     PB("門前ツモ");
@@ -5515,6 +5377,10 @@ function drawstep(){
       cx2.fillText('ドラ '+doracheck+'翻',haix,haiy)
       haiy +=25
       }
+    if(nuki[player]>0){
+      cx2.fillText('抜き '+nuki[player]+'翻',haix,haiy)
+      haiy +=25
+    };
     if(ponsw[player] >0){
         cx2.fillText('鳴き -2翻',haix,haiy)
         haiy +=25
@@ -7005,7 +6871,7 @@ function drawstep(){
           if(mouseY >260 && mouseY < 310){
       cx2.clearRect(80,530,670,70)
       cx2.strokeRect(86,261,288,48)
-      cx2.fillText("たいせん　他のプレイヤーとドンジャラをします。", 80, 550);
+      cx2.fillText("たいせん　工事中", 80, 550);
           }
           if(mouseY >310 && mouseY < 360){
       cx2.clearRect(80,530,670,70)
@@ -7370,6 +7236,19 @@ function drawstep(){
         cx3.strokeRect(711,401,78,38)
         }}
       }
+      if(nukiswitch[1]>0){
+        if(mouseY >430 && mouseY< 490){
+          if(mouseX >700 && mouseX<800){
+          cx3.clearRect(4,490,762,110)
+          cx3.clearRect(710,440,80,40)
+          }}
+        if(mouseY >440 && mouseY <480){
+          if(mouseX >710 && mouseX <790){
+          cx3.strokeStyle ='yellow'
+          cx3.lineWidth = 2;
+          cx3.strokeRect(711,441,78,38)
+          }}
+        }
         if(reach[1]==1){
     if(mouseY >430 && mouseY <490){
     if(mouseX >620 && mouseX <720){
@@ -7873,7 +7752,51 @@ function PonAnimation(ts,A=0,B){
     }
     }
   };
-  
+function NukiAnimation(ts,A=0,B){
+    //Ponからコピー
+      cx4.globalAlpha = alpha;
+      A+=1;
+      loopX+=3
+      loopX2+=80
+      var x=loopX*4
+      var xx=loopX*3
+      var y=300
+      y -=loopX*1.5
+      if(xx>50){xx=50};
+      if(x>=800){loopX=0}
+      if(loopX2>=500){loopX2=500}
+      cx4.clearRect(0,0,800,600)
+      cx4.fillStyle = "#001c0d";
+      cx4.fillRect(0,250-xx,800,xx*2);
+      cx4.drawImage(e15,400,200-xx,300,xx*2,loopX2,250-xx,300,xx*2)
+      cx4.strokeStyle = "white";
+      cx4.lineWidth = 6;
+      cx4.beginPath();
+      cx4.moveTo(0,250-xx);
+      cx4.lineTo(800,250-xx);
+      cx4.stroke();
+      cx4.beginPath();
+      cx4.moveTo(0,250+xx);
+      cx4.lineTo(800,250+xx);
+      cx4.stroke();
+      cx4.rotate(-15*Math.PI/180);
+      cx4.font = "bold 64px Arial";
+      cx4.fillStyle = "#919191";
+      var Reachtext='抜き'
+      cx4.strokeText(Reachtext,50,300);
+      cx4.fillText(Reachtext,50,300);
+      cx4.rotate(15*Math.PI/180);
+      if(alpha>0){
+      if(A<30){window.requestAnimationFrame((ts)=>NukiAnimation(ts,A,B));}else{
+      alpha -=0.1
+      window.requestAnimationFrame((ts)=>NukiAnimation(ts,A,B));}
+      }else if(alpha <=0){
+      cx4.clearRect(0,0,800,600);cx4.globalAlpha = 1;
+      console.log(B)
+      NukiSkill(B,1);
+      }
+    };
+    
 function SkillAnimation(ts){
   cx4.globalAlpha = alpha;
 cx4.clearRect(0,0,800,600)
@@ -8516,7 +8439,38 @@ function SpecialSkill(player,target=0){
     }
   }
   }//specialskill
-  
+
+function NukiSkill(player,n=0){
+//42を切ったあと、もう一度自分のターンとなる
+//nアニメ回した後に行う処理
+if(nukiswitch[player]==0){
+  console.log('おまじない')
+  return false;
+}
+if(n==0){
+  //まずアニメーションへ
+  loopX=0
+  loopX2=0;
+  alpha=1;
+  cx2.clearRect(630,400,80,40)
+  cx2.fillStyle = "rgba(20,20,20,0.5)";
+  cx2.fillRect(630,400,80,40)
+  e15.src=chrimg_src[chara[player]]
+  e15.onload=function(){
+    se8.play();
+    window.requestAnimationFrame((ts)=>NukiAnimation(ts,0,player))
+}
+}else{
+switch(player){
+  case 1:
+  var N=hand1.findIndex(value=>value==42);
+  reach[1]=0;
+  nuki[1]+=1;
+  nuki[0]=player;
+  PlayertoCpu(N);
+    break;
+}
+}};
 
 function gameover(){//けっかはっぴょぉうする
   musicnum=0;
