@@ -1,8 +1,5 @@
-//var0.75 つうしんたいせん
-//バグ・不具合
-//対局中に接続が切れた際の対処 playing->waitingにするか
-//デスマッチ工事中
-//キル・デス情報はまだ同期していない;
+//var0.90 つうしんたいせん
+//デスマッチ キル・デス情報はまだ同期していない;
 
 window.onload = function(){
   draw();
@@ -220,7 +217,7 @@ window.onload = function(){
   //6-9:ベルドレイド？
   var LPtemp=new Array(0,0,0,0,0)
   var chara =new Array(0,0,0,0,0)
-  var debugmode=true;  //コンソールログの表示を切り替えたり　リリースする前にfalseにする
+  var debugmode=false;  //コンソールログの表示切り替え　リリース時falseに
   //mpmove
   var Mpai = 0;
   var CMpai;
