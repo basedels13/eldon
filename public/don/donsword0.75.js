@@ -1,6 +1,4 @@
-//var0.75 つうしんたいせん
-//バグ・不具合
-//対局中に接続が切れた際の対処 playing->waitingにするか
+//var0.91 つうしんたいせん
 //デスマッチ工事中
 //キル・デス情報はまだ同期していない;
 
@@ -9,7 +7,8 @@ window.onload = function(){
   };
   
   function draw(){
-    //自分自身の情報を入れる箱
+  var debugmode=false;  //コンソールログの表示の切り替え　リリース時にfalseに
+  //自分自身の情報を入れる箱
   var IAM = {
     token: null,    // 戸別管理用のトークン
     name: null,     // 名前
@@ -220,7 +219,6 @@ window.onload = function(){
   //6-9:ベルドレイド？
   var LPtemp=new Array(0,0,0,0,0)
   var chara =new Array(0,0,0,0,0)
-  var debugmode=true;  //コンソールログの表示を切り替えたり　リリースする前にfalseにする
   //mpmove
   var Mpai = 0;
   var CMpai;
@@ -235,7 +233,7 @@ window.onload = function(){
   //chara0 0->cpuランダム 1->cpu決める
   //覚醒ゲージ0-30
   var DP =new Array(0,0,0,0,0)
-  //バフ 1スキン 2マナシールド 3ネイチャ 4ナソコア 5ほうせんきょ 6凍結
+  //バフ 1スキン 2マナシールド 3ネイチャ 4ナソコア 5やけど 6凍結 7ほうせんきょ
   //11マナブレ
   var Buff =new Array(0,[],[],[],[])
   //再発動間隔測る用の配列
@@ -287,13 +285,14 @@ window.onload = function(){
   var musiclistDT=[
   {title:"0",elia:"0",nod:"0"},
   {title:"夜の迷宮の入口",elia:"提供",nod:"ラビィのテーマのイメージ"},
-  {title:"決闘のテーマ",elia:"提供",nod:"Elsword music007_boss <耳コピ>"},
+  {title:"決闘のテーマ",elia:"提供",nod:"from Elsword music007_boss <耳コピ>"},
   {title:"盲目のアストライア",elia:"ISAo",nod:"@ DOVA-SYNDROM"},
   {title:"The Evil Sacrifice Archenemies",elia:"ISAo",nod:"@ DOVA-SYNDROM"},
   {title:"Nine Jack",elia:"まんぼう二等兵",nod:"@ DOVA-SYNDROM"},
   {title:"ロベリア",elia:"まんぼう二等兵",nod:"@ DOVA-SYNDROM"},
   {title:"リーチっぽい音楽",elia:"提供",nod:"アトラスシティーのイメージ"},
-  {title:"狂乱のオーラス",elia:"提供",nod:"Elsword music092_boss <耳コピ>"},
+  {title:"狂乱のオーラス",elia:"提供",nod:"from Elsword music092_boss <耳コピ>"},
+  {title:"エルの樹の麓",elia:"提供",nod:"from Elsword music005_stage <耳コピ>"},
   ]
   var skilltext=[{fir:"0",sec:"0",thr:"0"},
   {fir:"フレイムガイザー",sec:"FLAME GEYSER",thr:"0"},
@@ -757,6 +756,12 @@ window.onload = function(){
     loopEnd: 129250,
     volume: 0.3,
   };
+  const bgm9data ={
+    src: "don/Sortie_Rena.mp3",
+    loopStart: 10200,
+    loopEnd: 145040,
+    volume: 0.3,
+  };
   const bgm17data ={
     src: "don/STARDUST_LEMON.mp3",
     loopStart: 33450,
@@ -771,6 +776,7 @@ window.onload = function(){
       Bgm=new Music(bgm6data);
       Bgm=new Music(bgm7data);
       Bgm=new Music(bgm8data);
+      Bgm=new Music(bgm9data);
       Bgm=new Music(bgm17data);
   var musicnum=0
     se1.load();
@@ -1346,6 +1352,10 @@ window.onload = function(){
           break;
         case 8:
           Bgm =new Music(bgm8data);
+          Bgm.playMusic();
+          break;
+        case 9:
+          Bgm =new Music(bgm9data);
           Bgm.playMusic();
           break;
         default:
@@ -2556,6 +2566,10 @@ window.onload = function(){
                   Bgm =new Music(bgm8data);
                   Bgm.playMusic();
                 break;
+                case 9:
+                  Bgm =new Music(bgm9data);
+                  Bgm.playMusic();
+                  break;
               }
             drawbuttom(690,200,"Play",1,60,40)
             drawbuttom(690,270,"Play",0,60,40)
@@ -2606,6 +2620,10 @@ window.onload = function(){
                   Bgm =new Music(bgm8data);
                   Bgm.playMusic();
                 break;
+                case 9:
+                  Bgm =new Music(bgm9data);
+                  Bgm.playMusic();
+                  break;
               }
               drawbuttom(690,200,"Play",0,60,40)
               drawbuttom(690,270,"Play",1,60,40)
@@ -2656,6 +2674,10 @@ window.onload = function(){
                   Bgm =new Music(bgm8data);
                   Bgm.playMusic();
                 break;
+                case 9:
+                  Bgm =new Music(bgm9data);
+                  Bgm.playMusic();
+                  break;
               }
             drawbuttom(690,200,"Play",0,60,40)
             drawbuttom(690,270,"Play",0,60,40)
@@ -3763,7 +3785,7 @@ if(opLock==0 && gamestate ==1){
           }
         }else{
         //対局を止める
-        if(opLock==0 && gamestate ==1 && cLock==1){
+        if(opLock==0 && gamestate ==1){
         opLock=2;
         cx4.globalAlpha=1;
         se2.play();
@@ -4149,6 +4171,10 @@ if(opLock==0 && gamestate ==1){
           Bgm =new Music(bgm8data);
           Bgm.playMusic();
         break;
+        case 9:
+          Bgm =new Music(bgm9data);
+          Bgm.playMusic();
+          break;
         default:
           console.log(musicnum,'bgm error!')
           Bgm.stop();
@@ -4189,6 +4215,10 @@ if(opLock==0 && gamestate ==1){
         Bgm =new Music(bgm8data);
         Bgm.playMusic();
       break;
+      case 9:
+        Bgm =new Music(bgm9data);
+        Bgm.playMusic();
+        break;
       default:
         console.log(musicnum,'bgm error!')
         Bgm.stop();
@@ -4427,6 +4457,10 @@ if(opLock==0 && gamestate ==1){
             Bgm =new Music(bgm8data);
             Bgm.playMusic();
           break;
+          case 9:
+            Bgm =new Music(bgm9data);
+            Bgm.playMusic();
+            break;
           default:
             console.log(musicnum,'bgm error!')
             Bgm.stop();
@@ -4467,6 +4501,10 @@ if(opLock==0 && gamestate ==1){
           Bgm =new Music(bgm8data);
           Bgm.playMusic();
         break;
+        case 9:
+          Bgm =new Music(bgm9data);
+          Bgm.playMusic();
+          break;
         default:
           console.log(musicnum,'bgm error!')
           Bgm.stop();
@@ -5464,6 +5502,10 @@ if(opLock==0 && gamestate ==1){
             Bgm =new Music(bgm8data);
             Bgm.playMusic();
           break;
+          case 9:
+            Bgm =new Music(bgm9data);
+            Bgm.playMusic();
+            break;
           default:
             console.log(musicnum,'bgm error!')
             Bgm.stop();
@@ -6350,16 +6392,12 @@ if(opLock==0 && gamestate ==1){
                           LPrank[i].elia+=25000*(LPrank[i].pon/3);
                         }
                         LPrank.sort(compareFunc2);
-          if(T1.length>=1 && T2.length>=1 && T3.length>=1 && T4.length>=1){
             if(LPrank[3].chara ==chr){
               SpecialSkill(chr,LPrank[2].chara);
               }else{
               SpecialSkill(chr,LPrank[3].chara);
               }
               return true;
-                }else{
-                  return false;
-                }
             break;
           case 2:
             //ア//メモライズ
@@ -9938,7 +9976,7 @@ if(opLock==0 && gamestate ==1){
           case 4:
           var Skin=Buff[target].findIndex(value=>value==1);
           if(Skin ==-1){
-            Buff[target].push(5,5,5)
+            Buff[target].push(5,5,5,5,5)
             Buffdraw(target);
             console.log(Buff[target]);
             DP[player]-=20;
@@ -9991,7 +10029,7 @@ if(opLock==0 && gamestate ==1){
               if(player!==target && target!==100){
               var Skin=Buff[target].findIndex(value=>value==1);
               if(Skin ==-1){
-                Buff[target].push(5,5,5)
+                Buff[target].push(5,5,5,5,5)
                 Buffdraw(target);
                 console.log(Buff[target]);
                 DP[player]-=20;
@@ -10512,7 +10550,7 @@ if(opLock==0 && gamestate ==1){
       cx2.font = "13px Arial";
       cx2.fillText("MP消費:2ゲージ", 635, 210);
       cx2.fillText("対象:プレイヤー1人", 635, 230);
-      cx2.fillText("効果:対象を3巡の間", 635, 250);
+      cx2.fillText("効果:対象を5巡の間", 635, 250);
       cx2.fillText("「火傷」状態にする.", 635, 270);
       }else if(p==2){
         var MS=Buff[player].filter(value=>value==2)
@@ -10545,7 +10583,7 @@ if(opLock==0 && gamestate ==1){
       cx2.font = "14px Arial";
       cx2.fillText("MP消費:2ゲージ", 635, 230);
       cx2.fillText("対象:他のプレイヤー1人", 635, 250);
-      cx2.fillText("効果:対象を2巡の間", 635, 270);
+      cx2.fillText("効果:対象を3巡の間", 635, 270);
       cx2.fillText("「凍結」状態にする.", 635, 290);
       }else{
       cx2.font = "bold 16px Arial";
@@ -10610,12 +10648,10 @@ if(opLock==0 && gamestate ==1){
             break;
           case 5:
             cx2.font = "bold 16px Arial";
-            cx2.fillText("咆仙経", 635, y);
+            cx2.fillText("火傷", 635, y);
             cx2.font = "14px Arial";
             y+=20;
-            cx2.fillText(" リーチ時,高確率で", 635, y);
-            y+=20
-            cx2.fillText(" 一発ツモする.", 635, y);
+            cx2.fillText(" ポン不可", 635, y);
             y+=20
             break;
           case 6:
