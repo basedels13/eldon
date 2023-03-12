@@ -219,7 +219,6 @@ window.onload = function(){
   //6-9:ベルドレイド？
   var LPtemp=new Array(0,0,0,0,0)
   var chara =new Array(0,0,0,0,0)
-  var debugmode=true;  //コンソールログの表示を切り替えたり　リリースする前にfalseにする
   //mpmove
   var Mpai = 0;
   var CMpai;
