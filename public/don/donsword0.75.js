@@ -1088,8 +1088,8 @@ window.onload = function(){
   }}}}}
   
   if(loadstate <loadmax){
-    cx3.fillStyle = "rgb(0,0,0)";
-  cx3.fillRect(0, 0, 800, 600);
+  cx2.fillStyle = "rgb(0,0,0)";
+  cx2.fillRect(0, 0, 800, 600);
   cx3.font = "24px 'Century Gothic'";
   cx3.fillStyle = "#e4e4e4";
   　cx3.fillText( "Now Loading…",300,360)
@@ -1101,6 +1101,8 @@ window.onload = function(){
       createjs.Tween.get(Cstar)
       .to({x:A+100},300);
     loadstate+=1;
+    cx3.clearRect(260,260,120,60);
+    cx3.fillText( loadstate+"/"+loadmax,300,300)
     //console.log(loadstate,loadmax);
     if(loadstate>=loadmax){
       createjs.Tween.get(Cstar)
@@ -1288,14 +1290,15 @@ window.onload = function(){
               se10.volume(0);
               se11.volume(0);
               se12.volume(0);
+              jingle2.volume(0);
               if(debugmode){
               console.log(cx5.globalAlpha,cLock);
+                if(cLock==0){
+                  cLock=1;
+                }
               }
               cx5.clearRect(710, 10, 80, 38);
               cx5.globalAlpha = 1;
-              if(cLock==0){
-                cLock=1;
-              }
       //ミュートの切り替え
     if( mute=="OFF" ){
       se1.volume(0.25*sBar);
@@ -1310,6 +1313,7 @@ window.onload = function(){
       se10.volume(0.3*sBar);
       se11.volume(0.3*sBar);
       se12.volume(0.2*sBar);
+      jingle2.volume(0.3*sBar);
       Bgm.mute(false);
       switch (musicnum){
         case 1:
@@ -1344,11 +1348,8 @@ window.onload = function(){
           Bgm =new Music(bgm8data);
           Bgm.playMusic();
           break;
-        case 17:
-          Bgm =new Music(bgm17data);
-          Bgm.playMusic();
-        break;
         default:
+          //Bgm =new Music(bgm17data);はbgm多重に流れる可能性あるため削除
           console.log(musicnum,'bgm error!')
           Bgm.stop();
       }
@@ -1411,7 +1412,7 @@ window.onload = function(){
       var M=MEMBER.filter(value=>value.turnflag==2)
       var MM=4-M.length
       cx4.clearRect(0,0,800,600)
-      cx4.font = "bold 13px 'メイリオ'";
+      cx4.font = "bold 16px 'メイリオ'";
       cx4.fillStyle = "black";
       cx4.strokeStyle ="rgba(250,250,250,0.9)";
       cx4.lineWidth=5;
@@ -1529,7 +1530,7 @@ window.onload = function(){
     }}
     gamestate=0;
     }else if(gamestate ==3){//タイトルへ
-      if(pvpmode==1){
+      if(pvpmode==1 && gamestate !==10){
         console.log('ロビーに戻る',IAM.room);
         //cx4.clearRect(0,0,800,600);
           Bgm =new Music(bgm17data);
@@ -1545,8 +1546,10 @@ window.onload = function(){
             socket.emit("game_over", {Token:IAM.token,room:RoomName[IAM.room],type:1});
             return false;
       }
+      if(pvpmode==0){
     pagestate =0;
     gamestate=10;
+      }
     console.log(pagestate)
     }else if(gamestate ==1){
       if(opLock==3){
@@ -1600,9 +1603,15 @@ window.onload = function(){
         //escによる終了
         if(mouseX >220 && mouseY > 240 && mouseX <340 && mouseY <300){
         se3.play();
-        scoretemp[0]=-1;
+        scoretemp[0]=-2;
         cx4.clearRect(0,0,800,600)
         opLock=0;
+        cx4.globalAlpha=1;
+        cx4.font = "bold 26px 'メイリオ'";
+        cx4.fillStyle = "white";
+        var RsString=['ルーム長がトイレに行きました','ルーム長権限が発動しました','ルーム長がゲームを終了させました'];
+        var A=Math.floor(Math.random()*RsString.length);
+        cx4.fillText(RsString[A],50,590);
         gameover();
         }
       return false;
@@ -1648,6 +1657,7 @@ window.onload = function(){
         }
       }
       if(mouseX >0 && mouseX< 100){
+      if(pvpmode==0){
         if(cLock==1){
           se4.play();
           if(navisw==1){navisw=0}else{navisw=1};
@@ -1656,6 +1666,7 @@ window.onload = function(){
         if(mouseY >200 && mouseY<300){Skillname(3,navisw);}
         if(mouseY >300 && mouseY<400){Skillname(4,navisw);}
         if(mouseY >400 && mouseY<480){Skillname(1,navisw);}
+        }
     }}
     if(cLock==3){
       //**スキルで自分のパイ選択画面
@@ -2166,6 +2177,19 @@ window.onload = function(){
             Menu();
             }
           }}
+          if(mouseX >120 && mouseX <340){
+            if(mouseY >95 && mouseY < 155){
+              //実績リストボタンその2
+              e10.src=chrimg_src[chara[1]]
+              e10.onload=function(){
+              cx2.clearRect(675,390,80,50)
+              cx3.clearRect(675,385,80,60)
+              pagestate=5;
+              msgstate=-1;
+              se5.play();
+              Menu();
+              }
+            }}
         break;
         case 3:
           //フリバへ
@@ -2892,28 +2916,30 @@ window.onload = function(){
           case 5:
               //実績
             if(mouseX >700 && mouseX <750 && mouseY >50 && mouseY <100){
+              if(msgstate !==-1){
               pagestate=0;
               msgstate=0;
               se2.play();
               Menu();
+              }
               return false;
             }
             if(mouseX >60 && mouseX <190 && mouseY >80 && mouseY <125){
-              if(msgstate!==0){
+              if(msgstate>0){
               msgstate=0;
               se4.play();
               Menu();
               }
             }
             if(mouseX >60 && mouseX <190 && mouseY >125 && mouseY <170){
-              if(msgstate!==1){
+              if(msgstate!==1 && msgstate !==-1){
               msgstate=1;
               se4.play();
               Menu();
               }
             }
             if(mouseX >60 && mouseX <190 && mouseY >170 && mouseY <215){
-              if(msgstate!==2){
+              if(msgstate!==2 && msgstate !==-1){
               msgstate=2;
               se4.play();
               Menu();
@@ -3485,6 +3511,17 @@ window.onload = function(){
   });
   //入室状態更新
   socket.on("room-update", (data)=>{
+    if(gamestate>=0 && gamestate<=2){
+      cx4.globalAlpha = 1;
+      cx4.clearRect(0,0,800,600);
+      cx4.font = "bold 26px 'メイリオ'";
+      cx4.fillStyle = "white";
+      cx4.fillText('ルーム人数が変化したため、ゲームが終了しました',50,590);
+      se3.play();
+      scoretemp[0]=-1;
+      opLock=0;
+      gameover();
+    }else if(gamestate==10){
     //data.focus 0->誰かが入室してきた 1->ready 2->ゲームオーバーのあと
     if(IsHost(IAM.room && data.focus==0)){
       //ルーム設定を同期
@@ -3682,6 +3719,7 @@ window.onload = function(){
           break;
       }
     console.log('room updated')
+  }
   });
    break;
     }
@@ -3696,8 +3734,34 @@ window.onload = function(){
       if(e.keyCode==27 && key27==0){
         key27=1;
         if(pvpmode==1){
-          return false;
-        }
+          if(IsHost(IAM.room)){
+//対局を止める
+if(opLock==0 && gamestate ==1){
+  opLock=2;
+  cx4.globalAlpha=1;
+  se2.play();
+  cx4.fillStyle = "rgba(20,20,20,0.7)";
+  cx4.fillRect(0,0,800,600)
+  cx4.font = "bold 26px 'メイリオ'";
+  cx4.fillStyle = "black";
+  cx4.strokeStyle ="rgba(250,250,250,0.9)";
+  cx4.lineWidth=5;
+  cx4.strokeText("タイトル画面に戻りますか？",240,200);
+  cx4.fillText("タイトル画面に戻りますか？",240,200);
+  cx4.fillStyle="#ff3838";
+  cx4.strokeRect(220,240,120,60)
+  cx4.fillRect(220,240,120,60)
+  cx4.fillStyle = "#f0f0f0";
+  cx4.font = "bold 24px 'メイリオ'";
+  cx4.fillText("YES",250,280);
+  cx4.fillStyle="#3898ff";
+  cx4.strokeRect(460,240,120,60)
+  cx4.fillRect(460,240,120,60)
+  cx4.fillStyle = "#f0f0f0";
+  cx4.fillText("NO",500,280);
+  }
+          }
+        }else{
         //対局を止める
         if(opLock==0 && gamestate ==1 && cLock==1){
         opLock=2;
@@ -3723,6 +3787,7 @@ window.onload = function(){
         cx4.fillStyle = "#f0f0f0";
         cx4.fillText("NO",500,280);
         }}
+      }
       }
   var yakumapYmax;
   function Yakucheck2(move=0){
@@ -5922,6 +5987,7 @@ window.onload = function(){
     //必要な情報をポイする
     socket.emit("throwed_pai",{Num:1,Player:1,who:MEMBER[0].id,Token:IAM.token,room:RoomName[IAM.room],Tumotemp:tumotemp,Reach:reach,Ippatu:ippatu,Nuki:nuki,Dp:DP,mb:ManaBreak,Hand:{hand1,hand2,hand3,hand4}});
   }else{
+    
   handgraph(1,1)
   }
   };
@@ -8754,7 +8820,6 @@ window.onload = function(){
         cx2.clearRect(80,530,670,70)
         cx2.strokeRect(120,95,220,60)
         cx2.fillText("あなたのプロフィールです。", 80, 550);
-        cx2.fillText("k※設定を変更する場合は右下の虫眼鏡をクリック", 80, 570)
             }}
               if(mouseX >80 && mouseX <380){
             if(mouseY >160 && mouseY < 210){
@@ -9369,11 +9434,17 @@ window.onload = function(){
       Skillname(1);
     }}
         if(mouseX >0 && mouseX< 100){
-          //クリックで切り替えできるように
+          if(pvpmode==1){
+            if(mouseY >100 && mouseY<200){Skillname(2,1);}
+            if(mouseY >200 && mouseY<300){Skillname(3,1);}
+            if(mouseY >300 && mouseY<400){Skillname(4,1);}
+            if(mouseY >400 && mouseY<480){Skillname(1,1);}
+          }else{
           if(mouseY >100 && mouseY<200){Skillname(2,navisw);}
           if(mouseY >200 && mouseY<300){Skillname(3,navisw);}
           if(mouseY >300 && mouseY<400){Skillname(4,navisw);}
           if(mouseY >400 && mouseY<480){Skillname(1,navisw);}
+          }
       }
       //河,riverx,120=>110,33,43.5
         }
@@ -10094,7 +10165,7 @@ window.onload = function(){
         case 4:
         var Skin=Buff[target].findIndex(value=>value==1);
         if(Skin ==-1){
-          Buff[target].push(6,6)
+          Buff[target].push(6,6,6)
           Buffdraw(target);
           console.log(Buff[target]);
           DP[player]-=20;
@@ -10147,7 +10218,7 @@ window.onload = function(){
             if(player!==target && target!==100){
             var Skin=Buff[target].findIndex(value=>value==1);
             if(Skin ==-1){
-              Buff[target].push(6,6)
+              Buff[target].push(6,6,6)
               Buffdraw(target);
               console.log(Buff[target]);
               DP[player]-=20;
@@ -10229,18 +10300,30 @@ window.onload = function(){
   }};
   socket.on("game-over", (data)=>{
     if(IAM.token!==data.Token){
+      if(data.scoretemp==-1){
+        scoretemp[0]=-1;
+      }
+      if(data.scoretemp==-2){
+        scoretemp[0]=-1;
+        cx4.globalAlpha=1;
+        cx4.font = "bold 26px 'メイリオ'";
+        cx4.fillStyle = "white";
+        var RsString=['ルーム長がトイレに行きました','ルーム長権限が発動しました','ルーム長がゲームを終了させました'];
+        var A=Math.floor(Math.random()*RsString.length);
+        cx4.fillText(RsString[A],50,590);
+      }
       gameover();
     }
   });
   function gameover(){//けっかはっぴょぉうする
     if(pvpmode==1){
-      cx4.clearRect(0,0,800,600);
+      cx4.clearRect(0,0,800,500);
       jingle2.seek(1);
       jingle2.play();
       tweeNsquare.paused=true;
       Csquare.alpha=0;
       if(IsHost(IAM.room)){
-        socket.emit("game_over", {Token:IAM.token,room:RoomName[IAM.room],type:0});
+        socket.emit("game_over", {Token:IAM.token,room:RoomName[IAM.room],type:0,scoretemp:scoretemp[0]});
       }
     }
     musicnum=0;
@@ -10248,34 +10331,85 @@ window.onload = function(){
     Bgm.on("fade", ()=>{
     Bgm.stop();
     });
-    //ユーザー名をcpu2とかにされたらたまらんので
+            //ユーザー名をcpu2とかにされたらたまらんので
     var LPresult=[
-    {pc:"Player", chara:chara[1], elia:LP[1]},
-    {pc:"CPU2", chara:chara[2], elia:LP[2]},
-    {pc:"CPU3", chara:chara[3], elia:LP[3]},
-    {pc:"CPU1", chara:chara[4], elia:LP[4]},
-      ]
+      {pc:"Player", chara:chara[1], elia:LP[1]},
+      {pc:"CPU2", chara:chara[2], elia:LP[2]},
+      {pc:"CPU3", chara:chara[3], elia:LP[3]},
+      {pc:"CPU1", chara:chara[4], elia:LP[4]},
+        ]
+      if(pvpmode==1){
+        for(var i=0; i<LPresult.length;i++){
+          LPresult[i].pc=MEMBER[i].name
+        }
+      }
     LPresult.sort(compareFunc2);
     console.log(LPresult)
+    var RankingStr=["1st","2nd","3rd","4th"];
+    if(LPresult[3].elia==LPresult[2].elia){
+      RankingStr[1]=RankingStr[0];
+    }
+    if(LPresult[2].elia==LPresult[1].elia){
+      RankingStr[2]=RankingStr[1];
+    }
+    if(LPresult[1].elia==LPresult[0].elia){
+      RankingStr[3]=RankingStr[2];
+    }
     gamestate=3;
     cx1.fillStyle = "#001c0d";
     cx1.fillRect(0,0,800,600)
     cx2.clearRect(0,0,800,600)
     e10.src=chrimg_src[LPresult[3].chara]
       e10.onload=function(){
-    cx2.drawImage(e10,400,0,300,600,0,100,200,400)
+    cx2.drawImage(e10,0,0,800,600,100,50,600,450)
     e10.src=chrimg_src[LPresult[2].chara]
       e10.onload=function(){
-    cx2.drawImage(e10,400,0,300,600,200,100,200,400)
+        if(LPresult[2].chara==1){
+          cx1.drawImage(e10,500,120,215,215,50,201,60,60)
+          }else{
+          cx1.drawImage(e10,500,50,215,215,50,201,60,60)
+          }
     e10.src=chrimg_src[LPresult[1].chara]
       e10.onload=function(){
-    cx2.drawImage(e10,400,0,300,600,400,100,200,400)
+        if(LPresult[1].chara==1){
+          cx1.drawImage(e10,500,120,215,215,50,301,60,60)
+          }else{
+          cx1.drawImage(e10,500,50,215,215,50,301,60,60)
+          }
     e10.src=chrimg_src[LPresult[0].chara]
       e10.onload=function(){
-    cx2.drawImage(e10,400,0,300,600,600,100,200,400)
+        if(LPresult[0].chara==1){
+          cx1.drawImage(e10,500,120,215,215,50,401,60,60)
+          }else{
+          cx1.drawImage(e10,500,50,215,215,50,401,60,60)
+          }
+    cx2.font = "bold 45px Arial";
+    cx2.fillStyle = "white";
+    cx2.fillText("終　局", 350, 48);
+    cx2.font = "bold 40px Arial";
+    cx2.fillText(RankingStr[0], 50, 100);
+    cx2.font = "bold 32px Arial";
+    cx2.fillText(RankingStr[1], 50, 200);
+    cx2.fillText(RankingStr[2], 50, 300);
+    cx2.fillText(RankingStr[3], 50, 400);
+    cx2.font = "26px Arial";
+    cx2.fillText("クリックで進む", 50, 550);
+    //1位
+    cx2.font = "bold 30px Arial";
+    cx2.fillText(LPresult[3].pc, 120, 130);
+    cx2.font = "bold 26px Arial";
+    cx2.fillText(LPresult[2].pc, 120, 230);
+    cx2.fillText(LPresult[1].pc, 120, 330);
+    cx2.fillText(LPresult[0].pc, 120, 430);
+  cx2.font = "bold 28px Arial";
+  cx2.fillText(LPresult[3].elia, 120, 160);
+  cx2.font = "bold 24px Arial";
+  cx2.fillText(LPresult[2].elia, 120, 260);
+  cx2.fillText(LPresult[1].elia, 120, 360);
+  cx2.fillText(LPresult[0].elia, 120, 460);
       //スコア更新
       console.log(scoretemp,achievetemp,achievetempB)
-      if(scoretemp[0]!==-1){
+      if(scoretemp[0]>=0){
         scoretemp[0]=3-LPresult.findIndex(value=>value.pc=="Player")
         highscore[0]+=1;
         if(scoretemp[1]>highscore[3]){highscore[3]=scoretemp[1];};
@@ -10328,44 +10462,6 @@ window.onload = function(){
         AK("クレストコンプリート")
       };
     };
-    cx2.font = "bold 32px Arial";
-    cx2.fillStyle = "white";
-    cx2.fillText("1st", 0, 50);
-    cx2.fillText("2nd", 200, 50);
-    cx2.fillText("3rd", 400, 50);
-    cx2.fillText("4th", 600, 50);
-    cx2.font = "bold 26px Arial";
-    if(pvpmode==1){
-      var x=10;
-      var y=80
-      for(var i=0;i<LPresult.length;i++){
-      switch(LPresult[i].pc){
-        case "Player":
-      cx2.fillText(MEMBER[3].name, x, y);
-          break;
-        case "CPU2":
-      cx2.fillText(MEMBER[2].name, x, y);
-          break;
-        case "CPU3":
-      cx2.fillText(MEMBER[1].name, x, y);
-          break;
-        case "CPU1":
-      cx2.fillText(MEMBER[0].name, x, y);
-          break;
-        }
-      x+=200;
-      };
-}else{
-    if(LPresult[3].pc=="player"){cx2.fillText(Username, 10, 80);}else{cx2.fillText(LPresult[3].pc, 10, 80);}
-    if(LPresult[2].pc=="player"){cx2.fillText(Username, 210, 80);}else{cx2.fillText(LPresult[2].pc, 210, 80);}
-    if(LPresult[1].pc=="player"){cx2.fillText(Username, 410, 80);}else{cx2.fillText(LPresult[1].pc, 410, 80);}
-    if(LPresult[0].pc=="player"){cx2.fillText(Username, 610, 80);}else{cx2.fillText(LPresult[0].pc, 610, 80);}
-}
-    cx2.font = "bold 24px Arial";
-    cx2.fillText(LPresult[3].elia, 10, 550);
-    cx2.fillText(LPresult[2].elia, 210, 550);
-    cx2.fillText(LPresult[1].elia, 410, 550);
-    cx2.fillText(LPresult[0].elia, 610, 550);
         }
         }}}
     }//
