@@ -1,6 +1,8 @@
 //var0.91 つうしんたいせん
 //デスマッチ工事中
 //キル・デス情報はまだ同期していない;
+//アイシャのCPUスキル後に止まることがある？
+//オプションの左側を追加する,対戦画面からオプションに移動できるようにする
 
 window.onload = function(){
   draw();
@@ -117,21 +119,21 @@ window.onload = function(){
   var Usercount=0;
   var RoomNum=[0,0,0];
   var RoomState=["open","open","open"];
-    var mouseX;
-    var mouseY;
-    var Savetitle =new Array("This is savedata of <https://azurelsword.web.fc2.com/ronan.html>",0,0);
-    var mute="ON"
-    var alpha = 0;
-    var loadstate=0;
-    var Username = "player";
-    var Usercrest = "称号なし";
-    const canvas = document.getElementById("canvas0");//ベースレイヤ。背景、置物
-    var canvas1 = document.getElementById("canvas1");//立ち絵,捨てパイ
-    var canvas2 = document.getElementById("canvas2");//パイ、ボタン
-    var canvas3 = document.getElementById("canvas3");//カーソル、
-    var canvas4 = document.getElementById("canvas4");//残パイ、アニメーション用
-    var canvas6 = document.getElementById("canvas6");//パイの一覧表用
-    var canvas5 = document.getElementById("canvas5");//カーソルのアニメーション用
+  var mouseX;
+  var mouseY;
+  var Savetitle =new Array("This is savedata of <https://azurelsword.web.fc2.com/ronan.html>",0,0);
+  var mute="ON"
+  var alpha = 0;
+  var loadstate=0;
+  var Username = "player";
+  var Usercrest = "称号なし";
+  const canvas = document.getElementById("canvas0");//ベースレイヤ。背景、置物
+  var canvas1 = document.getElementById("canvas1");//立ち絵,捨てパイ
+  var canvas2 = document.getElementById("canvas2");//パイ、ボタン
+  var canvas3 = document.getElementById("canvas3");//カーソル、
+  var canvas4 = document.getElementById("canvas4");//残パイ、アニメーション用
+  var canvas6 = document.getElementById("canvas6");//パイの一覧表用
+  var canvas5 = document.getElementById("canvas5");//カーソルのアニメーション用
   
     if ( ! canvas || ! canvas.getContext ) { return false; }
     var cx = canvas.getContext("2d");
@@ -165,14 +167,13 @@ window.onload = function(){
   graphics
     .beginRadialGradientFill(["white","orange"],[0.0,1.0],0,0,20,0,0,100)
     .drawPolyStar(0, 0, 50, 5, 0.4, -90);
-    var Cstar = new createjs.Shape(graphics);
-    Cstar.x=100;
-    Cstar.y=225;
+  var Cstar = new createjs.Shape(graphics);
+  Cstar.x=100;
+  Cstar.y=225;
   stage.addChild(Cstar); // 表示リストに追加
   var tweeNstar;
   tweeNstar=createjs.Tween.get(Cstar, {loop: true})
   .to({rotation:360},1200);
-
   var Csquare= new createjs.Shape();
   Csquare.graphics.beginFill("white").drawRect(0,0,135,100);
   Csquare.x=10;
@@ -185,6 +186,10 @@ window.onload = function(){
   .to({alpha:0.5},600);
   tweeNsquare.paused=true;
   Csquare.alpha=0;
+  var Clvup = new createjs.Bitmap("don/Don_fever.png");
+  Clvup.alpha=0;
+  stage.addChild(Clvup);
+
     //アップデートする
     createjs.Ticker.timingMode = createjs.Ticker.RAF;
     createjs.Ticker.addEventListener("tick",function(){
@@ -222,6 +227,7 @@ window.onload = function(){
   //mpmove
   var Mpai = 0;
   var CMpai;
+  var Fever =0;
   //ルーム設定
   var LP_PVP={Length:[1,"東風","半荘",],LP:[1,75000,150000,300000],Block:[1,"満貫あり","満貫なし"],Rule:[1,"サバイバル","デスマッチ"]};
   var mpmoving=false;
@@ -254,12 +260,10 @@ window.onload = function(){
   var raidlog=new Array(0,300000,0,0);//与ダメ、受ダメ、その他個別用、コンテニュー
   var raidscore=new Array(0,0,0)
   var LPlist=new Array("一般","ヘル","ミリオネア","∞")
-  var musiclist=new Array("test","夜の迷宮の入口","決闘のテーマ","盲目のアストライア","The Evil Sacrifice Archenemies","Nine Jack","ロベリア","リーチっぽい音楽","狂乱のオーラス")
+  var musiclist=new Array("test","夜の迷宮の入口","決闘のテーマ","盲目のアストライア","The Evil Sacrifice Archenemies","Nine Jack","ロベリア","リーチっぽい音楽","狂乱のオーラス","エルの樹の麓")
   var chrlist=new Array("名無しさん","エルス","アイシャ","レナ")//,"レイヴン","エド","アラ","ラビィ")
   var chrimg_src= new Array("don/Don_chara0.png","don/Don_chara1.png","don/Don_chara2.png","don/Don_chara3.png");
   var atrbute_src= new Array("don/Don_DP.png","don/Duel_mana.png","don/Duel_sun.png","don/Duel_aqua.png","don/Duel_wind.png","don/Duel_moon.png","don/Duel_gaia.png","don/Duel_heat.png","don/Don_HA.png");
-  var tour=new Array(1,"1回戦")
-  //push"準決勝","決勝","ランダム"
   var bgimg_src=new Array(1,"don/Don_bg1.png","don/elimg2.png","don/stadium2.png");
   //説明用
   var epic_src =new Array("don/elstudio_bg1.png","don/Don_epic1.png","don/Don_epic2.png","don/Don_epic3.png","don/Don_epicline.png","don/Don_ss11.png","don/Don_epic4.png");
@@ -280,7 +284,7 @@ window.onload = function(){
   //expected 45
   //バフアイコン
   var donicon=new Image();
-  var donicon_src= new Array("don/Don_buff.png","don/Don_mbicon.png")
+  var donicon_src= new Array("don/Don_buff.png","don/Don_mbicon.png","don/Don_fever.png")
   var win_src= new Array("don/win1.png","don/win1.png","don/win2.png","don/win3.png","don/win4.png","don/win5.png","don/win6.png","don/wintumo.png","don/winron.png","don/winreach.png");
   var musiclistDT=[
   {title:"0",elia:"0",nod:"0"},
@@ -558,10 +562,13 @@ window.onload = function(){
   //ツモロン判定用
   //cpuの思考用
   var Cpuhandtemp=[]
-  var cpuwant =0
+  var cpuwant =0;
+  //ポン頻度調整用 0->全部ポン　1->ポンしない
+  var Ponrate=0.4;
+  //MPチャージ速度
+  var mpVelocity=1;
   //初手の積み込み用
   var hand1b =new Array
-  
   var trash1=[]
   var trash2=[]
   var trash3=[]
@@ -570,8 +577,7 @@ window.onload = function(){
   var Extrash=[]
   //除外
   //playerで使われている=>ctl[1]
-  //var c2=0;var c3=0;var c4=0
-  //cpuのインターバルをクリアするスイッチはctlを使用
+  //cpuのインターバルをクリアするスイッチ
   var ctl=new Array(0,0,0,0,0)
   var ctlerror=new Array(0,0,0,0,0)
   var ctlswitch
@@ -759,7 +765,7 @@ window.onload = function(){
   const bgm9data ={
     src: "don/Sortie_Rena.mp3",
     loopStart: 10200,
-    loopEnd: 145040,
+    loopEnd: 171500,
     volume: 0.3,
   };
   const bgm17data ={
@@ -1616,10 +1622,12 @@ window.onload = function(){
         scoretemp[0]=-2;
         cx4.clearRect(0,0,800,600)
         opLock=0;
+        if(pvpmode==1){
         cx4.globalAlpha=1;
         cx4.font = "bold 26px 'メイリオ'";
         cx4.fillStyle = "white";
         var RsString=['ルーム長がトイレに行きました','ルーム長権限が発動しました','ルーム長がゲームを終了させました'];
+        };
         var A=Math.floor(Math.random()*RsString.length);
         cx4.fillText(RsString[A],50,590);
         gameover();
@@ -2089,7 +2097,7 @@ window.onload = function(){
             cx2.font = "24px 'Century Gothic'";
             cx2.fillText("◀ "+LPlist[LP[0]],520,100)
             cx2.fillText("プレイヤー",390,150)
-            cx2.fillText("ＣＰＵ設定",390,200)
+            cx2.fillText("ＣＰＵ",390,200)
             cx2.fillText("◀ "+chrlist[chara[1]],520,150);
             cx2.fillText(" ▶",670,100)
             cx2.fillText(" ▶",670,150)
@@ -2120,21 +2128,65 @@ window.onload = function(){
           drawbuttom2(470,410,"START！")
           }}
           if(mouseY >310 && mouseY <360){//オプション
-            cx2.clearRect(675,390,80,50)
+            //cx2.clearRect(675,390,80,50)
             se5.play();
-            cx1.fillStyle = "rgba(20,20,20,0.7)";
-            cx1.fillRect(0,0,800,510)
-            cx1.drawImage(e4,370,10,390,500)
+            epic.src=epic_src[0]
+            epic.onload=function(){
+              cx1.fillStyle = "rgba(20,20,20,0.7)";
+              cx2.clearRect(0,0,800,510)
+              cx1.fillRect(0,0,800,510)
+              cx1.drawImage(epic,50,50,350,460)
+              cx1.drawImage(epic,400,50,350,460)
+            //cx1.drawImage(e4,370,10,390,500)
             drawbuttom(690,200,"Play",0,60,40)
             drawbuttom(690,270,"Play",0,60,40)
             drawbuttom(690,340,"Play",0,60,40)
+            if(mpVelocity==1){
+              drawbuttom(80,310,"おそめ",1,80,40)
+            }else{
+              drawbuttom(80,310,"おそめ",0,80,40)
+            }
+            if(mpVelocity==1.5){
+            drawbuttom(170,310,"ふつう",1,80,40)
+            }else{
+            drawbuttom(170,310,"ふつう",0,80,40)
+            }
+            if(mpVelocity==2){
+            drawbuttom(260,310,"はやめ",1,80,40)
+            }else{
+            drawbuttom(260,310,"はやめ",0,80,40)
+            }
+            drawbuttom2(600,450,"OK",0,100,40,1)
+            drawbuttom2(400,450,"デフォルトに戻す",0,180,40,1)
             cx2.fillStyle = "black";
+            cx2.fillRect(360,70,2,400);
+            cx2.font = "36px 'Century Gothic'";
+            cx2.fillText("オプション",110,120)
             cx2.font = "26px 'Century Gothic'";
+            cx2.fillText("対局設定",60,200)
             cx2.fillText("音量設定",390,100)
+            cx2.fillText("対局BGM設定",390,198)
+            cx2.font = "18px 'Century Gothic'";
+            cx2.fillText("（注意：対局設定について）",60,420)
+            cx2.fillText("「たいせん」モードでは",60,440)
+            cx2.fillText("ルーム長の対局設定データが",65,460)
+            cx2.fillText("全体に反映されます。",65,480)
             cx2.font = "24px 'Century Gothic'";
+            cx2.fillText("CPUのポン頻度",100,230);
+            cx2.fillText("◀",120,260)
+            cx2.fillText("▶",260,260)
+            var A=(1-Ponrate)*5;
+            for (var i=0;i<A;i++){
+              cx2.fillText("■",140+i*24,260);
+            };
+            cx2.fillText("MPチャージ速度",100,300);
+            if(Fever==-1){
+              cx2.fillText("FEVER なし",100,380);
+            }else{
+            cx2.fillText("FEVER あり",100,380);
+            }
             cx2.fillText("BGM(0-7)",430,130)
             cx2.fillText("SE(0-7)",430,160)
-            cx2.fillText("フリーバトルBGM設定",390,200)
             cx2.fillText("◀ "+Math.floor(vBar*5)+" ▶",580,130)
             cx2.fillText("◀ "+Math.floor(sBar*5)+" ▶",580,160)
             cx2.fillText("通常",430,230)
@@ -2151,9 +2203,9 @@ window.onload = function(){
             cx2.fillText("◀ ",380,400)
             cx2.fillText(" ▶",720,260)
             cx2.fillText(" ▶",720,330)
-            cx2.fillText(" ▶",720,400)
+            cx2.fillText(" ▶",720,400)         
             pagestate=2;
-            }
+            }}
           if(mouseY >360 && mouseY <410){//セーブ
             se5.play();
             var result = window.confirm('セーブファイルをダウンロードします！');
@@ -2360,7 +2412,9 @@ window.onload = function(){
         break;
         case 2:
           //オプション画面
-          if(mouseX >80 && mouseX <380 && mouseY >80 && mouseY <480){
+          drawbuttom2(600,450,"OK",0,100,40,1)
+          drawbuttom2(400,450,"デフォルトに戻す",0,180,40,1)
+          if(mouseX >600 && mouseX <700 && mouseY >450 && mouseY <490){
             //se3.play();
             if(musicnum!==0){
             musicnum=0;
@@ -2372,6 +2426,89 @@ window.onload = function(){
             pagestate=0;
             se2.play();
             Menu();
+          }
+          if(mouseX >400 && mouseX <580 && mouseY >450 && mouseY <490){
+            //デフォルトに戻す
+            Ponrate=0.4;
+            mpVelocity=1;
+              se3.play();
+              drawbuttom(80,310,"おそめ",1,80,40)
+              drawbuttom(170,310,"ふつう",0,80,40)
+              drawbuttom(260,310,"はやめ",0,80,40)
+              musicset=[3,7,8];
+              if(Ponrate<0){Ponrate=0};
+              cx2.font = "24px 'Century Gothic'";
+              cx2.fillStyle = "black";
+              cx2.clearRect(140,240,120,20);
+              var A=(1-Ponrate)*5;
+              for (var i=0;i<A;i++){
+                cx2.fillText("■",140+i*24,260);
+              };
+          }
+          if(mouseX >80 && mouseX <160 && mouseY >310 && mouseY <350){
+            if(mpVelocity!==1){
+            mpVelocity=1;
+            se3.play();
+            drawbuttom(80,310,"おそめ",1,80,40)
+            drawbuttom(170,310,"ふつう",0,80,40)
+            drawbuttom(260,310,"はやめ",0,80,40)
+            }
+          }
+          if(mouseX >170 && mouseX <260 && mouseY >310 && mouseY <350){
+            if(mpVelocity!==1.5){
+            mpVelocity=1.5;
+            se3.play();
+            drawbuttom(80,310,"おそめ",0,80,40)
+            drawbuttom(170,310,"ふつう",1,80,40)
+            drawbuttom(260,310,"はやめ",0,80,40)
+            }
+          }
+          if(mouseX >260 && mouseX <340 && mouseY >310 && mouseY <350){
+            if(mpVelocity!==2){
+            mpVelocity=2;
+            se3.play();
+            drawbuttom(80,310,"おそめ",0,80,40)
+            drawbuttom(170,310,"ふつう",0,80,40)
+            drawbuttom(260,310,"はやめ",1,80,40)
+            }
+          }
+          if(mouseX >80 && mouseX <340 && mouseY >350 && mouseY <410){
+            cx2.font = "24px 'Century Gothic'";
+            cx2.fillStyle="black";
+            cx2.clearRect(99,355,160,26);
+            se3.play();
+            if(Fever!==-1){
+              Fever=-1;
+                cx2.fillText("FEVER なし",100,380);
+              }else{
+                Fever=0
+              cx2.fillText("FEVER あり",100,380);
+              }
+          }
+          if(mouseX >110 && mouseX <150 && mouseY >230 && mouseY <270){
+            //ponrate
+            se3.play();
+            Ponrate+=0.2;
+            if(Ponrate>1){Ponrate=1};
+            cx2.font = "24px 'Century Gothic'";
+            cx2.fillStyle = "black";
+            cx2.clearRect(140,240,120,20);
+            var A=(1-Ponrate)*5;
+            for (var i=0;i<A;i++){
+              cx2.fillText("■",140+i*24,260);
+            };
+          }
+          if(mouseX >250 && mouseX <300 && mouseY >230 && mouseY <270){
+            se3.play();
+            Ponrate-=0.2;
+            if(Ponrate<0){Ponrate=0};
+            cx2.font = "24px 'Century Gothic'";
+            cx2.fillStyle = "black";
+            cx2.clearRect(140,240,120,20);
+            var A=(1-Ponrate)*5;
+            for (var i=0;i<A;i++){
+              cx2.fillText("■",140+i*24,260);
+            };
           }
           if(mouseX >570 && mouseX <610 && mouseY >100 && mouseY <135){
             se3.play();
@@ -4103,7 +4240,7 @@ if(opLock==0 && gamestate ==1){
             console.log(hand3);
             console.log(hand4);
             }
-            socket.emit("deck_handler",{room:RoomName[IAM.room],Deck:deck,Hand:{hand1,hand2,hand3,hand4},King:king} );
+            socket.emit("deck_handler",{room:RoomName[IAM.room],Deck:deck,Hand:{hand1,hand2,hand3,hand4},King:king,MPV:mpVelocity,PON:Ponrate,FEV:Fever} );
           };
       //ゲームスタート時の配牌と画面
       cx.clearRect(0,0,800,600)
@@ -4133,6 +4270,22 @@ if(opLock==0 && gamestate ==1){
         auras=1;
       }else{cx1.fillText("第"+(skillusage2[0])+"局 "+(skillusage2[5])+"本場",10,88);
            }
+           cx1.font = "18px 'Century Gothic'";
+           cx1.fillText("FEVER",160,84);
+            var x=220;
+            var y=68;
+            cx1.fillStyle="#3d3d3d";
+            cx1.clearRect(x,y,90,15);
+            cx1.fillRect(x,y,90,15);
+            cx1.fillStyle="#00ff66";
+            cx1.fillRect(x,y,30*Fever,15);
+            cx1.fillStyle="#99ed68";
+            cx1.fillRect(x,y,30*Fever,5);;
+            cx1.strokeStyle="#e3e3e3"
+            cx1.strokeRect(x,y,30,15);
+            cx1.strokeRect(x+30,y,30,15);
+            cx1.strokeRect(x+60,y,30,15);;
+            cx1.fillStyle ="white";
       //music
       if(auras==0 && musicset[0]!==musicnum){
         musicnum=musicset[0]
@@ -4369,8 +4522,63 @@ if(opLock==0 && gamestate ==1){
     dora.push(king[0])
     if(debugmode){console.log(dora)}
     dorax=60
+    if(Fever>=3){
+      console.log('fever!',Fever);
+      Clvup.alpha=0;
+      Clvup.x=-400;
+      Clvup.y=0;
+      se12.play();
+      createjs.Tween.get(Clvup)
+      .to({x:40,alpha:1},200)
+      .to({alpha:0},300)
+      .to({alpha:1},300)
+      .to({alpha:0},100)
+      .to({alpha:1},100)
+      .to({alpha:0},100)
+      .to({alpha:1},100)
+      .to({alpha:0},100)
+      .to({alpha:1},100)
+      .to({alpha:0},100)
+      .to({alpha:1},100)
+      .to({scaleX:1.5,scaleY:1.5,x:-120,y:-10},300,createjs.Ease.backOut)
+      .to({scaleX:1,scaleY:1,x:800,y:0,alpha:0},200,createjs.Ease.cubicIn)
+      .call(feverTime);
+function feverTime (){
+  var DD=dora[dora.length-1]+1
+  if(DD>=45){DD=0;}
+  e7.src=eltear_src[DD]
+e7.onload=function(){
+cx1.drawImage(e7,dorax,10,33,43.5)
+      dora.push(king[1]);
+    var DD=dora[dora.length-1]+1
+    if(DD>=45){DD=0;}
+    e7.src=eltear_src[DD]
+  e7.onload=function(){
+  dorax+=40
+  cx1.drawImage(e7,dorax,10,33,43.5)
+  dora.push(king[2]);
+  var DD=dora[dora.length-1]+1
+  if(DD>=45){DD=0;}
+  e7.src=eltear_src[DD]
+e7.onload=function(){
+dorax+=40
+cx1.drawImage(e7,dorax,10,33,43.5)
+dora.push(king[3]);
+var DD=dora[dora.length-1]+1
+if(DD>=45){DD=0;}
+e7.src=eltear_src[DD]
+e7.onload=function(){
+dorax+=40
+cx1.drawImage(e7,dorax,10,33,43.5)
+    Fever=0;
+    handgraph(-1,1);
+    decklength();  
+}}}}
+};
+    }else{
       handgraph(-1,1);
       decklength();
+    }
       //player1();
       turn =parent
       for(var i=0;i<MEMBER.length;i++){
@@ -5451,7 +5659,7 @@ if(opLock==0 && gamestate ==1){
       cx1.rotate(-90 * Math.PI / 180);
       cx1.translate(-riverx[player], -rivery[player])
       counter[player] +=1;
-      if(player==parent){DP[player] +=1.2}else{DP[player] +=1};
+      if(player==parent){DP[player] +=mpVelocity*1.2}else{DP[player] +=mpVelocity};
       if(DP[player]>30){DP[player]=30}
       drawDP(player);
       console.log(player)
@@ -5531,7 +5739,7 @@ if(opLock==0 && gamestate ==1){
           cx1.fillText("X",riverx[player]+5,rivery[player]+35);
           }
       counter[player] +=1
-      if(player==parent){DP[player] +=1.2}else{DP[player] +=1};
+      if(player==parent){DP[player] +=mpVelocity*1.2}else{DP[player] +=mpVelocity};
       if(DP[player]>30){DP[player]=30}
       drawDP(player);
       turnchecker();
@@ -5780,6 +5988,7 @@ if(opLock==0 && gamestate ==1){
       }};
     console.log('Setup',pvp);//socketで飛ばすとなんか3回くらい呼び出される
     navisw=0;
+    if(Fever!==-1){Fever=0};
     DP =new Array(0,0,0,0,0)
     skillusage2=new Array(0,-1,-1,-1,-1,0)
     death=[
@@ -5947,6 +6156,9 @@ if(opLock==0 && gamestate ==1){
           hand4=data.Hand.hand3.concat();
           break;
       }
+      mpVelocity=data.MPV;
+      Ponrate=data.PON;
+      Fever=data.FEV
       console.log(king);//嶺上牌
       console.log(hand1);//自分の手札
       console.log(hand2);
@@ -6500,6 +6712,7 @@ if(opLock==0 && gamestate ==1){
       //type：未使用
       startTime = Date.now()
       reach[player]=1;
+      poncpu[player]=Ponrate;
     //敵の思考ルーチン
     var cputumo =Cpuhandtemp.length-1;//何番目を切るのかを返す
     //console.log(handtemp[1],Cpuhandtemp[1]);
@@ -6516,7 +6729,6 @@ if(opLock==0 && gamestate ==1){
     }
     var keyj=Object.keys(Count);
     var keyj2=Object.keys(Line);
-    //console.log(keyj.length);
     console.log(keyj2.length);//expected 1~5
     var reachj=0;//同じキャラ2枚をカウント
     var tumoj=0;//同じキャラ3枚をカウント
@@ -6562,7 +6774,6 @@ if(opLock==0 && gamestate ==1){
                   }else if(D.length==1){
                     cputumo=Cpuhandtemp.findIndex(value=>value==42);
                   }else{
-                    //
                     console.log('line error')
                     reach[player]=1;
                     cputumo=1+Math.floor(Math.random()*9)
@@ -6597,7 +6808,6 @@ if(opLock==0 && gamestate ==1){
                   }else if(D.length==1){
                     cputumo=Cpuhandtemp.findIndex(value=>value==42);
                   }else{
-                    //
                     console.log('line error')
                     reach[player]=1;
                     cputumo=1+Math.floor(Math.random()*9)
@@ -6761,7 +6971,7 @@ if(opLock==0 && gamestate ==1){
       if(ponsw[player]<3 && resultF !==undefined){
         var resultFF=Object.keys(Line).find((key)=>Line[key]==5);//->あればlineが帰ってくる
         if(resultFF !==undefined){
-          if(ponsw[player]<3){poncpu[player]=0.5};
+          if(ponsw[player]<3){poncpu[player]=Ponrate};
         }else{
         if(ponsw[player]<3){poncpu[player]=1};
         }
@@ -7084,6 +7294,7 @@ if(opLock==0 && gamestate ==1){
       se7.play();
       cLock=0
       gamestate=-1
+      if(Fever!==-1){Fever+=1};
       var vichand=[]
       var ponf=0
       if(player ==1){
@@ -8881,7 +9092,7 @@ if(opLock==0 && gamestate ==1){
             if(mouseY >310 && mouseY < 360){
         cx2.clearRect(80,530,670,70)
         cx2.strokeRect(86,311,288,48)
-        cx2.fillText("オプション　音楽の設定ができます。", 80, 550);
+        cx2.fillText("オプション　対局の設定や音楽の設定ができます。", 80, 550);
             }
             if(mouseY >360 && mouseY < 410){
         cx2.clearRect(80,530,670,70)
@@ -8985,7 +9196,7 @@ if(opLock==0 && gamestate ==1){
           case 2:
             //オプション
             cx3.clearRect(360,70,400,440)
-            cx2.clearRect(80,150,300,270)
+            //cx2.clearRect(80,150,300,270)
             cx3.strokeStyle ='orange'
             cx3.lineWidth = 2;
             cx2.fillStyle = "black";
@@ -9049,7 +9260,30 @@ if(opLock==0 && gamestate ==1){
               cx2.clearRect(80,530,670,70)
               cx2.fillText("オーラス時に流れるBGMを変更できます。", 80, 550);
               cx2.fillText("曲詳細："+musiclistDT[musicset[2]].title+", "+musiclistDT[musicset[2]].elia+"（"+musiclistDT[musicset[2]].nod+"）", 80, 570);
-  
+            }
+            if(mouseX >50 && mouseX <300 && mouseY >200 && mouseY <260){
+              cx2.clearRect(80,530,670,70)
+              cx2.fillText("CPUのポンのしやすさを調節します。", 80, 550);
+              cx2.fillText("右に行くほどCPUがポンしやすくなるようです。", 80, 570);
+            }
+            if(mouseX >50 && mouseX <350 && mouseY >260 && mouseY <350){
+              cx2.clearRect(80,530,670,70)
+              cx2.fillText("パイを切った時にMPが溜まる速度です。", 80, 550);
+            }
+            if(mouseX >50 && mouseX <350 && mouseY >350 && mouseY <400){
+              cx2.clearRect(80,530,670,70)
+              cx2.fillText("（たいせんモードのみ）ありにすると特定のタイミングでFEVERが発生します。", 80, 550);
+              cx2.fillText("現在のFEVER効果：ドラ3枚追加（効果は予告なく変わる場合があります）", 80, 570);
+            }
+            if(mouseX >600 && mouseX <700 && mouseY >450 && mouseY <490){
+              cx3.strokeRect(600,450,100,40)
+              cx2.clearRect(80,530,670,70)
+              cx2.fillText("現在の設定を反映して戻ります。", 80, 550);
+            }
+            if(mouseX >400 && mouseX <580 && mouseY >450 && mouseY <490){
+              cx3.strokeRect(400,450,180,40)
+              cx2.clearRect(80,530,670,70)
+              cx2.fillText("オプションを初回起動時の設定に戻します。", 80, 550);
             }
           break;
           case 4:
@@ -10106,6 +10340,7 @@ if(opLock==0 && gamestate ==1){
         var SX=hand1.findIndex(value=>value==skillusage2[player])
         DP[player]-=10;
         drawDP(player);
+        PlayertoCpu(SX);
       }else{
         setTimeout(function(){
           SpecialSkill(player,target)
@@ -10683,6 +10918,9 @@ if(opLock==0 && gamestate ==1){
       "AchieveA":achieveA,
       "AchieveB":achieveB,
       "Highscore":highscore,
+      "MPV":mpVelocity,
+      "PON":Ponrate,
+      "FEV":Fever,
     }
     console.log(json_obj)
     var write_json=JSON.stringify(json_obj);
@@ -10725,6 +10963,19 @@ if(opLock==0 && gamestate ==1){
     vBar=data.Volume;
     sBar=data.SEVolume;
     winrank=data.Rank.concat();
+    mpVelocity=data.MPV;
+    Ponrate=data.PON;
+    Fever=data.FEV;
+    //追加データ部分　undefinedなら初期値にしておく
+    if (mpVelocity === void 0) {
+      mpVelocity=1;
+    }
+    if (Fever === void 0) {
+      Fever=0;
+    }
+    if (Ponrate === void 0) {
+      Ponrate=0.4;
+    }
     //achieveA=data.AchieveA.concat();
     //dataにある分だけ上書き
     for(var i=0; i<data.AchieveA.length; i++){
