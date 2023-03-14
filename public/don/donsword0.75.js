@@ -830,7 +830,7 @@ Bgm.on("load", () => {
     se12.load();
   var donX=40;
   var donY=100;
-  var loadmax=79;
+  var loadmax=80;
   
   DPimg.src=atrbute_src[0];
     DPimg.onload=function(){loadgraph();
@@ -885,6 +885,9 @@ Bgm.on("load", () => {
   epic.onload=function(){loadgraph();
   epic.src=epic_src[6]
   epic.onload=function(){loadgraph();
+  epic.src=epic_src[7]
+  epic.onload=function(){loadgraph();
+    }
   }}
   }}}}}
   eltear.src=eltear_src[0]
@@ -9457,7 +9460,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                   cx3.strokeRect(52,310,200,40)
                 }
                 if(mouseX >50 && mouseX <250 && mouseY >350 && mouseY <390){
-                  cx3.strokeRect(52,310,200,40)
+                  cx3.strokeRect(52,350,200,40)
                 }
                 break;
               case 1:
