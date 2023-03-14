@@ -266,7 +266,7 @@ window.onload = function(){
   var atrbute_src= new Array("don/Don_DP.png","don/Duel_mana.png","don/Duel_sun.png","don/Duel_aqua.png","don/Duel_wind.png","don/Duel_moon.png","don/Duel_gaia.png","don/Duel_heat.png","don/Don_HA.png");
   var bgimg_src=new Array(1,"don/Don_bg1.png","don/elimg2.png","don/stadium2.png");
   //説明用
-  var epic_src =new Array("don/elstudio_bg1.png","don/Don_epic1.png","don/Don_epic2.png","don/Don_epic3.png","don/Don_epicline.png","don/Don_ss11.png","don/Don_epic4.png");
+  var epic_src =new Array("don/elstudio_bg1.png","don/Don_epic1.png","don/Don_epic2.png","don/Don_epic3.png","don/Don_epicline.png","don/Don_ss11.png","don/Don_epic4.png","don/Don_epic5.png");
   //裏＆ツモロンボタン
   var eltearB_src =new Array( "don/Don_img0.png","don/Don_tumoA.png","don/Don_tumoB.png","don/Don_tumoC.png","don/Don_tumoD.png");
   var eltear= new Image();
@@ -774,16 +774,47 @@ window.onload = function(){
     loopEnd: 163580,
     volume: 0.12,
   };
-  var Bgm=new Music(bgm1data);
-      Bgm=new Music(bgm2data);
-      Bgm=new Music(bgm3data);
-      Bgm=new Music(bgm4data);
-      Bgm=new Music(bgm5data);
-      Bgm=new Music(bgm6data);
-      Bgm=new Music(bgm7data);
-      Bgm=new Music(bgm8data);
-      Bgm=new Music(bgm9data);
-      Bgm=new Music(bgm17data);
+  var Bgm=new Music(bgm3data);
+Bgm.on("load", () => {
+    loadgraph();
+  })
+  var Bgm7=new Music(bgm7data);
+  Bgm7.on("load", () => {
+    loadgraph();
+  })
+  var Bgm8=new Music(bgm8data);
+  Bgm8.on("load", () => {
+    loadgraph();
+  })
+  var Bgm1=new Music(bgm1data);
+  Bgm1.on("load", () => {
+    loadgraph();
+  })
+  var Bgm2=new Music(bgm2data);
+  Bgm2.on("load", () => {
+    loadgraph();
+  })
+  var Bgm4=new Music(bgm4data);
+  Bgm4.on("load", () => {
+    loadgraph();
+  })
+  var Bgm5=new Music(bgm5data);
+  Bgm5.on("load", () => {
+    loadgraph();
+  })
+  var Bgm6=new Music(bgm6data);
+  Bgm6.on("load", () => {
+    loadgraph();
+  })
+  var Bgm9=new Music(bgm9data);
+  Bgm9.on("load", () => {
+    loadgraph();
+  })
+  var Bgm17=new Music(bgm17data);
+  Bgm17.on("load", () => {
+    loadgraph();
+  })
+
   var musicnum=0
     se1.load();
     se2.load();
@@ -799,7 +830,7 @@ window.onload = function(){
     se12.load();
   var donX=40;
   var donY=100;
-  var loadmax=69;
+  var loadmax=79;
   
   DPimg.src=atrbute_src[0];
     DPimg.onload=function(){loadgraph();
@@ -1473,7 +1504,7 @@ window.onload = function(){
         break;
     } 
     if(LP_PVP.Rule[0]==1){
-    if(LP[1] >0 && LP[2]>0 && LP[3] >0 && LP[4]>0){
+    if(LP[1] >=0 && LP[2]>=0 && LP[3] >=0 && LP[4]>=0){
       gamestate =1
       deckHandler();
       return false;
@@ -1493,7 +1524,7 @@ window.onload = function(){
           gameover();
           return false;
         }
-        if(LP[1] >0 && LP[2]>0 && LP[3] >0 && LP[4]>0){
+        if(LP[1] >=0 && LP[2]>=0 && LP[3] >=0 && LP[4]>=0){
           gamestate =1
           deckHandler();
           return false;
@@ -1528,7 +1559,7 @@ window.onload = function(){
             break;
             default:
   //∞モード
-  if(LP[1] >0 && LP[2]>0 && LP[3] >0 && LP[4]>0){
+  if(LP[1] >=0 && LP[2]>=0 && LP[3] >=0 && LP[4]>=0){
     gamestate =1
     deckHandler();
     }else{gameover();}
@@ -2845,8 +2876,6 @@ window.onload = function(){
                   cx2.clearRect(50,50,660,460);
                   cx3.clearRect(50,50,700,460)
                   cx2.fillStyle = "black";
-                  //cx2.font = "26px 'Century Gothic'";
-                  //cx2.fillText("どうやってプレイするのですか？", 280, 90);
                   cx2.drawImage(epic,90,55,600,450);
                   msgstate=1;
                   cx2.clearRect(80,530,670,70)
@@ -2971,15 +3000,69 @@ window.onload = function(){
                   cx2.font = "26px 'Century Gothic'";
                   cx2.fillText("シナジー", 90, 90);
                   cx2.font = "20px 'Century Gothic'";
-                  cx2.fillText("（クリックで上下にスクロールできます）", 210, 90);
+                  cx2.fillText("（枠内クリックで上下にスクロールできます）", 210, 90);
                   msgstate=3;
                   cx2.clearRect(80,530,670,70)
                   cx2.font = "18px Arial";
-                  cx2.fillText("各シナジー役を構成するキャラクターの一覧です。", 80, 540);
-                  cx2.fillText("基本役（３ペア・ライン通貫・国士無双）を揃えなければ和了できないので、", 80, 560);
-                  cx2.fillText("まずは基本役を優先し、余裕があればより多くのシナジーを狙うと良いでしょう。", 80, 580)
+                  cx2.fillText("和了した時に、それぞれの組み合わせの中から2枚以上所持していると", 80, 540);
+                  cx2.fillText("シナジー役がつきます（ただし1枚役は1翻）。", 80, 560);
+                  cx2.fillText("まずは基本役である3ペアやライン通貫を優先し、余裕があれば狙ってみましょう。", 80, 580)
                 }
                 if(mouseX >50 && mouseX <250 && mouseY >310 && mouseY <350){
+                  epic.src=epic_src[7]
+                  epic.onload=function(){
+                  se4.play();
+                  var X=240;
+                  var Y=55;
+                  var Aicon=new Image();
+                  Aicon.src="don/Duel_gaia.png"
+                  Aicon.onload=function(){
+                    cx2.drawImage(Aicon,X,Y,40,40);
+                    X+=40;
+                      Aicon.src="don/Duel_heat.png"
+                      Aicon.onload=function(){
+                        cx2.drawImage(Aicon,X,Y,40,40);
+                        X+=40;
+                          Aicon.src="don/Duel_aqua.png"
+                          Aicon.onload=function(){
+                            cx2.drawImage(Aicon,X,Y,40,40);
+                            X+=40;
+                            Aicon.src="don/Duel_wind.png"
+                            Aicon.onload=function(){
+                              cx2.drawImage(Aicon,X,Y,40,40);
+                              X+=40;
+                              Aicon.src="don/Duel_sun.png"
+                              Aicon.onload=function(){
+                                cx2.drawImage(Aicon,X,Y,40,40);
+                                X+=40;
+                                Aicon.src="don/Duel_moon.png"
+                                Aicon.onload=function(){
+                                  cx2.drawImage(Aicon,X,Y,40,40);
+                                  X+=40;
+                              Aicon.src="don/Don_HA.png"
+                              Aicon.onload=function(){
+                                cx2.drawImage(Aicon,X,Y,40,40);
+                  }}}}}}};
+                  drawbuttom(5,80,"目次")
+                  cx2.clearRect(50,50,660,460);
+                  cx3.clearRect(50,50,700,460)
+                  cx2.drawImage(epic,60,100,630,270);
+                  cx2.clearRect(680,50,60,40);
+                  cx2.font = "32px 'Century Gothic'";
+                  cx2.fillText("　×",680,80)
+                  cx2.fillStyle = "black";
+                  cx2.font = "26px 'Century Gothic'";
+                  cx2.fillText("クレスト", 90, 90);
+                  cx2.font = "22px 'Century Gothic'";
+                  msgstate=2;
+                  cx2.clearRect(80,530,670,70)
+                  cx2.font = "18px Arial";
+                  cx2.fillText("パイに描かれたマークは、それぞれの属性を示しています。", 80, 540);
+                  cx2.fillText("3ペアで和了した時に、属性が同じパイを2組（6枚）所持していれば、", 80, 560);
+                  cx2.fillText("クレスト役がつきます。", 80, 580);
+
+                }}
+                if(mouseX >50 && mouseX <250 && mouseY >350 && mouseY <390){
                   epic.src=epic_src[6]
                   epic.onload=function(){
                   se4.play();
@@ -3060,7 +3143,8 @@ window.onload = function(){
                 cx2.fillText("役/国士無双",60,220)
                 cx2.fillText("ポン",60,260)
                 cx2.fillText("シナジー",60,300)
-                cx2.fillText("マナブレイク",60,340)
+                cx2.fillText("クレスト",60,340)
+                cx2.fillText("マナブレイク",60,380)
                 cx2.font = "32px 'Century Gothic'";
                 cx2.fillText("　×",680,80)
                 cx2.clearRect(80,520,670,70)
@@ -3972,23 +4056,23 @@ if(opLock==0 && gamestate ==1){
           .beginFill("gold")
           .drawRect(40, 100, 620, 390);
   var Sinagy=[
-    {id:"鋭さ",chr:[7,12,24,28,33,38,39]},
-    {id:"物理特化",chr:[5,8,27,35,36,41]},
-    {id:"魔法特化",chr:[1,10,16,24,31]},
-    {id:"敏捷さ",chr:[2,6,9,16,36,40]},
-    {id:"殴り合い",chr:[10,24,33]},
+    {id:"鋭さ",chr:[12,24,33,39,7,28,38]},
+    {id:"物理特化",chr:[27,36,5,8,35,41]},
+    {id:"魔法特化",chr:[24,1,10,16,31]},
+    {id:"敏捷さ",chr:[6,9,36,16,40,2]},
+    {id:"殴り合い",chr:[24,33,10]},
     {id:"時空間",chr:[5,26,32]},
     {id:"精霊の加護",chr:[6,7,8]},
     {id:"魔族",chr:[27,28,29]},
     {id:"ナソード研究",chr:[12,13,14,24,42]},
     {id:"原初的な動き",chr:[0,9,21]},
-    {id:"マナ守護",chr:[4,20,34]},
-    {id:"属性鍛錬者",chr:[1,3,15,22]},
-    {id:"巨人審判者",chr:[2,11,17,39,30,37]},
-    {id:"探求する者",chr:[13,17,25,37,42]},
-    {id:"渇望",chr:[4,19,23,26,29,31,32]},
+    {id:"マナ守護",chr:[4,34,20]},
+    {id:"属性鍛錬者",chr:[3,15,1,22]},
+    {id:"巨人審判者",chr:[39,30,37,2,11,17]},
+    {id:"探求する者",chr:[3,13,25,37,17,42]},
+    {id:"渇望",chr:[4,19,31,23,26,29,32]},
     {id:"正義を貫徹する者",chr:[0,15,18,21,30]},
-    {id:"痛いから問題ない",chr:[11,23,31,34,38]},
+    {id:"痛いから問題ない",chr:[31,34,11,23,38]},
     {id:"戦場の天使",chr:[14,41]},
     {id:"貫徹する足取り",chr:[18]},
     {id:"豊かな足取り",chr:[19]},
@@ -4038,6 +4122,7 @@ if(opLock==0 && gamestate ==1){
   // マスクを適用する
   yakumap2.mask = shapeMask;
   }
+  //シナジー改善案
   function Yakucheck(move=0){
         if(move!==0){
         //上下移動
@@ -4052,30 +4137,30 @@ if(opLock==0 && gamestate ==1){
         var rect = new createjs.Shape();
         rect.graphics
                 .beginFill("rgba(20,20,20,0.7)")
-                .drawRect(40, 100, 580, 2800);
+                .drawRect(40, 100, 660, 2800);
         yakumap.addChild(rect);
         var shapeMask = new createjs.Shape();
       shapeMask.graphics
               .beginFill("gold")
-              .drawRect(40, 100, 620, 390);
+              .drawRect(40, 100, 660, 390);
       var Sinagy=[
-        {id:"鋭さ",chr:[7,12,24,28,33,38,39]},
-        {id:"物理特化",chr:[5,8,27,35,36,41]},
-        {id:"魔法特化",chr:[1,10,16,24,31]},
-        {id:"敏捷さ",chr:[2,6,9,16,36,40]},
-        {id:"殴り合い",chr:[10,24,33]},
+        {id:"鋭さ",chr:[12,24,33,39,7,28,38]},
+        {id:"物理特化",chr:[27,36,5,8,35,41]},
+        {id:"魔法特化",chr:[24,1,10,16,31]},
+        {id:"敏捷さ",chr:[6,9,36,16,40,2]},
+        {id:"殴り合い",chr:[24,33,10]},
         {id:"時空間",chr:[5,26,32]},
         {id:"精霊の加護",chr:[6,7,8]},
         {id:"魔族",chr:[27,28,29]},
         {id:"ナソード研究",chr:[12,13,14,24,42]},
         {id:"原初的な動き",chr:[0,9,21]},
-        {id:"マナ守護",chr:[4,20,34]},
-        {id:"属性鍛錬者",chr:[1,3,15,22]},
-        {id:"巨人審判者",chr:[2,11,17,39,30,37]},
-        {id:"探求する者",chr:[13,17,25,37,42]},
-        {id:"渇望",chr:[4,19,23,26,29,31,32]},
+        {id:"マナ守護",chr:[4,34,20]},
+        {id:"属性鍛錬者",chr:[3,15,1,22]},
+        {id:"巨人審判者",chr:[39,30,37,2,11,17]},
+        {id:"探求する者",chr:[3,13,25,37,17,42]},
+        {id:"渇望",chr:[4,19,31,23,26,29,32]},
         {id:"正義を貫徹する者",chr:[0,15,18,21,30]},
-        {id:"痛いから問題ない",chr:[11,23,31,34,38]},
+        {id:"痛いから問題ない",chr:[31,34,11,23,38]},
         {id:"戦場の天使",chr:[14,41]},
         {id:"貫徹する足取り",chr:[18]},
         {id:"豊かな足取り",chr:[19]},
@@ -4098,7 +4183,7 @@ if(opLock==0 && gamestate ==1){
         s= new createjs.Bitmap(eltear_src[Sinagy[i].chr[j]]);
         s.scaleX=1/2;
         s.scaleY=1/2;
-        s.x=X+50;
+        s.x=X-40;
         s.y=Y;
         yakumap.addChild(s);
         X+=65;
@@ -4490,7 +4575,7 @@ if(opLock==0 && gamestate ==1){
       opLock=0;
       //ポンポポン
       ponsw=[0,0,0,0,0]
-      poncpu=[0,0,0,0,0]
+      poncpu=[0,Ponrate,Ponrate,Ponrate,Ponrate]
       pon1=[];
       pon2=[];
       pon3=[];
@@ -4826,7 +4911,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         opLock=0;
         //ポンポポン
         ponsw=[0,0,0,0,0]
-        poncpu=[0,0,0,0,0]
+        poncpu=[0,Ponrate,Ponrate,Ponrate,Ponrate]
         pon1=[];
         pon2=[];
         pon3=[];
@@ -6241,8 +6326,55 @@ cx1.drawImage(e7,dorax,10,33,43.5)
     //必要な情報をポイする
     socket.emit("throwed_pai",{Num:1,Player:1,who:MEMBER[0].id,Token:IAM.token,room:RoomName[IAM.room],Tumotemp:tumotemp,Reach:reach,Ippatu:ippatu,Nuki:nuki,Dp:DP,mb:ManaBreak,Hand:{hand1,hand2,hand3,hand4}});
   }else{
-    
-  handgraph(1,1)
+        //manabreak
+        if(ManaBreak>0){
+          e15.src=chrimg_src[chara[1]]
+          e15.onload=function(){
+            var B=450;
+          loopX=0
+          loopX2=0;
+          alpha=1;
+          se12.play();
+          window.requestAnimationFrame((ts)=>ManaAnimation(ts,0,B));
+          };
+        }else{
+            handgraph(1,1);
+        };
+        function ManaAnimation(ts,A=0,B=100){
+            cx4.globalAlpha = alpha;
+            A+=1;
+            loopX+=3
+            loopX2+=50
+            var x=loopX*4
+            var xx=loopX*3
+            if(xx>50){xx=50};
+            if(x>=800){loopX=0}
+            if(loopX2>=150){loopX2=150}
+            cx4.clearRect(0,0,800,600)
+            cx4.fillStyle = "#001c0d";
+            cx4.fillRect(0,B-xx,200,xx*2);
+            cx4.drawImage(e15,400,200-xx,300,xx*2,loopX2-250,B-xx,300,xx*2)
+            cx4.strokeStyle = "white";
+            cx4.lineWidth = 5;
+            cx4.beginPath();
+            cx4.moveTo(0,B-xx);
+            cx4.lineTo(200,B-xx);
+            cx4.stroke();
+            cx4.beginPath();
+            cx4.moveTo(0,B+xx);
+            cx4.lineTo(200,B+xx);
+            cx4.stroke();
+            cx4.drawImage(MBicon,160,B-100,200,100);
+            if(alpha>0){
+            if(A<45){window.requestAnimationFrame((ts)=>ManaAnimation(ts,A,B));}else{
+            alpha -=0.1
+            window.requestAnimationFrame((ts)=>ManaAnimation(ts,A,B));}
+            }else if(alpha <=0){
+            cx4.clearRect(0,0,800,600);
+            cx4.globalAlpha = 1;
+            handgraph(1,1);
+            }
+          };  
   }
   };
   
@@ -6712,10 +6844,9 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       //type：未使用
       startTime = Date.now()
       reach[player]=1;
-      poncpu[player]=Ponrate;
+      //poncpu[player]=Ponrate;
     //敵の思考ルーチン
     var cputumo =Cpuhandtemp.length-1;//何番目を切るのかを返す
-    //console.log(handtemp[1],Cpuhandtemp[1]);
     //まずリーチできる場合
     var Count={};
     var Line={};
@@ -6962,7 +7093,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
     //非テンパイ時 -1になってる原因この辺にありそう
     if(type ==0){
       //1つのライン6枚以上あればラインを狙いに行く,ポンしない
-      //1つのライン5枚以上あればラインを狙いに行く,1/2の確率でポンしない
+      //1つのライン5枚以上あればラインを狙いに行き,ponRateの確率でポンしない
       //ライン条件該当しないなら（オールマイティ以外の）1枚しか持っていないキャラを優先して切る
       //↑2つに該当しなければ（オールマイティ以外の）ランダムに切る
       var resultF=Object.keys(Line).find((key)=>Line[key]>5);//->あればlineが帰ってくる
@@ -9069,6 +9200,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         cx2.clearRect(80,530,670,70)
         cx2.strokeRect(120,95,220,60)
         cx2.fillText("あなたのプロフィールです。", 80, 550);
+        cx2.fillText("クリックで詳細表示。", 80, 570);
             }}
               if(mouseX >80 && mouseX <380){
             if(mouseY >160 && mouseY < 210){
@@ -9324,6 +9456,9 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                 if(mouseX >50 && mouseX <250 && mouseY >310 && mouseY <350){
                   cx3.strokeRect(52,310,200,40)
                 }
+                if(mouseX >50 && mouseX <250 && mouseY >350 && mouseY <390){
+                  cx3.strokeRect(52,310,200,40)
+                }
                 break;
               case 1:
                 if(mouseX >90 && mouseX <200 && mouseY >60 && mouseY <100){
@@ -9526,22 +9661,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         }
         if(turn ==0){
           if(reach[1] !==3){
-          if(skillswitch[1]==0){
-      if(mouseY >390 && mouseY< 450){
-      if(mouseX >700 && mouseX<800){
-      cx3.clearRect(4,490,762,110)
-      cx3.clearRect(710,400,80,40)
-      }}
-      if(mouseY >440 && mouseY< 480){
-      if(mouseX >710 && mouseX<790){
-      cx3.clearRect(4,490,762,110)
-      cx3.clearRect(710,400,80,40)
-      cx3.strokeStyle ='yellow'
-      cx3.lineWidth = 2;
-      //cx3.strokeRect(711,441,78,38)
-      }}
-      }
-      if(skillswitch[1]==0){
+          if(skillswitch[1]==0 && pvpmode==0){
         if(mouseY >390 && mouseY< 450){
           if(mouseX >700 && mouseX<800){
           cx3.clearRect(4,490,762,110)
