@@ -4,10 +4,11 @@
   <title>エルドンオンライン</title>
   <link rel="icon" href="favicon.ico" id="favicon">
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width">
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="エルドンオンライン" />
-  <meta name="twitter:description" content="ドンジャラソード！　対戦機能付きのドンジャラです。" />
-  <meta name="twitter:image" content="https://eldontest.glitch.me/public/ss5.png" />
+  <meta name="twitter:description" content="エルコレドンジャラ　対戦機能付きのドンジャラです。" />
+  <meta name="twitter:image" content="https://eldontest.glitch.me/ss5.png" />
   <style>
     body {
       background-image: url("don/elstudio_bg1.png");
@@ -184,31 +185,42 @@ margin: 0 auto;
     ・fc2体験版公開(2022/08/12)<br>
     ・v0.9公開(2023/03/12)<br>
     ・v0.91公開　(2023/03/12)<br>
-    ・v0.92公開 (2023/03/14)<br><br>
+    ・v0.92公開 (2023/03/14)<br>
+    ・v0.93公開 (2023/03/17)<br><br>
   </div>
   <div class="square">
-    <p style="text-align:center"><b><font size="5">【不具合・バグ情報】</font><br></b></p>
+    <p style="text-align:center"><b><font size="5">【不具合・バグ情報/Patch Notes】</font><br></b></p>
     <div onclick="obj=document.getElementById('open2').style; obj.display=(obj.display=='none')?'block':'none';">
       <div class="square"><a style="cursor:pointer;"><p style="text-align:center"><b>▼ クリックで展開 ▼</b></p></a>
         <div id="open2" style="display:none;clear:both;">
     ＜発生中・検証中＞<br>
     ・（セーブ）1度他の画面でセーブデータを読み込むと「今は読み込めません」と表示され、<br>それ以降セーブデータを読み込めなくなる（調整中）<br>
     ・（表示の不具合）抜きボタン連打で抜きアニメーションが複数回流れる（調整中）<br>
-    ・（フリバ）「メモライズ」したパイを次局以降に持ち越せてしまう→調整中<br>
-    ・（対戦）終局後、勝手に退室させられる（検証中）<br>
-    ・（対戦）特定の状況でルーム内に自分が2人存在する問題（検証中）<br>
-    ・（対戦）特定の状況で対局が止まる（検証中）<br><br>
+    ・（対戦）終局後、勝手に退室させられる場合がある（検証中）<br>
+    ・（対戦）特定の状況でルーム内に自分が2人存在する場合がある（検証中）<br>
+    ・（対戦）特定の状況で対局が止まる場合がある（検証中）<br><br>
     ＜解決済み＞<br>
-    ・（ロード）ロードに非常に時間がかかる問題→bgmのビットレートを下げ容量削減<br>
-    ・（表示の不具合）シナジー「探求する者」にエーテルセージが表示されていない問題→修正済<br>
-    ・（表示の不具合）終局画面で各プレイヤーとキャラクター画像が対応していない問題→修正済<br>
-    ・（表示の不具合）フリーバトル中にマナブレイク演出が出ない→修正済<br>
-    ・（フリバ/対戦）CPUポンの頻度が高い→オプションから頻度調整できるよう修正<br>
-    ・（対戦）対局途中で誰かが抜けると詰む問題→対戦途中でもESCキーで抜けられるよう修正<br>
-    ・（対戦）SOUNDをミュートにしていても対局終了後のbgmが流れる→修正済<br>
-    ・（フリバ）CPUの「フレイムガイザー」時、対局が止まる→修正済
-    ・（フリバ）バフ・デバフ欄で「火傷」デバフが「咆仙経」と表示される→修正済<br>
-    ・（フリバ）プレイヤーの「メモライズ」使用後、自動的にパイが切られない→修正済<br>
+    v0.91<br>
+    ・（追加）bgmを1曲追加<br>
+    ・（表示の不具合）終局画面で各プレイヤーとキャラクター画像が対応していない問題を修正<br>
+    ・（対戦）対戦途中でもルーム長の操作でESCキーで抜けられるよう修正<br>
+    ・（対戦）SOUNDをミュートにしていても対局終了後のbgmが流れる問題を修正<br>
+    ・（フリバ）バフ・デバフ欄で「火傷」デバフが「咆仙経」と表示される問題を修正<br>
+    v0.92<br>
+    ・（追加）プレイガイドにクレスト役に関する説明を追記<br>
+    ・（追加）対戦モードでのFEVER機能を追加<br>
+    ・（追加）オプションにCPUポンの頻度・MPチャージ速度・FEVERを追加<br>
+    ・（ロード）ロードに非常に時間が掛かってしまうためbgmの容量削減<br>
+    ・（表示の不具合）シナジー「探求する者」にエーテルセージが表示されていない問題を修正<br>
+    ・（表示の不具合）フリーバトル中にマナブレイク演出が出ない問題を修正<br>
+    ・（フリバ/対戦）終局で順位が同立だった場合の処理を修正<br>
+    ・（フリバ）CPUの「フレイムガイザー」時、対局が止まる問題を修正済
+    ・（フリバ）プレイヤーの「メモライズ」使用後、自動的にパイが切られない問題を修正<br>
+    v0.93<br>
+    ・（フリバ）「メモライズ」したパイを次局以降に持ち越せてしまう問題→仕様として様子見<br>
+    ・（対戦）対戦モードの戦績が勝率に反映されない問題を修正<br>
+    ・（表示の不具合）FEVERなしの際にFEVERゲージの表示がおかしい問題を修正<br>
+ 
   </div></div></div>
 </body>
 <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>

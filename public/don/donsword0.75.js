@@ -4358,6 +4358,7 @@ if(opLock==0 && gamestate ==1){
         auras=1;
       }else{cx1.fillText("第"+(skillusage2[0])+"局 "+(skillusage2[5])+"本場",10,88);
            }
+           if(Fever>=0){
            cx1.font = "18px 'Century Gothic'";
            cx1.fillText("FEVER",160,84);
             var x=220;
@@ -4374,6 +4375,7 @@ if(opLock==0 && gamestate ==1){
             cx1.strokeRect(x+30,y,30,15);
             cx1.strokeRect(x+60,y,30,15);;
             cx1.fillStyle ="white";
+           }
       //music
       if(auras==0 && musicset[0]!==musicnum){
         musicnum=musicset[0]
@@ -9826,7 +9828,9 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       //スキルは右下に移動
         if(mouseY >400 && mouseY< 440){
           if(mouseX >710 && mouseX<790){
+            if(pvpmode==1){
       Skillname(1);
+            };
     }}
         if(mouseX >0 && mouseX< 100){
           if(pvpmode==1){
@@ -10729,14 +10733,15 @@ cx1.drawImage(e7,dorax,10,33,43.5)
     });
             //ユーザー名をcpu2とかにされたらたまらんので
     var LPresult=[
-      {pc:"Player", chara:chara[1], elia:LP[1]},
-      {pc:"CPU2", chara:chara[2], elia:LP[2]},
-      {pc:"CPU3", chara:chara[3], elia:LP[3]},
-      {pc:"CPU1", chara:chara[4], elia:LP[4]},
+      {pc:"Player", token:0, chara:chara[1], elia:LP[1]},
+      {pc:"CPU2", token:0, chara:chara[2], elia:LP[2]},
+      {pc:"CPU3", token:0, chara:chara[3], elia:LP[3]},
+      {pc:"CPU1", token:0, chara:chara[4], elia:LP[4]},
         ]
       if(pvpmode==1){
         for(var i=0; i<LPresult.length;i++){
-          LPresult[i].pc=MEMBER[i].name
+          LPresult[i].pc=MEMBER[i].name;
+          LPresult[i].token=MEMBER[i].token
         }
       }
     LPresult.sort(compareFunc2);
@@ -10806,12 +10811,39 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       //スコア更新
       console.log(scoretemp,achievetemp,achievetempB)
       if(scoretemp[0]>=0){
-        scoretemp[0]=3-LPresult.findIndex(value=>value.pc=="Player")
+        var A;
+        if(pvpmode==1){
+          //tokenで判別
+          A=LPresult.findIndex(value=>value.token==IAM.token);
+          //RankingStr=["1st","2nd","3rd","4th"];
+        }else{
+          A=LPresult.findIndex(value=>value=>value.pc=="Player");         
+        }
+        if(A==-1){
+          console.log('token error!',LPresult);
+          A=0;
+        }
+        switch(RankingStr[A]){
+          case "1st":
+            scoretemp[0]=0;
+            break;
+          case "2nd":
+            scoretemp[0]=1;
+            break;
+          case "3rd":
+            scoretemp[0]=2;
+            break;
+          case "4th":
+            scoretemp[0]=3;
+            break;
+          default:
+            break;
+        };
         highscore[0]+=1;
         if(scoretemp[1]>highscore[3]){highscore[3]=scoretemp[1];};
         if(LP[1]>highscore[1]){highscore[1]=LP[1]};
         //if(LP[1]<=0){};
-        winrank[scoretemp[0]]+=1;
+        winrankwinrank[scoretemp[0]]+=1;
         if(scoretemp[3]>highscore[2]){highscore[2]=scoretemp[3]};
         for(var i=0;i<achievetemp.length;i++){
             var A=achieveB.findIndex(value=>value.name==achievetemp[i].name);
