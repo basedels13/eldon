@@ -7208,8 +7208,10 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             Count[elm]=(Count[elm] || 0)+1
             Line[elm2]=(Line[elm2] || 0)+1
           }
-          console.log(Count);
-          console.log(Line);
+          if(debugmode){
+            console.log(Count);
+            console.log(Line);
+          }
           //リーチできるならreach[player]=1;
           //アガリ系は3ペアorライン統一
           //ラインチェック
@@ -7408,7 +7410,9 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       }
   
       var HH=handtemp.findIndex(value=>value==100);
+      if(debugmode){
       console.log(HH,handtemp)
+      };
       if(HH !==-1){
         handtemp[HH]=tumotemp
       }
@@ -8810,8 +8814,8 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                 //3ペアでリーチ後の待ちは3,3,2だけ
                 if(tumoj==2 && reachj==1){
                   //アガリ
-                  var resultF=Object.keys(Count).find((key)=>Count[key]==2);//->あればキャラ名が帰ってくる
-                  console.log(resultF);
+                  var resultF=Object.keys(Count).find((key)=>Count[key]==2);
+                  //->あればキャラ名が帰ってくる
                   Result[0]=resultF+"待ち"
                   var E=donpai.filter(value=>value.name==resultF);
                   for(var i=0; i<E.length ; i++){
@@ -8820,11 +8824,9 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                 }
                 if(Result.length>6){break;}
               }
-  
                 }
                 break;
-          }
-        
+          };
           //国士無双:エピックラインのみ、かつ同パイを含まない
           var Kokushi=[0,3,7,10,13,15,18,21,24,28,31,34,36,41,43,44]
           var resultF=Kokushi.concat();
@@ -8841,10 +8843,8 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           }else{Kreach+=1}
             if(Kreach>2){break;}
             }
-            console.log(resultF);
           if(Kreach==0 && KKreach==0){
-              //国士ツモ
-              console.log(resultF.length);
+              //国士
               Result[0]="国士無双待ち"
               for(var i=0; i<resultF.length ; i++){
                 if(Remaincheck(resultF[i])){
@@ -10808,18 +10808,17 @@ cx1.drawImage(e7,dorax,10,33,43.5)
   cx2.fillText(LPresult[2].elia, 120, 260);
   cx2.fillText(LPresult[1].elia, 120, 360);
   cx2.fillText(LPresult[0].elia, 120, 460);
-      //スコア更新
-      console.log(scoretemp,achievetemp,achievetempB)
       if(scoretemp[0]>=0){
         var A;
         if(pvpmode==1){
           //tokenで判別
-          A=LPresult.findIndex(value=>value.token==IAM.token);
+          A=3-LPresult.findIndex(value=>value.token==IAM.token);
           //RankingStr=["1st","2nd","3rd","4th"];
         }else{
-          A=LPresult.findIndex(value=>value=>value.pc=="Player");         
+          A=3-LPresult.findIndex(value=>value.pc=="Player");         
         }
-        if(A==-1){
+        console.log(A);
+        if(A==4){
           console.log('token error!',LPresult);
           A=0;
         }
@@ -10840,10 +10839,12 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             break;
         };
         highscore[0]+=1;
+      //スコア更新
+      console.log(scoretemp,achievetemp,achievetempB)
         if(scoretemp[1]>highscore[3]){highscore[3]=scoretemp[1];};
         if(LP[1]>highscore[1]){highscore[1]=LP[1]};
         //if(LP[1]<=0){};
-        winrankwinrank[scoretemp[0]]+=1;
+        winrank[scoretemp[0]]+=1;
         if(scoretemp[3]>highscore[2]){highscore[2]=scoretemp[3]};
         for(var i=0;i<achievetemp.length;i++){
             var A=achieveB.findIndex(value=>value.name==achievetemp[i].name);
