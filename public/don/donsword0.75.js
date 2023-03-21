@@ -1,8 +1,7 @@
-//var0.91 つうしんたいせん
-//デスマッチ工事中
+//var0.95
+//フリバに魔界モード追加　デスマッチ工事中
 //キル・デス情報はまだ同期していない;
 //アイシャのCPUスキル後に止まることがある？
-//オプションの左側を追加する,対戦画面からオプションに移動できるようにする
 
 window.onload = function(){
   draw();
@@ -105,7 +104,6 @@ window.onload = function(){
     }
   });
   socket.on('xxx', (data)=>{
-    var A=Usercount;
     if(Usercount !== data.message){
     Usercount=data.message;
     if(pagestate==6 && msgstate==0){
@@ -155,13 +153,11 @@ window.onload = function(){
     stage.addChild(yakumap);
     var yakumap2 = new createjs.Container();
     stage.addChild(yakumap2);
-    var raidmap = new createjs.Container();
-    stage.addChild(raidmap);
-    var raidmapB = new createjs.Container();
-    stage.addChild(raidmapB);
+    var handmap = new createjs.Container();
+    stage.addChild(handmap);
+    //reachhandあたりでの手札をcreateで描画してもいいかも？
     yakumap.alpha=0;
     var yakumapY=0;
-    var raidmapY=0;
     var graphics;
   graphics=new createjs.Graphics();
   graphics
@@ -234,13 +230,14 @@ window.onload = function(){
   var mpC=0;
   var ManaBreak=0;
   var pvpmode=0;
+  var raidscore=new Array(0,0,0,0,0);//魔界ルールで使用 0->終了時 1-4 和了した人
   var drawcard;
   var Cskillprepare=[0,0,0,0,0];
   //chara0 0->cpuランダム 1->cpu決める
   //覚醒ゲージ0-30
   var DP =new Array(0,0,0,0,0)
-  //バフ 1スキン 2マナシールド 3ネイチャ 4ナソコア 5やけど 6凍結 7ほうせんきょ
-  //11マナブレ
+  //バフ 1スキン 2マナシールド 3ネイチャ 4ナソコア 5やけど 6凍結 7適応力
+  //11~修羅の戦で和了済みの人
   var Buff =new Array(0,[],[],[],[])
   //再発動間隔測る用の配列
   var BuffCT = [];
@@ -257,12 +254,10 @@ window.onload = function(){
   //オーラスの時1　現在音楽のみに影響
   var Ronturn=[];
   //データベース
-  var raidlog=new Array(0,300000,0,0);//与ダメ、受ダメ、その他個別用、コンテニュー
-  var raidscore=new Array(0,0,0)
-  var LPlist=new Array("一般","ヘル","ミリオネア","∞")
+  var LPlist=new Array("一般","ヘル","ミリオネア","∞","魔界血戦")
   var musiclist=new Array("test","夜の迷宮の入口","決闘のテーマ","盲目のアストライア","The Evil Sacrifice Archenemies","Nine Jack","ロベリア","リーチっぽい音楽","狂乱のオーラス","エルの樹の麓")
   var chrlist=new Array("名無しさん","エルス","アイシャ","レナ")//,"レイヴン","エド","アラ","ラビィ")
-  var chrimg_src= new Array("don/Don_chara0.png","don/Don_chara1.png","don/Don_chara2.png","don/Don_chara3.png");
+  var chrimg_src= new Array("don/Don_chara0.png","don/Don_chara1.png","don/Don_chara2.png","don/Don_chara3.png","don/Don_chara0.png");
   var atrbute_src= new Array("don/Don_DP.png","don/Duel_mana.png","don/Duel_sun.png","don/Duel_aqua.png","don/Duel_wind.png","don/Duel_moon.png","don/Duel_gaia.png","don/Duel_heat.png","don/Don_HA.png");
   var bgimg_src=new Array(1,"don/Don_bg1.png","don/elimg2.png","don/stadium2.png");
   //説明用
@@ -302,9 +297,9 @@ window.onload = function(){
   {fir:"フレイムガイザー",sec:"FLAME GEYSER",thr:"0"},
   {fir:"メモライズ",sec:"MEMORIZE",thr:"0"},
   {fir:"フリージングアロー",sec:"FREEZING ARROW",thr:"0"},
+  {fir:"グラウンドクラッシュ",sec:"GROUND CRUSH",thr:"0"},
   ]
   //name->キャラsub->職、役判定で使用　line->ライン役判定に使用 0->all　color->1234567陽水風月土火E 0->all
-  //都合によりロゼを最後に
   var donpai=[
   {name:"エルス",sub:"ナイトエンペラー",line:1,color:1},
   {name:"エルス",sub:"ルーンマスター",line:2,color:1},
@@ -544,6 +539,8 @@ window.onload = function(){
   var dora=[]
   //手札.hand1[0]==-1 ron -2 tumo -3上がり判定、
   var hand1=[]
+  var Chand=[];
+  //create用に？
   var hand2=[]
   var hand3=[]
   var hand4=[]
@@ -564,6 +561,7 @@ window.onload = function(){
   var Cpuhandtemp=[]
   var cpuwant =0;
   //ポン頻度調整用 0->全部ポン　1->ポンしない
+  var tumoConfig=0;
   var Ponrate=0.4;
   //MPチャージ速度
   var mpVelocity=1;
@@ -597,7 +595,6 @@ window.onload = function(){
   //reach 1->リーチできます 2->リーチします　3->リーチ中 1,2ならパイを切った後に0に
   var ippatu =new Array(0,0,0,0,0)
   var rorder =new Array(0,0,0,0,0)
-  var porder =new Array(0,0,0,0,0)
   var nuki =new Array(0,0,0,0,0);
   var nukiswitch =new Array(0,0,0,0,0);
   //0->抜き直後に1にして嶺上　抜き枚数チェック
@@ -639,7 +636,11 @@ window.onload = function(){
   var msgstate=0
   var gamestate =10;
   //-1=>tumoronで使用,クリックさせたくない時 0=>クリックで1に,ゲームをしてない時 1=>game中 2=>クリックで0に,ツモのアニメーション 3=>ゲームオーバー、タイトルに戻るなどする 10=>麻雀をしていない
-  var Cimage;//ツモ画面でcanvasコピー用
+  var Cimage;//ツモ画面で対局画面の保存用
+  var CcanvasAry=[];
+  var N1;
+  var N2;
+  var N3;
   var turn =0
   var turntemp
   var parent=0
@@ -814,7 +815,6 @@ Bgm.on("load", () => {
   Bgm17.on("load", () => {
     loadgraph();
   })
-
   var musicnum=0
     se1.load();
     se2.load();
@@ -1242,7 +1242,19 @@ Bgm.on("load", () => {
     }
     canvas5.addEventListener("mousedown", mouseDownHandler, false);
     canvas5.addEventListener("mouseup", mouseUpHandler, false);
+    canvas5.addEventListener(`contextmenu`, contextHandler, false);
     canvas5.addEventListener("click", clickHandler, false);
+  function contextHandler(e){
+    //右クリック無効、右クリックでツモ切り
+      e.preventDefault();
+      if(tumoConfig==0){
+        if(gamestate==1){
+      if(opLock==0 && cLock==1 && turn ==0){
+            PlayertoCpu(hand1.length-1);
+          }}
+      }
+    };
+    
   //mousedown->mouseup->clickの順番に処理される
     function mouseDownHandler(e) {
       if(debugmode){
@@ -1560,13 +1572,36 @@ Bgm.on("load", () => {
       return false;
     }
             break;
-            default:
+            case 4:
+               //魔界ルール
+               console.log(raidscore);
+    //raidscore[0]==0 && raidscore[2] ==0 ->引き継ぎはgamestate2へ
+    if(raidscore[0]==1){
+      if(skillusage2[0]>=8){
+        gameover();
+        return false;
+      }
+    if(LP[1] >=0 && LP[2]>=0 && LP[3] >=0 && LP[4]>=0){
+      gamestate =1;
+      raidscore[0]=0;
+      deckHandler();
+        }else{
+      gameover();
+    }
+  }else{
+    //結果発表へ
+    if(cLock==1 || raidscore[2]==1){
+    ResultPhase();
+    }
+  }
+          break;
+        default:
   //∞モード
   if(LP[1] >=0 && LP[2]>=0 && LP[3] >=0 && LP[4]>=0){
     gamestate =1
     deckHandler();
     }else{gameover();}
-              break;
+          break;
     }
     }else if(gamestate ==2){//次のゲームへ
     if(pvpmode==1 && IsHost(IAM.room)){
@@ -1578,7 +1613,138 @@ Bgm.on("load", () => {
       MEMBER[i].turnflag=2;
     }
     }}
-    gamestate=0;
+    if(LP[0]==4){
+      if(raidscore[0]==0 && raidscore[2] ==0){
+        cx2.clearRect(0,0,800,600);
+        //引き継ぎ
+        cx2.putImageData(Cimage,0,0);
+        gamestate=1;
+        ctl=new Array(0,0,0,0,0)
+        ctlerror=new Array(0,0,0,0,0)
+        ponsw[0]=1;
+          cx2.font = "16px 'Century Gothic'";
+          cx2.strokeStyle ="white";
+          cx2.fillStyle ="black";
+          var Mary=[0,0,0,0,0];
+          var Vmax=60;
+        window.requestAnimationFrame((ts)=>scoreMove(ts))
+        function scoreMove(ts,n=0){
+          if(alpha>0){
+            //loopanime終わるまで待機
+            window.requestAnimationFrame((ts)=>scoreMove(ts,n))
+            return false;
+          }
+          var Y=170;
+          cx4.globalAlpha=1;
+          cx4.font = "16px 'Century Gothic'";
+          cx4.fillStyle ="blue";
+          cx4.strokeStyle = 'white';
+            for(var i=1;i<LPtemp.length;i++){
+              if(LPtemp[i]>0){
+                cx4.fillStyle ="blue";
+                switch(i){
+                  case 1:
+                    Y=470;
+                    break;
+                  case 2:
+                    Y=170;
+                    break;
+                  case 3:
+                    Y=270;
+                    break;
+                  case 4:
+                    Y=370;
+                    break;
+                }
+                cx4.strokeText("+"+LPtemp[i],165,Y)
+                cx4.fillText("+"+LPtemp[i],165,Y)
+              }else if(LPtemp[i]<0){
+                cx4.fillStyle ="red";
+                switch(i){
+                  case 1:
+                    Y=470;
+                    break;
+                  case 2:
+                    Y=170;
+                    break;
+                  case 3:
+                    Y=270;
+                    break;
+                  case 4:
+                    Y=370;
+                    break;
+                }
+                cx4.strokeText(LPtemp[i],160,Y)
+                cx4.fillText(LPtemp[i],160,Y)
+              }
+            }
+          n+=1;
+          var M=n/Vmax;
+          if(M>1){M==1};
+          for(var i=1;i<LPtemp.length;i++){
+            if(LPtemp[i]!==0){
+              switch(i){
+                case 1:
+                  Y=470;
+                  break;
+                case 2:
+                  Y=170;
+                  break;
+                case 3:
+                  Y=270;
+                  break;
+                case 4:
+                  Y=370;
+                  break;
+              }
+              Mary[i]=Math.floor(LP[i]-LPtemp[i]+(LPtemp[i]*M));
+              cx2.clearRect(75,Y-20,75,23);
+              cx2.strokeText(Mary[i],80,Y)
+              cx2.fillText(Mary[i],80,Y)
+            }
+          } 
+          if(n>Vmax){
+            cx4.clearRect(0,0,800,600);
+            cx4.globalAlpha=0;
+            for(var i=1;i<LPtemp.length;i++){
+              if(LPtemp[i]!==0){
+                switch(i){
+                  case 1:
+                    Y=470;
+                    break;
+                  case 2:
+                    Y=170;
+                    break;
+                  case 3:
+                    Y=270;
+                    break;
+                  case 4:
+                    Y=370;
+                    break;
+                }
+                cx2.clearRect(75,Y-20,75,23);
+                cx2.strokeText(LP[i],80,Y)
+                cx2.fillText(LP[i],80,Y)
+              }
+            } 
+            turnchecker();
+          }else{
+            window.requestAnimationFrame((ts)=>scoreMove(ts,n))
+          }
+        }
+        //turnchecker();
+      }else{
+        if(raidscore[2]==1){
+          se10.play();
+          cx1.fillStyle = "rgba(20,20,20,0.5)";
+          cx1.fillRect(10,100,780,400)
+          cx2.fillStyle = "white";
+          cx2.font = "36px 'Century Gothic'";
+          cx2.fillText("流局",360,300)
+          }
+        gamestate=0;
+      }
+    }
     }else if(gamestate ==3){//タイトルへ
       if(pvpmode==1 && gamestate !==10){
         console.log('ロビーに戻る',IAM.room);
@@ -1661,9 +1827,9 @@ Bgm.on("load", () => {
         cx4.font = "bold 26px 'メイリオ'";
         cx4.fillStyle = "white";
         var RsString=['ルーム長がトイレに行きました','ルーム長権限が発動しました','ルーム長がゲームを終了させました'];
-        };
         var A=Math.floor(Math.random()*RsString.length);
         cx4.fillText(RsString[A],50,590);
+        }
         gameover();
         }
       return false;
@@ -1722,18 +1888,31 @@ Bgm.on("load", () => {
     }}
     if(cLock==3){
       //**スキルで自分のパイ選択画面
+      //オールマイティは対象にできないようにする
     cx3.clearRect(0,0,800,600)
     if(mouseY >490 && mouseY < 590 && mouseX >100 && mouseX <760){
         var SX=Math.floor((mouseX+size-100)/size);
           if(mouseX >100 && mouseX <660){
             if(hand1.length>SX+1){
+              if(hand1[SX] ==43 || hand1[SX] ==44){
+                cLock=1;
+                return false;
+              }
               PlayertoCpu(SX);
             }
             if(ponsw[1]==1 && hand1.length==SX+1){
+              if(hand1[SX] ==43 || hand1[SX] ==44){
+                cLock=1;
+                return false;
+              }
               PlayertoCpu(SX);
             }
           }else if(mouseX >690 && mouseX <690+size){
             if(turn==0){
+              if(hand1[hand1.length-1] ==43 || hand1[hand1.length-1] ==44){
+                cLock=1;
+                return false;
+              }
               PlayertoCpu(hand1.length-1);
             }
           }
@@ -1830,6 +2009,8 @@ Bgm.on("load", () => {
           if(pvpmode==1){
           socket.emit("nuki", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[0].id});
           }
+          cLock=0;
+          console.log('操作禁止',cLock);
           NukiSkill(1);
         };
     }}
@@ -2063,7 +2244,7 @@ Bgm.on("load", () => {
       cx1.font = "14px 'Century Gothic'";
       cx1.fillText(Usercrest,182,115);
     }
-    cx.drawImage(BGimg,0,0,800,600);
+    cx.drawImage(BGimg,0,0,400,300,0,0,800,600);
     cx.clearRect(0,520,800,70)
     cx.fillStyle = "rgba(20,20,20,0.7)";
     cx.fillRect(410,210,350,240)
@@ -2194,9 +2375,10 @@ Bgm.on("load", () => {
             drawbuttom2(400,450,"デフォルトに戻す",0,180,40,1)
             cx2.fillStyle = "black";
             cx2.fillRect(360,70,2,400);
-            cx2.font = "36px 'Century Gothic'";
-            cx2.fillText("オプション",110,120)
+            //cx2.font = "36px 'Century Gothic'";
+            //cx2.fillText("オプション",110,120)
             cx2.font = "26px 'Century Gothic'";
+            cx2.fillText("ユーザー補助",60,100)
             cx2.fillText("対局設定",60,200)
             cx2.fillText("音量設定",390,100)
             cx2.fillText("対局BGM設定",390,198)
@@ -2206,6 +2388,11 @@ Bgm.on("load", () => {
             cx2.fillText("ルーム長の対局設定データが",65,460)
             cx2.fillText("全体に反映されます。",65,480)
             cx2.font = "24px 'Century Gothic'";
+            if(tumoConfig==0){
+              cx2.fillText("右クリック　ツモ切り",90,130);
+            }else if(tumoConfig==-1){
+            cx2.fillText("右クリック　何もしない",90,130);
+            }
             cx2.fillText("CPUのポン頻度",100,230);
             cx2.fillText("◀",120,260)
             cx2.fillText("▶",260,260)
@@ -2463,21 +2650,68 @@ Bgm.on("load", () => {
           }
           if(mouseX >400 && mouseX <580 && mouseY >450 && mouseY <490){
             //デフォルトに戻す
+            tumoConfig=0;
             Ponrate=0.4;
             mpVelocity=1;
               se3.play();
-              drawbuttom(80,310,"おそめ",1,80,40)
-              drawbuttom(170,310,"ふつう",0,80,40)
-              drawbuttom(260,310,"はやめ",0,80,40)
               musicset=[3,7,8];
               if(Ponrate<0){Ponrate=0};
-              cx2.font = "24px 'Century Gothic'";
-              cx2.fillStyle = "black";
-              cx2.clearRect(140,240,120,20);
-              var A=(1-Ponrate)*5;
-              for (var i=0;i<A;i++){
-                cx2.fillText("■",140+i*24,260);
-              };
+              //描画
+              cx2.clearRect(0,0,800,510)
+            drawbuttom(690,200,"Play",0,60,40)
+            drawbuttom(690,270,"Play",0,60,40)
+            drawbuttom(690,340,"Play",0,60,40)
+            drawbuttom(80,310,"おそめ",1,80,40)
+            drawbuttom(170,310,"ふつう",0,80,40)
+            drawbuttom(260,310,"はやめ",0,80,40)
+            drawbuttom2(600,450,"OK",0,100,40,1)
+            drawbuttom2(400,450,"デフォルトに戻す",0,180,40,1)
+            cx2.fillStyle = "black";
+            cx2.fillRect(360,70,2,400);
+            cx2.font = "26px 'Century Gothic'";
+            cx2.fillText("ユーザー補助",60,100)
+            cx2.fillText("対局設定",60,200)
+            cx2.fillText("音量設定",390,100)
+            cx2.fillText("対局BGM設定",390,198)
+            cx2.font = "18px 'Century Gothic'";
+            cx2.fillText("（注意：対局設定について）",60,420)
+            cx2.fillText("「たいせん」モードでは",60,440)
+            cx2.fillText("ルーム長の対局設定データが",65,460)
+            cx2.fillText("全体に反映されます。",65,480)
+            cx2.font = "24px 'Century Gothic'";
+            cx2.fillText("右クリック　ツモ切り",90,130);
+            cx2.fillText("CPUのポン頻度",100,230);
+            cx2.fillText("◀",120,260)
+            cx2.fillText("▶",260,260)
+            var A=(1-Ponrate)*5;
+            for (var i=0;i<A;i++){
+              cx2.fillText("■",140+i*24,260);
+            };
+            cx2.fillText("MPチャージ速度",100,300);
+            if(Fever==-1){
+              cx2.fillText("FEVER なし",100,380);
+            }else{
+            cx2.fillText("FEVER あり",100,380);
+            }
+            cx2.fillText("BGM(0-7)",430,130)
+            cx2.fillText("SE(0-7)",430,160)
+            cx2.fillText("◀ "+Math.floor(vBar*5)+" ▶",580,130)
+            cx2.fillText("◀ "+Math.floor(sBar*5)+" ▶",580,160)
+            cx2.fillText("通常",430,230)
+            cx2.fillText("リーチ",430,300)
+            cx2.fillText("オーラス",430,370)
+            cx2.font = "20px 'Century Gothic'";
+            cx2.textAlign = "center";
+            cx2.fillText(musiclist[musicset[0]],560,260)
+            cx2.fillText(musiclist[musicset[1]],560,330)
+            cx2.fillText(musiclist[musicset[2]],560,400)
+            cx2.textAlign = "start";
+            cx2.fillText("◀ ",380,260)
+            cx2.fillText("◀ ",380,330)
+            cx2.fillText("◀ ",380,400)
+            cx2.fillText(" ▶",720,260)
+            cx2.fillText(" ▶",720,330)
+            cx2.fillText(" ▶",720,400)    
           }
           if(mouseX >80 && mouseX <160 && mouseY >310 && mouseY <350){
             if(mpVelocity!==1){
@@ -2505,6 +2739,19 @@ Bgm.on("load", () => {
             drawbuttom(170,310,"ふつう",0,80,40)
             drawbuttom(260,310,"はやめ",1,80,40)
             }
+          }
+          if(mouseX >80 && mouseX <360 && mouseY >100 && mouseY <170){
+            cx2.font = "24px 'Century Gothic'";
+            cx2.fillStyle="black";
+            cx2.clearRect(89,105,270,26);
+            se3.play();
+            if(tumoConfig==0){
+              tumoConfig=-1;
+                cx2.fillText("右クリック　何もしない",90,130);
+              }else{
+                tumoConfig=0
+              cx2.fillText("右クリック　ツモ切り",90,130);
+              }
           }
           if(mouseX >80 && mouseX <340 && mouseY >350 && mouseY <410){
             cx2.font = "24px 'Century Gothic'";
@@ -4338,7 +4585,11 @@ if(opLock==0 && gamestate ==1){
       cx4.clearRect(0,0,800,600)
       alpha=1
       //背景
-      cx.drawImage(BGimg,0,0,800,600);
+      if(LP[0]==4){
+        cx.drawImage(BGimg,0,300,400,300,0,0,800,600);
+      }else{
+      cx.drawImage(BGimg,0,0,400,300,0,0,800,600);
+      }
       cx1.fillStyle = "rgba(10,10,10,0.6)";
       cx1.fillRect(630,400,160,80)
       cx1.fillRect(630,10,160,350)
@@ -4489,12 +4740,13 @@ if(opLock==0 && gamestate ==1){
       e14.src=chrimg_src[chara[4]]
       e14.onload=function(){
       cx1.drawImage(e14,500,0,300,300,0,parentY,100,100)
+      cx2.font = "16px 'Century Gothic'";
       if(LP[0]>=6 && LP[0]<10){
-      cx1.fillStyle ="white";
-      cx1.strokeStyle = '#eb5600';
+      cx2.fillStyle ="white";
+      cx2.strokeStyle = '#eb5600';
       }else{
-      cx1.fillStyle ="black";
-      cx1.strokeStyle = 'white';
+      cx2.fillStyle ="black";
+      cx2.strokeStyle = 'white';
       }
       for(var i=1; i<skillswitch.length;i++){
         skillswitch[i]=1;
@@ -4516,18 +4768,20 @@ if(opLock==0 && gamestate ==1){
           }}
       cx1.lineWidth = 3;
       cx1.lineJoin = 'round';
+      cx2.lineWidth = 3;
+      cx2.lineJoin = 'round';
       parentY =170
-      cx1.strokeText(LP[2],80,parentY)
-      cx1.fillText(LP[2],80,parentY)
+      cx2.strokeText(LP[2],80,parentY)
+      cx2.fillText(LP[2],80,parentY)
       parentY +=100
-      cx1.strokeText(LP[3],80,parentY)
-      cx1.fillText(LP[3],80,parentY)
+      cx2.strokeText(LP[3],80,parentY)
+      cx2.fillText(LP[3],80,parentY)
       parentY +=100
-      cx1.strokeText(LP[4],80,parentY)
-      cx1.fillText(LP[4],80,parentY)
+      cx2.strokeText(LP[4],80,parentY)
+      cx2.fillText(LP[4],80,parentY)
       parentY +=100
-      cx1.strokeText(LP[1],80,parentY)
-      cx1.fillText(LP[1],80,parentY)
+      cx2.strokeText(LP[1],80,parentY)
+      cx2.fillText(LP[1],80,parentY)
       parentY +=100
       cx1.font = "bold 16px 'Century Gothic'";
       cx1.fillStyle ="black";
@@ -4578,6 +4832,7 @@ if(opLock==0 && gamestate ==1){
       Extrash=[];
       c1=0
       opLock=0;
+      raidscore=[0,0,0,0,0];
       //ポンポポン
       ponsw=[0,0,0,0,0]
       poncpu=[0,Ponrate,Ponrate,Ponrate,Ponrate]
@@ -4607,6 +4862,14 @@ if(opLock==0 && gamestate ==1){
       drawDP(3)
       drawDP(4)
       Buff =new Array(0,[],[],[],[])
+      if(LP[0]==4){
+        var K=5-skillusage2[0];
+        if(K>0){;
+      for (var i=1;i<Buff.length;i++){
+        for(var j=0;j<K;j++){
+      Buff[i].push(7);
+      }}}
+    }
       Buffdraw();
     //playmaker
     dora.push(king[0])
@@ -4697,7 +4960,11 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         cx4.clearRect(0,0,800,600)
         alpha=1
         //背景
-        cx.drawImage(BGimg,0,0,800,600);
+        if(LP[0]==4){
+        cx.drawImage(BGimg,0,300,400,300,0,0,800,600);
+        }else{
+        cx.drawImage(BGimg,0,0,400,300,0,0,800,600);
+        }
         cx1.fillStyle = "rgba(10,10,10,0.6)";
         cx1.fillRect(630,400,160,80)
         cx1.fillRect(630,10,160,350)
@@ -4831,12 +5098,13 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         e14.src=chrimg_src[chara[4]]
         e14.onload=function(){
         cx1.drawImage(e14,500,0,300,300,0,parentY,100,100)
+        cx2.font = "16px 'Century Gothic'";
         if(LP[0]>=6 && LP[0]<10){
-        cx1.fillStyle ="white";
-        cx1.strokeStyle = '#eb5600';
+        cx2.fillStyle ="white";
+        cx2.strokeStyle = '#eb5600';
         }else{
-        cx1.fillStyle ="black";
-        cx1.strokeStyle = 'white';
+        cx2.fillStyle ="black";
+        cx2.strokeStyle = 'white';
         }
         for(var i=1; i<skillswitch.length;i++){
           skillswitch[i]=1;
@@ -4852,18 +5120,20 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             }}
         cx1.lineWidth = 3;
         cx1.lineJoin = 'round';
+        cx2.lineWidth = 3;
+        cx2.lineJoin = 'round';
         parentY =170
-        cx1.strokeText(LP[2],80,parentY)
-        cx1.fillText(LP[2],80,parentY)
+        cx2.strokeText(LP[2],80,parentY)
+        cx2.fillText(LP[2],80,parentY)
         parentY +=100
-        cx1.strokeText(LP[3],80,parentY)
-        cx1.fillText(LP[3],80,parentY)
+        cx2.strokeText(LP[3],80,parentY)
+        cx2.fillText(LP[3],80,parentY)
         parentY +=100
-        cx1.strokeText(LP[4],80,parentY)
-        cx1.fillText(LP[4],80,parentY)
+        cx2.strokeText(LP[4],80,parentY)
+        cx2.fillText(LP[4],80,parentY)
         parentY +=100
-        cx1.strokeText(LP[1],80,parentY)
-        cx1.fillText(LP[1],80,parentY)
+        cx2.strokeText(LP[1],80,parentY)
+        cx2.fillText(LP[1],80,parentY)
         parentY +=100
         cx1.fillStyle ="black";
         cx1.strokeStyle = 'white';
@@ -4914,6 +5184,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         Extrash=[];
         c1=0
         opLock=0;
+        raidscore=[0,0,0,0,0];
         //ポンポポン
         ponsw=[0,0,0,0,0]
         poncpu=[0,Ponrate,Ponrate,Ponrate,Ponrate]
@@ -4944,6 +5215,14 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         drawDP(3)
         drawDP(4)
         Buff =new Array(0,[],[],[],[])
+        if(LP[0]==4){
+          var K=5-skillusage2[0];
+          if(K>0){;
+        for (var i=1;i<Buff.length;i++){
+          for(var j=0;j<K;j++){
+        Buff[i].push(7);
+        }}}
+      }
         Buffdraw();
         for(var i =0; i<43; i++){
         deck.push(i);
@@ -5070,6 +5349,19 @@ cx1.drawImage(e7,dorax,10,33,43.5)
     var D=Buff[i].filter(value=>value==4);
     var E=Buff[i].filter(value=>value==5);
     var F=Buff[i].filter(value=>value==6);
+    var G=Buff[i].filter(value=>value==11);
+    var H=Buff[i].filter(value=>value==7);
+    if(G.length>0){
+      cx2.drawImage(donicon,150,0,30,30,x[i],y[i],20,20);
+      x[i]-=20;
+    };
+    if(H.length>0){
+      cx2.drawImage(donicon,210,0,30,30,x[i],y[i],20,20);
+      cx2.font = "8px Arial";
+      cx2.fillStyle = "white";
+      cx2.fillText(H.length, x[i]+12,y[i]+20);
+      x[i]-=20;
+    };
         if(A.length>0){
         cx2.drawImage(donicon,0,0,30,30,x[i],y[i],20,20);
         cx2.font = "8px Arial";
@@ -5089,6 +5381,13 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             cx2.font = "8px Arial";
             cx2.fillStyle = "white";
             cx2.fillText(C.length, x[i]+12,y[i]+20);
+            x[i]-=20;
+          };
+          if(D.length>0){
+            cx2.drawImage(donicon,180,0,30,30,x[i],y[i],20,20);
+            cx2.font = "8px Arial";
+            cx2.fillStyle = "white";
+            cx2.fillText(D.length, x[i]+12,y[i]+20);
             x[i]-=20;
           };
             if(E.length>0){
@@ -5179,10 +5478,10 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       //CPUはロンできる時は必ずロンするため無視
       //CPUのポンはランダム要素があるためホスト側で決定する
         if(nuki[0]>0){
-          var Fr1=Buff[1].findIndex(value=>value==6);
-          var Fr2=Buff[2].findIndex(value=>value==6);
-          var Fr3=Buff[3].findIndex(value=>value==6);
-          var Fr4=Buff[4].findIndex(value=>value==6);
+          var Fr1=Buff[1].findIndex(value=>value==6 || value==11);
+          var Fr2=Buff[2].findIndex(value=>value==6 || value==11);
+          var Fr3=Buff[3].findIndex(value=>value==6 || value==11);
+          var Fr4=Buff[4].findIndex(value=>value==6 || value==11);
           if(rorder[1] !==2){
           if(rorder[1]==0 && turn !==0 && Fr1==-1 && ManaBreak==0){ron(1)};
           if(rorder[2]==0 && turn !==1 && Fr2==-1 && ManaBreak==0){ron(2)}
@@ -5257,10 +5556,10 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         //捨て牌で誰も上がらないならターンを回す
         //ロン＞ポン
         //だれもロンしないなら隣の人がポンするか判定
-        var Fr1=Buff[1].findIndex(value=>value==6);
-        var Fr2=Buff[2].findIndex(value=>value==6);
-        var Fr3=Buff[3].findIndex(value=>value==6);
-        var Fr4=Buff[4].findIndex(value=>value==6);
+        var Fr1=Buff[1].findIndex(value=>value==6 || value==11);
+        var Fr2=Buff[2].findIndex(value=>value==6 || value==11);
+        var Fr3=Buff[3].findIndex(value=>value==6 || value==11);
+        var Fr4=Buff[4].findIndex(value=>value==6 || value==11);
         if(rorder[1] !==2){
         if(rorder[1]==0 && turn !==0 && Fr1==-1 && ManaBreak==0){ron(1)};
         if(rorder[2]==0 && turn !==1 && Fr2==-1 && ManaBreak==0){ron(2)}
@@ -5433,24 +5732,24 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           ManaBreak=0};
         switch(turn){
           case 1:
-            var Freeze=Buff[2].filter(value=>value==6)
+            var Freeze=Buff[2].filter(value=>value==6 || value==11)
             if(Freeze.length>0 || LP[2]<0){
-              if(Freeze.length>0){
               var F=Buff[2].findIndex(value=>value==6)
+              if(F!==-1){
               Buff[2].splice(F,1)
               }
               turn+=1;ctl[3]=0;
-              Freeze=Buff[3].filter(value=>value==6)
+              Freeze=Buff[3].filter(value=>value==6 || value==11)
               if(Freeze.length>0 || LP[3]<0){
-                if(Freeze.length>0){
                 var F=Buff[3].findIndex(value=>value==6)
+                if(F!==-1){
                 Buff[3].splice(F,1)
                 }
                 turn+=1;ctl[4]=0;
-                Freeze=Buff[4].filter(value=>value==6)
+                Freeze=Buff[4].filter(value=>value==6 || value==11)
                 if(Freeze.length>0 || LP[4]<0){
-                  if(Freeze.length>0){
                   var F=Buff[4].findIndex(value=>value==6)
+                  if(F!==-1){
                   Buff[4].splice(F,1)
                   }
                   turn=0
@@ -5461,24 +5760,24 @@ cx1.drawImage(e7,dorax,10,33,43.5)
               if(rorder[4]==1){rorder[4]=0}
             break;
           case 2:
-            var Freeze=Buff[3].filter(value=>value==6)
+            var Freeze=Buff[3].filter(value=>value==6 || value==11)
             if(Freeze.length>0 || LP[3]<0){
-              if(Freeze.length>0){
               var F=Buff[3].findIndex(value=>value==6)
+              if(F!==-1){
               Buff[3].splice(F,1)
               }
               turn+=1;ctl[4]=0;
-              Freeze=Buff[4].filter(value=>value==6)
+              Freeze=Buff[4].filter(value=>value==6 || value==11)
               if(Freeze.length>0 || LP[4]<0){
-                if(Freeze.length>0){
                 var F=Buff[4].findIndex(value=>value==6)
+                if(F!==-1){
                 Buff[4].splice(F,1)
                 }
                 turn=0
-              Freeze=Buff[1].filter(value=>value==6)
+              Freeze=Buff[1].filter(value=>value==6 || value==11)
               if(Freeze.length>0 || LP[1]<0){
-                if(Freeze.length>0){
                 var F=Buff[1].findIndex(value=>value==6)
+                if(F!==-1){
                 Buff[1].splice(F,1)
                 }
                 turn+=1;ctl[2]=0;
@@ -5489,24 +5788,24 @@ cx1.drawImage(e7,dorax,10,33,43.5)
               if(rorder[4]==1){rorder[4]=0}
             break;
           case 3:
-            var Freeze=Buff[4].filter(value=>value==6)
+            var Freeze=Buff[4].filter(value=>value==6 || value==11)
             if(Freeze.length>0 || LP[4]<0){
-              if(Freeze.length>0){
               var F=Buff[4].findIndex(value=>value==6)
+              if(F!==-1){
               Buff[4].splice(F,1)
               }
               turn=0;
-              Freeze=Buff[1].filter(value=>value==6)
+              Freeze=Buff[1].filter(value=>value==6 || value==11)
               if(Freeze.length>0 || LP[1]<0){
-                if(Freeze.length>0){
                 var F=Buff[1].findIndex(value=>value==6)
+                if(F!==-1){
                 Buff[1].splice(F,1)
                 }
                 turn+=1;ctl[2]=0;
-                Freeze=Buff[2].filter(value=>value==6)
+                Freeze=Buff[2].filter(value=>value==6 || value==11)
             if(Freeze.length>0 || LP[2]<0){
-              if(Freeze.length>0){
               var F=Buff[2].findIndex(value=>value==6)
+              if(F!==-1){
               Buff[2].splice(F,1)
               }
               turn+=1;ctl[3]=0;
@@ -5518,24 +5817,24 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             break;
           case 4:
               turn=0;
-              var Freeze=Buff[1].filter(value=>value==6)
+              var Freeze=Buff[1].filter(value=>value==6 || value==11)
               if(Freeze.length>0 || LP[1]<0){
-                if(Freeze.length>0){
                 var F=Buff[1].findIndex(value=>value==6)
+                if(F!==-1){
                 Buff[1].splice(F,1)
                 }
                 turn+=1;ctl[2]=0;
-                Freeze=Buff[2].filter(value=>value==6)
+                Freeze=Buff[2].filter(value=>value==6 || value==11)
             if(Freeze.length>0 || LP[2]<0){
-              if(Freeze.length>0){
               var F=Buff[2].findIndex(value=>value==6)
+              if(F!==-1){
               Buff[2].splice(F,1)
               }
               turn+=1;ctl[3]=0;
-              Freeze=Buff[3].filter(value=>value==6)
+              Freeze=Buff[3].filter(value=>value==6 || value==11)
             if(Freeze.length>0 || LP[3]<0){
-              if(Freeze.length>0){
               var F=Buff[3].findIndex(value=>value==6)
+              if(F!==-1){
               Buff[3].splice(F,1)
               }
               turn+=1;ctl[4]=0;
@@ -5835,7 +6134,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       turnchecker();
       }}
       }
-      if(num ==0){//*
+      if(num ==0){
       reachhand=[];
       var ponnum=pon1.length;
       reachhand=hand1.concat(pon1);
@@ -5845,15 +6144,12 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       }
       console.log(reachhand,ponnum)
       //handE1-handE9　reachhandをポン時に出した方が計算量減るかモ
-      //カンを実装したら手札が増えそうで震え
       hand1x =100
       hand2x =hand1x+size*3
       hand3x =hand2x+size*3
       var h=1
       var c=4
       var d=7
-      //cx2.clearRect(0,hand1y-5,670,60);
-      //cx2.clearRect(hand1x-2,hand1y,485,sizey);
       var r1=hand1[h];;
       handE1.src=eltear_src[reachhand[1]]
       handE2.src=eltear_src[reachhand[2]]
@@ -5883,8 +6179,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         }else{
           handE9.src=eltear_src[hand1[hand1.length-1]]
           handE9.onload=function(){
-          //たぶんこ↑こ↓出番ない、ありました、フレイムガイザー直後にありました
-          //cx2.drawImage(handE9,hand1x+size*8,hand1y,size,sizey);
+          //たぶんこ↑こ↓出番ない
           cx2.drawImage(handE9,690,500,size,sizey);
         }}
         };
@@ -6106,6 +6401,9 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       case 2:
         for(var i=1;i<LP.length;i++){LP[i]=100000}
         mode=1;
+        break;
+      case 4:
+        for(var i=1;i<LP.length;i++){LP[i]=150000}
         break;
       default:
         mode=1;
@@ -6406,7 +6704,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
   cx2.fillStyle = "#007fd9";
   cx2.fillRect(630,365,timerw,30)
   if(thinkTime >t*1000){
-  PlayertoCpu(9);}
+  PlayertoCpu(hand1.length-1);}
   }}
   
     function turnrole(){
@@ -7431,6 +7729,19 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       //上がった画面描画～次のゲーム,num=0→ツモ,1~→ロン dubダブロン用
       console.log("tumoron",player,num,ctl)
       console.log(ponsw[player])
+      if(LP[0]==4){
+        //魔界ルール
+        //ロンなら塗りつぶす
+        if(num>=1){
+        cx1.fillStyle = "rgba(200,0,0,0.5)";
+          if(ippatu[num]==1){
+          cx1.fillRect(riverx[num]-10.5,rivery[num]+10.5,43.5,33)
+          }else{
+          cx1.fillRect(riverx[num],rivery[num],33,43.5)
+          }
+        };
+        Cimage = cx2.getImageData(0, 0, 800, 600);
+      };
       se7.play();
       cLock=0
       gamestate=-1
@@ -7479,13 +7790,15 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       //handtemp.sort(compareFunc);
       var Astyle=Nodyaku(player);//ラインorペア
       //3ペア→+30符
-      fu =30;
+      fu =60;
+      var B=Buff[player].filter(value=>value==7);
+      if(B.length>0){
+      fu-=10*B.length;
+      }
       if(Astyle=="3ペア"){
-        fu+=30;
         fu-=10*ponf;
       }
       if(Astyle=="国士無双"){
-        fu+=30;
         han[player]+=6;
       }
       if(num==0 && ponsw[player] ==0){han[player] +=1}//門前ツモ
@@ -7498,7 +7811,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       var doracheck =Doracheck(player);
       function Doracheck(player){
         var result =0
-        if(reach[player]==3 && dub==1){
+        if(reach[player]==3 && dub==1 && LP[0]!==4){
           dora.push(king[6]);
           var DD=dora[dora.length-1]+1
           if(DD>=45){DD=0;}
@@ -7536,15 +7849,20 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       };
     }
       if(parent==0){Scorepay(player,4,num)}else{Scorepay(player,parent,num)}
-      
+      //描画
+      e15.src=chrimg_src[chara[player]]
+      e15.onload=function(){
+      if(num==0){e16.src=win_src[7]}else{e16.src=win_src[8]}
+      e16.onload=function(){
+      cx2.clearRect(10,100,780,400)
+      cx2.drawImage(e15,10,10,780,400,10,100,780,400)
+      cx2.drawImage(e16,0,230,297,234)
       var i=1
       var hai=vichand[i];
       console.log(hai);
       var haix =15
       var haiy =120
-      //cx2.clearRect(630,60,160,320)
-      cx2.clearRect(10,100,780,400)
-      cx2.fillStyle = "rgba(20,20,20,0.7)";
+      cx2.fillStyle = "rgba(15,15,15,0.6)";
       cx2.fillRect(10,100,780,400)
       e8.src=eltear_src[hai]
       e8.onload=function(){
@@ -7611,7 +7929,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         }
         achievetempB[A].count+=count;
         }};
-      //console.log(i)
       haiy=250
       cx2.font = "20px 'Century Gothic'";
       cx2.fillStyle ="white";
@@ -7635,9 +7952,8 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       }else{
           cx2.fillText('槍槓 1翻',haix,haiy);
       }
-        //嶺上は記録しない
         haiy +=25
-      }//嶺上
+      }
       if(num==0 && ponsw[player]==0){
       cx2.fillText('門前ツモ 1翻',haix,haiy)
       PB("門前ツモ");
@@ -7679,7 +7995,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       cx2.textAlign = "start";
       cx2.font = "26px 'Century Gothic'";
       cx2.fillStyle ="white";
-      //cx2.fillText(fu+"符",530,260)
       cx2.fillText(han[player]+"翻",530,360)
       cx2.font = "28px 'Century Gothic'";
       if(mode==0){
@@ -7759,13 +8074,33 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       tweeNsquare.paused=true;
       Csquare.alpha=0;
       gamestate =2
+      if(LP[0]==4){
+        //10,100,780,400
+        switch(raidscore[1]){
+          case 0:
+            N1= cx2.getImageData(10, 100, 780, 400);
+            break;
+          case 1:
+            N2= cx2.getImageData(10, 100, 780, 400);
+            break;
+          case 2:
+            N3= cx2.getImageData(10, 100, 780, 400);
+            break;
+        }
+        Buff[player].push(11);
+        raidscore[1]+=1;
+        if(raidscore[1]>=3){
+          raidscore[2]=1;
+        };
+        if(LP[1]<0 || LP[2]<0 || LP[3]<0 || LP[4]<0){
+          raidscore[2]=1;
+        };
+        cx2.clearRect(10,100,780,400);
+      }
       loopX=0
       loopX2=0;
       alpha=1;
-      e15.src=chrimg_src[chara[player]]
-      e15.onload=function(){
-      if(num==0){e16.src=win_src[7]}else{e16.src=win_src[8]}
-      e16.onload=function(){window.requestAnimationFrame((ts)=>LoopAnimation(ts))}
+        window.requestAnimationFrame((ts)=>LoopAnimation(ts))}
     }
       }}}};
       }}}};
@@ -7784,17 +8119,18 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       }
       if(fu<20){fu=20};
       if(han[player]<=0){han[player]=1};
-      var h=han[player]+6
+      var h=han[player]+2
       var hellhan=0
-      hellhan=fu*3*(1+h+(h*h)/2+(h*h*h)/6)
-      hellhan=Math.ceil(hellhan/100)*100
+      hellhan=fu*3*(h*2+h*h*h/2)
+      //hellhan=fu*3*(1+h+(h*h)/2+(h*h*h)/6)
+      hellhan=200*Math.ceil(hellhan/100)
       console.log(fu,hellhan)
       return hellhan
       };
   
     function Scorepay(player,parentS,num){
       //type0 通常 type1 サバイバル（予定）
-      if(player ==parentS){
+      if(LP[0]!==4 && player ==parentS){
         //連荘
       score =rootscore *1.5
       skillusage2[0]-=1;
@@ -7877,6 +8213,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       for(var i=1; i<LP.length;i++){
       LP[i]+=LPtemp[i]
       if(LP[i]<0){
+        if(chara[i]==4 && LP[i]!==1)
         //飛び
         if(skillusage2[i]==-1){
           skillusage2[i]=1;
@@ -9176,17 +9513,108 @@ cx1.drawImage(e7,dorax,10,33,43.5)
     cx2.fillStyle = "white";
     cx2.font = "36px 'Century Gothic'";
     cx2.fillText("流局",390,300)
+    if(LP[0]!==4){
     if(parent ==0){parent =3}else{parent -=1}
     skillusage2[0]-=1;
     skillusage2[5]+=1;
+    }
     for(var i=1 ;i<5; i++){
     ctl[i]=2;
   }
     cLock=0;
     gamestate =0;
     console.log('流局',ctl)
+    if(LP[0]==4){
+      raidscore[2]=1;
+      if(raidscore[0]==0){raidscore[0]=2};
+      ResultPhase();
+        //以降resultphaseは↑のほうで呼び出し
+      return false;
+    };
     }
-  
+
+    function ResultPhase(){
+      //ccanvasに保存した画像を順に見せる
+      cLock=0;
+      console.log('操作禁止',cLock);
+      if(raidscore[2]==1){
+        //はじめて
+        raidscore[2]=2;
+        msgstate=0;
+        cLock=1;
+        return;
+      }
+      console.log('resultphase',raidscore);
+      console.log(msgstate);
+      if(raidscore[1]<=msgstate){
+        raidscore[0]=1;
+        CcanvasAry=[];
+        return false;
+      }
+      //ツモ画面を順番に表示するのみ
+      //cx1.fillStyle='black';
+      //cx1.fillRect(10,100,780,400);
+      alpha=1;
+      var X=100;
+      var V=20;
+      var G=0.3;
+      cx1.clearRect(0,100,800,400);
+      cx4.globalAlpha=1;
+      cx4.fillStyle='black';
+      window.requestAnimationFrame((ts)=>Step1(ts))
+      function Step1(ts,N=0){
+        alpha-=0.05;
+        cx4.globalAlpha=alpha;
+        cx4.clearRect(0,100,800,400);
+        cx4.fillRect(0,100,800,400);
+        V+=G;
+        if(V>=100){V=100}
+        switch(msgstate){
+          case 0:
+            X-=V;
+            if(X<=10){
+            X=10;
+            N=1;
+            };
+            cx2.clearRect(0,100,800,400);
+            cx2.putImageData(N1,X,100);
+            break;
+          case 1:
+            if(X>10){X=10}
+            X-=V*2;
+            if(X<=-770){
+              X=-770;
+              N=1;
+            };
+            cx2.clearRect(0,100,800,400);
+            cx2.putImageData(N1,X,100);
+            cx2.putImageData(N2,X+780,100);
+            break;
+          case 2:
+            if(X>10){X=10}
+            X-=V*2;
+            if(X<=-770){
+              X=-770;
+              N=1;
+            };
+            cx2.clearRect(0,100,800,400);
+            cx2.putImageData(N2,X,100);
+            cx2.putImageData(N3,X+780,100);
+            break;
+          default:
+            console.log(msgstate);
+            return false;
+        }
+        if(alpha>0 && N==0){
+          window.requestAnimationFrame((ts)=>Step1(ts,N))
+        }else{
+      cx4.clearRect(0,0,800,600);
+      cx4.globalAlpha=1;
+      msgstate+=1;
+      cLock=1;
+    }
+      }
+    }
     function corsor(){
       if(gamestate==10){
         switch(pagestate){
@@ -9317,6 +9745,10 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             case 3:
               cx2.fillText(LPlist[LP[0]]+"：自由に打ち続けるモードです。Escキーでタイトル画面に戻れます。", 80, 550);
             break;
+            case 4:
+              cx2.fillText(LPlist[LP[0]]+"：4人中3人が和了するか、山がなくなるまで対局が続きます。", 80, 550);
+              cx2.fillText("※βテスト中/予期しないバグが起こる可能性があります。", 80, 570);
+              break;
           }
         }
         if(mouseX >520 && mouseX <650 && mouseY >175 && mouseY <205){
@@ -9398,6 +9830,11 @@ cx1.drawImage(e7,dorax,10,33,43.5)
               cx2.fillText("オーラス時に流れるBGMを変更できます。", 80, 550);
               cx2.fillText("曲詳細："+musiclistDT[musicset[2]].title+", "+musiclistDT[musicset[2]].elia+"（"+musiclistDT[musicset[2]].nod+"）", 80, 570);
             }
+            if(mouseX >50 && mouseX <360 && mouseY >100 && mouseY <170){
+              cx2.clearRect(80,530,670,70)
+              cx2.fillText("対局中に画面内を右クリックした時の操作を", 80, 550);
+              cx2.fillText("切り替えることができます。", 80, 570);
+            }
             if(mouseX >50 && mouseX <300 && mouseY >200 && mouseY <260){
               cx2.clearRect(80,530,670,70)
               cx2.fillText("CPUのポンのしやすさを調節します。", 80, 550);
@@ -9421,6 +9858,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
               cx3.strokeRect(400,450,180,40)
               cx2.clearRect(80,530,670,70)
               cx2.fillText("オプションを初回起動時の設定に戻します。", 80, 550);
+              cx2.fillText("※『音量設定』のみ初期化されません。", 80, 570);
             }
           break;
           case 4:
@@ -10037,7 +10475,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         cx4.lineTo(x,y);
         cx4.fill();
         }
-               
+
     function LoopAnimation(ts){
       cx4.globalAlpha = alpha;
       cx4.clearRect(0,0,800,600)
@@ -10058,7 +10496,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       y -=loopX*1.5
       if(x>=800){loopX=0}
       if(loopX2>=600){loopX2=600}
-      
       cx4.fillStyle = "#ff4c38";
       cx4.strokeStyle = "#ff4c38";
       drawstar(x,y)
@@ -10068,7 +10505,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       cx4.fillStyle = "#f558e5";
       cx4.strokeStyle = "#f558e5";
       drawstar(x*1.1+140,y*1.1+200)
-      
       cx4.drawImage(e15,loopX2-600,0,800+(600/loopX2),600+(600/loopX2))
       cx4.drawImage(e16,100,200,330+(loopxx/2),260+(loopxx*13/33))
       cx4.strokeStyle = "white";
@@ -10081,13 +10517,13 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       cx4.moveTo(x*3,y*3-700);
       cx4.lineTo(x*3+240,y*3-790);
       cx4.stroke();
-      
       if(alpha>0){
       if(gamestate==2){window.requestAnimationFrame((ts)=>LoopAnimation(ts));}else{
       alpha -=0.05
       window.requestAnimationFrame((ts)=>LoopAnimation(ts));}
       }else if(alpha <=0){
-      cx4.clearRect(0,0,800,600);cx4.globalAlpha = 1;
+      cx4.clearRect(0,0,800,600);
+      cx4.globalAlpha = 1;
       }
       };
   
@@ -10906,9 +11342,10 @@ cx1.drawImage(e7,dorax,10,33,43.5)
   cx2.clearRect(630,10,160,310)
   var p=chara[player]
   if(pvpmode==1){
-        cx2.fillText(MEMBER[player-1].name, 635, 58);
         if(IsHost(IAM.room)){
-        cx2.fillText("★", 635, 35);
+        cx2.fillText("★"+MEMBER[player-1].name, 635, 58);
+        }else{
+        cx2.fillText(MEMBER[player-1].name, 635, 58);
         }
   }else{
   switch(player){
@@ -10929,6 +11366,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
   cx2.fillStyle = "white";
   switch(num){
     case 0:
+      drawbuttom(635,10,"スキル",1,60,20)
     if(p==1){
       cx2.font = "bold 16px Arial";
       cx2.fillText("ストーンスキン", 635, 110);
@@ -10947,7 +11385,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         var MS=Buff[player].filter(value=>value==2)
         if(!MS.length){MS=[]};
       cx2.font = "bold 16px Arial";
-      cx2.fillText("マナシールド"+MS.length, 635, 110);
+      cx2.fillText("マナシールド", 635, 110);
       cx2.font = "14px Arial";
       cx2.fillText("・水パイを捨てる度に", 635, 130);
       cx2.fillText("マナシールドを張る." ,635, 150);
@@ -10955,12 +11393,21 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       cx2.fillText("メモライズ", 635, 170);
       cx2.font = "14px Arial";
       cx2.fillText("対象:手札のパイ1つ", 635, 190);
-      cx2.fillText("効果：①MPを1ゲージ", 635, 210);
-      cx2.fillText("消費し,対象のパイを", 635, 230);
-      cx2.fillText("メモしてから切る.", 635, 250);
-      cx2.fillText("②(メモ済みの場合)", 635, 270);
-      cx2.fillText("対象のパイをメモ", 635, 290);
-      cx2.fillText("したパイに変える.", 635, 310);
+      cx2.fillText("(オールマイティ以外)", 635, 210);
+      if(skillusage2[player]==-1){
+        cx2.fillText("効果：①MPを1ゲージ", 635, 230);
+        cx2.fillText("消費し,対象のパイを", 635, 250);
+        cx2.fillText("メモしてから切る.", 635, 270);
+        cx2.fillText("メモしたパイは,", 635, 290);
+        cx2.fillText("いつでも思い出せる.", 635, 310);
+      }else{
+      cx2.fillText("効果：②対象のパイを", 635, 230);
+      cx2.fillText("メモしたパイに変える.", 635, 250);
+      cx2.font = "bold 14px Arial";
+      cx2.fillText(donpai[skillusage2[player]].name, 640, 270);
+      cx2.fillText(donpai[skillusage2[player]].sub, 640, 290);
+
+      }
       }else if(p==3){
       cx2.font = "bold 15px Arial";
       cx2.fillText("ネイチャーフォース", 635, 110);
@@ -10976,6 +11423,22 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       cx2.fillText("対象:他のプレイヤー1人", 635, 250);
       cx2.fillText("効果:対象を3巡の間", 635, 270);
       cx2.fillText("「凍結」状態にする.", 635, 290);
+      }else if(p==4){
+      cx2.font = "bold 15px Arial";
+      cx2.fillText("ナソードコア", 635, 110);
+      cx2.font = "14px Arial";
+      cx2.fillText("・太陽パイを切る度に", 635, 130);
+      cx2.fillText("ナソードコアを生成する.", 635, 150);
+      cx2.fillText("・ナソードコアがある時,", 635, 170);
+      cx2.fillText("致死ダメージを受けても", 635, 190);
+      cx2.fillText("1度だけ食いしばる.", 635, 210);
+      cx2.font = "bold 15px Arial";
+      cx2.fillText("グラウンドクラッシャー", 635, 230);
+      cx2.font = "14px Arial";
+      cx2.fillText("MP消費:3ゲージ", 635, 250);
+      cx2.fillText("対象:全体", 635, 270);
+      cx2.fillText("効果:台パンにより", 635, 290);
+      cx2.fillText("この局を流局にする.", 635, 310);
       }else{
       cx2.font = "bold 16px Arial";
       cx2.fillText("パッシブスキル", 635, 110);
@@ -10989,17 +11452,18 @@ cx1.drawImage(e7,dorax,10,33,43.5)
     break;
    default:
     //Buff
+    drawbuttom(635,10,"バフ",1,50,20)
     var y=110;
     if(LP[player]<0){
       cx2.font = "bold 20px Arial";
-      cx2.fillText("戦闘不能", 635, y);
+      cx2.fillText("戦闘不可", 635, y);
       cx2.font = "14px Arial";
       y+=20;
       var T=1+skillusage2[player]
       cx2.fillText(" "+T+"局後に復活", 635, y);
-      y+=20
+      y+=22
     }
-    for(var i=1;i<7;i++){
+    for(var i=1;i<12;i++){
       var A=Buff[player].filter(value=>value==i)
       if(A.length>0){
         switch(i){
@@ -11009,7 +11473,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             cx2.font = "14px Arial";
             y+=20;
             cx2.fillText(" 自分へのスキル無効", 635, y);
-            y+=20
+            y+=22
             break;
           case 2:
             cx2.font = "bold 16px Arial";
@@ -11017,7 +11481,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             cx2.font = "14px Arial";
             y+=20;
             cx2.fillText(" 受けるダメージ減少", 635, y);
-            y+=20
+            y+=22
             break;
           case 3:
             cx2.font = "bold 16px Arial";
@@ -11025,7 +11489,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             cx2.font = "14px Arial";
             y+=20;
             cx2.fillText(" 勝利時戦闘力増加", 635, y);
-            y+=20
+            y+=22
             break;
           case 4:
             cx2.font = "bold 16px Arial";
@@ -11034,8 +11498,10 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             y+=20;
             cx2.fillText(" 勝利時追加ダメージ", 635, y);
             y+=20
-            cx2.fillText(" 受けるダメージ無効", 635, y);
+            cx2.fillText(" 1度だけ,致死ダメージ", 635, y);
             y+=20
+            cx2.fillText(" を受けた時食いしばり", 635, y);
+            y+=22
             break;
           case 5:
             cx2.font = "bold 16px Arial";
@@ -11043,7 +11509,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             cx2.font = "14px Arial";
             y+=20;
             cx2.fillText(" ポン不可", 635, y);
-            y+=20
+            y+=22
             break;
           case 6:
             cx2.font = "bold 16px Arial";
@@ -11051,8 +11517,27 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             cx2.font = "14px Arial";
             y+=20;
             cx2.fillText(" 行動不可.", 635, y);
-            y+=20
-            y+=20
+            y+=22
+            break;
+          case 7:
+            cx2.font = "bold 16px Arial";
+            cx2.fillText("環境　魔界"+A.length, 635, y);
+            cx2.font = "14px Arial";
+            y+=20;
+            cx2.fillText(" 戦闘力が減少する.", 635, y);
+            y+=20;
+            cx2.fillText(" 徐々に適応していく.", 635, y);
+            y+=22
+            break;
+          case 11:
+            cx2.font = "bold 16px Arial";
+            cx2.fillText("再結集のための休息", 635, y);
+            cx2.font = "14px Arial";
+            y+=20;
+            cx2.fillText(" 次の局まで待機.", 635, y);
+            y+=22
+            break;
+          default:
             break;
         }
       }
@@ -11075,6 +11560,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       "AchieveB":achieveB,
       "Highscore":highscore,
       "MPV":mpVelocity,
+      "tumoCon":tumoConfig,
       "PON":Ponrate,
       "FEV":Fever,
     }
@@ -11098,18 +11584,24 @@ cx1.drawImage(e7,dorax,10,33,43.5)
     var parentDiv = sp2.parentNode
     // 新しい要素を sp2 の手前に挿入
     parentDiv.insertBefore(button_read, sp2)
+    //ボタン追加ここまで
+
     button_read.addEventListener("change" , function(){
         if(!(button_read.value)) return; // ファイルが選択されない場合
         var file_list=button_read.files;
         if(!file_list) return; // ファイルリストが選択されない場合
         var file=file_list[0];
         if(!file) return; // ファイルが無い場合
+        if(pagestate!==1){
+          alert("❌　セーブデータはメイン画面の状態で読み込んでください");
+          button_read.value = "";
+          return;
+        }
         var file_reader=new FileReader();
         file_reader.readAsText(file);
         file_reader.onload=function(){
-            if(file_reader.result.slice(1, 74)=='"Title":"This is savedata of <https://azurelsword.web.fc2.com/ronan.html>'){ // .jsonの確認
-                data=JSON.parse(file_reader.result); // 読込んでdataを上書き
-    if(pagestate==1){
+        if(file_reader.result.slice(1, 74)=='"Title":"This is savedata of <https://azurelsword.web.fc2.com/ronan.html>'){ // .jsonの確認
+    data=JSON.parse(file_reader.result); // 読込んでdataを上書き
     sp2.innerHTML = "<h1>Welcome Back!</h1>"
     //各々グローバル変数に代入していく
     Username=data.Name
@@ -11120,11 +11612,15 @@ cx1.drawImage(e7,dorax,10,33,43.5)
     sBar=data.SEVolume;
     winrank=data.Rank.concat();
     mpVelocity=data.MPV;
+    tumoConfig=data.tumoCon;
     Ponrate=data.PON;
     Fever=data.FEV;
     //追加データ部分　undefinedなら初期値にしておく
     if (mpVelocity === void 0) {
       mpVelocity=1;
+    }
+    if (tumoConfig === void 0) {
+      tumoConfig=0;
     }
     if (Fever === void 0) {
       Fever=0;
@@ -11162,13 +11658,11 @@ cx1.drawImage(e7,dorax,10,33,43.5)
     console.log(Username,musicset);
     pagestate=0;
     Menu();
-    }
-              else{
-                alert("❌　今は読み込めません。");
-    }}
-            else{
-                alert("❌　ファイルが異なります。");
-            }}});
+    }  
+    else{
+        alert("❌　ファイルが異なります。");
+        button_read.value = "";
+    }}});
     }
         
   };
