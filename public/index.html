@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width">
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="エルドンオンライン" />
-  <meta name="twitter:description" content="エルコレドンジャラ　対戦機能付きのドンジャラです。" />
+  <meta name="twitter:description" content="エルドンオンライン　ドンジャラ風のボードゲームです。" />
   <meta name="twitter:image" content="https://eldontest.glitch.me/ss5.png" />
   <style>
     body {
@@ -99,17 +99,17 @@ margin: 0 auto;
    <canvas id="canvas5" WIDTH="800"; HEIGHT="600"></canvas>
 </div>
 <div class="parent">
-  <span id="child"><h1>ドンジャラソード！</h1></span>
+  <span id="child"><h1>エルドン</h1></span>
    </div>
     <div class="article">
       <div class="square">
-        <p style="text-align:center"><b><font size="5">【エルコレドンジャラ/for this game】</font><br></b></p>
+        <p style="text-align:center"><b><font size="5">【エルドンオンライン/for this game】</font><br></b></p>
       <b>はじめに</b><br>
-      　このゲームはエルソードの二次創作です。<br>
+      　エルソードに登場するキャラクターがパイになったドンジャラ風のボードゲームです。<br>
       　自動的にロードを行います。<br>
       　BGM,SEが鳴ります。<br>
       　外部セーブ機能付き。対戦記録をダウンロードしておくと、次回以降読み込めます。<br>
-      　対戦機能あり。最大4人でドンジャラができます。<br><br>
+      　ルーム対戦機能あり。最大4人で対戦ができます。<br><br>
       <b>概要</b><br>
       　9枚のパイで以下の「役」と呼ばれる組み合わせを揃えるゲームです。<br><br>
       ①3ペア：同じキャラ（エルス、アイシャなど）を3枚1組として、3組（3キャラ）を揃える。<br>
@@ -123,27 +123,6 @@ margin: 0 auto;
       　オールマイティのパイは何にでも代用可能です。<br>
       　ツモ・ロンした時、さらにシナジー役やクレスト役が追加でつき、得点が上がります。<br>
       　ゲーム内プレイガイドにも遊び方を記載しています。<br><br></p></div>
-<div class="square">
-  <p style="text-align:center"><b><font size="5">【対戦モードマニュアル】</font></b></p>
-  <p>　「たいせん」モードの説明です。</p>
-<div onclick="obj=document.getElementById('open').style; obj.display=(obj.display=='none')?'block':'none';">
-  <div class="square"><a style="cursor:pointer;"><p style="text-align:center"><b>▼ クリックで展開 ▼</b></p></a>
-<div id="open" style="display:none;clear:both;">
-  <p><b>ルーム画面</b><br>
-    　「たいせん」をクリック後、ルーム1～ルーム3をクリックすると、<br>以下のような画面に移ります。（ルーム長の画面）</p>
-  <img class="img-rounded article-img" src="don/ss4.png" width="640"/>
-  <p><b>ルーム長</b><br>
-    　そのルームのホストです。いちばん最初に部屋を立てた人です。ルーム長が退室した場合、ルーム内の他の誰かがルーム長になります。</p>
-  <p><b>ルーム設定</b><br>
-  　持ち点や対局の長さなどのルール設定です。ルーム長のみ設定を変更できます。</p>
-  <p><b>対局開始（ルーム長以外のプレイヤーでは代わりにREADYボタンが表示）</b><br>
-    　ルーム長：ルーム内のすべてのプレイヤーがREADY状態の場合にクリックすると、先に進めます。<br>
-  ルーム長以外のプレイヤー：READYボタンを押すとREADY状態となります。READY状態では退室ができません。</p>
-  <p><b>CPU</b><br>
-    　ルーム内のプレイヤー人数が4人未満の場合、ランダムにCPUキャラが参加します。<br>
-    CPUの対局設定は、ルーム長のデータのオプション設定が反映されます。<br>
-  <p></p>
-</div></div></div></div>
     <div class="square">
       <p style="text-align:center"><b><font size="5">【操作/how to play】</font><br></b></p>
       <p>基本的にマウス操作で遊べます。</p>
@@ -168,6 +147,35 @@ margin: 0 auto;
     <b>対局が止まった！</b>　ゲーム中に<b>Escキー</b>を押すといつでもゲームを終了できます。（※対戦中はルーム長のみ権限あり）<br>
     <b>CPUが強すぎる！</b>　つづける　がんばる<br></div>
 </div>
+<div class="square">
+  <p style="text-align:center"><b><font size="5">【対戦モードマニュアル】</font></b></p>
+  <p>　「たいせん」モードの説明です。</p>
+<div onclick="obj=document.getElementById('open').style; obj.display=(obj.display=='none')?'block':'none';">
+  <div class="square"><a style="cursor:pointer;"><p style="text-align:center"><b>▼ クリックで展開 ▼</b></p></a>
+<div id="open" style="display:none;clear:both;">
+  <p><b>ルーム画面</b><br>
+    　「たいせん」をクリック後、ルーム1～ルーム3をクリックすると、<br>以下のような画面に移ります。（ルーム長の画面）</p>
+  <img class="img-rounded article-img" src="don/ss4.png" width="640"/>
+  <p><b>ルーム長</b><br>
+    　そのルームのホストです。いちばん最初に部屋を立てた人です。ルーム長が退室した場合、ルーム内の他の誰かがルーム長になります。</p>
+  <p><b>ルーム設定</b><br>
+  　持ち点や対局の長さなどのルール設定です。ルーム長のみ設定を変更できます。</p>
+  <p><b>対局開始（ルーム長以外のプレイヤーでは代わりにREADYボタンが表示）</b><br>
+    　ルーム長：ルーム内のすべてのプレイヤーがREADY状態の場合にクリックすると、先に進めます。<br>
+  ルーム長以外のプレイヤー：READYボタンを押すとREADY状態となります。READY状態では退室ができません。</p>
+  <p><b>CPU</b><br>
+    　ルーム内のプレイヤー人数が4人未満の場合、ランダムにCPUキャラが参加します。<br>
+    CPUの対局設定は、ルーム長のデータのオプション設定が反映されます。<br>
+  <p></p>
+</div></div></div></div>
+<div class="square">
+  <p style="text-align:center"><b><font size="5">【参考：得点表】</font></b></p>
+<div onclick="obj=document.getElementById('open1').style; obj.display=(obj.display=='none')?'block':'none';">
+  <div class="square"><a style="cursor:pointer;"><p style="text-align:center"><b>▼ クリックで展開 ▼</b></p></a>
+<div id="open1" style="display:none;clear:both;">
+  <img class="img-rounded article-img" src="don/Don_tokuten.png" width="640"/>
+  <p></p>
+</div></div></div></div>
         <div class="square">
           <p style="text-align:center"><b><font size="5">【出典/Credit】</font><br></b></p>
    ・原作　ELSWORD<br>

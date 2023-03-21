@@ -1617,6 +1617,7 @@ Bgm.on("load", () => {
       if(raidscore[0]==0 && raidscore[2] ==0){
         cx2.clearRect(0,0,800,600);
         //引き継ぎ
+        cx3.clearRect(326,348,148,142);
         cx2.putImageData(Cimage,0,0);
         gamestate=1;
         ctl=new Array(0,0,0,0,0)
@@ -1637,11 +1638,10 @@ Bgm.on("load", () => {
           var Y=170;
           cx4.globalAlpha=1;
           cx4.font = "16px 'Century Gothic'";
-          cx4.fillStyle ="blue";
           cx4.strokeStyle = 'white';
             for(var i=1;i<LPtemp.length;i++){
               if(LPtemp[i]>0){
-                cx4.fillStyle ="blue";
+                cx4.fillStyle ="red";
                 switch(i){
                   case 1:
                     Y=470;
@@ -1659,7 +1659,7 @@ Bgm.on("load", () => {
                 cx4.strokeText("+"+LPtemp[i],165,Y)
                 cx4.fillText("+"+LPtemp[i],165,Y)
               }else if(LPtemp[i]<0){
-                cx4.fillStyle ="red";
+                cx4.fillStyle ="blue";
                 switch(i){
                   case 1:
                     Y=470;
@@ -1732,6 +1732,7 @@ Bgm.on("load", () => {
             window.requestAnimationFrame((ts)=>scoreMove(ts,n))
           }
         }
+        return false;
         //turnchecker();
       }else{
         if(raidscore[2]==1){
@@ -1740,11 +1741,11 @@ Bgm.on("load", () => {
           cx1.fillRect(10,100,780,400)
           cx2.fillStyle = "white";
           cx2.font = "36px 'Century Gothic'";
-          cx2.fillText("流局",360,300)
+          cx2.fillText("TIME UP",320,300)
           }
-        gamestate=0;
       }
     }
+    gamestate=0;
     }else if(gamestate ==3){//タイトルへ
       if(pvpmode==1 && gamestate !==10){
         console.log('ロビーに戻る',IAM.room);
@@ -9522,7 +9523,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
     ctl[i]=2;
   }
     cLock=0;
-    gamestate =0;
+    gamestate=0;
     console.log('流局',ctl)
     if(LP[0]==4){
       raidscore[2]=1;
