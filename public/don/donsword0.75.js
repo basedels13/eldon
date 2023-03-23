@@ -2,13 +2,16 @@
 //フリバに魔界モード追加　デスマッチ工事中
 //キル・デス情報はまだ同期していない;
 //アイシャのCPUスキル後に止まることがある？
+//対人でポンをスルーした場合、対局が止まる
+//サバイバルなのに死亡しても継続される？
+//解決？ラインリーチ中にオールマイティを切る
 
 window.onload = function(){
   draw();
   };
   
   function draw(){
-  var debugmode=false;  //コンソールログの表示の切り替え　リリース時にfalseに
+  var debugmode=true;  //コンソールログの表示の切り替え　リリース時にfalseに
   //自分自身の情報を入れる箱
   var IAM = {
     token: null,    // 戸別管理用のトークン
@@ -225,7 +228,7 @@ window.onload = function(){
   var CMpai;
   var Fever =0;
   //ルーム設定
-  var LP_PVP={Length:[1,"東風","半荘",],LP:[1,75000,150000,300000],Block:[1,"満貫あり","満貫なし"],Rule:[1,"サバイバル","デスマッチ"]};
+  var LP_PVP={Length:[1,"東風","半荘",],LP:[1,75000,150000,300000],Block:[1,"満貫あり","満貫なし"],Rule:[1,"サバイバル","デスマッチ"]};//,"魔界血戦"
   var mpmoving=false;
   var mpC=0;
   var ManaBreak=0;
@@ -1750,8 +1753,10 @@ Bgm.on("load", () => {
       if(pvpmode==1 && gamestate !==10){
         console.log('ロビーに戻る',IAM.room);
         //cx4.clearRect(0,0,800,600);
+        if(!Bgm.mute()){
           Bgm =new Music(bgm17data);
           Bgm.playMusic();
+        };
             musicnum=17;
             gamestate=10;
             pagestate=6;
@@ -3737,7 +3742,7 @@ Bgm.on("load", () => {
                     var clientChr=chara[1];
                     var roomId=RoomName[IAM.room];
                     //個人のルーム設定を初期化
-                    LP_PVP={Length:[1,"東風","半荘",],LP:[1,75000,150000,300000],Block:[1,"満貫あり","満貫なし"],Rule:[1,"サバイバル","デスマッチ"]};
+                    LP_PVP={Length:[1,"東風","半荘",],LP:[1,75000,150000,300000],Block:[1,"満貫あり","満貫なし"],Rule:[1,"サバイバル","デスマッチ"]};//"魔界血戦"
                     socket.emit('leave_to_room',{token: IAM.token,name:clientId,chr:clientChr,room:roomId});
                   }else{
                     se3.play();
@@ -3815,6 +3820,7 @@ Bgm.on("load", () => {
                   Nyusitu(3);
                 }
                 function Nyusitu(rn=1){
+                  console.log('nyusitu',rn);
                   var clientId=Username;
                   var clientCrest=Usercrest;
                   var clientChr=chara[1];
@@ -4017,7 +4023,7 @@ Bgm.on("load", () => {
       gameover();
     }else if(gamestate==10){
     //data.focus 0->誰かが入室してきた 1->ready 2->ゲームオーバーのあと
-    if(IsHost(IAM.room && data.focus==0)){
+    if(IsHost(IAM.room) && data.focus==0){
       //ルーム設定を同期
     socket.emit('room_config',{token: IAM.token,room:RoomName[IAM.room],config:LP_PVP});
     };
@@ -5464,6 +5470,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             ponsw[N]=pon4.length;
             break;
           default:
+            console.log('pon-pai N error?',N);
             ponsw[N]=pon2.length;
             break;
         }
@@ -5604,7 +5611,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         turntemp=turn
         turn=7
         if(pvpmode==1 && MEMBER[3].pc==1){
-          console.log('player3 waiting');
+          console.log('player4 waiting');
         }else{
         cpu(4);
         }
@@ -6411,6 +6418,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       }
     }
     if(pvp==1){
+      if(LP_PVP.Rule[0]==3){LP[0]=4};
       switch(LP_PVP.LP[0]){
         case 1:
           for(var i=1;i<LP.length;i++){LP[i]=75000}
@@ -6720,7 +6728,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         }
         turn=P;
         console.log(P,IAM.mwah,turn);
-        //ponsw[0]=0;
+        ponsw[0]=0;
         tweeNsquare.paused=false;
       switch(turn){ 
         case 0:
@@ -7191,7 +7199,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                   end=1;
               }
               if(keyj2.length==3){
-                //ここにいる？
                 if(Line["1"]==1 || Line["2"]==1 || Line["3"]==1 || Line["4"]==1){
                   console.log('line reach')
                   //if(reach[player]==1){reach[player]=2};
@@ -7479,13 +7486,15 @@ cx1.drawImage(e7,dorax,10,33,43.5)
               break;
               case 2:
                 PonN=pon2.length;
+                break;
               case 3:
                 PonN=pon3.length;
+                break;
               case 4:
                 PonN=pon4.length;
-                //handtempはcpu先でコピー済
               break;
               default:
+                console.log('player error!')
               handtemp = hand2.concat();
               //自信ないから残しとく
               break;
@@ -7791,10 +7800,10 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       //handtemp.sort(compareFunc);
       var Astyle=Nodyaku(player);//ラインorペア
       //3ペア→+30符
-      fu =60;
+      fu=100;
       var B=Buff[player].filter(value=>value==7);
       if(B.length>0){
-      fu-=10*B.length;
+      fu-=20*B.length;
       }
       if(Astyle=="3ペア"){
         fu-=10*ponf;
@@ -8120,9 +8129,9 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       }
       if(fu<20){fu=20};
       if(han[player]<=0){han[player]=1};
-      var h=han[player]+2
+      var h=han[player]
       var hellhan=0
-      hellhan=fu*3*(h*2+h*h*h/2)
+      hellhan=(fu+2)*3*(16*(h+2)+h*h*h/3)
       //hellhan=fu*3*(1+h+(h*h)/2+(h*h*h)/6)
       hellhan=200*Math.ceil(hellhan/100)
       console.log(fu,hellhan)
@@ -8150,13 +8159,14 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       LPtemp=[0,0,0,0,0]
       if(num >0){//ロン
         if(pvpmode==0 ||(pvpmode==1 && LP_PVP.Rule[0]==1)){
-        LPtemp[player]+=score;
+        LPtemp[player]=score;
       }
         var MS=Buff[num].filter(value=>value==2);
         if(MS.length){
-          LPtemp[num]+=Math.floor(score*(MS.length)/10);
+          LPtemp[num]=-Math.floor(score*(10-MS.length)/10);
+        }else{
+      LPtemp[num]=-score
         }
-      LPtemp[num]-=score
       if(LP_PVP.Rule[0]==2){
         death[player-1].Admg[num-1]+=score;
         death[num-1].Bdmg[player-1]+=score;
@@ -8167,13 +8177,14 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       for(var i=1;i<LP.length;i++){
       if(i==player){
         if(pvpmode==0 ||(pvpmode==1 && LP_PVP.Rule[0]==1)){
-          LPtemp[i]+=score;
+          LPtemp[i]=score;
         }
       }else{
-        LPtemp[i]-=score/3;
         var MS=Buff[i].filter(value=>value==2);
         if(MS.length){
-          LPtemp[i]+=Math.floor((score/3)*(MS.length)/10);
+          LPtemp[i]=-Math.floor((score/3)*(10-MS.length)/10);
+        }else{
+          LPtemp[i]=-score/3;
         }
         if(LP_PVP.Rule[0]==2){
           death[i-1].Bdmg[player-1]+=score/3;
@@ -8187,23 +8198,27 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       for(var i=1;i<LP.length;i++){
       if(i==player){
         if(pvpmode==0 ||(pvpmode==1 && LP_PVP.Rule[0]==1)){
-          LPtemp[i]+=score;
+          LPtemp[i]=score;
           if(LP_PVP.Rule[0]==2){
             death[player-1].Admg[player-1]+=score;
           }
         }
-      }else if(i==parentS){LPtemp[i]-=score/2;
+      }else if(i==parentS){
       var MS=Buff[i].filter(value=>value==2);
       if(MS.length){
-        LPtemp[i]+=Math.floor((score/2)*(MS.length)/10);
+        LPtemp[i]=-Math.floor((score/2)*(10-MS.length)/10);
+      }else{
+        LPtemp[i]=-score/2;
       }
       if(LP_PVP.Rule[0]==2){
         death[i-1].Bdmg[player-1]+=score/2;
       }
-      }else{LPtemp[i]-=score/4
+      }else{
       var MS=Buff[i].filter(value=>value==2);
       if(MS.length){
-        LPtemp[i]+=Math.floor((score/4)*(MS.length)/10);
+        LPtemp[i]=-Math.floor((score/4)*(10-MS.length)/10);
+      }else{
+        LPtemp[i]=-score/4
       }
       if(LP_PVP.Rule[0]==2){
         death[i-1].Bdmg[player-1]+=score/4;
@@ -9198,15 +9213,12 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       if(num==-1){
         //ポンできるかどうかの判定
         console.log('pon'+player,reach[player]);
-        var result=0;
         if(reach[player]==3){
           //立直しているならポンできない
-          //console.log('ron false');
           return false;
         }
         if(tumotemp==43 || tumotemp==44){
-          //オールマイティはポンできない、ポンに使えないことにする
-          //console.log('ron false');
+          //オールマイティはポンできない、ポンに使えない
           return false;
         }
         handtemp=[];
@@ -10007,6 +10019,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                 var elskunn=[
                   {name:"サバイバル　一般的な麻雀のようなルールです。",sub:"誰かが飛ぶかオーラス終了時までドンジャラを",suburb:"します。持ち点が多いほど高順位です。"},
                   {name:"デスマッチ　和了しても自分の持ち点は増えず、",sub:"誰かが飛んでも試合が続きます。",suburb:"（飛んだプレイヤーは2局後に75000点で復活）"},
+                  {name:"魔界血戦　4人中3人が和了するまで対局が続き、",sub:"裏ドラなし、連荘なし、魔界デバフ付与など",suburb:"特殊なルールです。"},
                   {name:"持ち点　ゲーム開始時の持ち点です。",sub:"※得点基準参考：親が満貫の場合、75000点"},
                   {name:"対局数の設定　東風では最大4局まで、",sub:"半荘では最大8局までドンジャラが続きます。"},
                   {name:"満貫打ち止め　満貫ブロックの有無の設定です。",sub:"「なし」にすると高得点が出やすくなります。"},
@@ -10017,10 +10030,14 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                   cx2.fillText(elskunn[0].name, 20, 540);
                   cx2.fillText(elskunn[0].sub, 20, 560); 
                   cx2.fillText(elskunn[0].suburb, 20, 580); 
-                  }else{
+                  }else if(LP_PVP.Rule[0]==2){
                   cx2.fillText(elskunn[1].name, 20, 540);
                   cx2.fillText(elskunn[1].sub, 20, 560); 
                   cx2.fillText(elskunn[1].suburb, 20, 580);  
+                }else if(LP_PVP.Rule[0]==3){
+                  cx2.fillText(elskunn[2].name, 20, 540);
+                  cx2.fillText(elskunn[2].sub, 20, 560); 
+                  cx2.fillText(elskunn[2].suburb, 20, 580);  
                   }                  
                 }
                 if(mouseX >340 && mouseX <460 && mouseY >0 && mouseY <45){
@@ -10045,10 +10062,14 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                     cx2.fillText(elskunn[0].name, 20, 540);
                     cx2.fillText(elskunn[0].sub, 20, 560); 
                     cx2.fillText(elskunn[0].suburb, 20, 580); 
-                    }else{
+                    }else if(LP_PVP.Rule[0]==2){
                     cx2.fillText(elskunn[1].name, 20, 540);
                     cx2.fillText(elskunn[1].sub, 20, 560); 
                     cx2.fillText(elskunn[1].suburb, 20, 580);  
+                    }else if(LP_PVP.Rule[0]==3){
+                    cx2.fillText(elskunn[2].name, 20, 540);
+                    cx2.fillText(elskunn[2].sub, 20, 560); 
+                    cx2.fillText(elskunn[2].suburb, 20, 580);  
                     }
                   }
                   if(mouseX >610 && mouseX <790 && mouseY >180 && mouseY <240){
@@ -11525,9 +11546,13 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             cx2.fillText("環境　魔界"+A.length, 635, y);
             cx2.font = "14px Arial";
             y+=20;
-            cx2.fillText(" 戦闘力が減少する.", 635, y);
+            cx2.fillText(" エルの力が届かない環境.", 635, y);
             y+=20;
-            cx2.fillText(" 徐々に適応していく.", 635, y);
+            cx2.fillText(" 段々と適応していく.", 635, y);
+            y+=20;
+            cx2.fillText(" 和了時の戦闘力が低下.", 635, y);
+            y+=20;
+            cx2.fillText(" 1局ごとに重複数減少.", 635, y);
             y+=22
             break;
           case 11:
