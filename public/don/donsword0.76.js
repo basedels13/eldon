@@ -1,8 +1,7 @@
 //var0.96
-//フリバに魔界モード追加　デスマッチ工事中
+//フリバに魔界モード追加
 //キル・デス情報はまだ同期していない;
 //対戦で魔界モードのリザルトが出ない
-//魂の一撃の下の実績が解除されない？
 //魔界モードで右クリックができなくなる？
 
 window.onload = function(){
@@ -1251,6 +1250,7 @@ Bgm.on("load", () => {
       if(tumoConfig==0){
         if(gamestate==1){
       if(opLock==0 && cLock==1 && turn ==0){
+            ctl[1]=0;
             PlayertoCpu(hand1.length-1);
           }}
       }
