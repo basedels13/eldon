@@ -9,7 +9,7 @@ window.onload = function(){
   };
   
   function draw(){
-  var debugmode=true;  //コンソールログの表示の切り替え　リリース時にfalseに
+  var debugmode=false;  //コンソールログの表示の切り替え　リリース時にfalseに
   //自分自身の情報を入れる箱
   var IAM = {
     token: null,    // 戸別管理用のトークン
@@ -71,7 +71,7 @@ window.onload = function(){
     return false;
     break;
   }};
- 
+ if(!debugmode){
   //接続
   const socket = io();
   socket.on('connect', () => {
@@ -113,7 +113,7 @@ window.onload = function(){
       cx2.fillText("現在の接続人数："+Usercount, 580, 550);
     }}
     });
-
+  }
   var Usercount=0;
   var RoomNum=[0,0,0];
   var RoomState=["open","open","open"];
