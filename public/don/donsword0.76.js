@@ -2,14 +2,14 @@
 //フリバに魔界モード追加
 //キル・デス情報はまだ同期していない;
 //対戦で魔界モードのリザルトが出ない
-//魔界モードで右クリックができなくなる？
+//魔界モードで誰かが上がった後に右クリックができなくなる？
 
 window.onload = function(){
   draw();
   };
   
   function draw(){
-  var debugmode=true;  //コンソールログの表示の切り替え/オフラインテストプレイ用　リリース時にfalseに
+  var debugmode=false;  //コンソールログの表示の切り替え/オフラインテストプレイ用　リリース時にfalseに
   //自分自身の情報を入れる箱
   var IAM = {
     token: null,    // 戸別管理用のトークン
@@ -8026,10 +8026,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           e8.onload=function(){
             cx2.drawImage(e8,haix,haiy,size,sizey)
             i +=1;
-          }}}};
-        }}}};
-        };
-        haiy=250
+        haiy=250;
         cx2.font = "20px 'Century Gothic'";
         cx2.fillStyle ="white";
         cx2.fillText(Astyle,haix,haiy)
@@ -8164,6 +8161,9 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         };
         cx2.clearRect(10,100,780,400);
       }
+        }}}};
+      }}}};
+      };
       loopX=0
       loopX2=0;
       alpha=1;
@@ -10774,6 +10774,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       }else if(alpha <=0){
       cx4.clearRect(0,0,800,600);
       cx4.globalAlpha = 1;
+      opLock=0;
       if(LP[0]!==4){Resultmap(player)};
       }
       };
