@@ -9,7 +9,7 @@ window.onload = function(){
   };
   
   function draw(){
-  var debugmode=false;  //コンソールログの表示の切り替え　リリース時にfalseに
+  var debugmode=true;  //コンソールログの表示の切り替え/オフラインテストプレイ用　リリース時にfalseに
   //自分自身の情報を入れる箱
   var IAM = {
     token: null,    // 戸別管理用のトークン
@@ -71,7 +71,6 @@ window.onload = function(){
     return false;
     break;
   }};
- if(!debugmode){
   //接続
   const socket = io();
   socket.on('connect', () => {
@@ -113,7 +112,6 @@ window.onload = function(){
       cx2.fillText("現在の接続人数："+Usercount, 580, 550);
     }}
     });
-  }
   var Usercount=0;
   var RoomNum=[0,0,0];
   var RoomState=["open","open","open"];
@@ -155,7 +153,8 @@ window.onload = function(){
     stage.addChild(yakumap2);
     var handmap = new createjs.Container();
     stage.addChild(handmap);
-    //reachhandあたりでの手札をcreateで描画してもいいかも？
+    var Resultary=[]
+    //クリア時アニメーションに使用
     yakumap.alpha=0;
     var yakumapY=0;
     var graphics;
@@ -263,7 +262,7 @@ window.onload = function(){
   //説明用
   var epic_src =new Array("don/elstudio_bg1.png","don/Don_epic1.png","don/Don_epic2.png","don/Don_epic3.png","don/Don_epicline.png","don/Don_ss11.png","don/Don_epic4.png","don/Don_epic5.png");
   //裏＆ツモロンボタン
-  var eltearB_src =new Array( "don/Don_img0.png","don/Don_tumoA.png","don/Don_tumoB.png","don/Don_tumoC.png","don/Don_tumoD.png");
+  var eltearB_src =new Array( "don/Don_img0.png","don/Don_tumoA.png","don/Don_tumoB.png","don/Don_tumoC.png","don/Don_tumoD.png","don/Don_winbg.png");
   var eltear= new Image();
   //donpaiのidは0から始まるためそのまま
   var eltear_src = new Array("don/Don_img1.png","don/Don_img2.png","don/Don_img3.png","don/Don_img4.png","don/Don_img5.png","don/Don_img6.png","don/Don_img7.png","don/Don_img8.png","don/Don_img9.png","don/Don_img10.png",);
@@ -522,6 +521,9 @@ window.onload = function(){
   //ツモロンの時の表示に
   var e18= new Image();
   var e19= new Image();
+  var e20= new Image();
+  //属性マーク
+  var Aicon=new Image();
   //マナブレアイコン
   var MBicon= new Image();
   var epic= new Image();
@@ -707,6 +709,18 @@ window.onload = function(){
     src:"don/decision18.mp3",
     volume: 0.2,
     });
+  var se13 = new Howl({
+    src:"don/explode.mp3",
+    volume: 0.3,
+    });
+  var se14 = new Howl({
+      src:"don/raise-a-pinball-flipper-2.mp3",
+      volume: 0.3,
+      });
+  var se15 = new Howl({
+    src:"don/kaiju_foot.mp3",
+    volume: 0.3,
+    });
   const jingle =new Howl({
       src: "don/Don_jingle.mp3",
       volume: 0.3,
@@ -828,13 +842,30 @@ Bgm.on("load", () => {
     se10.load();
     se11.load();
     se12.load();
+    se13.load();
+    se14.load();
+    se15.load();
   var donX=40;
   var donY=100;
-  var loadmax=80;
-  
+  var loadmax=88;
   DPimg.src=atrbute_src[0];
     DPimg.onload=function(){loadgraph();
          }
+  Aicon.src="don/Duel_gaia.png"
+  Aicon.onload=function(){loadgraph();
+      Aicon.src="don/Duel_heat.png"
+      Aicon.onload=function(){loadgraph();
+          Aicon.src="don/Duel_aqua.png"
+          Aicon.onload=function(){loadgraph();
+            Aicon.src="don/Duel_wind.png"
+            Aicon.onload=function(){loadgraph();
+              Aicon.src="don/Duel_sun.png"
+              Aicon.onload=function(){loadgraph();
+                Aicon.src="don/Duel_moon.png"
+                Aicon.onload=function(){loadgraph();
+              Aicon.src="don/Don_HA.png"
+              Aicon.onload=function(){loadgraph();
+  }}}}}}};
   e17.src=win_src[7]
   e17.onload=function(){loadgraph();
     e17.src=win_src[8]
@@ -853,6 +884,8 @@ Bgm.on("load", () => {
           e18.src=eltearB_src[4];
           e18.onload=function(){loadgraph();
           }}}}}
+  e20.src="don/Don_winbg.png";
+  e20.onload=function(){loadgraph();}
   etitle.src="don/Don_title.png";
   etitle.onload=function(){loadgraph();}
   donicon.src=donicon_src[0];
@@ -1159,8 +1192,6 @@ Bgm.on("load", () => {
   function load2(){
     loadstate+=1;
     //console.log(loadstate,loadmax);
-  tweeNstar.paused=true;
-  stage.removeChild(Cstar);
   cx3.fillStyle = "rgb(0,0,0)";
   cx3.fillRect(0, 0, 800, 600);
   cx3.fillStyle = "#007fd9";
@@ -1250,8 +1281,10 @@ Bgm.on("load", () => {
       if(tumoConfig==0){
         if(gamestate==1){
       if(opLock==0 && cLock==1 && turn ==0){
+        if(reach[1]!==2){
             ctl[1]=0;
             PlayertoCpu(hand1.length-1);
+        }
           }}
       }
     };
@@ -1349,6 +1382,9 @@ Bgm.on("load", () => {
               se10.volume(0);
               se11.volume(0);
               se12.volume(0);
+              se13.volume(0);
+              se14.volume(0);
+              se15.volume(0);
               jingle2.volume(0);
               if(debugmode){
               console.log(cx5.globalAlpha,cLock);
@@ -1360,19 +1396,7 @@ Bgm.on("load", () => {
               cx5.globalAlpha = 1;
       //ミュートの切り替え
     if( mute=="OFF" ){
-      se1.volume(0.25*sBar);
-      se2.volume(0.4*sBar);
-      se3.volume(0.3*sBar);
-      se4.volume(0.3*sBar);
-      se5.volume(0.2*sBar);
-      se6.volume(0.25*sBar);
-      se7.volume(0.18*sBar);
-      se8.volume(0.2*sBar);
-      se9.volume(0.3*sBar);
-      se10.volume(0.3*sBar);
-      se11.volume(0.3*sBar);
-      se12.volume(0.2*sBar);
-      jingle2.volume(0.3*sBar);
+      SEbuffer();
       Bgm.mute(false);
       switch (musicnum){
         case 1:
@@ -1437,6 +1461,8 @@ Bgm.on("load", () => {
         field.removeChild(ary[i]);
       }
       ary=[];
+      tweeNstar.paused=true;
+      stage.removeChild(Cstar);
     pagestate=0;
     se6.play();
     saveUP()
@@ -1462,6 +1488,8 @@ Bgm.on("load", () => {
   if(gamestate ==0){//ほんぺ
     //ニューゲーム
     cx5.globalAlpha = 1;
+    handmap.removeAllChildren();
+    //handmap.alpha=0;
     //と言いたいけどダブロンがあればその処理
     if(Ronturn.length>0){
       gamestate=1;
@@ -2023,7 +2051,7 @@ Bgm.on("load", () => {
     if(mouseX >630 && mouseX <710){
       switch(reach[1]){
         case 1:
-          se5.play()
+          se5.play();
           cx2.clearRect(630,440,80,40)
           drawbuttom(630,440,"リーチ",1);
           reach[1]=2//reach=2は仮確定、切った後3に確定
@@ -2816,19 +2844,7 @@ Bgm.on("load", () => {
             }
           if(mouseX >570 && mouseX <610 && mouseY >135 && mouseY <170){
             if(sBar<=0.2){sBar=0}else{sBar-=0.2}
-            se1.volume(0.25*sBar);
-            se2.volume(0.4*sBar);
-            se3.volume(0.3*sBar);
-            se4.volume(0.3*sBar);
-            se5.volume(0.2*sBar);
-            se6.volume(0.25*sBar);
-            se7.volume(0.18*sBar);
-            se8.volume(0.2*sBar);
-            se9.volume(0.3*sBar);
-            se10.volume(0.3*sBar);
-            se11.volume(0.3*sBar);
-            se12.volume(0.2*sBar);
-            jingle2.volume(0.3*sBar);
+            SEbuffer();
             se3.play();
             cx2.font = "24px 'Century Gothic'";
             cx2.fillStyle = "black";
@@ -2837,19 +2853,7 @@ Bgm.on("load", () => {
             }
           if(mouseX >620 && mouseX <660 && mouseY >135 && mouseY <170){
             if(sBar>=1.4){sBar=1.4}else{sBar+=0.2}
-            se1.volume(0.25*sBar);
-            se2.volume(0.4*sBar);
-            se3.volume(0.3*sBar);
-            se4.volume(0.3*sBar);
-            se5.volume(0.2*sBar);
-            se6.volume(0.25*sBar);
-            se7.volume(0.18*sBar);
-            se8.volume(0.2*sBar);
-            se9.volume(0.3*sBar);
-            se10.volume(0.3*sBar);
-            se11.volume(0.3*sBar);
-            se12.volume(0.2*sBar);
-            jingle2.volume(0.3*sBar);
+            SEbuffer();
             se3.play();
             cx2.font = "24px 'Century Gothic'";
             cx2.fillStyle = "black";
@@ -3271,7 +3275,6 @@ Bgm.on("load", () => {
                   se4.play();
                   var X=240;
                   var Y=55;
-                  var Aicon=new Image();
                   Aicon.src="don/Duel_gaia.png"
                   Aicon.onload=function(){
                     cx2.drawImage(Aicon,X,Y,40,40);
@@ -4523,7 +4526,7 @@ if(opLock==0 && gamestate ==1){
   function compareFunc3(a,b){
     if(a>=42){return 1}else{return a%3-b%3;}}
   function AK(name){
-    //実績系のなにか
+    //実績系
       var A=achieveA.findIndex(value=>value.name==name);
       if(A!==-1){
         if(achieveA[A].cleared==0){
@@ -5340,7 +5343,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       function Buffdraw(){
       console.log('Buffdraw')
      //バフアイコンを描画する
-     //どうせ大したことなさそうなので全員描画
      var x=[0,120,120,120,120];
      var y=[0,430,130,230,330];
      for(var i=1;i<5;i++){
@@ -6569,6 +6571,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         })
   
   function PlayertoCpu(num){
+    console.log('player to cpu',reach)
     //ノーテンリーチ禁止
   if(reach[1]==2 && reach[0]==1){
     return false;
@@ -7833,7 +7836,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         dorax+=40
         cx1.drawImage(e7,dorax,10,33,43.5)
         }}
-        //console.log(dora)
         for(var D=0 ; D< dora.length ; D++){
         var DD=dora[D]+1
         if(DD>=45){DD=0;}
@@ -7870,68 +7872,11 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       cx2.clearRect(10,100,780,400)
       cx2.drawImage(e15,10,10,780,400,10,100,780,400)
       cx2.drawImage(e16,0,230,297,234)
-      var i=1
-      var hai=vichand[i];
-      console.log(hai);
-      var haix =15
-      var haiy =120
       cx2.fillStyle = "rgba(15,15,15,0.6)";
       cx2.fillRect(10,100,780,400)
-      e8.src=eltear_src[hai]
-      e8.onload=function(){
-        cx2.drawImage(e8,haix,haiy,size,sizey)
-        haix +=size
-        i +=1
-        hai=vichand[i]
-        e8.src=eltear_src[hai]
-        e8.onload=function(){
-          cx2.drawImage(e8,haix,haiy,size,sizey)
-          haix +=size
-          i +=1
-        hai=vichand[i]
-        e8.src=eltear_src[hai]
-        e8.onload=function(){
-          cx2.drawImage(e8,haix,haiy,size,sizey)
-          haix +=size
-          i +=1
-        hai=vichand[i]
-        e8.src=eltear_src[hai]
-        e8.onload=function(){
-          cx2.drawImage(e8,haix,haiy,size,sizey)
-          haix +=size
-          i +=1
-      //console.log(h)
-        hai=vichand[i]
-        e8.src=eltear_src[hai]
-        e8.onload=function(){
-          cx2.drawImage(e8,haix,haiy,size,sizey)
-          haix +=size
-          i +=1
-        hai=vichand[i]
-        e8.src=eltear_src[hai]
-        e8.onload=function(){
-          cx2.drawImage(e8,haix,haiy,size,sizey)
-          haix +=size
-          i +=1
-        hai=vichand[i]
-        e8.src=eltear_src[hai]
-        e8.onload=function(){
-          cx2.drawImage(e8,haix,haiy,size,sizey)
-          haix +=size
-          i +=1
-        hai=vichand[i]
-        e8.src=eltear_src[hai]
-        e8.onload=function(){
-          cx2.drawImage(e8,haix,haiy,size,sizey)
-          haix +=size+10
-          i +=1
-      //console.log(h)
-        hai=vichand[i]
-        e8.src=eltear_src[hai]
-        e8.onload=function(){
-          cx2.drawImage(e8,haix,haiy,size,sizey)
-          i +=1
-          //{}閉じるかっこは最後にまとめて
+      var haix
+      var haiy
+      //以下resultmap代行をはかる
       function PB(name,count=1,pc=0){
         //pc->1なら自分以外がアガリの場合にも考慮する
         if(player==1 || pc==1){
@@ -7942,127 +7887,47 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         }
         achievetempB[A].count+=count;
         }};
-      haiy=250
       cx2.font = "20px 'Century Gothic'";
       cx2.fillStyle ="white";
-      haix=30
+      Resultary=[];
       console.log(Astyle);
-      cx2.fillText(Astyle,haix,haiy)
-      haiy +=35
+      Resultary.push(Astyle)
       if(counter[player] ==0){
-        if(num==0){cx2.fillText('天和 4翻',haix,haiy)}
+        if(num==0){Resultary.push('天和 4翻');}
         PB("天和");
-        haiy +=25
         }
         if(Astyle=="国士無双"){
-          cx2.fillText('国士無双 6翻',haix,haiy)
+          Resultary.push('国士無双 6翻')
           PB("国士無双");
-          haiy +=25
         }
       if(nuki[0]>0){
         if(num==0){
-          cx2.fillText('嶺上開花 1翻',haix,haiy)
+          Resultary.push('嶺上開花 1翻')
       }else{
-          cx2.fillText('槍槓 1翻',haix,haiy);
+          Resultary.push('槍槓 1翻');
       }
-        haiy +=25
       }
       if(num==0 && ponsw[player]==0){
-      cx2.fillText('門前ツモ 1翻',haix,haiy)
+      Resultary.push('門前ツモ 1翻')
       PB("門前ツモ");
-      haiy +=25}
+      }
       if(ippatu[player]==1){
-      cx2.fillText('一発 1翻',haix,haiy)
+      Resultary.push('一発 1翻')
       PB("一発");
-      haiy +=25
       }
       if(deck.length ==0){
-      cx2.fillText('海底 1翻',haix,haiy)
+      Resultary.push('海底 1翻')
       PB("海底");
-      haiy +=25
       }
       if(doracheck>0){
-        cx2.fillText('ドラ '+doracheck+'翻',haix,haiy)
-        haiy +=25
+        Resultary.push('ドラ '+doracheck+'翻')
         }
       if(nuki[player]>0){
-        cx2.fillText('抜き '+nuki[player]+'翻',haix,haiy)
-        haiy +=25
+        Resultary.push('抜き '+nuki[player]+'翻')
       };
       if(ponsw[player] >0){
-          cx2.fillText('鳴き -2翻',haix,haiy)
-          haiy +=25
-          }
-        haiy=250
-        haix=390;
-      cx2.textAlign = "right";
-      if(nodyaku[0] >0){
-        for(var i=1 ;i<nodyaku.length;i++){
-        cx2.fillText(nodyaku[i],haix,haiy)
-        haiy+=25
-        if(haiy>400){
-          haix+=240
-          haiy=250
-        }
-        }}
-      cx2.textAlign = "start";
-      cx2.fillStyle ="white";
-      cx2.font = "26px 'Century Gothic'";
-      cx2.fillText(fu+"符",530,330)
-      cx2.fillText(han[player]+"翻",530,360)
-      cx2.font = "28px 'Century Gothic'";
-      if(mode==0){
-      if(rootscore==220000){
-      cx2.fillStyle ="red";
-      cx2.fillText("数え役満",640,360);
-      PB("数え役満");}
-      if(rootscore==150000){
-      cx2.fillStyle ="red";
-      cx2.fillText("三倍満",640,360);
-      PB("三倍満");}
-      if(rootscore==100000){
-      cx2.fillStyle ="red";
-      cx2.fillText("二倍満",640,360);
-      PB("二倍満");}
-      if(rootscore==75000){
-      cx2.fillStyle ="red";
-      cx2.fillText("跳満",640,360);
-      PB("跳満");}
-      if(rootscore==50000){
-      cx2.fillStyle ="red";
-      cx2.fillText("満貫",640,360);
-      PB("満貫");}
+          Resultary.push('鳴き -2翻')
       }
-      //cx2.font = "28px 'Century Gothic'";
-      cx2.strokeStyle ="#ff4c38";
-      cx2.lineWidth = 5;
-      cx2.lineJoin = 'round';
-      cx2.fillStyle ="white";
-      cx2.strokeText("　　　 "+score,530,400)
-      cx2.fillText("戦闘力 "+score,530,400)
-      cx2.font = "24px 'Century Gothic'";
-      cx2.fillStyle ="white";
-      if(pvpmode==1){
-        var x=30;
-        var y=430
-        for(var i=0;i<MEMBER.length;i++){
-        cx2.fillText(MEMBER[i].name, x, y);
-        x+=200;
-        };
-  }else{
-      cx2.fillText(Username,30,430)
-        cx2.fillText("ＣＰＵ１",230,430)
-          cx2.fillText("ＣＰＵ２",430,430)
-            cx2.fillText("ＣＰＵ３",630,430)
-  }
-      cx2.fillText(chrlist[chara[1]],30,460)
-      cx2.fillText(LPtemp[1],30,490)
-      cx2.fillText(chrlist[chara[2]],230,460)
-      cx2.fillText(LPtemp[2],230,490)
-      cx2.fillText(chrlist[chara[3]],430,460)
-      cx2.fillText(LPtemp[3],430,490)
-      cx2.fillText(chrlist[chara[4]],630,460)
-      cx2.fillText(LPtemp[4],630,490)
       //実績
       if(player==1){
         var A=achievetemp.findIndex(value=>value.name==Astyle)
@@ -8082,14 +7947,202 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       }
       if(LP[1]<=0){PB("飛び",1,1)};
       PB("ポン",ponsw[1]/3,1);
+      if(rootscore==220000){
+        PB("数え役満");}
+        if(rootscore==150000){
+        PB("三倍満");}
+        if(rootscore==100000){
+        PB("二倍満");}
+        if(rootscore==75000){
+        PB("跳満");}
+        if(rootscore==50000){
+        PB("満貫");}
       yakumap2.alpha=0;
       cx4.clearRect(0,0,800,600)
       opLock=-1;
+      gamestate=2;
       tweeNsquare.paused=true;
       Csquare.alpha=0;
-      gamestate =2
       if(LP[0]==4){
-        //10,100,780,400
+        //従来通りツモ画面の描画のみ
+        var haix
+        var haiy
+        var i=1
+        var hai=vichand[i];
+        console.log(hai);
+        haix =15
+        haiy =120
+        e8.src=eltear_src[hai]
+        e8.onload=function(){
+          cx2.drawImage(e8,haix,haiy,size,sizey)
+          haix +=size
+          i +=1
+          hai=vichand[i]
+          e8.src=eltear_src[hai]
+          e8.onload=function(){
+            cx2.drawImage(e8,haix,haiy,size,sizey)
+            haix +=size
+            i +=1
+          hai=vichand[i]
+          e8.src=eltear_src[hai]
+          e8.onload=function(){
+            cx2.drawImage(e8,haix,haiy,size,sizey)
+            haix +=size
+            i +=1
+          hai=vichand[i]
+          e8.src=eltear_src[hai]
+          e8.onload=function(){
+            cx2.drawImage(e8,haix,haiy,size,sizey)
+            haix +=size
+            i +=1
+        //console.log(h)
+          hai=vichand[i]
+          e8.src=eltear_src[hai]
+          e8.onload=function(){
+            cx2.drawImage(e8,haix,haiy,size,sizey)
+            haix +=size
+            i +=1
+          hai=vichand[i]
+          e8.src=eltear_src[hai]
+          e8.onload=function(){
+            cx2.drawImage(e8,haix,haiy,size,sizey)
+            haix +=size
+            i +=1
+          hai=vichand[i]
+          e8.src=eltear_src[hai]
+          e8.onload=function(){
+            cx2.drawImage(e8,haix,haiy,size,sizey)
+            haix +=size
+            i +=1
+          hai=vichand[i]
+          e8.src=eltear_src[hai]
+          e8.onload=function(){
+            cx2.drawImage(e8,haix,haiy,size,sizey)
+            haix +=size+10
+            i +=1
+        //console.log(h)
+          hai=vichand[i]
+          e8.src=eltear_src[hai]
+          e8.onload=function(){
+            cx2.drawImage(e8,haix,haiy,size,sizey)
+            i +=1;
+          }}}};
+        }}}};
+        };
+        haiy=250
+        cx2.font = "20px 'Century Gothic'";
+        cx2.fillStyle ="white";
+        cx2.fillText(Astyle,haix,haiy)
+        if(counter[player] ==0){
+          if(num==0){cx2.fillText('天和 4翻',haix,haiy)}
+          haiy +=25
+          }
+          if(Astyle=="国士無双"){
+          if(num==0){cx2.fillText('国士無双 6翻',haix,haiy)}
+          haiy +=25
+          }
+        if(nuki[0]>0){
+          if(num==0){
+            cx2.fillText('嶺上開花 1翻',haix,haiy)
+        }else{
+            cx2.fillText('槍槓 1翻',haix,haiy);
+        }
+          haiy +=25
+        }
+        if(num==0 && ponsw[player]==0){
+        cx2.fillText('門前ツモ 1翻',haix,haiy)
+        haiy +=25
+        }
+        if(ippatu[player]==1){
+        cx2.fillText('一発 1翻',haix,haiy)
+        haiy +=25
+        }
+        if(deck.length ==0){
+        cx2.fillText('海底 1翻',haix,haiy)
+        haiy +=25
+        }
+        if(doracheck>0){
+          cx2.fillText('ドラ '+doracheck+'翻',haix,haiy)
+          haiy +=25
+          }
+        if(nuki[player]>0){
+          cx2.fillText('抜き '+nuki[player]+'翻',haix,haiy)
+          haiy +=25
+        };
+        if(ponsw[player] >0){
+            cx2.fillText('鳴き -2翻',haix,haiy)
+            haiy +=25
+        }
+          haiy=250
+          haix=390;
+        cx2.textAlign = "right";
+        if(nodyaku[0] >0){
+          for(var i=1 ;i<nodyaku.length;i++){
+          cx2.fillText(nodyaku[i],haix,haiy)
+          haiy+=25
+          if(haiy>400){
+            haix+=240
+            haiy=250
+          }
+          }}
+        cx2.textAlign = "start";
+        cx2.fillStyle ="white";
+        cx2.font = "26px 'Century Gothic'";
+        cx2.fillText(fu+"符",530,330)
+        cx2.fillText(han[player]+"翻",530,360)
+        cx2.font = "28px 'Century Gothic'";
+        if(mode==0){
+        if(rootscore==220000){
+        cx2.fillStyle ="red";
+        cx2.fillText("数え役満",640,360);
+        PB("数え役満");}
+        if(rootscore==150000){
+        cx2.fillStyle ="red";
+        cx2.fillText("三倍満",640,360);
+        PB("三倍満");}
+        if(rootscore==100000){
+        cx2.fillStyle ="red";
+        cx2.fillText("二倍満",640,360);
+        PB("二倍満");}
+        if(rootscore==75000){
+        cx2.fillStyle ="red";
+        cx2.fillText("跳満",640,360);
+        PB("跳満");}
+        if(rootscore==50000){
+        cx2.fillStyle ="red";
+        cx2.fillText("満貫",640,360);
+        PB("満貫");}
+        }
+        //cx2.font = "28px 'Century Gothic'";
+        cx2.strokeStyle ="#ff4c38";
+        cx2.lineWidth = 5;
+        cx2.lineJoin = 'round';
+        cx2.fillStyle ="white";
+        cx2.strokeText("　　　 "+score,530,400)
+        cx2.fillText("戦闘力 "+score,530,400)
+        cx2.font = "24px 'Century Gothic'";
+        cx2.fillStyle ="white";
+        if(pvpmode==1){
+          var x=30;
+          var y=430
+          for(var i=0;i<MEMBER.length;i++){
+          cx2.fillText(MEMBER[i].name, x, y);
+          x+=200;
+          };
+    }else{
+        cx2.fillText(Username,30,430)
+          cx2.fillText("ＣＰＵ１",230,430)
+            cx2.fillText("ＣＰＵ２",430,430)
+              cx2.fillText("ＣＰＵ３",630,430)
+    }
+        cx2.fillText(chrlist[chara[1]],30,460)
+        cx2.fillText(LPtemp[1],30,490)
+        cx2.fillText(chrlist[chara[2]],230,460)
+        cx2.fillText(LPtemp[2],230,490)
+        cx2.fillText(chrlist[chara[3]],430,460)
+        cx2.fillText(LPtemp[3],430,490)
+        cx2.fillText(chrlist[chara[4]],630,460)
+        cx2.fillText(LPtemp[4],630,490)  
         switch(raidscore[1]){
           case 0:
             N1= cx2.getImageData(10, 100, 780, 400);
@@ -8114,13 +8167,182 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       loopX=0
       loopX2=0;
       alpha=1;
-        window.requestAnimationFrame((ts)=>LoopAnimation(ts))}
+        window.requestAnimationFrame((ts)=>LoopAnimation(ts,player))}
     }
-      }}}};
-      }}}};
-      };
       }
-  
+    //一つずつ描画するパターン
+    function Resultmap(player){
+      gamestate=-1;
+      handmap.removeAllChildren();
+      //handmap.alpha=1; 
+      var drawcard;
+      var drawcardlist=[];
+      for (var i=1;i<10;i++){
+      drawcard=new createjs.Bitmap(eltear_src[handtemp[i]]);
+      drawcard.alpha=0;
+      drawcard.x=15+size*(i-1);
+      if(i==9){drawcard.x+=15}
+      drawcard.y=120;
+      drawcard.scaleX=7/12;
+      drawcard.scaleY=31/52;
+      drawcardlist[i-1]=drawcard;
+      handmap.addChild(drawcard);
+      }
+      var t;
+      var tlist=[];
+      var X=-30;
+      var Y=225;
+      t= new createjs.Text(Resultary[0], "bold 20px 'Century Gothic'", "white");
+      t.alpha=0;
+      t.x=X;
+      t.y=Y;
+      Y+=50
+      tlist[0]=t;
+      handmap.addChild(t);
+      if(Resultary.length>1){
+      for (var i=1;i<Resultary.length;i++){
+        console.log(Resultary[i]);
+        t= new createjs.Text(Resultary[i], "20px ' Century Gothic'", "white");
+        t.alpha=0;
+        t.x=X;
+        t.y=Y;
+        Y+=25;
+        tlist[i]=t;
+        handmap.addChild(t);
+        }};
+      var s;
+      var slist=[];
+      var X=380;
+      var Y=225;
+      for (var i=1;i<nodyaku.length;i++){
+        s= new createjs.Text(nodyaku[i], "20px ' Century Gothic'", "white");
+        s.alpha=0;
+        s.x=X;
+        s.y=Y;
+        s.textAlign = "right";
+        Y+=25;
+        if(i==8){
+          X+=240;
+          Y=225;
+        }
+        slist[i-1]=s;
+        handmap.addChild(s);
+        }
+        //描画
+      var I=0;
+      var nIntervId=setInterval(flashText, 130);
+      var nIntervId2;
+      var nIntervId3;
+      function flashText(){
+        //console.log(I,drawcardlist[I])
+        drawcard=drawcardlist[I]
+        createjs.Tween.get(drawcard)
+        .to({alpha: 1},150);
+        I+=1;
+        if(I>=drawcardlist.length){
+          clearInterval(nIntervId);
+          nIntervId2=setInterval(flashText2, 500);
+          t=tlist[0];
+          se14.play();
+          createjs.Tween.get(t)
+          .to({x:30, alpha: 1},125, createjs.Ease.cubicInOut)  
+        }
+      }
+      var J=1;
+      function flashText2(){
+        if(tlist.length>1){
+        t=tlist[J];
+        se14.play();
+        createjs.Tween.get(t)
+        .to({x:30, alpha: 1},125, createjs.Ease.cubicInOut)  
+        J+=1;
+        }
+        if(J>=tlist.length){
+          clearInterval(nIntervId2);
+          nIntervId3=setInterval(flashText3, 500);
+        }
+      }
+      var K=0;
+      function flashText3(){
+        s=slist[K];
+        se14.play();
+        if(K>8){
+        createjs.Tween.get(s)
+        .to({x:720, alpha: 1},125, createjs.Ease.cubicInOut)  
+        }else{
+        createjs.Tween.get(s)
+        .to({x:480, alpha: 1},125, createjs.Ease.cubicInOut)  
+        }
+        K+=1;
+        if(K>=slist.length){
+          clearInterval(nIntervId3);
+          setTimeout(() => {
+            flashText4();
+          }, "700");
+        }
+      }
+      function flashText4(){
+        gamestate =2;
+        if(rootscore>=50000){
+          se13.play();
+        }else{
+          se15.play()
+        }
+        cx2.textAlign = "start";
+        cx2.fillStyle ="white";
+        cx2.font = "26px 'Century Gothic'";
+        cx2.fillText(fu+"符",530,330)
+        cx2.fillText(han[player]+"翻",530,360)
+        cx2.font = "28px 'Century Gothic'";
+        if(mode==0){
+        if(rootscore==220000){
+        cx2.fillStyle ="red";
+        cx2.fillText("数え役満",640,360);}
+        if(rootscore==150000){
+        cx2.fillStyle ="red";
+        cx2.fillText("三倍満",640,360);}
+        if(rootscore==100000){
+        cx2.fillStyle ="red";
+        cx2.fillText("二倍満",640,360);}
+        if(rootscore==75000){
+        cx2.fillStyle ="red";
+        cx2.fillText("跳満",640,360);}
+        if(rootscore==50000){
+        cx2.fillStyle ="red";
+        cx2.fillText("満貫",640,360);}
+        }
+        //cx2.font = "28px 'Century Gothic'";
+        cx2.strokeStyle ="#ff4c38";
+        cx2.lineWidth = 5;
+        cx2.lineJoin = 'round';
+        cx2.fillStyle ="white";
+        cx2.strokeText("　　　 "+score,530,400)
+        cx2.fillText("戦闘力 "+score,530,400)
+        cx2.font = "24px 'Century Gothic'";
+        cx2.fillStyle ="white";
+        if(pvpmode==1){
+          var x=30;
+          var y=430
+          for(var i=0;i<MEMBER.length;i++){
+          cx2.fillText(MEMBER[i].name, x, y);
+          x+=200;
+          };
+    }else{
+        cx2.fillText(Username,30,430)
+          cx2.fillText("ＣＰＵ１",230,430)
+            cx2.fillText("ＣＰＵ２",430,430)
+              cx2.fillText("ＣＰＵ３",630,430)
+    }
+        cx2.fillText(chrlist[chara[1]],30,460)
+        cx2.fillText(LPtemp[1],30,490)
+        cx2.fillText(chrlist[chara[2]],230,460)
+        cx2.fillText(LPtemp[2],230,490)
+        cx2.fillText(chrlist[chara[3]],430,460)
+        cx2.fillText(LPtemp[3],430,490)
+        cx2.fillText(chrlist[chara[4]],630,460)
+        cx2.fillText(LPtemp[4],630,490)
+      }
+    }; 
     function Score(player){
       //符　tumoronで一部出してる
       //オールマイティ1枚につき-10
@@ -10504,7 +10726,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         cx4.fill();
         }
 
-    function LoopAnimation(ts){
+    function LoopAnimation(ts,player){
       cx4.globalAlpha = alpha;
       cx4.clearRect(0,0,800,600)
       cx4.fillStyle = "#001c0d";
@@ -10546,12 +10768,13 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       cx4.lineTo(x*3+240,y*3-790);
       cx4.stroke();
       if(alpha>0){
-      if(gamestate==2){window.requestAnimationFrame((ts)=>LoopAnimation(ts));}else{
+      if(gamestate==2){window.requestAnimationFrame((ts)=>LoopAnimation(ts,player));}else{
       alpha -=0.05
-      window.requestAnimationFrame((ts)=>LoopAnimation(ts));}
+      window.requestAnimationFrame((ts)=>LoopAnimation(ts,player));}
       }else if(alpha <=0){
       cx4.clearRect(0,0,800,600);
       cx4.globalAlpha = 1;
+      if(LP[0]!==4){Resultmap(player)};
       }
       };
   
@@ -11668,20 +11891,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
     }
     achieveB=data.AchieveB.concat();
     highscore=data.Highscore.concat();
-      se1.volume(0.25*sBar);
-      se2.volume(0.4*sBar);
-      se3.volume(0.3*sBar);
-      se4.volume(0.3*sBar);
-      se5.volume(0.2*sBar);
-      se6.volume(0.25*sBar);
-      se7.volume(0.18*sBar);
-      se8.volume(0.2*sBar);
-      se9.volume(0.3*sBar);
-      se10.volume(0.3*sBar);
-      se11.volume(0.3*sBar);
-      se12.volume(0.2*sBar);
-      jingle.volume(0.3*sBar);
-      jingle2.volume(0.3*sBar);
+    SEbuffer();
       jingle.seek(1);
       jingle.play();
       alert("✅「"+Username+"」さんの　セーブデータを読込みました。");
@@ -11694,5 +11904,23 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         button_read.value = "";
     }}});
     }
-        
+    function SEbuffer(){
+      se1.volume(0.25*sBar);
+      se2.volume(0.4*sBar);
+      se3.volume(0.3*sBar);
+      se4.volume(0.3*sBar);
+      se5.volume(0.2*sBar);
+      se6.volume(0.25*sBar);
+      se7.volume(0.18*sBar);
+      se8.volume(0.2*sBar);
+      se9.volume(0.3*sBar);
+      se10.volume(0.3*sBar);
+      se11.volume(0.3*sBar);
+      se12.volume(0.2*sBar);
+      se13.volume(0.3*sBar);
+      se14.volume(0.3*sBar);
+      se15.volume(0.3*sBar);
+      jingle.volume(0.3*sBar);
+      jingle2.volume(0.3*sBar);
+    }   
   };
