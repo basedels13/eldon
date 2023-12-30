@@ -1,10 +1,9 @@
-//var0.95
+//var0.96
 //フリバに魔界モード追加　デスマッチ工事中
 //キル・デス情報はまだ同期していない;
-//アイシャのCPUスキル後に止まることがある？
-//対人でポンをスルーした場合、対局が止まる
-//サバイバルなのに死亡しても継続される？
-//解決？ラインリーチ中にオールマイティを切る
+//対戦で魔界モードのリザルトが出ない
+//魂の一撃の下の実績が解除されない？
+//魔界モードで右クリックができなくなる？
 
 window.onload = function(){
   draw();
@@ -24,7 +23,6 @@ window.onload = function(){
   // メンバー一覧を入れる箱
   var MEMBER = [];
   //  例：{name:"マスター",chr:0,score:50000,turnflag:0,pc:1},
-  //ary.push({one: 1, two: 2, three: 3});
   var memberlist=[];
   const RoomName=[0,"room1","room2","room3"]
   var Roomlist1=[];
@@ -228,7 +226,7 @@ window.onload = function(){
   var CMpai;
   var Fever =0;
   //ルーム設定
-  var LP_PVP={Length:[1,"東風","半荘",],LP:[1,75000,150000,300000],Block:[1,"満貫あり","満貫なし"],Rule:[1,"サバイバル","デスマッチ"]};//,"魔界血戦"
+  var LP_PVP={Length:[1,"東風","半荘",],LP:[1,75000,150000,300000],Block:[1,"満貫あり","満貫なし"],Rule:[1,"サバイバル","デスマッチ","魔界血戦"]};//
   var mpmoving=false;
   var mpC=0;
   var ManaBreak=0;
@@ -1521,7 +1519,7 @@ Bgm.on("load", () => {
         }
         break;
     } 
-    if(LP_PVP.Rule[0]==1){
+    if(LP_PVP.Rule[0]==1 || LP_PVP.Rule[0]==3){
     if(LP[1] >=0 && LP[2]>=0 && LP[3] >=0 && LP[4]>=0){
       gamestate =1
       deckHandler();
@@ -2209,6 +2207,9 @@ Bgm.on("load", () => {
     }
     if(highscore[2]>=300000){
       AK("魂の一撃");
+    }
+    if(highscore[2]>=1000000){
+      AK("必殺の一撃");
     }
     if(highscore[3]>=2){
       AK("まだだ");
@@ -3742,7 +3743,7 @@ Bgm.on("load", () => {
                     var clientChr=chara[1];
                     var roomId=RoomName[IAM.room];
                     //個人のルーム設定を初期化
-                    LP_PVP={Length:[1,"東風","半荘",],LP:[1,75000,150000,300000],Block:[1,"満貫あり","満貫なし"],Rule:[1,"サバイバル","デスマッチ"]};//"魔界血戦"
+                    LP_PVP={Length:[1,"東風","半荘",],LP:[1,75000,150000,300000],Block:[1,"満貫あり","満貫なし"],Rule:[1,"サバイバル","デスマッチ","魔界血戦"]};//
                     socket.emit('leave_to_room',{token: IAM.token,name:clientId,chr:clientChr,room:roomId});
                   }else{
                     se3.play();
@@ -6418,7 +6419,9 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       }
     }
     if(pvp==1){
-      if(LP_PVP.Rule[0]==3){LP[0]=4};
+      if(LP_PVP.Rule[0]==3){LP[0]=4}else{
+        LP[0]=0;
+      };
       switch(LP_PVP.LP[0]){
         case 1:
           for(var i=1;i<LP.length;i++){LP[i]=75000}
@@ -8003,30 +8006,31 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         }
         }}
       cx2.textAlign = "start";
-      cx2.font = "26px 'Century Gothic'";
       cx2.fillStyle ="white";
+      cx2.font = "26px 'Century Gothic'";
+      cx2.fillText(fu+"符",530,330)
       cx2.fillText(han[player]+"翻",530,360)
       cx2.font = "28px 'Century Gothic'";
       if(mode==0){
       if(rootscore==220000){
       cx2.fillStyle ="red";
-      cx2.fillText("数え役満",630,360);
+      cx2.fillText("数え役満",640,360);
       PB("数え役満");}
       if(rootscore==150000){
       cx2.fillStyle ="red";
-      cx2.fillText("三倍満",630,360);
+      cx2.fillText("三倍満",640,360);
       PB("三倍満");}
       if(rootscore==100000){
       cx2.fillStyle ="red";
-      cx2.fillText("二倍満",630,360);
+      cx2.fillText("二倍満",640,360);
       PB("二倍満");}
       if(rootscore==75000){
       cx2.fillStyle ="red";
-      cx2.fillText("跳満",630,360);
+      cx2.fillText("跳満",640,360);
       PB("跳満");}
       if(rootscore==50000){
       cx2.fillStyle ="red";
-      cx2.fillText("満貫",630,360);
+      cx2.fillText("満貫",640,360);
       PB("満貫");}
       }
       //cx2.font = "28px 'Century Gothic'";
@@ -8140,16 +8144,18 @@ cx1.drawImage(e7,dorax,10,33,43.5)
   
     function Scorepay(player,parentS,num){
       //type0 通常 type1 サバイバル（予定）
-      if(LP[0]!==4 && player ==parentS){
+      if(player ==parentS){
         //連荘
       score =rootscore *1.5
-      skillusage2[0]-=1;
-      skillusage2[5]+=1
-      if(player==1){
-        if(skillusage2[5]>scoretemp[1]){
-          scoretemp[1]+=1;
-        }};
-      if(parent ==0){parent =3}else{parent -=1}
+      if(LP[0]!==4){
+        skillusage2[0]-=1;
+        skillusage2[5]+=1
+        if(player==1){
+          if(skillusage2[5]>scoretemp[1]){
+            scoretemp[1]+=1;
+          }};
+        if(parent ==0){parent =3}else{parent -=1}
+      }
       }else{
       score=rootscore
       skillusage2[5]=0
@@ -8158,7 +8164,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       if(LP[0] !==3){
       LPtemp=[0,0,0,0,0]
       if(num >0){//ロン
-        if(pvpmode==0 ||(pvpmode==1 && LP_PVP.Rule[0]==1)){
+        if(pvpmode==0 ||(pvpmode==1 && LP_PVP.Rule[0]!==2)){
         LPtemp[player]=score;
       }
         var MS=Buff[num].filter(value=>value==2);
@@ -8176,7 +8182,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       if(player==parentS){//おやつも
       for(var i=1;i<LP.length;i++){
       if(i==player){
-        if(pvpmode==0 ||(pvpmode==1 && LP_PVP.Rule[0]==1)){
+        if(pvpmode==0 ||(pvpmode==1 && LP_PVP.Rule[0]!==2)){
           LPtemp[i]=score;
         }
       }else{
@@ -8197,7 +8203,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       if(player!==parentS){//こつも
       for(var i=1;i<LP.length;i++){
       if(i==player){
-        if(pvpmode==0 ||(pvpmode==1 && LP_PVP.Rule[0]==1)){
+        if(pvpmode==0 ||(pvpmode==1 && LP_PVP.Rule[0]!==2)){
           LPtemp[i]=score;
           if(LP_PVP.Rule[0]==2){
             death[player-1].Admg[player-1]+=score;
@@ -10017,9 +10023,9 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                 cx2.fillStyle = "white";
                 cx2.font = "18px Arial";
                 var elskunn=[
-                  {name:"サバイバル　一般的な麻雀のようなルールです。",sub:"誰かが飛ぶかオーラス終了時までドンジャラを",suburb:"します。持ち点が多いほど高順位です。"},
+                  {name:"サバイバル　一般的な麻雀のようなルールです。",sub:"誰かが飛ぶかオーラス終了までドンジャラを",suburb:"します。持ち点が多いほど高順位です。"},
                   {name:"デスマッチ　和了しても自分の持ち点は増えず、",sub:"誰かが飛んでも試合が続きます。",suburb:"（飛んだプレイヤーは2局後に75000点で復活）"},
-                  {name:"魔界血戦　4人中3人が和了するまで対局が続き、",sub:"裏ドラなし、連荘なし、魔界デバフ付与など",suburb:"特殊なルールです。"},
+                  {name:"魔界血戦　4人中3人が和了するまで対局が続き、",sub:"後の局ほど点数が高くなります。",suburb:"裏ドラなし、連荘なし"},
                   {name:"持ち点　ゲーム開始時の持ち点です。",sub:"※得点基準参考：親が満貫の場合、75000点"},
                   {name:"対局数の設定　東風では最大4局まで、",sub:"半荘では最大8局までドンジャラが続きます。"},
                   {name:"満貫打ち止め　満貫ブロックの有無の設定です。",sub:"「なし」にすると高得点が出やすくなります。"},
@@ -11546,13 +11552,11 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             cx2.fillText("環境　魔界"+A.length, 635, y);
             cx2.font = "14px Arial";
             y+=20;
-            cx2.fillText(" エルの力が届かない環境.", 635, y);
-            y+=20;
-            cx2.fillText(" 段々と適応していく.", 635, y);
-            y+=20;
             cx2.fillText(" 和了時の戦闘力が低下.", 635, y);
             y+=20;
-            cx2.fillText(" 1局ごとに重複数減少.", 635, y);
+            cx2.fillText(" だんだん適応していく.", 635, y);
+            y+=20;
+            cx2.fillText(" (1局ごとに重複数減少)", 635, y);
             y+=22
             break;
           case 11:
