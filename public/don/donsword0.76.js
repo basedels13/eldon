@@ -1,8 +1,6 @@
 //var0.96
 //フリバに魔界モード追加
-//キル・デス情報はまだ同期していない;
 //対戦で魔界モードのリザルトが出ない
-//魔界モードで誰かが上がった後に右クリックができなくなる？
 
 window.onload = function(){
   draw();
@@ -541,12 +539,12 @@ window.onload = function(){
   var dora=[]
   //手札.hand1[0]==-1 ron -2 tumo -3上がり判定、
   var hand1=[]
-  var Chand=[];
   //create用に？
   var hand2=[]
   var hand3=[]
   var hand4=[]
   var handtemp=[]
+  var vichand=[];
   hand1=Array(10).fill(0);
   hand1[0]=-1;
   //ポンポポン
@@ -1279,7 +1277,7 @@ Bgm.on("load", () => {
     //右クリック無効、右クリックでツモ切り
       e.preventDefault();
       if(tumoConfig==0){
-        if(gamestate==1){
+        if(gamestate ==1){
       if(opLock==0 && cLock==1 && turn ==0){
         if(reach[1]!==2){
             ctl[1]=0;
@@ -1315,7 +1313,7 @@ Bgm.on("load", () => {
                     }else{
                   cx5.clearRect(0,0,800,600);
           }}
-          if(gamestate==1){
+          if(gamestate ==1){
             //mpチャージ
             if(cLock==1 && opLock>=0 && opLock !==2){
               mpC=-2;
@@ -1454,7 +1452,7 @@ Bgm.on("load", () => {
     cx3.fillText( mute, 730, 42);
           }};
   
-  if(gamestate==10 && loadstate >=loadmax){
+  if(gamestate ==10 && loadstate >=loadmax){
     //メニュー画面
     if(pagestate==-1){
       for(var i=0; i<12 ; i++){
@@ -1632,6 +1630,9 @@ Bgm.on("load", () => {
     }else{gameover();}
           break;
     }
+  }else if(gamestate ==-2){
+    //ツモ画面切り替え
+    gamestate=-1;
     }else if(gamestate ==2){//次のゲームへ
     if(pvpmode==1 && IsHost(IAM.room)){
       MEMBER[0].turnflag=1;
@@ -7110,7 +7111,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         r4 =Cputumo(chr);//時間がかかるとしたらcputumoのこの部分
       }
     }
-    if(ctl[chr]==3 && gamestate==1){
+    if(ctl[chr]==3 && gamestate ==1){
       if(r4==-1){
       console.log('waitcpu play',chr,ctl[chr]);
       setTimeout(()=>{
@@ -7760,9 +7761,9 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       };
       se7.play();
       cLock=0
-      gamestate=-1
+      gamestate=-2;
       if(Fever!==-1){Fever+=1};
-      var vichand=[]
+      vichand=[]
       var ponf=0
       if(player ==1){
         handtemp = hand1.concat();
@@ -7960,7 +7961,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       yakumap2.alpha=0;
       cx4.clearRect(0,0,800,600)
       opLock=-1;
-      gamestate=2;
+      //gamestate=2;
       tweeNsquare.paused=true;
       Csquare.alpha=0;
       if(LP[0]==4){
@@ -8026,10 +8027,12 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           e8.onload=function(){
             cx2.drawImage(e8,haix,haiy,size,sizey)
             i +=1;
+        haix=60;
         haiy=250;
         cx2.font = "20px 'Century Gothic'";
         cx2.fillStyle ="white";
         cx2.fillText(Astyle,haix,haiy)
+        haiy+=50;
         if(counter[player] ==0){
           if(num==0){cx2.fillText('天和 4翻',haix,haiy)}
           haiy +=25
@@ -8178,7 +8181,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       var drawcard;
       var drawcardlist=[];
       for (var i=1;i<10;i++){
-      drawcard=new createjs.Bitmap(eltear_src[handtemp[i]]);
+      drawcard=new createjs.Bitmap(eltear_src[vichand[i]]);
       drawcard.alpha=0;
       drawcard.x=15+size*(i-1);
       if(i==9){drawcard.x+=15}
@@ -10768,14 +10771,16 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       cx4.lineTo(x*3+240,y*3-790);
       cx4.stroke();
       if(alpha>0){
-      if(gamestate==2){window.requestAnimationFrame((ts)=>LoopAnimation(ts,player));}else{
+      if(gamestate==-2){window.requestAnimationFrame((ts)=>LoopAnimation(ts,player));}else{
       alpha -=0.05
       window.requestAnimationFrame((ts)=>LoopAnimation(ts,player));}
       }else if(alpha <=0){
       cx4.clearRect(0,0,800,600);
       cx4.globalAlpha = 1;
       opLock=0;
-      if(LP[0]!==4){Resultmap(player)};
+      if(LP[0]!==4){Resultmap(player)}else{
+        gamestate=2;
+      };
       }
       };
   
