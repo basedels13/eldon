@@ -1,13 +1,14 @@
 //var0.96
 //レイヴン、イヴ追加
 //対戦で魔界モードのリザルトが出ない
+//魔界モードでTIME UP時に先に進めない
 //judgeでエラーが入る問題
 window.onload = function(){
   draw();
   };
   
   function draw(){
-  var debugmode=true;  //コンソールログの表示の切り替え/オフラインテストプレイ用　リリース時にfalseに
+  var debugmode=false;  //コンソールログの表示の切り替え/オフラインテストプレイ用　リリース時にfalseに
   //自分自身の情報を入れる箱
   var IAM = {
     token: null,    // 戸別管理用のトークン
@@ -1776,6 +1777,7 @@ Bgm.on("load", () => {
           cx2.fillStyle = "white";
           cx2.font = "36px 'Century Gothic'";
           cx2.fillText("TIME UP",320,300)
+          gamestate=2;
           }
       }
     }else{
@@ -1791,7 +1793,6 @@ Bgm.on("load", () => {
       MEMBER[i].turnflag=2;
     }
     }}
-
     gamestate=0;
     }else if(gamestate ==3){//タイトルへ
       if(pvpmode==1 && gamestate !==10){
