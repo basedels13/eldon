@@ -1,5 +1,4 @@
 //var0.96
-//フリバに魔界モード追加
 //対戦で魔界モードのリザルトが出ない
 
 window.onload = function(){
@@ -159,10 +158,10 @@ window.onload = function(){
   graphics=new createjs.Graphics();
   graphics
     .beginRadialGradientFill(["white","orange"],[0.0,1.0],0,0,20,0,0,100)
-    .drawPolyStar(0, 0, 50, 5, 0.4, -90);
+    .drawPolyStar(0, 0, 40, 5, 0.4, -90);
   var Cstar = new createjs.Shape(graphics);
   Cstar.x=100;
-  Cstar.y=225;
+  Cstar.y=390;
   stage.addChild(Cstar); // 表示リストに追加
   var tweeNstar;
   tweeNstar=createjs.Tween.get(Cstar, {loop: true})
@@ -885,7 +884,9 @@ Bgm.on("load", () => {
   e20.src="don/Don_winbg.png";
   e20.onload=function(){loadgraph();}
   etitle.src="don/Don_title.png";
-  etitle.onload=function(){loadgraph();}
+  etitle.onload=function(){
+    cx2.drawImage(etitle,60,150,660,220);
+    loadgraph();}
   donicon.src=donicon_src[0];
   donicon.onload=function(){loadgraph();}  
   MBicon.src=donicon_src[1];
@@ -900,7 +901,9 @@ Bgm.on("load", () => {
   e10.onload=function(){loadgraph();
   }}}}
   BGimg.src=bgimg_src[1]
-  BGimg.onload=function(){loadgraph();
+  BGimg.onload=function(){
+    cx.drawImage(BGimg,0,0,400,300,0,0,800,600);
+    loadgraph();
   }
   epic.src=epic_src[0]
   epic.onload=function(){loadgraph();
@@ -1165,21 +1168,23 @@ Bgm.on("load", () => {
   }}}}}
   
   if(loadstate <loadmax){
-  cx2.fillStyle = "rgb(0,0,0)";
+  cx2.fillStyle = "rgba(0,0,0,0.3)";
   cx2.fillRect(0, 0, 800, 600);
   cx3.font = "24px 'Century Gothic'";
   cx3.fillStyle = "#e4e4e4";
-  　cx3.fillText( "Now Loading…",300,360)
+  cx3.fillText( "Now Loading…",100,360)
   }
   function loadgraph(){
-    cx3.fillStyle = "#e4e4e4";
+    cx3.fillStyle = "rgba(220,220,220,0.5)";
+    cx3.fillRect(100,380,600,25);
+    cx3.fillStyle = "#007fd9";
     var A=loadstate/loadmax*600;
-      cx3.fillRect(100, 200, A, 50);
+      cx3.fillRect(100, 380, A, 25);
       createjs.Tween.get(Cstar)
       .to({x:A+100},300);
     loadstate+=1;
-    cx3.clearRect(260,260,120,60);
-    cx3.fillText( loadstate+"/"+loadmax,300,300)
+    cx3.clearRect(280,330,120,40);
+    cx3.fillText( loadstate+"/"+loadmax,300,360)
     //console.log(loadstate,loadmax);
     if(loadstate>=loadmax){
       createjs.Tween.get(Cstar)
@@ -1190,14 +1195,14 @@ Bgm.on("load", () => {
   function load2(){
     loadstate+=1;
     //console.log(loadstate,loadmax);
-  cx3.fillStyle = "rgb(0,0,0)";
-  cx3.fillRect(0, 0, 800, 600);
+  cx3.clearRect(0,0,800,600);
+  cx2.fillRect(0, 0, 800, 600);
   cx3.fillStyle = "#007fd9";
-  cx3.fillRect(100, 200, 600, 50);
+  cx3.fillRect(100, 380, 600, 25);
   cx3.font = "24px 'Century Gothic'";
   cx3.fillStyle = "#e4e4e4";
-  　cx3.fillText( "画面をクリック（音が出ます）",240,360)
-  　cx3.fillText( "click to start",340,400)
+  //cx3.fillText( "画面をクリック（音が出ます）",240,360)
+  cx3.fillText( "click to start",340,400)
   }
   function loadtitle(){
   Yakucheck();
@@ -1632,17 +1637,6 @@ Bgm.on("load", () => {
     }
   }else if(gamestate ==-2){
     //ツモ画面切り替え
-    gamestate=-1;
-    }else if(gamestate ==2){//次のゲームへ
-    if(pvpmode==1 && IsHost(IAM.room)){
-      MEMBER[0].turnflag=1;
-  for(var i=1;i<MEMBER.length;i++){
-    if(MEMBER[i].pc==1 && MEMBER[i].turnflag !==2){
-      MEMBER[i].turnflag=0;
-    }else{
-      MEMBER[i].turnflag=2;
-    }
-    }}
     if(LP[0]==4){
       if(raidscore[0]==0 && raidscore[2] ==0){
         cx2.clearRect(0,0,800,600);
@@ -1774,7 +1768,20 @@ Bgm.on("load", () => {
           cx2.fillText("TIME UP",320,300)
           }
       }
+    }else{
+      gamestate=-1;
     }
+    }else if(gamestate ==2){//次のゲームへ
+    if(pvpmode==1 && IsHost(IAM.room)){
+      MEMBER[0].turnflag=1;
+  for(var i=1;i<MEMBER.length;i++){
+    if(MEMBER[i].pc==1 && MEMBER[i].turnflag !==2){
+      MEMBER[i].turnflag=0;
+    }else{
+      MEMBER[i].turnflag=2;
+    }
+    }}
+
     gamestate=0;
     }else if(gamestate ==3){//タイトルへ
       if(pvpmode==1 && gamestate !==10){
@@ -10778,8 +10785,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       cx4.clearRect(0,0,800,600);
       cx4.globalAlpha = 1;
       opLock=0;
-      if(LP[0]!==4){Resultmap(player)}else{
-        gamestate=2;
+      if(LP[0]!==4){Resultmap(player)
       };
       }
       };
