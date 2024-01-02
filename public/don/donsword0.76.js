@@ -380,7 +380,7 @@ window.onload = function(){
   {name:"これで終わりだ！",sub:"数え役満を和了する"},
   {name:"渾身の一撃",sub:"150000点以上の手を和了する"},
   {name:"魂の一撃",sub:"300000点以上の手を和了する"},
-  {name:"必殺の一撃",sub:"1000000点以上の手を和了する"},
+  {name:"必殺の一撃",sub:"600000点以上の手を和了する"},
   {name:"回れ！回れ！回れ！",sub:"通算30回ポンする"},
   {name:"YOUならやれるポン",sub:"通算100回ポンする"},
   {name:"変化無双",sub:"国士無双を和了する"},
@@ -2275,7 +2275,7 @@ Bgm.on("load", () => {
     if(highscore[2]>=300000){
       AK("魂の一撃");
     }
-    if(highscore[2]>=1000000){
+    if(highscore[2]>=600000){
       AK("必殺の一撃");
     }
     if(highscore[3]>=2){
@@ -6243,7 +6243,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         window.requestAnimationFrame((ts)=>ReachAnimation(ts))
         //イヴ様
         for(var i=1;i<5;i++){
-          if(i!==player && chara[i]==5 && skillusage[i]==0){
+          if(i!==player && chara[i]==5){
             skillusage[i]=player;
           }
         }
@@ -7894,8 +7894,8 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         if(reach[player]!==3){
           return false;
         }
-        cx3.clearRect(50,468,600,26)
-        for(var I=1;I<9;I++){
+        cx3.clearRect(50,468,700,26)
+        for(var I=1;I<hand1.length-1;I++){
         handtemp=[];
       switch(player){
         case 1:
@@ -7927,8 +7927,8 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         cx3.lineWidth = 5;
         cx3.lineJoin = 'round';
         cx3.fillStyle ="white";
-        cx3.strokeText("危",60+size*I,490)
-        cx3.fillText("危",60+size*I,490)
+        cx3.strokeText("危",60+size*I,485)
+        cx3.fillText("危",60+size*I,485)
       };
     }};
     function TumoRon(player,num,dub=1){
@@ -9399,14 +9399,14 @@ cx1.drawImage(e7,dorax,10,33,43.5)
               YakuDT("巨人審判者");
                 break;
               case 40:
-                nodpair1=[5,8,27,35,36,41];
-                YakuDT("物理特化"); 
+                nodpair1=[2,6,9,16,36,40];
+                YakuDT("敏捷さ");
                 nodpair1=[4,19,23,26,29,31,32];
                 YakuDT("渇望"); 
                 break;
               case 41:
-                nodpair1=[2,6,9,16,36,40];
-                YakuDT("敏捷さ");
+                nodpair1=[5,8,27,35,36,41];
+                YakuDT("物理特化"); 
                 nodpair1=hand1.findIndex(value=>value==41);
                 nodpair2=hand1.findIndex(value=>value==14);
                 cx2.font = "bold 16px Arial";
@@ -11977,10 +11977,11 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       cx2.font = "14px Arial";
       cx2.fillText("・リーチが発生した時", 635, 130);
       cx2.fillText("危険パイを察知する.", 635, 150);
-      cx2.fillText("・ツモパイは察知できない.", 635, 170);
-      cx2.fillText("・直近のリーチにのみ", 635, 190);
-      cx2.fillText("対応し,新たにリーチが", 635, 210);
-      cx2.fillText("発生した場合上書きされる.", 635, 230);
+      cx2.fillText("・引いたばかりのパイは", 635, 170);
+      cx2.fillText("察知できない.", 635, 190);
+      cx2.fillText("・新たにリーチが", 635, 210);
+      cx2.fillText("発生した場合,効果は.", 635, 230);
+      cx2.fillText("上書きされる.", 635, 230);
       if(skillusage[player]>0){
       switch(skillusage[player]){
         case 1:
@@ -11994,7 +11995,9 @@ cx1.drawImage(e7,dorax,10,33,43.5)
               break;
               case 4:
                 cx2.fillText("対象：CPU3", 635, 260);
-                break;            
+                break;
+                default:
+                  cx2.fillText("対象：--", 635, 260);
       }}
       }else{
       cx2.font = "bold 16px Arial";
