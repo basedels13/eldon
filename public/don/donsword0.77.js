@@ -1,12 +1,18 @@
-//var0.96
-//レイヴン、イヴ追加
-//対戦で魔界モードのリザルトが出ない
+//var1.01　season2 
+// npm run dev
+//全職75枚（エピックキャラは1枚ずつ増量）＋オールマイティ2枚＋マスター8枚（ガ、ロ、ベ、デ、ソ、ア、ハ）合計85枚→53枚スタート
+//国士無双を廃止、　クレストシリーズは手札を属性統一することで役満扱いへ
+//対戦で魔界モードのリザルトが出ないらしい
+//次→cpuルーチンの修正 リーチボタンとかの表示なおす
+//FEVER→最初に1回だけ、職変チャンス
+//いつか→se変更　不足分の画像　カン　対戦部屋の工事、マナブレ表示、スキル、プレイガイド　場の同じパイの色付け
+//cpuルーチンで止まる　たぶんリーチ時
 window.onload = function(){
   draw();
   };
   
   function draw(){
-  var debugmode=false;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にfalseに
+  var debugmode=true;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にfalseに
   //自分自身の情報を入れる箱
   var IAM = {
     token: null,    // 戸別管理用のトークン
@@ -117,15 +123,14 @@ window.onload = function(){
   var Savetitle =new Array("This is savedata of <https://azurelsword.web.fc2.com/ronan.html>",0,0);
   var mute="ON"
   var alpha = 0;
-  var loadstate=0;
   var Username = "player";
+  var UsernameText = new createjs.Text(Username, "24px Arial", "black");
   var Usercrest = "称号なし";
   const canvas = document.getElementById("canvas0");//ベースレイヤ。背景、置物
   var canvas1 = document.getElementById("canvas1");//立ち絵,捨てパイ
   var canvas2 = document.getElementById("canvas2");//パイ、ボタン
   var canvas3 = document.getElementById("canvas3");//カーソル、
   var canvas4 = document.getElementById("canvas4");//残パイ、アニメーション用
-  var canvas6 = document.getElementById("canvas6");//パイの一覧表用
   var canvas5 = document.getElementById("canvas5");//カーソルのアニメーション用
   
     if ( ! canvas || ! canvas.getContext ) { return false; }
@@ -134,22 +139,70 @@ window.onload = function(){
     var cx2 = canvas2.getContext("2d");
     var cx3 = canvas3.getContext("2d");
     var cx4 = canvas4.getContext("2d");
-    var cx6 = canvas6.getContext("2d");
     var cx5 = canvas5.getContext("2d");
-    //cx6.globalAlpha=0;
-    var stage = new createjs.Stage("canvas7");//Stage
-    var container = new createjs.Container();
-    container.x = 0;
-    container.y = 0;
-    stage.addChild(container); // 画面に追加
-    var field = new createjs.Container();
+    var stage = new createjs.Stage("canvas5");//Stage
+    if (createjs.Touch.isSupported() == true) {
+      createjs.Touch.enable(stage);//タップに対応するが...?
+      }
+    stage.enableMouseOver();//onmouseイベントに対応
+    var backyard = new createjs.Container();//背景の緑芝
+    stage.addChild(backyard);
+    var field = new createjs.Container();//タイトル、メイン画面
     stage.addChild(field);
-    var yakumap = new createjs.Container();
+    var textmap = new createjs.Container();//メッセージ
+    textmap.alpha=0;
+    stage.addChild(textmap);
+    var guidemap = new createjs.Container();//ラテ欄
+    stage.addChild(guidemap);
+    var ponkanmap = new createjs.Container();//プレイ中のボタン系
+    stage.addChild(ponkanmap);
+    var yakumap = new createjs.Container();//シナジー表示
     stage.addChild(yakumap);
-    var yakumap2 = new createjs.Container();
-    stage.addChild(yakumap2);
-    var handmap = new createjs.Container();
+      var yakumapMask = new createjs.Container();//スクロール用のインコンテナ
+    var paiviewer = new createjs.Container()//パイの一覧表用
+    stage.addChild(paiviewer);
+      var paiviewerMask = new createjs.Container();
+    var handmap = new createjs.Container();//手札/ツモ画面の描画に使用
     stage.addChild(handmap);
+    var fieldmap = new createjs.Container();//魔界血戦時のツモ画面の描画に使用
+    var soundmap = new createjs.Container();
+    stage.addChild(soundmap); //sound ミュートボタン
+    //Configmap
+    var Configmap = new createjs.Container();
+    stage.addChild(Configmap); //設定ボタン
+    var corsormap = new createjs.Container();//カーソル
+    stage.addChild(corsormap);
+    //テキスト欄
+    var Textlist=[];
+    var underText = new createjs.Bitmap("don/Don_textwindow.png");
+    underText.y=520;  
+    textmap.addChild(underText);
+    var underText = new createjs.Text("　", "24px Arial", "black");
+    underText.x=80;
+    underText.y=530;
+    textmap.addChild(underText);
+    Textlist.push(underText);
+    var underText = new createjs.Text("　", "24px Arial", "black");
+    underText.x=80;
+    underText.y=560;
+    textmap.addChild(underText);
+    Textlist.push(underText);
+    //残パイ枚数テキスト
+    var deckText = new createjs.Text("残:", "24px 'Century Gothic'", "white");
+    //soundボタン
+    var s = new createjs.Shape();
+    s.graphics.beginFill("#0a3361");
+    s.graphics.drawRect(710, 10, 80, 38);
+    soundmap.addChild(s);
+    s.addEventListener("click", {handleEvent:SoundConfig});
+    var t = new createjs.Text("SOUND", "12px Arial", "#ffffff");
+    t.x=720;
+    t.y=12;
+    soundmap.addChild(t);
+    var muteshape = new createjs.Text(mute, "Bold 24px Arial", "#ffffff");
+    muteshape.x=730;
+    muteshape.y=22;
+    soundmap.addChild(muteshape);
     var Resultary=[]
     //クリア時アニメーションに使用
     yakumap.alpha=0;
@@ -167,10 +220,10 @@ window.onload = function(){
   tweeNstar=createjs.Tween.get(Cstar, {loop: true})
   .to({rotation:360},1200);
   var Csquare= new createjs.Shape();
-  Csquare.graphics.beginFill("white").drawRect(0,0,135,100);
-  Csquare.x=10;
+  Csquare.graphics.beginFill("rgba(28, 134, 255, 0.7)").drawRect(0,0,145,100);
+  Csquare.x=0;
   Csquare.y=0;
-  stage.addChild(Csquare);
+  //stage.addChild(Csquare);
   var tweeNsquare;
   tweeNsquare=createjs.Tween.get(Csquare, {loop: true})
   .to({alpha:0.5},600)
@@ -178,6 +231,19 @@ window.onload = function(){
   .to({alpha:0.5},600);
   tweeNsquare.paused=true;
   Csquare.alpha=0;
+  var CorsorKey;//カーソル1
+  CorsorKey = new createjs.Shape();
+  CorsorKey.graphics.beginStroke("#0088f0");
+  CorsorKey.graphics.setStrokeStyle(5);
+  CorsorKey.graphics.drawRoundRect(0,0,100,100,10,10)
+  corsormap.addChild(CorsorKey);
+  var tweeNcor;
+  tweeNcor=createjs.Tween.get(CorsorKey, {loop: true})
+  .to({alpha:1},200)
+  .to({alpha:0.2},400)
+  .to({alpha:1},200);
+  tweeNcor.paused=true;
+  CorsorKey.alpha=0;
   var Clvup = new createjs.Bitmap("don/Don_fever.png");
   Clvup.alpha=0;
   stage.addChild(Clvup);
@@ -212,10 +278,8 @@ window.onload = function(){
         });
       }
     }
-  
   var LP =new Array(0,75000,75000,75000,75000);
-  //LP[0]:0->半荘150000/スキルあり 1->半荘300000/スキルあり 2->ミリオネア 3->無限を予定
-  //6-9:ベルドレイド？
+  //LP[0]:0->半荘150000/スキルあり 1->半荘300000/スキルあり 2->ミリオネア 3->無限 4->血戦
   var LPtemp=new Array(0,0,0,0,0)
   var chara =new Array(0,0,0,0,0)
   //mpmove
@@ -230,13 +294,13 @@ window.onload = function(){
   var drawcard;
   var Cskillprepare=[0,0,0,0,0];
   //chara0 0->cpuランダム 1->cpu決める
-  //覚醒ゲージ0-30
+  //MPゲージ0-30
   var DP =new Array(0,0,0,0,0)
+  var DPlist=new Array(0,0,0,0,0)
   //バフ 1スキン 2マナシールド 3ネイチャ 4ナソコア 5やけど 6凍結 7適応力
   //11~修羅の戦で和了済みの人
   var Buff =new Array(0,[],[],[],[])
-  //再発動間隔測る用の配列
-  var BuffCT = [];
+  var Bufflist =new Array(0,[],[],[],[])
   var mode=0
   var musicnum=0
   var musicset=new Array(3,7,8);
@@ -244,50 +308,51 @@ window.onload = function(){
   var vBar=1;
   var sBar=1;
   //音量調節機能を追加
-  var shiagytemp=1;
+  var shiagytemp=0;
   //0->一覧 1->所持パイのみ
   var auras=0;
   //オーラスの時1　現在音楽のみに影響
   var Ronturn=[];
   //データベース
   var LPlist=new Array("一般","ヘル","ミリオネア","∞","魔界血戦")
-  var musiclist=new Array("test","夜の迷宮の入口","決闘のテーマ","盲目のアストライア","The Evil Sacrifice Archenemies","Nine Jack","ロベリア","リーチっぽい音楽","狂乱のオーラス","エルの樹の麓")
-  var chrlist=new Array("名無しさん","エルス","アイシャ","レナ","レイヴン","イヴ")//"エド","アラ","ラビィ")
+  var musiclist=new Array("test","夜の迷宮の入口","決闘のテーマ","盲目のアストライア","The Evil Sacrifice Archenemies","Nine Jack","ロベリア","リーチっぽい音楽","狂乱のオーラス","エルの樹の麓","ベスマ湖","ウォーリーの城")
+  var chrlist=new Array("名無しさん","エルス","アイシャ","レナ","レイヴン","イヴ")//"ラシェ","アラ","エド","ラビィ")
   var chrimg_src= new Array("don/Don_chara0.png","don/Don_chara1.png","don/Don_chara2.png","don/Don_chara3.png","don/Don_chara4.png","don/Don_chara5_2.png");
   var atrbute_src= new Array("don/Don_DP.png","don/Duel_mana.png","don/Duel_sun.png","don/Duel_aqua.png","don/Duel_wind.png","don/Duel_moon.png","don/Duel_gaia.png","don/Duel_heat.png","don/Don_HA.png");
-  var bgimg_src=new Array(1,"don/Don_bg1.png","don/elimg2.png","don/stadium2.png");
   //説明用
   var epic_src =new Array("don/elstudio_bg1.png","don/Don_epic1.png","don/Don_epic2.png","don/Don_epic3.png","don/Don_epicline.png","don/Don_ss11.png","don/Don_epic4.png","don/Don_epic5.png");
-  //裏＆ツモロンボタン
-  var eltearB_src =new Array( "don/Don_img0.png","don/Don_tumoA.png","don/Don_tumoB.png","don/Don_tumoC.png","don/Don_tumoD.png","don/Don_winbg.png");
+  //パイの裏
+  var eltearB_src =new Array("don/Don_img0.png","don/Don_winbg.png");
   var eltear= new Image();
-  //donpaiのidは0から始まるためそのまま
-  var eltear_src = new Array("don/Don_img1.png","don/Don_img2.png","don/Don_img3.png","don/Don_img4.png","don/Don_img5.png","don/Don_img6.png","don/Don_img7.png","don/Don_img8.png","don/Don_img9.png","don/Don_img10.png",);
-  eltear_src.push("don/Don_img11.png","don/Don_img12.png","don/Don_img13.png","don/Don_img14.png","don/Don_img15.png","don/Don_img16.png","don/Don_img17.png","don/Don_img18.png","don/Don_img19.png","don/Don_img20.png",);
-  eltear_src.push("don/Don_img21.png","don/Don_img22.png","don/Don_img23.png","don/Don_img24.png","don/Don_img25.png","don/Don_img26.png","don/Don_img27.png","don/Don_img28.png","don/Don_img29.png","don/Don_img30.png",);
-  eltear_src.push("don/Don_img31.png","don/Don_img32.png","don/Don_img33.png","don/Don_img34.png","don/Don_img35.png","don/Don_img36.png","don/Don_img37.png","don/Don_img38.png","don/Don_img39.png","don/Don_img40.png",);
-  eltear_src.push("don/Don_img41.png","don/Don_img42.png","don/Don_img43.png","don/Don_img44.png","don/Don_img45.png");
+  //donpaiのidは0から始める　ロゼimg40-43は位置が変わる
+  var eltear_src = new Array("don/Don_img1.png","don/Don_img2.png","don/Don_img3.png","don/Don_img4_1.png","don/Don_img4.png","don/Don_img5.png","don/Don_img6.png","don/Don_img4_2.png","don/Don_img7.png","don/Don_img8.png","don/Don_img9.png","don/Don_img4_3.png","don/Don_img10.png",);
+  eltear_src.push("don/Don_img11.png","don/Don_img12.png","don/Don_img4_4.png","don/Don_img13.png","don/Don_img14.png","don/Don_img15.png","don/Don_img4_5.png","don/Don_img16.png","don/Don_img17.png","don/Don_img18.png","don/Don_img4_6.png","don/Don_img19.png","don/Don_img20.png",);
+  eltear_src.push("don/Don_img21.png","don/Don_img4_7.png","don/Don_img22.png","don/Don_img23.png","don/Don_img24.png","don/Don_img4_8.png","don/Don_img25.png","don/Don_img26.png","don/Don_img27.png","don/Don_img4_9.png","don/Don_img28.png","don/Don_img29.png","don/Don_img30.png",);
+  eltear_src.push("don/Don_img4_10.png","don/Don_img40.png","don/Don_img41.png","don/Don_img42.png","don/Don_img43.png","don/Don_img31.png","don/Don_img32.png","don/Don_img33.png","don/Don_img4_11.png","don/Don_img34.png","don/Don_img35.png","don/Don_img36.png","don/Don_img4_12.png","don/Don_img37.png","don/Don_img38.png","don/Don_img39.png","don/Don_img4_13.png",);
+  eltear_src.push("don/Don_img46.png","don/Don_img47.png","don/Don_img48.png","don/Don_img49.png");
+  eltear_src.push("don/Don_imgM1.png","don/Don_imgM2.png","don/Don_imgM3.png","don/Don_imgM4.png","don/Don_imgM5.png","don/Don_imgM6.png","don/Don_imgM7.png","don/Don_imgM8.png","don/Don_img44.png","don/Don_img45.png");
   //create用
-  var donpaiList=[];
   var s;
   var ary=[];
   console.log(eltear_src.length);
-  //expected 45
+  //expected 62
   //バフアイコン
   var donicon=new Image();
   var donicon_src= new Array("don/Don_buff.png","don/Don_mbicon.png","don/Don_fever.png")
-  var win_src= new Array("don/win1.png","don/win1.png","don/win2.png","don/win3.png","don/win4.png","don/win5.png","don/win6.png","don/wintumo.png","don/winron.png","don/winreach.png");
+  var win_src= new Array("don/Don_menu1.png","don/Don_menu2.png","don/Don_menu3.png","don/Don_menu4.png","don/wintumo.png","don/winron.png","don/winreach.png","don/Don_Cutin.png");
   var musiclistDT=[
   {title:"0",elia:"0",nod:"0"},
   {title:"夜の迷宮の入口",elia:"提供",nod:"ラビィのテーマのイメージ"},
-  {title:"決闘のテーマ",elia:"提供",nod:"from Elsword music007_boss <耳コピ>"},
-  {title:"盲目のアストライア",elia:"ISAo",nod:"@ DOVA-SYNDROM"},
-  {title:"The Evil Sacrifice Archenemies",elia:"ISAo",nod:"@ DOVA-SYNDROM"},
-  {title:"Nine Jack",elia:"まんぼう二等兵",nod:"@ DOVA-SYNDROM"},
-  {title:"ロベリア",elia:"まんぼう二等兵",nod:"@ DOVA-SYNDROM"},
+  {title:"決闘のテーマ",elia:"提供",nod:"from Elsword music <耳コピアレンジ>"},
+  {title:"盲目のアストライア",elia:"ISAo",nod:"@ DOVA-SYNDROME"},
+  {title:"The Evil Sacrifice Archenemies",elia:"ISAo",nod:"@ DOVA-SYNDROME"},
+  {title:"Nine Jack",elia:"まんぼう二等兵",nod:"@ DOVA-SYNDROME"},
+  {title:"ロベリア",elia:"まんぼう二等兵",nod:"@ DOVA-SYNDROME"},
   {title:"リーチっぽい音楽",elia:"提供",nod:"アトラスシティーのイメージ"},
-  {title:"狂乱のオーラス",elia:"提供",nod:"from Elsword music092_boss <耳コピ>"},
-  {title:"エルの樹の麓",elia:"提供",nod:"from Elsword music005_stage <耳コピ>"},
+  {title:"狂乱のオーラス",elia:"提供",nod:"from Elsword music <耳コピアレンジ>"},
+  {title:"エルの樹の麓",elia:"提供",nod:"from Elsword music <耳コピアレンジ>"},
+  {title:"ベスマ湖",elia:"提供",nod:"from Elsword music <耳コピアレンジ>"},
+  {title:"ウォーリーの城",elia:"提供",nod:"from Elsword music <耳コピアレンジ>"},
   ]
   var skilltext=[{fir:"0",sec:"0",thr:"0"},
   {fir:"フレイムガイザー",sec:"FLAME GEYSER",thr:"0"},
@@ -301,53 +366,107 @@ window.onload = function(){
   {name:"エルス",sub:"ナイトエンペラー",line:1,color:1},
   {name:"エルス",sub:"ルーンマスター",line:2,color:1},
   {name:"エルス",sub:"イモータル",line:3,color:1},
+  {name:"エルス",sub:"ジェネシス",line:4,color:1},
   {name:"アイシャ",sub:"エーテルセイジ",line:1,color:2},
   {name:"アイシャ",sub:"オズソーサラー",line:2,color:2},
   {name:"アイシャ",sub:"メタモルフィ",line:3,color:2},
+  {name:"アイシャ",sub:"ロードアゾット",line:4,color:2},
   {name:"レナ",sub:"アネモス",line:1,color:3},
   {name:"レナ",sub:"デイブレイカー",line:2,color:3},
   {name:"レナ",sub:"トワイライト",line:3,color:3},
-  {name:"レイヴン",sub:"フューリアスブレード",line:1,color:0},
-  {name:"レイヴン",sub:"レイジハーツ",line:2,color:0},
-  {name:"レイヴン",sub:"ノヴァインペラトル",line:3,color:0},
+  {name:"レナ",sub:"プロフェテス",line:4,color:3},
+  {name:"レイヴン",sub:"フューリアスブレード",line:1,color:1},
+  {name:"レイヴン",sub:"レイジハーツ",line:2,color:1},
+  {name:"レイヴン",sub:"ノヴァインペラトル",line:3,color:1},
+  {name:"レイヴン",sub:"レヴァナント",line:4,color:1},
   {name:"イヴ",sub:"コードアルティメイト",line:1,color:4},
   {name:"イヴ",sub:"コードエセンシア",line:2,color:4},
   {name:"イヴ",sub:"コードサリエル",line:3,color:4},
+  {name:"イヴ",sub:"コードアンチテーゼ",line:4,color:4},
   {name:"ラシェ",sub:"コメットクルセイダー",line:1,color:2},
   {name:"ラシェ",sub:"フェイタルファントム",line:2,color:2},
   {name:"ラシェ",sub:"センチュリオン",line:3,color:2},
+  {name:"ラシェ",sub:"ディウスアエール",line:4,color:2},
   {name:"アラ",sub:"飛天",line:1,color:5},
   {name:"アラ",sub:"黒闇天",line:2,color:5},
   {name:"アラ",sub:"羅天",line:3,color:5},
+  {name:"アラ",sub:"日天子",line:4,color:5},
   {name:"エリシス",sub:"エンパイアソード",line:1,color:6},
   {name:"エリシス",sub:"フレイムロード",line:2,color:6},
   {name:"エリシス",sub:"ブラッディクイーン",line:3,color:6},
+  {name:"エリシス",sub:"アドレスティア",line:4,color:6},
   {name:"エド",sub:"ドゥームブリンガー",line:1,color:4},
   {name:"エド",sub:"ドミネーター",line:2,color:4},
   {name:"エド",sub:"マッドパラドックス",line:3,color:4},
+  {name:"エド",sub:"オーバーマインド",line:4,color:4},
   {name:"ルシエル",sub:"カタストロフィ",line:1,color:6},
   {name:"ルシエル",sub:"イノセント",line:2,color:6},
   {name:"ルシエル",sub:"ディアンゲリオン",line:3,color:6},
-  {name:"アイン",sub:"リヒター",line:1,color:7},
-  {name:"アイン",sub:"ブルーヘン",line:2,color:7},
-  {name:"アイン",sub:"ヘルシャー",line:3,color:7},
-  {name:"ラビィ",sub:"エタニティーウィナー",line:1,color:5},
-  {name:"ラビィ",sub:"ラディアントソウル",line:2,color:5},
-  {name:"ラビィ",sub:"ニーシャラビリンス",line:3,color:5},
-  {name:"ノア",sub:"リベレーター",line:1,color:7},
-  {name:"ノア",sub:"セレスティア",line:2,color:7},
-  {name:"ノア",sub:"ニュクスピエタ",line:3,color:7},
+  {name:"ルシエル",sub:"デメルシオ",line:4,color:6},
   {name:"ロゼ",sub:"テンペストバスター",line:1,color:3},
   {name:"ロゼ",sub:"ブラックマッサーカー",line:2,color:3},
   {name:"ロゼ",sub:"ミネルヴァ",line:3,color:3},
   {name:"ロゼ",sub:"プライムオペレーター",line:4,color:3},
+  {name:"アイン",sub:"リヒター",line:1,color:7},
+  {name:"アイン",sub:"ブルーヘン",line:2,color:7},
+  {name:"アイン",sub:"ヘルシャー",line:3,color:7},
+  {name:"アイン",sub:"ビゴット",line:4,color:7},
+  {name:"ラビィ",sub:"エタニティーウィナー",line:1,color:5},
+  {name:"ラビィ",sub:"ラディアントソウル",line:2,color:5},
+  {name:"ラビィ",sub:"ニーシャラビリンス",line:3,color:5},
+  {name:"ラビィ",sub:"ツインズピカロ",line:4,color:5},
+  {name:"ノア",sub:"リベレーター",line:1,color:7},
+  {name:"ノア",sub:"セレスティア",line:2,color:7},
+  {name:"ノア",sub:"ニュクスピエタ",line:3,color:7},
+  {name:"ノア",sub:"モルペウス",line:4,color:7},
+  {name:"リティア",sub:"ジェムブリス",line:1,color:5},
+  {name:"リティア",sub:"アヴァリス",line:2,color:5},
+  {name:"リティア",sub:"アクリュース",line:3,color:5},
+  {name:"リティア",sub:"ミスチーフ",line:4,color:5},
+  {name:"ガイア",sub:"マスターロード",line:1,color:5},
+  {name:"デニフ",sub:"マスターロード",line:2,color:2},
+  {name:"ロッソ",sub:"マスターロード",line:3,color:6},
+  {name:"イベルン",sub:"マスターロード",line:4,color:7},
+  {name:"ソーレス",sub:"マスターロード",line:1,color:1},
+  {name:"アドリアン",sub:"マスターロード",line:2,color:4},
+  {name:"ベントス",sub:"マスターロード",line:3,color:3},
+  {name:"ハルニエ",sub:"マスターロード",line:4,color:7},
   {name:"アリエル",sub:"コボ",line:0,color:0},
   {name:"ルリエル",sub:"コボ",line:0,color:0},
   ]
   for(var i=0; i<donpai.length;i++){
     donpai[i].id=i;
   }
-  console.log(donpai.length);//45
+  console.log(donpai.length);//70
+  //全部1ずつ引いてます
+  var Sinagy=[
+    {id:"貫徹する足取り",chr:[24],han:[1]},
+    {id:"豊かな足取り",chr:[25],han:[1]},
+    {id:"上手な足取り",chr:[26],han:[1]},
+    {id:"交感の足取り",chr:[27],han:[1]},
+    {id:"ラビィの友達",chr:[50],han:[1]},
+    {id:"悪戯の王",chr:[51],han:[1]},
+    {id:"機械工学",chr:[43],han:[1]},
+    {id:"原初的な動き",chr:[0,12,28],han:[2]},
+    {id:"マナ守護",chr:[5,26,49],han:[2,3]},
+    {id:"殴り合い",chr:[13,32,48],han:[2]},
+    {id:"時空間",chr:[6,34,46],han:[2]},
+    {id:"戦場の天使",chr:[18,23,42],han:[2]},
+    {id:"精霊の加護",chr:[8,9,10,11],han:[2]},
+    {id:"魔族",chr:[36,37,38,39],han:[2,3]},
+    {id:"属性鍛錬者",chr:[1,4,20,29],han:[2,3]},
+    {id:"歪曲された視線",chr:[19,47,55,59],han:[2]},
+    {id:"ナソード研究",chr:[16,17,18,33,56],han:[2,4]},
+    {id:"正義を貫徹する者",chr:[0,3,20,24,28,44],han:[2,4]},
+    {id:"敏捷さ",chr:[2,8,12,21,31,42,52],han:[2,3]},
+    {id:"巨人審判者",chr:[2,14,22,40,44,53,55,66],han:[2,3]},
+    {id:"探求する者",chr:[4,7,17,22,33,35,43,53],han:[2,3]},
+    {id:"魔法特化",chr:[1,11,13,21,32,45,51,58],han:[2,3]},
+    {id:"物理特化",chr:[6,10,15,35,36,41,50,52,57],han:[2,3]},
+    {id:"痛いから問題ない",chr:[14,23,27,30,39,45,49,54,57],han:[2,3]},
+    {id:"鋭さ",chr:[3,9,16,19,29,31,37,40,48,54,58],han:[2,3]},
+    {id:"渇望",chr:[5,7,15,25,30,34,38,41,46,47],han:[2,3]},
+  ]
   //実績
   var achieveA=[
   {name:"始めまして～",sub:"エルドンを1回プレイする"},
@@ -395,12 +514,13 @@ window.onload = function(){
     achieveA[i].id=i;
     achieveA[i].cleared=0;
   }
-  //役
+  //役 maxの部分は保留
   var achieveB=[
     {name:"3ペア",sub:"アガリ形"},
     {name:"1ライン通貫",sub:"アガリ形"},
     {name:"2ライン通貫",sub:"アガリ形"},
     {name:"3ライン通貫",sub:"アガリ形"},
+    {name:"4ライン通貫",sub:"アガリ形"},
     {name:"国士無双",sub:"アガリ形"},
     {name:"鋭さ",sub:"シナジー役",max:7},
     {name:"ナソード研究",sub:"シナジー役",max:5},
@@ -410,6 +530,7 @@ window.onload = function(){
     {name:"貫徹する足取り",sub:"シナジー役",max:1},
     {name:"豊かな足取り",sub:"シナジー役",max:1},
     {name:"上手な足取り",sub:"シナジー役",max:1},
+    {name:"交感の足取り",sub:"シナジー役",max:1},
     {name:"敏捷さ",sub:"シナジー役",max:6},
     {name:"正義を貫徹する者",sub:"シナジー役",max:5},
     {name:"殴り合い",sub:"シナジー役",max:3},
@@ -421,9 +542,11 @@ window.onload = function(){
     {name:"原初的な動き",sub:"シナジー役",max:3},
     {name:"渇望",sub:"シナジー役",max:7},
     {name:"属性鍛錬者",sub:"シナジー役",max:4},
+    {name:"歪曲された視線",sub:"シナジー役",max:3},
     {name:"痛いから問題ない",sub:"シナジー役",max:5},
     {name:"機械工学",sub:"シナジー役",max:1},
     {name:"ラビィの友達",sub:"シナジー役",max:1},
+    {name:"悪戯の王",sub:"シナジー役",max:1},
     {name:"戦場の天使",sub:"シナジー役",max:2},
     {name:"クレストオブガイア",sub:"キャラ役"},
     {name:"クレストオブソーレス",sub:"キャラ役"},
@@ -496,16 +619,13 @@ window.onload = function(){
     "FEV":Fever,
   };
   var key27=0;//esc
-  var handE1= new Image();
-  var handE2= new Image();
-  var handE3= new Image();
-  var handE4= new Image();
-  var handE5= new Image();
-  var handE6= new Image();
-  var handE7= new Image();
-  var handE8= new Image();
-  var handE9= new Image();
-  var etitle= new Image();
+  var handlist=[];
+  //タイトルロゴ
+  var etitle= new createjs.Bitmap("don/Don_title.png");
+  //背景
+  var BGimg= new createjs.Bitmap("don/Don_bg1.png");
+  BGimg.scale=2;
+  //赤背景はBGimg.y=-600に;
   var e1= new Image();
   var e2= new Image();
   var e3= new Image();
@@ -522,9 +642,6 @@ window.onload = function(){
   //リーチの待ちパイ、cpuのpon
   //メニューウインドウ
   var e10= new Image();
-  //背景
-  var BGimg=new Image();
-  var DPimg=new Image();
   var e11= new Image();
   var e12= new Image();
   var e13= new Image();
@@ -536,13 +653,13 @@ window.onload = function(){
   //ツモロンの時の表示に
   var e18= new Image();
   var e19= new Image();
-  var e20= new Image();
   //属性マーク
   var Aicon=new Image();
   //マナブレアイコン
   var MBicon= new Image();
   var epic= new Image();
-  var zoom= new Image();
+  var zoom=  new createjs.Bitmap("don/zoom650.png");
+  zoom.scale=0.4;
   //ツモロンボタン
   var skilltext1
   var skilltext2
@@ -598,7 +715,7 @@ window.onload = function(){
   var ctlerror=new Array(0,0,0,0,0)
   var ctlswitch
   var cLock=1
-  var opLock=0;
+  var opLock=0;//
   //残パイ確認・役確認等用
   var handsort=0;
   //0->ID順、1->職ライン順
@@ -652,7 +769,7 @@ window.onload = function(){
   var sizey=93
   var pagestate=-1
   var msgstate=0
-  var gamestate =10;
+  var gamestate =-10;
   //-2,-1=>tumoronで使用,クリックさせたくない時 0=>クリックで1に,ゲームをしてない時 1=>game中 2=>クリックで0に,ツモのアニメーション 3=>ゲームオーバー、タイトルに戻るなどする 10=>麻雀をしていない
   var Cimage;//ツモ画面で対局画面の保存用
   var N1;
@@ -691,7 +808,7 @@ window.onload = function(){
         volume: 0.3,
       });
   var se5 = new Howl({
-    src:"don/decision47.mp3",
+    src:"don/button25.mp3",
     volume: 0.2,
       });
   var se6 = new Howl({
@@ -699,7 +816,7 @@ window.onload = function(){
     volume: 0.25,
     });
   var se7 = new Howl({
-    src:"don/K.O..mp3",
+    src:"don/skillSE.mp3",
     volume: 0.18,
     });
   var se8 = new Howl({
@@ -800,6 +917,18 @@ window.onload = function(){
     loopEnd: 171500,
     volume: 0.3,
   };
+  const bgm10data ={
+    src: "don/Stage_Bethma.mp3",
+    loopStart: 1150,
+    loopEnd: 98610,
+    volume: 0.15,
+  };
+  const bgm11data ={
+    src: "don/Unrest_KBF_li.mp3",
+    loopStart: 14250,
+    loopEnd: 173120,
+    volume: 0.4,
+  };
   const bgm17data ={
     src: "don/STARDUST_LEMON.mp3",
     loopStart: 33450,
@@ -807,46 +936,7 @@ window.onload = function(){
     volume: 0.12,
   };
   var Bgm=new Music(bgm3data);
-Bgm.on("load", () => {
-    loadgraph();
-  })
-  var Bgm7=new Music(bgm7data);
-  Bgm7.on("load", () => {
-    loadgraph();
-  })
-  var Bgm8=new Music(bgm8data);
-  Bgm8.on("load", () => {
-    loadgraph();
-  })
-  var Bgm1=new Music(bgm1data);
-  Bgm1.on("load", () => {
-    loadgraph();
-  })
-  var Bgm2=new Music(bgm2data);
-  Bgm2.on("load", () => {
-    loadgraph();
-  })
-  var Bgm4=new Music(bgm4data);
-  Bgm4.on("load", () => {
-    loadgraph();
-  })
-  var Bgm5=new Music(bgm5data);
-  Bgm5.on("load", () => {
-    loadgraph();
-  })
-  var Bgm6=new Music(bgm6data);
-  Bgm6.on("load", () => {
-    loadgraph();
-  })
-  var Bgm9=new Music(bgm9data);
-  Bgm9.on("load", () => {
-    loadgraph();
-  })
-  var Bgm17=new Music(bgm17data);
-  Bgm17.on("load", () => {
-    loadgraph();
-  })
-  var musicnum=0
+  var musicnum=0;
     se1.load();
     se2.load();
     se3.load();
@@ -862,375 +952,166 @@ Bgm.on("load", () => {
     se13.load();
     se14.load();
     se15.load();
-  var donX=40;
-  var donY=100;
-  var loadmax=90;
-  DPimg.src=atrbute_src[0];
-    DPimg.onload=function(){loadgraph();
-         }
-  Aicon.src="don/Duel_gaia.png"
-  Aicon.onload=function(){loadgraph();
-      Aicon.src="don/Duel_heat.png"
-      Aicon.onload=function(){loadgraph();
-          Aicon.src="don/Duel_aqua.png"
-          Aicon.onload=function(){loadgraph();
-            Aicon.src="don/Duel_wind.png"
-            Aicon.onload=function(){loadgraph();
-              Aicon.src="don/Duel_sun.png"
-              Aicon.onload=function(){loadgraph();
-                Aicon.src="don/Duel_moon.png"
-                Aicon.onload=function(){loadgraph();
-              Aicon.src="don/Don_HA.png"
-              Aicon.onload=function(){loadgraph();
-  }}}}}}};
-  e17.src=win_src[7]
-  e17.onload=function(){loadgraph();
-    e17.src=win_src[8]
-  e17.onload=function(){loadgraph();
-    e17.src=win_src[9]
-    e17.onload=function(){loadgraph();
-    }}}
-  e18.src=eltearB_src[0];
-  e18.onload=function(){loadgraph();
-    e18.src=eltearB_src[1];
-    e18.onload=function(){loadgraph();
-      e18.src=eltearB_src[2];
-      e18.onload=function(){loadgraph();
-        e18.src=eltearB_src[3];
-        e18.onload=function(){loadgraph();
-          e18.src=eltearB_src[4];
-          e18.onload=function(){loadgraph();
-          }}}}}
-  e20.src="don/Don_winbg.png";
-  e20.onload=function(){loadgraph();}
-  etitle.src="don/Don_title.png";
-  etitle.onload=function(){
-    cx2.drawImage(etitle,60,150,660,220);
-    loadgraph();}
-  donicon.src=donicon_src[0];
-  donicon.onload=function(){loadgraph();}  
-  MBicon.src=donicon_src[1];
-  MBicon.onload=function(){loadgraph();}
-  e10.src=chrimg_src[0]
-  e10.onload=function(){loadgraph();
-  e10.src=chrimg_src[1]
-  e10.onload=function(){loadgraph();
-  e10.src=chrimg_src[2]
-  e10.onload=function(){loadgraph();
-  e10.src=chrimg_src[3]
-  e10.onload=function(){loadgraph();
-    e10.src=chrimg_src[4]
-    e10.onload=function(){loadgraph();
-      e10.src=chrimg_src[5]
-      e10.onload=function(){loadgraph();
-      }}
-  }}}}
-  BGimg.src=bgimg_src[1]
-  BGimg.onload=function(){
-    cx.drawImage(BGimg,0,0,400,300,0,0,800,600);
-    loadgraph();
+// LoadQueueのインスタンスを作成
+var queue = new createjs.LoadQueue(),
+//ロード画像適宜追加
+      manifest = [];
+    for(var i=0;i<eltear_src.length;i++){
+      manifest.push({src:eltear_src[i]})
+    };
+    for(var i=0;i<eltearB_src.length;i++){
+      manifest.push({src:eltearB_src[i]})
+    };
+    for(var i=0;i<chrimg_src.length;i++){
+      manifest.push({src:chrimg_src[i]})
+    };
+    for(var i=0;i<win_src.length;i++){
+      manifest.push({src:win_src[i]})
+    };
+    manifest.push({src: 'don/circle88.png'})
+    console.log(manifest.length);
+// 同時接続数を設定
+queue.setMaxConnections(6);
+// 読み込みの進行状況が変化した
+queue.addEventListener("progress", handleProgress);
+// 1つのファイルを読み込み終わったら
+queue.addEventListener(
+  "fileload",
+  handleFileLoadComplete
+);
+// 全てのファイルを読み込み終わったら
+queue.addEventListener("complete", handleComplete);
+// 読み込み開始
+queue.loadManifest(manifest);
+function handleProgress(event) {
+  // 読み込み率を0.0~1.0で取得
+  var progress = event.progress;
+  field.removeAllChildren();
+  var Rate=Math.floor(progress*100);
+  var load = new createjs.Text("Now loading..."+Rate+"%", "24px serif", "white");
+  var loadGrp = new createjs.Shape();
+    loadGrp.graphics.beginFill("#007fd9")
+    loadGrp.graphics.drawRect(100, 380,6*Rate, 25);
+    createjs.Tween.get(Cstar).to({x:6*Rate+100},300);
+  load.x=100;
+  load.y=360;
+  field.addChild(load);
+  field.addChild(loadGrp);
+  backyard.addChild(BGimg);
+}
+function handleFileLoadComplete(event) {
+  // 読み込んだファイル
+  var result = event.result;
+}
+function handleComplete() {
+  console.log("LOAD COMPLETE");
+  field.removeAllChildren();
+  loadtitle()
+}
+canvas5.onmousedown = mouseDownListener;
+function mouseDownListener(e) {
+  createjs.Ticker.addEventListener("tick", MouseCircle);
+};
+canvas5.onmouseup = mouseUpListener;
+function mouseUpListener(e) {
+  createjs.Ticker.removeEventListener("tick", MouseCircle);
+};
+createjs.Ticker.addEventListener("tick", UpdateParticles);
+function UpdateParticles(event){
+  updateParticles();
+}
+function MouseCircle(event){
+  //クリックした場所を教える
+  //create化する
+  emitParticles();
+  // パーティクルを更新
+  updateParticles();
+}
+var count = 0; // tick イベントの回数
+var MAX_LIFE = 20; // 寿命の最大値
+var particles = [];
+// パーティクルを発生させます
+function emitParticles() {
+  // パーティクルの生成
+  for (var i = 0; i < 5; i++) {
+    // カウントの更新
+    count += 1;
+    // オブジェクトの作成
+    var particle = new createjs.Shape();
+    var R=30*Math.random()
+    particle.graphics
+            .beginFill(createjs.Graphics.getHSL(218, 90, 50))
+            .drawRect(-R/2, -R/2, R, R);
+    field.addChild(particle);
+    particle.compositeOperation = "lighter";
+    particle.alpha=0.25;
+    // パーティクルの発生場所
+    particle.x = stage.mouseX*(1/stage.scaleX);
+    particle.y = stage.mouseY*(1/stage.scaleY);
+    // 動的にプロパティーを追加します。
+    // 速度
+    particle.vx = 3 * (Math.random() - 0.5);
+    particle.vy = 3 * (Math.random() - 0.5);
+    // 寿命
+    particle.life = MAX_LIFE;
+    particles.push(particle);
   }
-  epic.src=epic_src[0]
-  epic.onload=function(){loadgraph();
-  epic.src=epic_src[1]
-  epic.onload=function(){loadgraph();
-  epic.src=epic_src[2]
-  epic.onload=function(){loadgraph();
-  epic.src=epic_src[3]
-  epic.onload=function(){loadgraph();
-  epic.src=epic_src[4]
-  epic.onload=function(){loadgraph();
-  epic.src=epic_src[5]
-  epic.onload=function(){loadgraph();
-  epic.src=epic_src[6]
-  epic.onload=function(){loadgraph();
-  epic.src=epic_src[7]
-  epic.onload=function(){loadgraph();
+}
+// パーティクルを更新します
+function updateParticles() {
+  // パーティクルの計算を行う
+  for (var i = 0; i < particles.length; i++) {
+    // オブジェクトの作成
+    var particle = particles[i];
+    // 重力
+    particle.vy += 0.2;
+    // 摩擦
+    particle.vx *= 0.96;
+    particle.vy *= 0.96;
+    // 速度を位置に適用
+    particle.x += particle.vx;
+    particle.y += particle.vy;
+    // 地面
+    if (particle.y > stage.canvas.height) {
+      particle.y = stage.canvas.height; // 行き過ぎ補正
+      particle.vy *= -1; // Y軸の速度を反転
     }
-  }}
-  }}}}}
-  eltear.src=eltear_src[0]
-  eltear.onload=function(){
-  cx6.drawImage(eltear,donX,donY,60,78)
-  donX+=60;
-  loadgraph();
-  eltear.src=eltear_src[1]
-  eltear.onload=function(){
-    cx6.drawImage(eltear,donX,donY,60,78)
-    donX+=60;
-  loadgraph();
-  eltear.src=eltear_src[2]
-  eltear.onload=function(){
-    cx6.drawImage(eltear,donX,donY,60,78)
-    donX+=60;
-  loadgraph();
-  eltear.src=eltear_src[3]
-  eltear.onload=function(){
-    cx6.drawImage(eltear,donX,donY,60,78)
-    donX+=60;
-  loadgraph();
-  eltear.src=eltear_src[4]
-  eltear.onload=function(){
-    cx6.drawImage(eltear,donX,donY,60,78)
-    donX+=60;
-  loadgraph();
-  eltear.src=eltear_src[5]
-  eltear.onload=function(){
-    cx6.drawImage(eltear,donX,donY,60,78)
-    donX+=60;
-  loadgraph();
-  eltear.src=eltear_src[6]
-  eltear.onload=function(){
-    cx6.drawImage(eltear,donX,donY,60,78)
-    donX+=60;
-  loadgraph();
-  eltear.src=eltear_src[7]
-  eltear.onload=function(){
-    cx6.drawImage(eltear,donX,donY,60,78)
-    donX+=60;
-  loadgraph();
-  eltear.src=eltear_src[8]
-  eltear.onload=function(){
-    cx6.drawImage(eltear,donX,donY,60,78)
-    donX=40;
-    donY+=78
-  loadgraph();
-  eltear.src=eltear_src[9]
-  eltear.onload=function(){
-    cx6.drawImage(eltear,donX,donY,60,78)
-    donX+=60;
-  loadgraph();
-  eltear.src=eltear_src[10]
-  eltear.onload=function(){
-    cx6.drawImage(eltear,donX,donY,60,78)
-    donX+=60;
-  loadgraph();
-  console.log("harmony!");
-  eltear.src=eltear_src[11]
-  eltear.onload=function(){
-    cx6.drawImage(eltear,donX,donY,60,78)
-    donX+=60;
-  loadgraph();
-  eltear.src=eltear_src[12]
-  eltear.onload=function(){
-    cx6.drawImage(eltear,donX,donY,60,78)
-    donX+=60;
-  loadgraph();
-  eltear.src=eltear_src[13]
-  eltear.onload=function(){
-    cx6.drawImage(eltear,donX,donY,60,78)
-    donX+=60;
-  loadgraph();
-  eltear.src=eltear_src[14]
-  eltear.onload=function(){
-    cx6.drawImage(eltear,donX,donY,60,78)
-    donX+=60;
-  loadgraph();
-  eltear.src=eltear_src[15]
-  eltear.onload=function(){
-    cx6.drawImage(eltear,donX,donY,60,78)
-    donX+=60;
-  loadgraph();
-  eltear.src=eltear_src[16]
-  eltear.onload=function(){
-    cx6.drawImage(eltear,donX,donY,60,78)
-    donX+=60;
-  loadgraph();
-  eltear.src=eltear_src[17]
-  eltear.onload=function(){
-    cx6.drawImage(eltear,donX,donY,60,78)
-    donX=40;
-    donY+=78
-  loadgraph();
-  console.log("critical!")
-  eltear.src=eltear_src[18]
-  eltear.onload=function(){
-    cx6.drawImage(eltear,donX,donY,60,78)
-    donX+=60;
-  loadgraph();
-  eltear.src=eltear_src[19]
-  eltear.onload=function(){
-    cx6.drawImage(eltear,donX,donY,60,78)
-    donX+=60;
-  loadgraph();
-  eltear.src=eltear_src[20]
-  eltear.onload=function(){
-    cx6.drawImage(eltear,donX,donY,60,78)
-    donX+=60;
-  loadgraph();
-  eltear.src=eltear_src[21]
-  eltear.onload=function(){
-    cx6.drawImage(eltear,donX,donY,60,78)
-    donX+=60;
-  loadgraph();
-  eltear.src=eltear_src[22]
-  eltear.onload=function(){
-    cx6.drawImage(eltear,donX,donY,60,78)
-    donX+=60;
-  loadgraph();
-  eltear.src=eltear_src[23]
-  eltear.onload=function(){
-    cx6.drawImage(eltear,donX,donY,60,78)
-    donX+=60;
-  loadgraph();
-  eltear.src=eltear_src[24]
-  eltear.onload=function(){
-    cx6.drawImage(eltear,donX,donY,60,78)
-    donX+=60;
-  loadgraph();
-  eltear.src=eltear_src[25]
-  eltear.onload=function(){
-    cx6.drawImage(eltear,donX,donY,60,78)
-    donX+=60;
-  loadgraph();
-  eltear.src=eltear_src[26]
-  eltear.onload=function(){
-    cx6.drawImage(eltear,donX,donY,60,78)
-    donX=40;
-    donY+=78
-  loadgraph();
-  eltear.src=eltear_src[27]
-  eltear.onload=function(){
-    cx6.drawImage(eltear,donX,donY,60,78)
-    donX+=60;
-  loadgraph();
-  eltear.src=eltear_src[28]
-  eltear.onload=function(){
-    cx6.drawImage(eltear,donX,donY,60,78)
-    donX+=60;
-  loadgraph();
-  eltear.src=eltear_src[29]
-  eltear.onload=function(){
-    cx6.drawImage(eltear,donX,donY,60,78)
-    donX+=60;
-  loadgraph();
-  eltear.src=eltear_src[30]
-  eltear.onload=function(){
-    cx6.drawImage(eltear,donX,donY,60,78)
-    donX+=60;
-  loadgraph();
-  eltear.src=eltear_src[31]
-  eltear.onload=function(){
-    cx6.drawImage(eltear,donX,donY,60,78)
-    donX+=60;
-    loadgraph();
-  eltear.src=eltear_src[32]
-  eltear.onload=function(){
-    cx6.drawImage(eltear,donX,donY,60,78)
-    donX+=60;
-  loadgraph();
-  eltear.src=eltear_src[33]
-  eltear.onload=function(){
-    cx6.drawImage(eltear,donX,donY,60,78)
-    donX+=60;
-  loadgraph();
-  console.log("destroy!")
-  eltear.src=eltear_src[34]
-  eltear.onload=function(){
-    cx6.drawImage(eltear,donX,donY,60,78)
-    donX+=60;
-  loadgraph();
-  eltear.src=eltear_src[35]
-  eltear.onload=function(){
-    cx6.drawImage(eltear,donX,donY,60,78)
-    donX=40;
-    donY+=78
-  loadgraph();
-  eltear.src=eltear_src[36]
-  eltear.onload=function(){
-    cx6.drawImage(eltear,donX,donY,60,78)
-    donX+=60;
-  loadgraph();
-  eltear.src=eltear_src[37]
-  eltear.onload=function(){
-    cx6.drawImage(eltear,donX,donY,60,78)
-    donX+=60;
-  loadgraph();
-  eltear.src=eltear_src[38]
-    eltear.onload=function(){
-      cx6.drawImage(eltear,donX,donY,60,78)
-      donX+=60;
-  loadgraph();
-  eltear.src=eltear_src[39]
-    eltear.onload=function(){
-      cx6.drawImage(eltear,donX,donY,60,78)
-      donX+=60;
-  loadgraph();
-  eltear.src=eltear_src[40]
-    eltear.onload=function(){
-      cx6.drawImage(eltear,donX,donY,60,78)
-      donX+=60;
-  loadgraph();
-  eltear.src=eltear_src[41]
-    eltear.onload=function(){
-      cx6.drawImage(eltear,donX,donY,60,78)
-      donX+=60;
-  loadgraph();
-  eltear.src=eltear_src[42]
-    eltear.onload=function(){
-      cx6.drawImage(eltear,donX,donY,60,78)
-      donX+=60;
-  loadgraph();
-  eltear.src=eltear_src[43]
-    eltear.onload=function(){
-      cx6.drawImage(eltear,donX,donY,60,78)
-      donX+=60;
-  loadgraph();
-  eltear.src=eltear_src[44]
-    eltear.onload=function(){
-      cx6.drawImage(eltear,donX,donY,60,78)
-  loadgraph();
-   console.log("beteran!",loadstate)
-  cx6.globalAlpha=0;
-  for(var i=0 ; i<45; i++){
-    s = new createjs.Bitmap(eltear_src[i]);
-    donpaiList.push(s);
-    }; 
-    }}}}}}}}}}
-  }}}}}}}}}}
-    }}}}}}}}}}
-  }}}}}}}}}}
-  }}}}}
-  
-  if(loadstate <loadmax){
-  cx2.fillStyle = "rgba(0,0,0,0.3)";
-  cx2.fillRect(0, 0, 800, 600);
-  cx3.font = "24px 'Century Gothic'";
-  cx3.fillStyle = "#e4e4e4";
-  cx3.fillText( "Now Loading…",100,360)
-  }
-  function loadgraph(){
-    cx3.fillStyle = "rgba(220,220,220,0.5)";
-    cx3.fillRect(100,380,600,25);
-    cx3.fillStyle = "#007fd9";
-    var A=loadstate/loadmax*600;
-      cx3.fillRect(100, 380, A, 25);
-      createjs.Tween.get(Cstar)
-      .to({x:A+100},300);
-    loadstate+=1;
-    cx3.clearRect(280,330,120,40);
-    cx3.fillText( loadstate+"/"+loadmax,300,360)
-    if(loadstate>=loadmax){
-      createjs.Tween.get(Cstar)
-  .to({x:700},300);
-      loadtitle();
+    // パーティクルのサイズをライフ依存にする
+    var scale = particle.life / MAX_LIFE;
+    particle.scaleX = particle.scaleY = scale;
+    // 寿命を減らす
+    particle.life -= 1;
+    // 寿命の判定
+    if (particle.life <= 0) {
+      // ステージから削除
+      field.removeChild(particle);
+      // 配列からも削除
+      particles.splice(i, 1);
     }
   }
+}
   function load2(){
-    loadstate+=1;
-  cx3.clearRect(0,0,800,600);
-  cx2.fillStyle = "rgba(255,255,255,0.5)";
-  cx2.fillRect(10, 170,780,200);
-  cx2.drawImage(etitle,60,150,660,220);
-  //cx2.fillRect(0, 0, 800, 600);
-  cx3.fillStyle = "#007fd9";
-  cx3.fillRect(100, 380, 600, 25);
-  cx3.font = "24px 'Century Gothic'";
-  cx3.fillStyle = "#e4e4e4";
-  cx3.fillText( "click to start",340,400)
+  var shape = new createjs.Shape();
+  shape.graphics.beginFill("rgb(255,255,255)");
+  shape.graphics.drawRect(10, 170, 780, 200);
+  shape.alpha=0.5;
+  field.addChild(shape);
+  etitle.x=60;
+  etitle.y=150;
+  field.addChild(etitle)
+  var shape = new createjs.Shape();
+  shape.graphics.beginFill("#007fd9");
+  shape.graphics.drawRect(100, 380, 600, 25);
+  field.addChild(shape);
+  var t = new createjs.Text("click to start", "24px 'Century Gothic'", "#e4e4e4");
+  t.x=340;
+  t.y=380;
+  field.addChild(t);
+  gamestate=10;
   }
   function loadtitle(){
   Yakucheck();
+  paiView();
   for(var i=0;i<6;i++){
     var A=Math.floor(Math.random()*45);
     s = new createjs.Bitmap(eltear_src[A]);
@@ -1289,14 +1170,7 @@ Bgm.on("load", () => {
       var rect = e.target.getBoundingClientRect();
       mouseX = Math.floor(e.clientX - rect.left);
       mouseY = Math.floor(e.clientY - rect.top);
-      cx3.clearRect(710, 10, 80, 38);
-      cx3.fillStyle = "#ffffff";
-  cx3.font = "12px Arial";
-  cx3.font = "12px Arial";
-  cx3.fillText("SOUND", 710, 22);
-  cx3.font = "Bold 24px Arial";
-  cx3.fillText( mute, 730, 42);
-        //カーソル
+      //カーソル
      corsor();
     }
     canvas5.addEventListener("mousedown", mouseDownHandler, false);
@@ -1317,39 +1191,17 @@ Bgm.on("load", () => {
       }
     };
     
-  //mousedown->mouseup->clickの順番に処理される
     function mouseDownHandler(e) {
       if(debugmode){
       console.log("X座標：" + mouseX,"Y座標：" + mouseY);
       }
-                  //クリックした場所を教える
-                  var r=2;
-                  var alphaS=1;
-                  cx5.lineWidth=3
-                  cx5.strokeStyle = "#fff596";
-                  var sx=mouseX
-                  var sy=mouseY
-                  window.requestAnimationFrame(circle)
-                  function circle(){
-                    if(alphaS > 0){
-                      cx5.clearRect(0,0,800,600);
-                      cx5.globalAlpha =alphaS
-                      cx5.beginPath();
-                      cx5.arc(sx,sy,r, 0, 2 * Math.PI, false)
-                      cx5.stroke();
-                      alphaS -= 3/60
-                      r=1+r+1/r
-                      window.requestAnimationFrame(circle)
-                    }else{
-                  cx5.clearRect(0,0,800,600);
-          }}
-          if(gamestate ==1){
-            //mpチャージ
-            if(cLock==1 && opLock>=0 && opLock !==2){
-              mpC=-2;
-              mpmoving=true;
-            window.requestAnimationFrame((ts)=>mpMove(ts,mpC))
-            }
+      if(gamestate ==1){
+        //mpチャージ
+        if(cLock==1 && opLock>=0 && opLock !==2){
+          mpC=-2;
+          mpmoving=true;
+        window.requestAnimationFrame((ts)=>mpMove(ts,mpC))
+        }
           }
     };
     function mpMove(ts,start){
@@ -1393,96 +1245,9 @@ Bgm.on("load", () => {
        var rect = e.target.getBoundingClientRect();
        mouseX =  Math.floor(e.clientX - rect.left);
       mouseY =  Math.floor(e.clientY - rect.top);
-      if(debugmode){console.log('click!',cLock,"msgstate",msgstate)}
-      if(mouseX>710 && mouseX <790){
-            if(mouseY>10 && mouseY<48){
-              //for debug
-              se1.volume(0);
-              se2.volume(0);
-              se3.volume(0);
-              se4.volume(0);
-              se5.volume(0);
-              se6.volume(0);
-              se7.volume(0);
-              se8.volume(0);
-              se9.volume(0);
-              se10.volume(0);
-              se11.volume(0);
-              se12.volume(0);
-              se13.volume(0);
-              se14.volume(0);
-              se15.volume(0);
-              se16.volume(0);
-              jingle2.volume(0);
-              if(debugmode){
-              console.log(cx5.globalAlpha,cLock);
-                if(cLock==0){
-                  cLock=1;
-                }
-              }
-              cx5.clearRect(710, 10, 80, 38);
-              cx5.globalAlpha = 1;
-      //ミュートの切り替え
-    if( mute=="OFF" ){
-      SEbuffer();
-      Bgm.mute(false);
-      switch (musicnum){
-        case 1:
-          Bgm =new Music(bgm1data);
-          Bgm.playMusic();
-          break;
-        case 2:
-          Bgm =new Music(bgm2data);
-          Bgm.playMusic();
-        break;
-        case 3:
-          Bgm =new Music(bgm3data);
-          Bgm.playMusic();
-        break;
-        case 4:
-          Bgm =new Music(bgm4data);
-          Bgm.playMusic();
-        break;
-        case 5:
-          Bgm =new Music(bgm5data);
-          Bgm.playMusic();
-        break;
-        case 6:
-          Bgm =new Music(bgm6data);
-          Bgm.playMusic();
-          break;
-        case 7:
-          Bgm =new Music(bgm7data);
-          Bgm.playMusic();
-          break;
-        case 8:
-          Bgm =new Music(bgm8data);
-          Bgm.playMusic();
-          break;
-        case 9:
-          Bgm =new Music(bgm9data);
-          Bgm.playMusic();
-          break;
-        default:
-          //Bgm =new Music(bgm17data);はbgm多重に流れる可能性あるため削除
-          console.log(musicnum,'bgm error!')
-          Bgm.stop();
-      }
-      mute="ON";
-      }else{
-      Bgm.mute(true);
-      Bgm.stop();
-      mute="OFF";
-          console.log(musicnum,'bgm muted!')
-      }
-    cx3.clearRect(710, 10, 80, 38);
-    cx3.font = "12px Arial";
-    cx3.fillText("SOUND", 710, 22);
-    cx3.font = "Bold 24px Arial";
-    cx3.fillText( mute, 730, 42);
-          }};
+      if(debugmode){console.log('click!',cLock,"pagestate",pagestate,"msgstate",msgstate)};
   
-  if(gamestate ==10 && loadstate >=loadmax){
+  if(gamestate ==10){
     //メニュー画面
     if(pagestate==-1){
       for(var i=0; i<12 ; i++){
@@ -1786,11 +1551,14 @@ Bgm.on("load", () => {
       }else{
         if(raidscore[2]==1){
           se10.play();
-          cx1.fillStyle = "rgba(20,20,20,0.5)";
-          cx1.fillRect(10,100,780,400)
-          cx2.fillStyle = "white";
-          cx2.font = "36px 'Century Gothic'";
-          cx2.fillText("TIME UP",320,300)
+          var s = new createjs.Shape();
+          s.graphics.beginFill("rgba(20,20,20,0.5)");
+          s.graphics.drawRect(10, 100, 700, 400);
+          field.addChild(s);
+          var t = new createjs.Text("TIME UP", "36px 'Century Gothic'", "white");
+          t.x=320;
+          t.y=300;
+          field.addChild(t);
           gamestate=2;
           }
       }
@@ -1835,51 +1603,43 @@ Bgm.on("load", () => {
     }else if(gamestate ==1){
       if(opLock==3){
         if(mouseX >300 && mouseY > 55 && mouseX <400 && mouseY <100){
+          se2.play();
           if(shiagytemp==0){
             shiagytemp=1;
-            drawbuttom2(300,55,"所持パイ",0,100,44,1);
-            yakumap.alpha=0;
-            Yakucheck2(0);
-            yakumap2.alpha=1;
           }else{
             shiagytemp=0;
-            yakumap2.alpha=0;
-            drawbuttom2(300,55,"一覧",0,100,44,1);     
-            yakumap.alpha=1;    
           }
+          Yakucheck(0);
           return false;
         }
         if(mouseX >40 && mouseY > 100 && mouseX <620 && mouseY <200){
-          if(shiagytemp==0){Yakucheck(180);}else{Yakucheck2(180);}
+          Yakucheck(180);
         return false;
         }
         if(mouseX >40 && mouseY > 200 && mouseX <620 && mouseY <300){
-          if(shiagytemp==0){Yakucheck(90);}else{Yakucheck2(90);}
+          Yakucheck(90);
           return false;
           }
         if(mouseX >40 && mouseY > 300 && mouseX <620 && mouseY <400){
-          if(shiagytemp==0){Yakucheck(-90);}else{Yakucheck2(-90);}
+          Yakucheck(-90);
         return false;
         }
         if(mouseX >40 && mouseY > 400 && mouseX <620 && mouseY <480){
-          if(shiagytemp==0){Yakucheck(-180);}else{Yakucheck2(-180);}
+          Yakucheck(-180);
           return false;
           }
-        yakumap2.removeAllChildren();
+        yakumap.removeAllChildren();
         yakumap.alpha=0;
-        cx2.clearRect(300,55,100,45);
-        drawbuttom2(300,10,"シナジー",0,100,44,1);
         opLock=0;
         se2.play();
-        corsor();
         return false;
       }
       if(opLock==2){
         if(mouseX >460 && mouseY > 240 && mouseX <580 && mouseY <300){
           cx4.clearRect(0,0,800,600)
+          Configmap.removeAllChildren();
           opLock=0;
           se3.play();
-          corsor();
         }
         //escによる終了
         if(mouseX >220 && mouseY > 240 && mouseX <340 && mouseY <300){
@@ -1900,11 +1660,10 @@ Bgm.on("load", () => {
       return false;
       }
       if(opLock==1){
-        cx4.clearRect(10,100,610,400)
+        paiviewer.alpha=0;
         opLock=0;
-        drawbuttom(400,10,"残パイリスト",0,130,44);
+        //drawbuttom(400,10,"残パイリスト",0,130,44);
         se2.play();
-        corsor();
         return false;
       }
       if(mouseX >290 && mouseY > 10 && mouseX <400 && mouseY <55){
@@ -1912,15 +1671,8 @@ Bgm.on("load", () => {
         if(cLock==1 || (pvpmode==1 && opLock>=0)){
           opLock=3;
           se4.play();
-          drawbuttom2(300,10,"シナジー",1,100,44,1);
-          if(shiagytemp==0){
-            drawbuttom2(300,55,"一覧",0,100,44,1);     
-            yakumap.alpha=1;       
-          }else{
-            drawbuttom2(300,55,"所持パイ",0,100,44,1);
-            Yakucheck2(0);
-            yakumap2.alpha=1;
-          }
+          yakumap.alpha=1;       
+          Yakucheck(0);
           cx4.clearRect(10,100,610,400)
           return false;
           }
@@ -1930,11 +1682,8 @@ Bgm.on("load", () => {
         if(cLock==1 || (pvpmode==1 && opLock>=0)){
         opLock=1;
         se4.play();
-        drawbuttom(400,10,"残パイリスト",1,130,44);
-        cx4.clearRect(10,100,610,400)
-        cx4.fillStyle = "rgba(20,20,20,0.7)";
-        cx4.fillRect(10,100,610,390)
-        cx4.drawImage(canvas6,0,0,800,600);
+        paiviewer.alpha=1;
+        //drawbuttom(400,10,"残パイリスト",1,130,44);
         Remaincheck();
         return false;
         }
@@ -2006,14 +1755,8 @@ Bgm.on("load", () => {
         if(debugmode){console.log(Hlast)};
         hand1.sort(compareFunc) 
         hand1=hand1.concat(Hlast)
-        handgraph(0,1)
-        if(ponsw[1]!==1){
-          eltear.src=eltear_src[hand1[hand1.length-1]]
-          eltear.onload=function(){
-          cx2.clearRect(690,500,size,sizey)
-          cx2.drawImage(eltear,690,500,size,sizey)
-          }}
-        drawbuttom(10,550,"SORT");
+        handgraph(0,1,1)
+        //eltear.src=eltear_src[hand1[hand1.length-1]]
         se4.play();
         if(skillusage[1]>0 && chara[1]==5){
           yoti(skillusage[1]);
@@ -2024,15 +1767,7 @@ Bgm.on("load", () => {
         if(debugmode){console.log(Hlast)};
         hand1.sort(compareFunc3);
         hand1=hand1.concat(Hlast) 
-        handgraph(0,1)
-        //9枚目だけここで書く
-        if(ponsw[1]!==1){
-        eltear.src=eltear_src[hand1[hand1.length-1]]
-        eltear.onload=function(){
-        cx2.clearRect(690,500,size,sizey)
-        cx2.drawImage(eltear,690,500,size,sizey)
-        }}
-        drawbuttom(10,550,"SORT",1);
+        handgraph(0,1,1)
         se4.play();
         if(skillusage[1]>0 && chara[1]==5){
           yoti(skillusage[1]);
@@ -2091,8 +1826,13 @@ Bgm.on("load", () => {
       switch(reach[1]){
         case 1:
           se5.play();
+          ponkanmap.removeAllChildren();
           cx2.clearRect(630,440,80,40)
           drawbuttom(630,440,"リーチ",1);
+          ponkanmap.removeAllChildren();
+          var C=canvas2.toDataURL();
+          var Cb = new createjs.Bitmap(C);
+          ponkanmap.addChild(Cb);
           reach[1]=2//reach=2は仮確定、切った後3に確定
           ElnameM=0;
           corsor();
@@ -2101,8 +1841,11 @@ Bgm.on("load", () => {
           se3.play()
           cx2.clearRect(630,440,80,40)
           drawbuttom(630,440,"リーチ");
+          ponkanmap.removeAllChildren();
+          var C=canvas2.toDataURL();
+          var Cb = new createjs.Bitmap(C);
+          ponkanmap.addChild(Cb);
           reach[1]=1;
-          cx3.clearRect(200,370,360,120);
           corsor();
         break;
         default:
@@ -2110,41 +1853,9 @@ Bgm.on("load", () => {
           break;
       };
     }}
-    //アガリ
-    if(hand1[0]==-3){
-      if(mouseY >348 && mouseY< 490){
-        if(mouseX >326 && mouseX<474){    
-    if(debugmode){console.log('アガリ',han[1])}
-    cx3.clearRect(326,348,148,142);
-    if(pvpmode==1){
-      socket.emit("tumo", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[0].id,Tumo:tumo,status:true});
-      }
-    TumoRon(1,0)
-    }}}
-    
+    //アガリはボタン自体にクリック判定している ->TumoronBt    
     }//turn
-    //ロンアガリ、turn0ではない
-    if(hand1[0]==-2){
-    if(mouseY >348 && mouseY< 490 && mouseX >326 && mouseX<474){
-      if(debugmode){console.log('アガリ',han[1])}
-    cx3.clearRect(326,348,148,142);
-    Ronturn.push(1);
-    if(pvpmode==1){
-    socket.emit("ron", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[0].id,status:true});
-    }
-    }else{
-      if(debugmode){console.log('ロンをスルー')}
-    se3.play();
-    cx3.clearRect(326,348,148,142);
-    if(pvpmode==1){
-    socket.emit("ron", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[0].id,status:false});
-    }
-    }
-    rorder[1]=1
-    hand1[0]=-1
-    turn=turntemp;
-    turnchecker();
-    }
+    //ロンアガリ
     //ポン
     if(ponsw[1]==1 && turn !==0){
     if(mouseY >400 && mouseY <440 && mouseX >630 && mouseX <710){
@@ -2172,15 +1883,616 @@ Bgm.on("load", () => {
     }
     }//gamestate
       }
+  //画面を描画したものを用意しておく
+  var Cbt=canvas2.toDataURL();
+  var Cbutton = new createjs.Bitmap(Cbt);
+  var menu_main = new createjs.Container();//メイン画面（実績等）
+  var menu_solo = new createjs.Container();//ソロ受付
+  var menu_setting = new createjs.Container();//設定
+  var menu_guide = new createjs.Container();//プレイガイド
+  var menu_duel = new createjs.Container();//対戦
+  //
+  var menu_solo_list=[];//createjsの可変リスト
+  var menu_main_list=[];//createjsの可変リスト
+function menuMap(p=0){
+  if(debugmode){console.log('menuMap',p,pagestate)}
+  switch(p){
+    case 0:
+      //solo
+      menu_solo.removeAllChildren();
+      menu_solo_list=[]
+      var rect = new createjs.Shape();
+      rect.graphics
+        .beginFill("rgba(20,20,20,0.7)")
+        .drawRect(0, 0, 800, 510);
+      menu_solo.addChild(rect);
+      var solo = new createjs.Bitmap("don/Don_menu1.png");
+      solo.x=0;
+      solo.y=0;
+      solo.scale=0.5;
+      menu_solo.addChild(solo);
+      e4 = new createjs.Bitmap(eltearB_src[0]);
+      e4.x=360;
+      e4.y=10;
+      e4.scale=1.4;
+      menu_solo.addChild(e4);
+      var bt = new createjs.Bitmap("don/Don_startbt.png");
+      bt.x=470;
+      bt.y=410;
+      menu_solo.addChild(bt);
+      var t = new createjs.Text("ルール", "26px 'Century Gothic'", "black");
+      t.x=390;
+      t.y=80;
+      menu_solo.addChild(t);
+      var t = new createjs.Text("プレイヤー", "26px 'Century Gothic'", "black");
+      t.x=390;
+      t.y=130;
+      menu_solo.addChild(t);
+      var t = new createjs.Text("ＣＰＵ", "26px 'Century Gothic'", "black");
+      t.x=390;
+      t.y=180;
+      menu_solo.addChild(t);
+      if(chara[0]==0){
+        var t = new createjs.Text("✓おまかせ", "26px 'Century Gothic'", "black");
+        }else{
+        var t = new createjs.Text("　おまかせ", "26px 'Century Gothic'", "black");
+      }
+      t.x=520;
+      t.y=180;
+      menu_solo.addChild(t);
+      menu_solo_list.push(t);
+      var t = new createjs.Text("◀ "+LPlist[LP[0]], "24px 'Century Gothic'", "black");
+      t.x=520;
+      t.y=80;
+      menu_solo.addChild(t);
+      menu_solo_list.push(t);
+      var t = new createjs.Text("◀ "+chrlist[chara[1]], "24px 'Century Gothic'", "black");
+      t.x=520;
+      t.y=130;
+      menu_solo.addChild(t);
+      menu_solo_list.push(t);
+      var t = new createjs.Text(" ▶", "24px 'Century Gothic'", "black");
+      t.x=670;
+      t.y=80;
+      menu_solo.addChild(t);
+      var t = new createjs.Text(" ▶", "24px 'Century Gothic'", "black");
+      t.x=670;
+      t.y=130;
+      menu_solo.addChild(t);
+      var Ary=[["ＣＰＵ１","ＣＰＵ２","ＣＰＵ３"],["◀ "+chrlist[chara[2]],"◀ "+chrlist[chara[3]],"◀ "+chrlist[chara[4]]],[" ▶"," ▶"," ▶"]]
+     for(var i=0;i<Ary.length;i++){
+      var t = new createjs.Text(Ary[0][i], "24px 'Century Gothic'", "black");
+      t.x=390;
+      t.y=230+40*i;
+      menu_solo.addChild(t);
+      var t = new createjs.Text(Ary[1][i], "24px 'Century Gothic'", "black");
+      t.x=520;
+      t.y=230+40*i;
+      if(chara[0]==0){t.alpha=0.4}else{t.alpha=1}
+      menu_solo.addChild(t);
+      menu_solo_list.push(t);
+      var t = new createjs.Text(Ary[2][i], "24px 'Century Gothic'", "black");
+      t.x=670;
+      t.y=230+40*i;
+      if(chara[0]==0){t.alpha=0.4}else{t.alpha=1}
+      menu_solo.addChild(t);
+      menu_solo_list.push(t);
+     }
+      var t = new createjs.Text("ＣＰＵスキル", "24px 'Century Gothic'", "black");
+      t.x=390;
+      t.y=350;
+      menu_solo.addChild(t);
+      var Ary=["　禁止しない","✓禁止"]
+      //-1のときは禁止
+      var t = new createjs.Text(Ary[-skillswitch[0]], "24px 'Century Gothic'", "black");
+      t.x=540;
+      t.y=350;
+      menu_solo.addChild(t);
+      menu_solo_list.push(t);
+      e10 = new createjs.Bitmap(chrimg_src[chara[1]]);
+      e10.sourceRect={x:400,y:0,width:350,height:510}
+      e10.x=10;
+      e10.y=0;
+      e10.scale=1;
+      menu_solo.addChild(e10);
+      menu_solo_list.push(e10);    
+      break;
+    case 1:
+      //setting
+      menu_setting.removeAllChildren();
+      cx2.clearRect(0,0,800,600);
+      var e = new createjs.Bitmap(epic_src[0]);
+      e.x=50;
+      e.y=30;
+      e.scale=1.1;
+      menu_setting.addChild(e);
+      var e = new createjs.Bitmap(epic_src[0]);
+      e.x=400;
+      e.y=30;
+      e.scale=1.1;
+      menu_setting.addChild(e);   
+      if(musicnum==musicset[0]){
+        drawbuttom(690,200,"Play",1,60,40)
+        }else{
+        drawbuttom(690,200,"Play",0,60,40)
+      }
+      if(musicnum==musicset[1]){
+        drawbuttom(690,270,"Play",1,60,40)
+        }else{
+        drawbuttom(690,270,"Play",0,60,40)
+      }
+      if(musicnum==musicset[2]){
+        drawbuttom(690,340,"Play",1,60,40)
+      }else{
+        drawbuttom(690,340,"Play",0,60,40)
+      }
+      if(dahaiSE==1){
+      drawbuttom(665,110,"A",1,40,40)
+      drawbuttom(705,110,"B",0,40,40)
+      }else if(dahaiSE==2){
+      drawbuttom(665,110,"A",0,40,40)
+      drawbuttom(705,110,"B",1,40,40)
+      }
+      if(mpVelocity==1){
+        drawbuttom(80,310,"おそめ",1,80,40)
+      }else{
+        drawbuttom(80,310,"おそめ",0,80,40)
+      }
+      if(mpVelocity==1.5){
+      drawbuttom(170,310,"ふつう",1,80,40)
+      }else{
+      drawbuttom(170,310,"ふつう",0,80,40)
+      }
+      if(mpVelocity==2){
+      drawbuttom(260,310,"はやめ",1,80,40)
+      }else{
+      drawbuttom(260,310,"はやめ",0,80,40)
+      }
+      drawbuttom2(600,450,"OK",0,100,40,1)
+      drawbuttom2(400,450,"デフォルトに戻す",0,180,40,1)
+      cx2.fillStyle = "black";
+      cx2.fillRect(360,70,2,400);
+      cx2.fillRect(660,70,2,100);
+      cx2.font = "26px 'Century Gothic'";
+      cx2.fillText("ユーザー補助",60,100)
+      cx2.fillText("対局設定",60,200)
+      cx2.fillText("音量設定",390,100)
+      cx2.fillText("打牌音",665,100)
+      cx2.fillText("対局BGM設定",390,198)
+      cx2.font = "18px 'Century Gothic'";
+      cx2.fillText("（注意：対局設定について）",60,420)
+      cx2.fillText("「たいせん」モードでは",60,440)
+      cx2.fillText("ルーム長の対局設定データが",65,460)
+      cx2.fillText("全体に反映されます。",65,480)
+      cx2.font = "24px 'Century Gothic'";
+      if(tumoConfig==0){
+        cx2.fillText("右クリック　ツモ切り",90,130);
+      }else if(tumoConfig==-1){
+      cx2.fillText("右クリック　何もしない",90,130);
+      }
+      cx2.fillText("CPUのポン頻度",100,230);
+      cx2.fillText("◀",120,260)
+      cx2.fillText("▶",260,260)
+      var A=(1-Ponrate)*5;
+      for (var i=0;i<A;i++){
+        cx2.fillText("■",140+i*24,260);
+      };
+      cx2.fillText("MPチャージ速度",100,300);
+      if(Fever==-1){
+        cx2.fillText("FEVER なし",100,380);
+      }else{
+      cx2.fillText("FEVER あり",100,380);
+      }
+      cx2.fillText("BGM(0-7)",430,130)
+      cx2.fillText("SE(0-7)",430,160)
+      cx2.fillText("◀ "+Math.floor(vBar*5)+" ▶",580,130)
+      cx2.fillText("◀ "+Math.floor(sBar*5)+" ▶",580,160)
+      cx2.fillText("通常",430,230)
+      cx2.fillText("リーチ",430,300)
+      cx2.fillText("オーラス",430,370)
+      cx2.font = "20px 'Century Gothic'";
+      cx2.textAlign = "center";
+      cx2.fillText(musiclist[musicset[0]],560,260)
+      cx2.fillText(musiclist[musicset[1]],560,330)
+      cx2.fillText(musiclist[musicset[2]],560,400)
+      cx2.textAlign = "start";
+      cx2.fillText("◀ ",380,260)
+      cx2.fillText("◀ ",380,330)
+      cx2.fillText("◀ ",380,400)
+      cx2.fillText(" ▶",720,260)
+      cx2.fillText(" ▶",720,330)
+      cx2.fillText(" ▶",720,400)         
+      Cbt=canvas2.toDataURL();
+      Cbutton = new createjs.Bitmap(Cbt);
+      menu_setting.addChild(Cbutton);
+      break;
+    case 2:
+      menu_main.removeAllChildren();
+          cx2.clearRect(0,0,800,600);
+          var e = new createjs.Bitmap(epic_src[0]);
+          e.x=50;
+          e.y=50;
+          e.scale=1.1;
+          menu_main.addChild(e);
+          var e = new createjs.Bitmap(epic_src[0]);
+          e.x=400;
+          e.y=50;
+          e.scale=1.1;
+          menu_main.addChild(e);
+          cx2.font = "32px 'Century Gothic'";
+          cx2.fillStyle = "black";
+          cx2.fillText("　×",680,80)
+      switch(msgstate){
+        case 0:
+          //プロフィール
+          Textlist[0].text="今までの主な戦績です。";
+          Textlist[1].text="ニックネームやキャラクターを変更できます。"
+          var rect = new createjs.Shape();//名前入力欄
+          rect.graphics
+              .beginFill("rgba(0,0,0,0.8)")
+              .drawRect(530, 90, 200, 40);
+          rect.addEventListener("click", {handleEvent:NameChange});
+          menu_main.addChild(rect);
+          UsernameText.text=Username;
+          UsernameText.x=532;
+          UsernameText.y=95;
+          menu_main.addChild(UsernameText);
+          var AryX=[500,500,500,530,480,510]
+          var AryY=[50,100,80,50,120,75]
+          for(var i=0;i<chrimg_src.length;i++){
+            var j=i%4;
+            var k=Math.floor(i/4);
+            e11 = new createjs.Bitmap(chrimg_src[i]);
+            e11.sourceRect={x:AryX[i],y:AryY[i],width:200,height:200}
+            e11.x=530+50*j;
+            e11.y=400+50*k;
+            e11.scale=1/4;
+            menu_main.addChild(e11);
+          }
+          var rect = new createjs.Shape();//キャラ設定欄
+          rect.graphics
+              .beginFill("rgba(0,0,0,0.8)")
+              .drawRect(0, 0, 50, 50);
+          rect.x=530+50*(chara[1]%4)
+          rect.y=400+50*Math.floor(chara[1]/4)
+          menu_main.addChild(rect);
+          menu_main_list.push(rect);
+          e10 = new createjs.Bitmap(chrimg_src[chara[1]]);
+          e10.sourceRect={x:400,y:0,width:350,height:490}
+          e10.x=530;
+          e10.y=120;
+          e10.scale=20/35;
+          menu_main.addChild(e10);
+          menu_main_list.push(e10);
+          drawbuttom(60,80,"戦績",1,130,44);
+          drawbuttom(60,125,"実績リスト",0,130,44);
+          drawbuttom(60,170,"達成役一覧",0,130,44);
+          cx2.font = "32px 'Century Gothic'";
+          cx2.fillStyle = "rgba(0,0,0,0.8)";
+          cx2.fillRect(530,90,200,40)
+          if(chara[1]>=4){
+            cx2.fillRect(530+50*(chara[1]-4),450,50,50);
+          }else{
+          cx2.fillRect(530+50*chara[1],400,50,50);
+          }
+          var wT=winrank[0]+winrank[1]+winrank[2]+winrank[3]
+          var winrate=0;
+          if(wT>0){
+            winrate=Math.floor(winrank[0]/wT*1000)/10  
+          }
+          cx2.font = "26px 'Century Gothic'";
+          cx2.fillStyle = "white";
+          cx2.fillText(Username,532,120);
+          var X=200;
+          cx2.font = "22px 'Century Gothic'";
+          cx2.fillStyle = "black";
+          cx2.fillText( "総プレイ回数："+highscore[0]+"回",X,105);
+          cx2.fillText( "通算勝率："+winrate+"%",X,135);
+          cx2.fillText( "最大戦闘力："+highscore[1],X,185);
+          cx2.fillText( "瞬間最大火力："+highscore[2],X,215);
+          cx2.font = "18px 'Century Gothic'";
+          cx2.fillText( "(1位："+winrank[0]+" /2位："+winrank[1]+" /3位："+winrank[2]+" /4位："+winrank[3]+")",X,155);
+          var achieveC=achieveB.filter(value=>value.sub=="その他");
+          X+=10;
+          var Y=250
+          cx2.fillStyle = "black"; 
+          cx2.font = "20px 'Century Gothic'";
+          cx2.fillText("最大連荘",X,Y);
+          cx2.fillText(highscore[3]+"回",X+130,Y);
+          Y+=22;
+          for(var i=0;i<achieveC.length; i++){
+              cx2.fillText(achieveC[i].name,X,Y);
+              cx2.fillText(achieveC[i].cleared+"回",X+130,Y);
+            Y+=22;
+            if(Y>=500){
+              X+=280;
+              Y=110;
+            }
+          }
+          break;
+        case 1:
+          //実績リスト
+          Textlist[0].text="解放された実績リストです。";
+          Textlist[1].text="クリックで装着することができます。（効果はない）"
+          var A=achieveA.findIndex(value=>value.name==Usercrest);
+          if(A>=0){
+            if(A<20){
+              cx2.fillStyle = "rgba(0,0,0,0.3)";
+              cx2.fillRect(190,92+20*A,240,20);
+            }else{
+              cx2.fillStyle = "rgba(0,0,0,0.3)";
+              cx2.fillRect(470,92+20*(A-20),240,20);
+            }
+          }
+            drawbuttom(60,80,"戦績",0,130,44);
+            drawbuttom(60,125,"実績リスト",1,130,44);
+            drawbuttom(60,170,"達成役一覧",0,130,44);
+            var A=achieveA.filter(value=>value.cleared>0);
+            cx2.font = "bold 20px 'Century Gothic'";
+            cx2.fillStyle = "black";
+            cx2.fillText("実績 "+A.length+"/"+achieveA.length,200,85) 
+            var X=200;
+            var Y=110
+            cx2.fillStyle = "black"; 
+            for(var i=0;i<achieveA.length; i++){
+              if(achieveA[i].cleared==0){
+                cx2.font = "18px 'Century Gothic'";
+                cx2.fillText("？？？",X,Y);
+              }else{
+                cx2.font = "bold 18px 'Century Gothic'";
+                cx2.fillText(achieveA[i].name,X,Y);
+                cx2.font = "18px 'Century Gothic'";
+              }
+              Y+=20;
+              if(Y>=500){
+                X+=280;
+                Y=110;
+              }
+            }
+          break;
+        case 2:
+          //達成役一覧
+          Textlist[0].text="達成役一覧です。";
+          Textlist[1].text="かっこ内は達成した回数です。"
+            drawbuttom(60,80,"戦績",0,130,44);
+            drawbuttom(60,125,"実績リスト",0,130,44);
+            drawbuttom(60,170,"達成役一覧",1,130,44);
+            var achieveC=achieveB.filter(value=>value.sub=="シナジー役");
+            var A=achieveC.filter(value=>value.cleared>0);
+            cx2.font = "bold 20px 'Century Gothic'";
+            cx2.fillStyle = "black";
+            cx2.fillText("シナジー "+A.length+"/"+achieveC.length,200,85) 
+            var X=200;
+            var Y=110
+            for(var i=0;i<achieveC.length; i++){
+              if(achieveC[i].cleared==0){
+                cx2.fillStyle = "#8c8c8c";
+                cx2.font = "18px 'Century Gothic'";
+                cx2.fillText(achieveC[i].name,X,Y);
+                cx2.fillText(achieveC[i].count+"/"+achieveC[i].max,X+150,Y);
+              }else{
+                cx2.fillStyle = "black"; 
+                cx2.font = "bold 18px 'Century Gothic'";
+                cx2.fillText(achieveC[i].name,X,Y);
+                cx2.font = "18px 'Century Gothic'";
+                cx2.fillText(achieveC[i].count+"/"+achieveC[i].max+" ("+achieveC[i].cleared+")",X+150,Y);
+              }
+              Y+=20;
+              if(Y>=500){
+                X+=280;
+                Y=110;
+              }
+            }
+            var achieveD=achieveB.filter(value=>value.sub=="キャラ役");
+            var B=achieveD.filter(value=>value.cleared>0);
+            cx2.font = "bold 20px 'Century Gothic'";
+            cx2.fillStyle = "black";
+            cx2.fillText("クレスト "+B.length+"/"+achieveD.length,380,85) 
+            Y+=10;
+            for(var i=0;i<achieveD.length; i++){
+              if(achieveD[i].cleared==0){
+                cx2.fillStyle = "#8c8c8c";
+                cx2.font = "18px 'Century Gothic'";
+                cx2.fillText(achieveD[i].name,X,Y);
+                cx2.fillText(" ("+achieveD[i].cleared+")",X+200,Y);
+              }else{
+                cx2.fillStyle = "black"; 
+                cx2.font = "bold 18px 'Century Gothic'";
+                cx2.fillText(achieveD[i].name,X,Y);
+                cx2.font = "18px 'Century Gothic'";
+                cx2.fillText(" ("+achieveD[i].cleared+")",X+200,Y);
+              }
+              Y+=20;
+              if(Y>=500){
+                X+=280;
+                Y=110;
+              }
+            }
+            var achieveC=achieveB.filter(value=>value.sub=="アガリ形");
+            var A=achieveC.filter(value=>value.cleared>0);
+            cx2.font = "bold 20px 'Century Gothic'";
+            cx2.fillStyle = "black";
+            cx2.fillText("一般 "+A.length+"/"+achieveC.length,560,85) 
+            Y+=10
+            for(var i=0;i<achieveC.length; i++){
+              if(achieveC[i].cleared==0){
+                cx2.fillStyle = "#8c8c8c";
+                cx2.font = "18px 'Century Gothic'";
+                cx2.fillText(achieveC[i].name,X,Y);
+                cx2.fillText(" ("+achieveC[i].cleared+")",X+200,Y);
+              }else{
+                cx2.fillStyle = "black"; 
+                cx2.font = "bold 18px 'Century Gothic'";
+                cx2.fillText(achieveC[i].name,X,Y);
+                cx2.font = "18px 'Century Gothic'";
+                cx2.fillText(" ("+achieveC[i].cleared+")",X+200,Y);
+              }
+              Y+=20;
+              if(Y>=500){
+                break;
+              }
+            }
+          break;
+      }
+      var Cb=canvas2.toDataURL();
+      Cbb = new createjs.Bitmap(Cb);
+      menu_main.addChild(Cbb);
+      break;
+  }
+};
+
+function NameChange(){
+  se3.play();
+  user = window.prompt("プレイヤー名を入力", Username);
+  if(!user ||!user.match(/\S/g)){
+    se2.play();
+    window.alert("未入力です")
+    return false;
+  }
+    let len = 0;
+    for (let i = 0; i < user.length; i++) {
+    (user[i].match(/[ -~]/)) ? len += 1 : len += 2;
+    }
+    if(len>12){
+      se2.play();
+      window.alert("長すぎる名前は嫌われます")
+      return false;
+    }
+    //表示名を更新する処理
+    se3.play();
+    Username=user;
+    UsernameText.text=Username;
+    menuMap(2);
+  };
+  function OptionConfig(){
+    if(opLock==0 && pagestate==1){
+    opLock=3;
+    se11.play();
+    Configmap.removeAllChildren();
+    var shape = new createjs.Shape();
+    shape.graphics.beginFill("black");
+    shape.graphics.drawRect(300, 200, 220, 250);
+    shape.alpha=0.7;
+    Configmap.addChild(shape);
+    var option_bt2 = new createjs.Bitmap('don/soL_option_bt2.png');
+    option_bt2.x=310;
+    option_bt2.y=280;
+    option_bt2.scale=1.2;
+    Configmap.addChild(option_bt2)
+    var option_bt3 = new createjs.Bitmap('don/soL_option_bt3.png');
+    option_bt3.x=310;
+    option_bt3.y=330;
+    option_bt3.scale=1.2;
+    Configmap.addChild(option_bt3)
+    var option_bt4 = new createjs.Bitmap('don/soL_option_bt4.png');
+    option_bt4.x=310;
+    option_bt4.y=380;
+    option_bt4.scale=1.2;
+    Configmap.addChild(option_bt4)
+    var option_bt5 = new createjs.Bitmap('don/soL_batu.png');
+    option_bt5.x=475;
+    option_bt5.y=200;
+    option_bt5.scale=0.4;
+    Configmap.addChild(option_bt5)
+    option_bt2.addEventListener("click", {card:2,handleEvent:OptionConfig});
+    option_bt3.addEventListener("click", {card:3,handleEvent:OptionConfig});
+    option_bt4.addEventListener("click", {card:4,handleEvent:OptionConfig});
+    option_bt5.addEventListener("click", {card:5,handleEvent:OptionConfig});
+    //
+    return false;
+    }
+    if(opLock==3){
+      switch(this.card){
+        case 2:
+          pagestate=-2;
+          se5.play();
+          menuMap(1);
+          Configmap.removeAllChildren();
+          Configmap.addChild(menu_setting);
+          break;
+        case 3:
+            //セーブ
+            se5.play();
+            //Configmap.removeAllChildren();
+            saveDLcomfirm();
+            function saveDLcomfirm(){
+            var result = window.confirm('セーブファイルをダウンロードします！');
+            if( result) {
+            console.log('save');
+            saveDL();
+                }else{
+            console.log('save cancelled');
+                }
+            }
+          break;
+        case 4:
+            //データ初期化
+            //Configmap.removeAllChildren();
+            if(JSON.parse(localStorage.getItem('UserData_Don')) === null){
+              se2.play();
+            }else{
+              se5.play();
+                var result = window.confirm('セーブデータを削除します!!（この操作は取り消しできません）');
+                if(result) {
+                console.log('save delete');
+                saveDel();
+                }else{
+                console.log('save delete cancelled');
+                }
+            }
+          break;
+        case 5:
+          //閉じる
+          se2.play();
+          Configmap.removeAllChildren();
+          opLock=0;
+          break;
+      }
+    }
+  }
+  function Menubutton(){
+    console.log('Menubutton',this.card);
+  if(opLock==0 && pagestate==1){
+    //メイン画面を開いている間のみ受付
+    switch(this.card){
+      case 1:
+        //プレイガイド
+          pagestate=4;
+          msgstate=-1;
+          se5.play();
+          Menu();
+        break;
+      case 2:
+        //フリーバトル
+          pagestate=-3;
+          se5.play();
+          field.addChild(menu_solo);
+        break;
+      case 3:
+        //設定->optionconfig
+        break;
+      case 4:
+        //たいせん
+        break;
+      case 5:
+        //実績等
+        pagestate=-5;
+        msgstate=0;
+        se5.play();
+        menuMap(2);
+        field.addChild(menu_main);
+        break;
+    }
+  }
+  };
   function Menu(){
+    console.log('Menu',pagestate);
     switch(pagestate){
       case 0:
         musicnum=0;
         Bgm.stop();
-        e4.src=eltearB_src[0]
-        e4.onload=function(){
         pagestate=1;
-            //実績解放
+    //実績解放
     var A=achieveB.findIndex(value=>value.name=="国士無双")
     if(achieveB[A].cleared>0){
       AK("変化無双");
@@ -2239,7 +2551,8 @@ Bgm.on("load", () => {
     var A=achieveB.findIndex(value=>value.name=="1ライン通貫")
     var B=achieveB.findIndex(value=>value.name=="2ライン通貫")
     var C=achieveB.findIndex(value=>value.name=="3ライン通貫")
-    if(achieveB[A].cleared+achieveB[B].cleared+achieveB[C].cleared>=10){
+    var D=achieveB.findIndex(value=>value.name=="4ライン通貫")
+    if(achieveB[A].cleared+achieveB[B].cleared+achieveB[C].cleared+achieveB[D].cleared>=10){
       AK("突き抜ける快感");
     };
     if(highscore[0]>0){
@@ -2297,242 +2610,100 @@ Bgm.on("load", () => {
     if(winrank[3]>=5){
       AK("ドカーン！")
     }
-    cx.clearRect(0,0,800,600)
-    cx1.clearRect(0,0,800,600)
-    cx2.clearRect(0,0,800,600)
-    cx3.clearRect(0,0,800,600)
-    BGimg.src=bgimg_src[1]
-    BGimg.onload=function(){
-    e10.src=chrimg_src[chara[1]]
-    e10.onload=function(){
-      cx1.fillStyle = "rgba(0,0,0,0.8)";
-      cx1.fillRect(120,95,220,60)
+    //画像ID
+    e4 = new createjs.Bitmap(eltearB_src[0]);
+    e10 = new createjs.Bitmap(chrimg_src[chara[1]]);
+    //bitmap
+    textmap.alpha=1;
+    field.removeAllChildren();
+    etitle.y=0;
+    field.addChild(etitle)
+    var rect = new createjs.Shape();
+    rect.graphics
+      .beginFill("rgba(0,0,0,0.8)")
+      .drawRect(40, 150, 360, 60);
+    field.addChild(rect);
+    rect.graphics
+    .beginFill("rgba(20,20,20,0.7)")
+    .drawRect(410, 210, 350, 240);
+    field.addChild(rect);
       if(chara[1]==1){
-      cx1.drawImage(e10,500,120,215,215,120,95,60,60)
+        e10.sourceRect={x:500,y:120,width:215,height:215}
       }else{
-      cx1.drawImage(e10,500,50,215,215,120,95,60,60)
+        e10.sourceRect={x:500,y:50,width:215,height:215}
       }
-      cx1.font = "24px 'Century Gothic'";
-      cx1.fillStyle = "white";
-      cx1.fillText(Username,192,145);
-      cx1.font = "14px 'Century Gothic'";
-      cx1.fillText(Usercrest,182,115);
-    }
-    cx.drawImage(BGimg,0,0,400,300,0,0,800,600);
-    cx.clearRect(0,520,800,70)
-    cx.fillStyle = "rgba(20,20,20,0.7)";
-    cx.fillRect(410,210,350,240)
-    cx.fillStyle = "rgba(255,255,255,0.7)";
-    cx1.drawImage(e4,80,80,300,400)
-    cx1.drawImage(etitle,90,0,660,220)
-    cx1.font = "32px 'Century Gothic'";
-      cx1.fillStyle = "black";
-    cx1.font = "28px 'Century Gothic'";
-    cx1.fillStyle = "black";
-    cx1.textAlign = "center";
-    cx1.fillStyle = "#ffffff";
-    cx1.fillText( "戦 ★ 績",580,240);
-    drawbuttom(85,160,"プレイガイド",1,290,45,1,cx1);
-    drawbuttom2(85,205,"フリーバトル",1,290,45,2,cx1);
-    drawbuttom2(85,250,"たいせん",1,290,45,2,cx1);
-    drawbuttom(85,295,"オプション",1,290,45,1,cx1);
-    drawbuttom(85,340,"データ出力",1,290,45,1,cx1);
-    drawbuttom(85,385,"データ初期化",1,290,45,1,cx1);
-    cx1.textAlign = "start";
-    cx1.font = "22px 'Century Gothic'";
+    e10.x=40;
+    e10.y=95;
+    e10.scale=0.6;
+    field.addChild(e10);
+    var t = new createjs.Text(Username, "24px 'Century Gothic'", "white");
+    t.x=192;
+    t.y=175;
+    field.addChild(t);
+    var t = new createjs.Text(Usercrest, "14px 'Century Gothic'", "white");
+    t.x=182;
+    t.y=155;
+    field.addChild(t);
+    var t = new createjs.Text("戦 ★ 績", "28px 'Century Gothic'", "#ffffff");
+    t.x=582;
+    t.y=215;
+    t.textAlign = "center";
+    field.addChild(t);
+    var solo = new createjs.Bitmap("don/Don_menu1.png");
+    solo.x=40;
+    solo.y=210;
+    solo.scale=0.6;
+    field.addChild(solo);
+    var multi = new createjs.Bitmap("don/Don_menu2.png");
+    multi.x=220;
+    multi.y=210;
+    multi.scale=0.6;
+    field.addChild(multi);
+    var howto = new createjs.Bitmap("don/Don_menu3.png");
+    howto.x=40;
+    howto.y=300;
+    howto.scale=0.6;
+    field.addChild(howto);
+    var setting = new createjs.Bitmap("don/Don_menu4.png");
+    setting.x=220;
+    setting.y=300;
+    setting.scale=0.6;
+    field.addChild(setting);
+    solo.addEventListener("click", {card:2,handleEvent:Menubutton});
+    multi.addEventListener("click", {card:4,handleEvent:Menubutton});
+    howto.addEventListener("click", {card:1,handleEvent:Menubutton});
+    setting.addEventListener("click", {handleEvent:OptionConfig});
     var wT=winrank[0]+winrank[1]+winrank[2]+winrank[3]
     var winrate=0;
     if(wT>0){
       winrate=Math.floor(winrank[0]/wT*1000)/10  
     }
-    cx1.fillText( "総プレイ回数："+highscore[0]+"回",420,270);
-    cx1.fillText( "通算勝率："+winrate+"%",420,300);
-    cx1.fillText( "最大戦闘力："+highscore[1],420,350);
-    cx1.fillText( "瞬間最大火力："+highscore[2],420,380);
     var Ach=achieveA.filter(value=>value.cleared>0);
-    cx1.fillText( "実績："+Ach.length+"/"+achieveA.length,420,410);
-    cx1.font = "18px 'Century Gothic'";
-    cx1.fillStyle = "#e8e8e8";
-    cx1.fillText( "(1位："+winrank[0]+" /2位："+winrank[1]+" /3位："+winrank[2]+" /4位："+winrank[3]+")",420,320);
-    zoom.src="don/zoom650.png";
-    zoom.onload=function(){
-      drawbuttom2(678,390," ",0,75,50)
-      cx2.drawImage(zoom,705,395,40,40);
-      corsor();
-    }
-    }}
+    var Ary=["総プレイ回数："+highscore[0]+"回","通算勝率："+winrate+"%","最大戦闘力："+highscore[1],"瞬間最大火力："+highscore[2],"実績："+Ach.length+"/"+achieveA.length]
+    for( i=0 ; i<Ary.length ; i++ ) {
+      var t=new createjs.Text(Ary[i],"22px 'Century Gothic'","#ffffff");
+      t.x=420;
+      t.y=250+i*40;
+      field.addChild(t);
+    };
+    var t=new createjs.Text( "(1位："+winrank[0]+" /2位："+winrank[1]+" /3位："+winrank[2]+" /4位："+winrank[3]+")","16px 'Century Gothic'","#ffffff");
+    t.x=420;
+    t.y=310;
+    field.addChild(t);
+    var btn1 = createButton("　", 60, 60);
+          btn1.x = 700;
+          btn1.y = 390;
+          field.addChild(btn1);
+    zoom.x=710;
+    zoom.y=400;
+    field.addChild(zoom);
+    //実績とか名前変更する画面へ
+    btn1.addEventListener("click", {card:5,handleEvent:Menubutton});
+    menuMap();
     break;
       case 1:
-        if(mouseX >80 && mouseX <380){
-          if(mouseY >160 && mouseY <205){//プレイガイド
-            cx2.clearRect(675,390,80,50)
-            pagestate=4;
-            msgstate=-1;
-            se5.play();
-            Menu();
-          }
-          if(mouseY >205 && mouseY <250){//自由
-            cx2.clearRect(675,390,80,50)
-            pagestate=3
-            se5.play();
-            e10.src=chrimg_src[chara[1]]
-            e10.onload=function(){
-            cx2.drawImage(e10,400,0,350,510,10,0,350,510)
-            cx1.fillStyle = "rgba(20,20,20,0.7)";
-            cx1.fillRect(0,0,800,510)
-            cx1.drawImage(e4,370,10,357,480)
-            cx2.fillStyle = "black";
-            cx2.font = "26px 'Century Gothic'";
-            cx2.fillText("　ルール",390,100)
-            cx2.font = "24px 'Century Gothic'";
-            cx2.fillText("◀ "+LPlist[LP[0]],520,100)
-            cx2.fillText("プレイヤー",390,150)
-            cx2.fillText("ＣＰＵ",390,200)
-            cx2.fillText("◀ "+chrlist[chara[1]],520,150);
-            cx2.fillText(" ▶",670,100)
-            cx2.fillText(" ▶",670,150)
-            cx2.fillText("ＣＰＵスキル",390,370)
-          if(skillswitch[0]==0){
-            cx2.fillText("　禁止しない",540,370);
-            }else if(skillswitch[0]==-1){
-            cx2.fillText("✓禁止",540,370)
-            cx2.fillStyle = "black";
-          }
-          if(chara[0]==0){
-            cx2.fillText("✓おまかせ",520,200);
-            cx2.fillStyle = "rgba(0,0,0,0.4)";
-            }else{
-            cx2.fillText("　おまかせ",520,200)
-            cx2.fillStyle = "black";
-          }
-            cx2.font = "24px 'Century Gothic'";
-            cx2.fillText("ＣＰＵ１",390,250)
-            cx2.fillText("ＣＰＵ２",390,290)
-            cx2.fillText("ＣＰＵ３",390,330)
-            cx2.fillText("◀ "+chrlist[chara[2]],520,250)
-            cx2.fillText("◀ "+chrlist[chara[3]],520,290)
-            cx2.fillText("◀ "+chrlist[chara[4]],520,330)
-            cx2.fillText(" ▶",670,250)
-            cx2.fillText(" ▶",670,290)
-            cx2.fillText(" ▶",670,330)  
-          drawbuttom2(470,410,"START！")
-          }}
-          if(mouseY >295 && mouseY <340){//オプション
-            //cx2.clearRect(675,390,80,50)
-            se5.play();
-            epic.src=epic_src[0]
-            epic.onload=function(){
-              cx1.fillStyle = "rgba(20,20,20,0.7)";
-              cx2.clearRect(0,0,800,510)
-              cx1.fillRect(0,0,800,510)
-              cx1.drawImage(epic,50,50,350,460)
-              cx1.drawImage(epic,400,50,350,460)
-            drawbuttom(690,200,"Play",0,60,40)
-            drawbuttom(690,270,"Play",0,60,40)
-            drawbuttom(690,340,"Play",0,60,40)
-            if(dahaiSE==1){
-            drawbuttom(665,110,"A",1,40,40)
-            drawbuttom(705,110,"B",0,40,40)
-            }else if(dahaiSE==2){
-            drawbuttom(665,110,"A",0,40,40)
-            drawbuttom(705,110,"B",1,40,40)
-            }
-            if(mpVelocity==1){
-              drawbuttom(80,310,"おそめ",1,80,40)
-            }else{
-              drawbuttom(80,310,"おそめ",0,80,40)
-            }
-            if(mpVelocity==1.5){
-            drawbuttom(170,310,"ふつう",1,80,40)
-            }else{
-            drawbuttom(170,310,"ふつう",0,80,40)
-            }
-            if(mpVelocity==2){
-            drawbuttom(260,310,"はやめ",1,80,40)
-            }else{
-            drawbuttom(260,310,"はやめ",0,80,40)
-            }
-            drawbuttom2(600,450,"OK",0,100,40,1)
-            drawbuttom2(400,450,"デフォルトに戻す",0,180,40,1)
-            cx2.fillStyle = "black";
-            cx2.fillRect(360,70,2,400);
-            cx2.fillRect(660,70,2,100);
-            //cx2.font = "36px 'Century Gothic'";
-            //cx2.fillText("オプション",110,120)
-            cx2.font = "26px 'Century Gothic'";
-            cx2.fillText("ユーザー補助",60,100)
-            cx2.fillText("対局設定",60,200)
-            cx2.fillText("音量設定",390,100)
-            cx2.fillText("打牌音",665,100)
-            cx2.fillText("対局BGM設定",390,198)
-            cx2.font = "18px 'Century Gothic'";
-            cx2.fillText("（注意：対局設定について）",60,420)
-            cx2.fillText("「たいせん」モードでは",60,440)
-            cx2.fillText("ルーム長の対局設定データが",65,460)
-            cx2.fillText("全体に反映されます。",65,480)
-            cx2.font = "24px 'Century Gothic'";
-            if(tumoConfig==0){
-              cx2.fillText("右クリック　ツモ切り",90,130);
-            }else if(tumoConfig==-1){
-            cx2.fillText("右クリック　何もしない",90,130);
-            }
-            cx2.fillText("CPUのポン頻度",100,230);
-            cx2.fillText("◀",120,260)
-            cx2.fillText("▶",260,260)
-            var A=(1-Ponrate)*5;
-            for (var i=0;i<A;i++){
-              cx2.fillText("■",140+i*24,260);
-            };
-            cx2.fillText("MPチャージ速度",100,300);
-            if(Fever==-1){
-              cx2.fillText("FEVER なし",100,380);
-            }else{
-            cx2.fillText("FEVER あり",100,380);
-            }
-            cx2.fillText("BGM(0-7)",430,130)
-            cx2.fillText("SE(0-7)",430,160)
-            cx2.fillText("◀ "+Math.floor(vBar*5)+" ▶",580,130)
-            cx2.fillText("◀ "+Math.floor(sBar*5)+" ▶",580,160)
-            cx2.fillText("通常",430,230)
-            cx2.fillText("リーチ",430,300)
-            cx2.fillText("オーラス",430,370)
-            cx2.font = "20px 'Century Gothic'";
-            cx2.textAlign = "center";
-            cx2.fillText(musiclist[musicset[0]],560,260)
-            cx2.fillText(musiclist[musicset[1]],560,330)
-            cx2.fillText(musiclist[musicset[2]],560,400)
-            cx2.textAlign = "start";
-            cx2.fillText("◀ ",380,260)
-            cx2.fillText("◀ ",380,330)
-            cx2.fillText("◀ ",380,400)
-            cx2.fillText(" ▶",720,260)
-            cx2.fillText(" ▶",720,330)
-            cx2.fillText(" ▶",720,400)         
-            pagestate=2;
-            }}
-          if(mouseY >340 && mouseY <385){//セーブ
-            se5.play();
-            var result = window.confirm('セーブファイルをダウンロードします！');
-                if( result) {
-            console.log('save');
-            saveDL();
-                }else{
-            console.log('save cancelled');
-                }
-            }
-            if(mouseY >385 && mouseY <430){//データ初期化
-              if(JSON.parse(localStorage.getItem('UserData_Don')) === null){
-                se2.play();
-              }else{
-              se5.play();
-              var result = window.confirm('セーブデータを削除します!!（この操作は取り消しできません）');
-                  if(result) {
-              console.log('save delete');
-              saveDel();
-                  }else{
-              console.log('save delete cancelled');
-                  }}
-              }
+        //旧ボタン　自由・オプションは移行済み
+        if(mouseX <0){
           if(mouseY >250 && mouseY <295){//pvpたいせん
             cx2.clearRect(675,390,80,50)
             cx3.clearRect(675,385,80,60)
@@ -2544,34 +2715,10 @@ Bgm.on("load", () => {
             Menu();
           }
         }
-        if(mouseX >678 && mouseX <750){
-          if(mouseY >390 && mouseY <440){//実績リスト
-            e10.src=chrimg_src[chara[1]]
-            e10.onload=function(){
-            cx2.clearRect(675,390,80,50)
-            cx3.clearRect(675,385,80,60)
-            pagestate=5;
-            msgstate=-1;
-            se5.play();
-            Menu();
-            }
-          }}
-          if(mouseX >120 && mouseX <340){
-            if(mouseY >95 && mouseY < 155){
-              //実績リストボタンその2
-              e10.src=chrimg_src[chara[1]]
-              e10.onload=function(){
-              cx2.clearRect(675,390,80,50)
-              cx3.clearRect(675,385,80,60)
-              pagestate=5;
-              msgstate=-1;
-              se5.play();
-              Menu();
-              }
-            }}
         break;
         case 3:
           //フリバへ
+          console.log('2439!')
           if(mouseX >80 && mouseX <380 && mouseY >80 && mouseY <480){
             se2.play();
             pagestate=0;
@@ -2579,158 +2726,114 @@ Bgm.on("load", () => {
           }
           if(mouseX >470 && mouseX <640 && mouseY >410 && mouseY <470){
           gamestate=1;
+          field.removeAllChildren();
+          textmap.alpha=0;
           Bgm =new Music(bgm2data);
           musicnum=2;
           //bgm1.fade(0, 0.4, 100);
-          bgimg_src[0]=1
           Setup();
           }
           if(mouseX >510 && mouseX <560 && mouseY >80 && mouseY <110){
           se3.play();
           if(LP[0]==0){LP[0]=LPlist.length-1}else{LP[0]-=1}
-          cx2.font = "24px 'Century Gothic'";
-          cx2.fillStyle = "black";
-          cx2.clearRect(510,80,170,26)
-          cx2.fillText("◀ "+LPlist[LP[0]],520,100)
+          menu_solo_list[1].text="◀ "+LPlist[LP[0]]
           }
           if(mouseX >670 && mouseX <705 && mouseY >80 && mouseY <110){
             se3.play();
             if(LP[0]==LPlist.length-1){LP[0]=0}else{LP[0]+=1}
-            cx2.font = "24px 'Century Gothic'";
-            cx2.fillStyle = "black";
-            cx2.clearRect(510,80,170,26)
-            cx2.fillText("◀ "+LPlist[LP[0]],520,100)
+            menu_solo_list[1].text="◀ "+LPlist[LP[0]]
             }
           if(mouseX >510 && mouseX <560 && mouseY >130 && mouseY <160){
             se3.play();
             if(chara[1]==0){chara[1]=chrlist.length-1}else{chara[1]-=1}
-            cx2.font = "24px 'Century Gothic'";
-            cx2.fillStyle = "black";
-            cx2.clearRect(510,127,170,29)
-            cx2.fillText("◀ "+chrlist[chara[1]],520,150);
-            e10.src=chrimg_src[chara[1]]
-            e10.onload=function(){
-            cx2.clearRect(10,0,350,510);
-            cx2.drawImage(e10,400,0,350,510,10,0,350,510)
-            }
+            menu_solo_list[2].text="◀ "+chrlist[chara[1]]
+            menu_solo.removeChild(menu_solo_list[menu_solo_list.length-1]);
+            menu_solo_list.pop();
+            e10 = new createjs.Bitmap(chrimg_src[chara[1]]);
+            e10.sourceRect={x:400,y:0,width:350,height:510}
+            e10.x=10;
+            e10.y=0;
+            e10.scale=1;
+            menu_solo.addChild(e10);
+            menu_solo_list.push(e10);
             }
           if(mouseX >670 && mouseX <705 && mouseY >130 && mouseY <160){
             se3.play();
             if(chara[1]==chrlist.length-1){chara[1]=0}else{chara[1]+=1}
-            cx2.font = "24px 'Century Gothic'";
-            cx2.fillStyle = "black";
-            cx2.clearRect(510,127,170,29)
-            cx2.fillText("◀ "+chrlist[chara[1]],520,150);
-            e10.src=chrimg_src[chara[1]]
-            e10.onload=function(){
-            cx2.clearRect(10,0,350,510);
-            cx2.drawImage(e10,400,0,350,510,10,0,350,510)
-            }
+            menu_solo_list[2].text="◀ "+chrlist[chara[1]]
+            menu_solo.removeChild(menu_solo_list[menu_solo_list.length-1]);
+            menu_solo_list.pop();
+            e10 = new createjs.Bitmap(chrimg_src[chara[1]]);
+            e10.sourceRect={x:400,y:0,width:350,height:510}
+            e10.x=10;
+            e10.y=0;
+            e10.scale=1;
+            menu_solo.addChild(e10);
+            menu_solo_list.push(e10);
             } 
           if(mouseX >520 && mouseX <650 && mouseY >175 && mouseY <205){
             se3.play();
             if(chara[0]==0){chara[0]=1}else{chara[0]=0};
-            cx2.clearRect(515,180,130,30)
-            cx2.clearRect(380,220,330,120)
-            cx2.font = "24px 'Century Gothic'";
-            cx2.fillStyle = "black";
             if(chara[0]==0){
-              cx2.fillText("✓おまかせ",520,200);
-              cx2.fillStyle = "rgba(0,0,0,0.4)";
+              menu_solo_list[0].text="✓おまかせ"
+              for(var i=0;i<6;i++){menu_solo_list[i+3].alpha=0.4};
               }else{
-              cx2.fillText("　おまかせ",520,200)
-              cx2.fillStyle = "black";
+              menu_solo_list[0].text="　おまかせ"
+              for(var i=0;i<6;i++){menu_solo_list[i+3].alpha=1};
               }
-              cx2.font = "24px 'Century Gothic'";
-              cx2.fillText("ＣＰＵ１",390,250)
-              cx2.fillText("ＣＰＵ２",390,290)
-              cx2.fillText("ＣＰＵ３",390,330)
-              cx2.fillText("◀ "+chrlist[chara[2]],520,250)
-              cx2.fillText("◀ "+chrlist[chara[3]],520,290)
-              cx2.fillText("◀ "+chrlist[chara[4]],520,330)
-              cx2.fillText(" ▶",670,250)
-              cx2.fillText(" ▶",670,290)
-              cx2.fillText(" ▶",670,330)
           }
           if(mouseX >520 && mouseX <650 && mouseY >345 && mouseY <375){
             se3.play();
             if(skillswitch[0]==0){skillswitch[0]=-1}else{skillswitch[0]=0};
-            cx2.clearRect(540,340,150,35)
-            cx2.font = "24px 'Century Gothic'";
-            cx2.fillStyle = "black";
-            if(skillswitch[0]==0){
-              cx2.fillText("　禁止しない",540,370);
-              }else if(skillswitch[0]==-1){
-              cx2.fillText("✓禁止",540,370)
-              cx2.fillStyle = "black";
-              }
+            var Ary=["　禁止しない","✓禁止"]
+            menu_solo_list[9].text=Ary[-skillswitch[0]]
             }
           if(mouseX >670 && mouseX <705 && mouseY >230 && mouseY <260){
             if(chara[0]==1){
             se3.play();
             if(chara[2]==chrlist.length-1){chara[2]=0}else{chara[2]+=1}
-            cx2.font = "24px 'Century Gothic'";
-            cx2.fillStyle = "black";
-            cx2.clearRect(510,230,170,26)
-            cx2.fillText("◀ "+chrlist[chara[2]],520,250);
+            menu_solo_list[3].text="◀ "+chrlist[chara[2]]
             }
             }
           if(mouseX >670 && mouseX <705 && mouseY >270 && mouseY <300){
             if(chara[0]==1){
             se3.play();
             if(chara[3]==chrlist.length-1){chara[3]=0}else{chara[3]+=1}
-            cx2.font = "24px 'Century Gothic'";
-            cx2.fillStyle = "black";
-            cx2.clearRect(510,270,170,26)
-            cx2.fillText("◀ "+chrlist[chara[3]],520,290);
+            menu_solo_list[4].text="◀ "+chrlist[chara[3]]
             }
             }
           if(mouseX >670 && mouseX <705 && mouseY >310 && mouseY <340){
             if(chara[0]==1){
             se3.play();
             if(chara[4]==chrlist.length-1){chara[4]=0}else{chara[4]+=1}
-            cx2.font = "24px 'Century Gothic'";
-            cx2.fillStyle = "black";
-            cx2.clearRect(510,310,170,26)
-            cx2.fillText("◀ "+chrlist[chara[4]],520,330);
+            menu_solo_list[5].text="◀ "+chrlist[chara[4]]
             }
             }
             if(mouseX >510 && mouseX <560 && mouseY >230 && mouseY <260){
               if(chara[0]==1){
               se3.play();
               if(chara[2]==0){chara[2]=chrlist.length-1}else{chara[2]-=1}
-              cx2.font = "24px 'Century Gothic'";
-              cx2.fillStyle = "black";
-              cx2.clearRect(510,230,170,26)
-              cx2.fillText("◀ "+chrlist[chara[2]],520,250);
+              menu_solo_list[3].text="◀ "+chrlist[chara[2]]
               }
               }
             if(mouseX >510 && mouseX <560 && mouseY >270 && mouseY <300){
               if(chara[0]==1){
               se3.play();
               if(chara[3]==0){chara[3]=chrlist.length-1}else{chara[3]-=1}
-              cx2.font = "24px 'Century Gothic'";
-              cx2.fillStyle = "black";
-              cx2.clearRect(510,270,170,26)
-              cx2.fillText("◀ "+chrlist[chara[3]],520,290);
+              menu_solo_list[4].text="◀ "+chrlist[chara[3]]
               }
               }
             if(mouseX >510 && mouseX <560 && mouseY >310 && mouseY <340){
               if(chara[0]==1){
               se3.play();
               if(chara[4]==0){chara[4]=chrlist.length-1}else{chara[4]-=1}
-              cx2.font = "24px 'Century Gothic'";
-              cx2.fillStyle = "black";
-              cx2.clearRect(510,310,170,26)
-              cx2.fillText("◀ "+chrlist[chara[4]],520,330);
+              menu_solo_list[5].text="◀ "+chrlist[chara[4]]
               }
               }
         corsor();
         break;
         case 2:
           //オプション画面
-          drawbuttom2(600,450,"OK",0,100,40,1)
-          drawbuttom2(400,450,"デフォルトに戻す",0,180,40,1)
           if(mouseX >600 && mouseX <700 && mouseY >450 && mouseY <490){
             if(musicnum!==0){
             musicnum=0;
@@ -2740,6 +2843,8 @@ Bgm.on("load", () => {
             });
             }
             pagestate=0;
+            Configmap.removeAllChildren();
+            opLock=0;
             se2.play();
             save_Local();
             Menu();
@@ -2753,130 +2858,51 @@ Bgm.on("load", () => {
               se3.play();
               musicset=[3,7,8];
               if(Ponrate<0){Ponrate=0};
-              //描画
-              cx2.clearRect(0,0,800,510)
-            drawbuttom(690,200,"Play",0,60,40)
-            drawbuttom(690,270,"Play",0,60,40)
-            drawbuttom(690,340,"Play",0,60,40)
-            drawbuttom(80,310,"おそめ",1,80,40)
-            drawbuttom(170,310,"ふつう",0,80,40)
-            drawbuttom(260,310,"はやめ",0,80,40)
-            drawbuttom2(600,450,"OK",0,100,40,1)
-            drawbuttom2(400,450,"デフォルトに戻す",0,180,40,1)
-            cx2.fillStyle = "black";
-            cx2.fillRect(360,70,2,400);
-            cx2.font = "26px 'Century Gothic'";
-            cx2.fillText("ユーザー補助",60,100)
-            cx2.fillText("対局設定",60,200)
-            cx2.fillText("音量設定",390,100)
-            cx2.fillText("対局BGM設定",390,198)
-            cx2.font = "18px 'Century Gothic'";
-            cx2.fillText("（注意：対局設定について）",60,420)
-            cx2.fillText("「たいせん」モードでは",60,440)
-            cx2.fillText("ルーム長の対局設定データが",65,460)
-            cx2.fillText("全体に反映されます。",65,480)
-            cx2.font = "24px 'Century Gothic'";
-            cx2.fillText("右クリック　ツモ切り",90,130);
-            cx2.fillText("CPUのポン頻度",100,230);
-            cx2.fillText("◀",120,260)
-            cx2.fillText("▶",260,260)
-            var A=(1-Ponrate)*5;
-            for (var i=0;i<A;i++){
-              cx2.fillText("■",140+i*24,260);
-            };
-            cx2.fillText("MPチャージ速度",100,300);
-            if(Fever==-1){
-              cx2.fillText("FEVER なし",100,380);
-            }else{
-            cx2.fillText("FEVER あり",100,380);
-            }
-            cx2.fillText("BGM(0-7)",430,130)
-            cx2.fillText("SE(0-7)",430,160)
-            cx2.fillText("◀ "+Math.floor(vBar*5)+" ▶",580,130)
-            cx2.fillText("◀ "+Math.floor(sBar*5)+" ▶",580,160)
-            cx2.fillText("通常",430,230)
-            cx2.fillText("リーチ",430,300)
-            cx2.fillText("オーラス",430,370)
-            cx2.font = "20px 'Century Gothic'";
-            cx2.textAlign = "center";
-            cx2.fillText(musiclist[musicset[0]],560,260)
-            cx2.fillText(musiclist[musicset[1]],560,330)
-            cx2.fillText(musiclist[musicset[2]],560,400)
-            cx2.textAlign = "start";
-            cx2.fillText("◀ ",380,260)
-            cx2.fillText("◀ ",380,330)
-            cx2.fillText("◀ ",380,400)
-            cx2.fillText(" ▶",720,260)
-            cx2.fillText(" ▶",720,330)
-            cx2.fillText(" ▶",720,400)    
           }
           if(mouseX >665 && mouseX <705 && mouseY >110 && mouseY <150){
             if(dahaiSE!==1){
             dahaiSE=1;
             se4.play();
-            drawbuttom(665,110,"A",1,40,40)
-            drawbuttom(705,110,"B",0,40,40)
             }
           }
           if(mouseX >705 && mouseX <745 && mouseY >110 && mouseY <150){
             if(dahaiSE!==2){
             dahaiSE=2;
             se16.play();
-            drawbuttom(665,110,"A",0,40,40)
-            drawbuttom(705,110,"B",1,40,40)
             }
           }
           if(mouseX >80 && mouseX <160 && mouseY >310 && mouseY <350){
             if(mpVelocity!==1){
             mpVelocity=1;
             se3.play();
-            drawbuttom(80,310,"おそめ",1,80,40)
-            drawbuttom(170,310,"ふつう",0,80,40)
-            drawbuttom(260,310,"はやめ",0,80,40)
             }
           }
           if(mouseX >170 && mouseX <260 && mouseY >310 && mouseY <350){
             if(mpVelocity!==1.5){
             mpVelocity=1.5;
             se3.play();
-            drawbuttom(80,310,"おそめ",0,80,40)
-            drawbuttom(170,310,"ふつう",1,80,40)
-            drawbuttom(260,310,"はやめ",0,80,40)
             }
           }
           if(mouseX >260 && mouseX <340 && mouseY >310 && mouseY <350){
             if(mpVelocity!==2){
             mpVelocity=2;
             se3.play();
-            drawbuttom(80,310,"おそめ",0,80,40)
-            drawbuttom(170,310,"ふつう",0,80,40)
-            drawbuttom(260,310,"はやめ",1,80,40)
             }
           }
           if(mouseX >80 && mouseX <360 && mouseY >100 && mouseY <170){
-            cx2.font = "24px 'Century Gothic'";
-            cx2.fillStyle="black";
-            cx2.clearRect(89,105,270,26);
             se3.play();
             if(tumoConfig==0){
               tumoConfig=-1;
-                cx2.fillText("右クリック　何もしない",90,130);
               }else{
                 tumoConfig=0
-              cx2.fillText("右クリック　ツモ切り",90,130);
               }
           }
           if(mouseX >80 && mouseX <340 && mouseY >350 && mouseY <410){
-            cx2.font = "24px 'Century Gothic'";
-            cx2.fillStyle="black";
-            cx2.clearRect(99,355,160,26);
             se3.play();
             if(Fever!==-1){
               Fever=-1;
-                cx2.fillText("FEVER なし",100,380);
               }else{
-                Fever=0
-              cx2.fillText("FEVER あり",100,380);
+              Fever=0;
               }
           }
           if(mouseX >110 && mouseX <150 && mouseY >230 && mouseY <270){
@@ -2884,313 +2910,89 @@ Bgm.on("load", () => {
             se3.play();
             Ponrate+=0.2;
             if(Ponrate>1){Ponrate=1};
-            cx2.font = "24px 'Century Gothic'";
-            cx2.fillStyle = "black";
-            cx2.clearRect(140,240,120,20);
-            var A=(1-Ponrate)*5;
-            for (var i=0;i<A;i++){
-              cx2.fillText("■",140+i*24,260);
-            };
           }
           if(mouseX >250 && mouseX <300 && mouseY >230 && mouseY <270){
             se3.play();
             Ponrate-=0.2;
             if(Ponrate<0){Ponrate=0};
-            cx2.font = "24px 'Century Gothic'";
-            cx2.fillStyle = "black";
-            cx2.clearRect(140,240,120,20);
-            var A=(1-Ponrate)*5;
-            for (var i=0;i<A;i++){
-              cx2.fillText("■",140+i*24,260);
-            };
           }
           if(mouseX >570 && mouseX <610 && mouseY >100 && mouseY <135){
             se3.play();
             if(vBar<=0.2){vBar=0}else{vBar-=0.2}
-            cx2.font = "24px 'Century Gothic'";
-            cx2.fillStyle = "black";
-            cx2.clearRect(578,105,80,26)
-            cx2.fillText("◀ "+Math.floor(vBar*5)+" ▶",580,130)
             }
           if(mouseX >620 && mouseX <660 && mouseY >100 && mouseY <135){
             se3.play();
             if(vBar>=1.4){vBar=1.4}else{vBar+=0.2}
-            cx2.font = "24px 'Century Gothic'";
-            cx2.fillStyle = "black";
-            cx2.clearRect(578,105,80,26)
-            cx2.fillText("◀ "+Math.floor(vBar*5)+" ▶",580,130)
             }
           if(mouseX >570 && mouseX <610 && mouseY >135 && mouseY <170){
             if(sBar<=0.2){sBar=0}else{sBar-=0.2}
             SEbuffer();
             se3.play();
-            cx2.font = "24px 'Century Gothic'";
-            cx2.fillStyle = "black";
-            cx2.clearRect(578,135,80,26)
-            cx2.fillText("◀ "+Math.floor(sBar*5)+" ▶",580,160)
             }
           if(mouseX >620 && mouseX <660 && mouseY >135 && mouseY <170){
             if(sBar>=1.4){sBar=1.4}else{sBar+=0.2}
             SEbuffer();
             se3.play();
-            cx2.font = "24px 'Century Gothic'";
-            cx2.fillStyle = "black";
-            cx2.clearRect(578,135,80,26)
-            cx2.fillText("◀ "+Math.floor(sBar*5)+" ▶",580,160)
             }
             if(mouseX >370 && mouseX <430 && mouseY >240 && mouseY <270){
               //bgm
               se3.play();
               if(musicset[0]==1){musicset[0]=musiclist.length-1}else{musicset[0]-=1}
-              cx2.clearRect(400,240,330,30)
-              cx2.font = "20px 'Century Gothic'";
-              cx2.fillStyle = "black";
-              cx2.textAlign = "center";
-              cx2.fillText(musiclist[musicset[0]],560,260)
-              cx2.textAlign = "start";
-              if(musicnum==musicset[0]){
-                drawbuttom(690,200,"Play",1,60,40)
-              }else{
-              drawbuttom(690,200,"Play",0,60,40)
-              }
             }
             if(mouseX >370 && mouseX <430 && mouseY >310 && mouseY <340){
               se3.play();
               if(musicset[1]==1){musicset[1]=musiclist.length-1}else{musicset[1]-=1}
-              cx2.clearRect(400,310,330,30)
-              cx2.font = "20px 'Century Gothic'";
-              cx2.fillStyle = "black";
-              cx2.textAlign = "center";
-              cx2.fillText(musiclist[musicset[1]],560,330)
-              cx2.textAlign = "start";
-              if(musicnum==musicset[1]){
-                drawbuttom(690,270,"Play",1,60,40)
-              }else{
-                drawbuttom(690,270,"Play",0,60,40)
-              }
             }
             if(mouseX >370 && mouseX <430 && mouseY >380 && mouseY <410){
               se3.play();
               if(musicset[2]==1){musicset[2]=musiclist.length-1}else{musicset[2]-=1}
-              cx2.clearRect(400,380,330,30)
-              cx2.font = "20px 'Century Gothic'";
-              cx2.fillStyle = "black";
-              cx2.textAlign = "center";
-              cx2.fillText(musiclist[musicset[2]],560,400)
-              cx2.textAlign = "start";
-              if(musicnum==musicset[2]){
-                drawbuttom(690,340,"Play",1,60,40)
-              }else{
-                drawbuttom(690,340,"Play",0,60,40)
-              }
             }
             if(mouseX >690 && mouseX <750 && mouseY >240 && mouseY <270){
               se3.play();
               if(musicset[0]==musiclist.length-1){musicset[0]=1}else{musicset[0]+=1}
-              cx2.clearRect(400,240,330,30)
-              cx2.font = "20px 'Century Gothic'";
-              cx2.fillStyle = "black";
-              cx2.textAlign = "center";
-              cx2.fillText(musiclist[musicset[0]],560,260)
-              cx2.textAlign = "start";
-              if(musicnum==musicset[0]){
-                drawbuttom(690,200,"Play",1,60,40)
-              }else{
-              drawbuttom(690,200,"Play",0,60,40)
-              }
             }
             if(mouseX >690 && mouseX <750 && mouseY >310 && mouseY <340){
               se3.play();
               if(musicset[1]==musiclist.length-1){musicset[1]=1}else{musicset[1]+=1}
-              cx2.clearRect(400,310,330,30)
-              cx2.font = "20px 'Century Gothic'";
-              cx2.fillStyle = "black";
-              cx2.textAlign = "center";
-              cx2.fillText(musiclist[musicset[1]],560,330)
-              cx2.textAlign = "start";
-              if(musicnum==musicset[1]){
-                drawbuttom(690,270,"Play",1,60,40)
-              }else{
-                drawbuttom(690,270,"Play",0,60,40)
-              }
             }
             if(mouseX >690 && mouseX <750 && mouseY >380 && mouseY <410){
               se3.play();
               if(musicset[2]==musiclist.length-1){musicset[2]=1}else{musicset[2]+=1}
-              cx2.clearRect(400,380,330,30)
-              cx2.font = "20px 'Century Gothic'";
-              cx2.fillStyle = "black";
-              cx2.textAlign = "center";
-              cx2.fillText(musiclist[musicset[2]],560,400)
-              cx2.textAlign = "start";
-              if(musicnum==musicset[2]){
-                drawbuttom(690,340,"Play",1,60,40)
-              }else{
-                drawbuttom(690,340,"Play",0,60,40)
-              }
             }
           if(mouseX >690 && mouseX <750 && mouseY >200 && mouseY <240){
             //通常play
             if(musicnum==musicset[0]){
               musicnum=0;
-              Bgm.stop()
-              drawbuttom(690,200,"Play",0,60,40)
-              drawbuttom(690,270,"Play",0,60,40)
-              drawbuttom(690,340,"Play",0,60,40)            
+              Bgm.stop()       
             }else{
               Bgm.stop()
               musicnum=musicset[0];
-              switch (musicnum){
-                case 1:
-                  Bgm =new Music(bgm1data);
-                  Bgm.playMusic();
-                  break;
-                case 2:
-                  Bgm =new Music(bgm2data);
-                  Bgm.playMusic();
-                break;
-                case 3:
-                  Bgm =new Music(bgm3data);
-                  Bgm.playMusic();
-                break;
-                case 4:
-                  Bgm =new Music(bgm4data);
-                  Bgm.playMusic();
-                break;
-                case 5:
-                  Bgm =new Music(bgm5data);
-                  Bgm.playMusic();
-                break;
-                case 6:
-                  Bgm =new Music(bgm6data);
-                  Bgm.playMusic();
-                break;
-                case 7:
-                  Bgm =new Music(bgm7data);
-                  Bgm.playMusic();
-                break;
-                case 8:
-                  Bgm =new Music(bgm8data);
-                  Bgm.playMusic();
-                break;
-                case 9:
-                  Bgm =new Music(bgm9data);
-                  Bgm.playMusic();
-                  break;
-              }
-            drawbuttom(690,200,"Play",1,60,40)
-            drawbuttom(690,270,"Play",0,60,40)
-            drawbuttom(690,340,"Play",0,60,40) 
+              musicStart(musicnum);
             }      
           }
           if(mouseX >690 && mouseX <750 && mouseY >270 && mouseY <310){
             //リーチplay
             if(musicnum==musicset[1]){
               musicnum=0;
-              Bgm.stop()
-              drawbuttom(690,200,"Play",0,60,40)
-              drawbuttom(690,270,"Play",0,60,40)
-              drawbuttom(690,340,"Play",0,60,40)            
+              Bgm.stop()        
             }else{
               Bgm.stop()
               musicnum=musicset[1];
-              switch (musicnum){
-                case 1:
-                  Bgm =new Music(bgm1data);
-                  Bgm.playMusic();
-                  break;
-                case 2:
-                  Bgm =new Music(bgm2data);
-                  Bgm.playMusic();
-                break;
-                case 3:
-                  Bgm =new Music(bgm3data);
-                  Bgm.playMusic();
-                break;
-                case 4:
-                  Bgm =new Music(bgm4data);
-                  Bgm.playMusic();
-                break;
-                case 5:
-                  Bgm =new Music(bgm5data);
-                  Bgm.playMusic();
-                break;
-                case 6:
-                  Bgm =new Music(bgm6data);
-                  Bgm.playMusic();
-                break;
-                case 7:
-                  Bgm =new Music(bgm7data);
-                  Bgm.playMusic();
-                break;
-                case 8:
-                  Bgm =new Music(bgm8data);
-                  Bgm.playMusic();
-                break;
-                case 9:
-                  Bgm =new Music(bgm9data);
-                  Bgm.playMusic();
-                  break;
-              }
-              drawbuttom(690,200,"Play",0,60,40)
-              drawbuttom(690,270,"Play",1,60,40)
-              drawbuttom(690,340,"Play",0,60,40)
+              musicStart(musicnum);
             }      
           }
           if(mouseX >690 && mouseX <750 && mouseY >340 && mouseY <380){
             //オーラスplay
             if(musicnum==musicset[2]){
               musicnum=0;
-              Bgm.stop()
-              drawbuttom(690,200,"Play",0,60,40)
-              drawbuttom(690,270,"Play",0,60,40)
-              drawbuttom(690,340,"Play",0,60,40)            
+              Bgm.stop()          
             }else{
               Bgm.stop()
               musicnum=musicset[2];
-              switch (musicnum){
-                case 1:
-                  Bgm =new Music(bgm1data);
-                  Bgm.playMusic();
-                  break;
-                case 2:
-                  Bgm =new Music(bgm2data);
-                  Bgm.playMusic();
-                break;
-                case 3:
-                  Bgm =new Music(bgm3data);
-                  Bgm.playMusic();
-                break;
-                case 4:
-                  Bgm =new Music(bgm4data);
-                  Bgm.playMusic();
-                break;
-                case 5:
-                  Bgm =new Music(bgm5data);
-                  Bgm.playMusic();
-                break;
-                case 6:
-                  Bgm =new Music(bgm6data);
-                  Bgm.playMusic();
-                break;
-                case 7:
-                  Bgm =new Music(bgm7data);
-                  Bgm.playMusic();
-                break;
-                case 8:
-                  Bgm =new Music(bgm8data);
-                  Bgm.playMusic();
-                break;
-                case 9:
-                  Bgm =new Music(bgm9data);
-                  Bgm.playMusic();
-                  break;
-              }
-            drawbuttom(690,200,"Play",0,60,40)
-            drawbuttom(690,270,"Play",0,60,40)
-            drawbuttom(690,340,"Play",1,60,40)
+              musicStart(musicnum);
             }
           }
+          menuMap(1);
           corsor();
           break;
           case 4:
@@ -3501,6 +3303,7 @@ Bgm.on("load", () => {
               pagestate=0;
               msgstate=0;
               se2.play();
+              menu_main.removeAllChildren();
               Menu();
               }
               return false;
@@ -3509,129 +3312,52 @@ Bgm.on("load", () => {
               if(msgstate>0){
               msgstate=0;
               se4.play();
-              Menu();
               }
             }
             if(mouseX >60 && mouseX <190 && mouseY >125 && mouseY <170){
               if(msgstate!==1 && msgstate !==-1){
               msgstate=1;
               se4.play();
-              Menu();
               }
             }
             if(mouseX >60 && mouseX <190 && mouseY >170 && mouseY <215){
               if(msgstate!==2 && msgstate !==-1){
               msgstate=2;
               se4.play();
-              Menu();
               }
             }
             switch(msgstate){
               case 0:
-                if(mouseX >530 && mouseX <730 && mouseY >90 && mouseY <130){
-                  se3.play();
-                  user = window.prompt("プレイヤー名を入力", Username);
-                  if(!user ||!user.match(/\S/g)){
-                    se2.play();
-                    window.alert("未入力です")
-                    return false;
-                  }
-                    let len = 0;
-                    for (let i = 0; i < user.length; i++) {
-                    (user[i].match(/[ -~]/)) ? len += 1 : len += 2;
-                    }
-                    if(len>12){
-                      se2.play();
-                      window.alert("長すぎる名前は嫌われます")
-                      return false;
-                    }
-                    se3.play();
-                  Username=user;
-                  cx2.clearRect(530,90,200,40)
-                  cx2.fillStyle = "rgba(0,0,0,0.8)";
-                  cx2.fillRect(530,90,200,40)
-                  cx2.font = "26px 'Century Gothic'";
-                  cx2.fillStyle = "white";
-                  cx2.fillText(Username,532,120);
-                  }
                   if(mouseX >530 && mouseX <730 && mouseY >400 && mouseY <450){
                     se3.play();
                     chara[1]=Math.floor((mouseX-530)/50);
+                    menu_main.removeChild(menu_main_list[menu_main_list.length-1])
+                    menu_main_list.pop();
+                    e10 = new createjs.Bitmap(chrimg_src[chara[1]]);
+                    e10.sourceRect={x:400,y:0,width:350,height:525}
+                    e10.x=530;
+                    e10.y=120;
+                    e10.scale=1/2;
+                    menu_main.addChild(e10);
+                    menu_main_list.push(e10);
+                    menu_main_list[0].x=530+50*(chara[1]%4)
+                    menu_main_list[0].y=400+50*Math.floor(chara[1]/4)
                   }
                   if(mouseX >530 && mouseX <630 && mouseY >450 && mouseY <500){
                     se3.play();
                     chara[1]=4+Math.floor((mouseX-530)/50);
-                  }
-                e10.src=chrimg_src[chara[1]]
-                e10.onload=function(){
-                  cx2.clearRect(190,60,550,440)
-                  cx2.drawImage(e10,400,0,350,525,530,120,200,300)
-                  e11.src=chrimg_src[0];
-                  e11.onload=function(){
-                    cx2.drawImage(e11,500,50,200,200,530,400,50,50)
-                  e11.src=chrimg_src[1];
-                  e11.onload=function(){
-                    cx2.drawImage(e11,500,100,200,200,580,400,50,50)
-                  e11.src=chrimg_src[2];
-                  e11.onload=function(){
-                    cx2.drawImage(e11,500,80,200,200,630,400,50,50) 
-                  e11.src=chrimg_src[3];
-                  e11.onload=function(){
-                    cx2.drawImage(e11,530,50,200,200,680,400,50,50)   
-                    e11.src=chrimg_src[4];
-                    e11.onload=function(){
-                      cx2.drawImage(e11,480,70,250,250,530,450,50,50)   
-                      e11.src=chrimg_src[5];
-                      e11.onload=function(){
-                        cx2.drawImage(e11,510,50,200,200,580,450,50,50)   
-                  drawbuttom(60,80,"戦績",1,130,44);
-                  drawbuttom(60,125,"実績リスト",0,130,44);
-                  drawbuttom(60,170,"達成役一覧",0,130,44);
-                  cx2.font = "32px 'Century Gothic'";
-                  cx2.fillStyle = "rgba(0,0,0,0.8)";
-                  cx2.fillRect(530,90,200,40)
-                  if(chara[1]>=4){
-                    cx2.fillRect(530+50*(chara[1]-4),450,50,50);
-                  }else{
-                  cx2.fillRect(530+50*chara[1],400,50,50);
-                  }
-                  cx2.fillStyle = "black";
-                  cx2.fillText("　×",680,80)
-                  var wT=winrank[0]+winrank[1]+winrank[2]+winrank[3]
-                  var winrate=0;
-                  if(wT>0){
-                    winrate=Math.floor(winrank[0]/wT*1000)/10  
-                  }
-                  cx2.font = "26px 'Century Gothic'";
-                  cx2.fillStyle = "white";
-                  cx2.fillText(Username,532,120);
-                  var X=200;
-                  cx2.font = "22px 'Century Gothic'";
-                  cx2.fillStyle = "black";
-                  cx2.fillText( "総プレイ回数："+highscore[0]+"回",X,105);
-                  cx2.fillText( "通算勝率："+winrate+"%",X,135);
-                  cx2.fillText( "最大戦闘力："+highscore[1],X,185);
-                  cx2.fillText( "瞬間最大火力："+highscore[2],X,215);
-                  cx2.font = "18px 'Century Gothic'";
-                  cx2.fillText( "(1位："+winrank[0]+" /2位："+winrank[1]+" /3位："+winrank[2]+" /4位："+winrank[3]+")",X,155);
-                  var achieveC=achieveB.filter(value=>value.sub=="その他");
-                  X+=10;
-                  var Y=250
-                  cx2.fillStyle = "black"; 
-                  cx2.font = "20px 'Century Gothic'";
-                  cx2.fillText("最大連荘",X,Y);
-                  cx2.fillText(highscore[3]+"回",X+130,Y);
-                  Y+=22;
-                  for(var i=0;i<achieveC.length; i++){
-                      cx2.fillText(achieveC[i].name,X,Y);
-                      cx2.fillText(achieveC[i].cleared+"回",X+130,Y);
-                    Y+=22;
-                    if(Y>=500){
-                      X+=280;
-                      Y=110;
-                    }
-                  }}}}}};
-                  }};
+                    menu_main.removeChild(menu_main_list[menu_main_list.length-1])
+                    menu_main_list.pop();
+                    e10 = new createjs.Bitmap(chrimg_src[chara[1]]);
+                    e10.sourceRect={x:400,y:0,width:350,height:525}
+                    e10.x=530;
+                    e10.y=120;
+                    e10.scale=1/2;
+                    menu_main.addChild(e10);
+                    menu_main_list.push(e10);
+                    menu_main_list[0].x=530+50*(chara[1]%4)
+                    menu_main_list[0].y=400+50*Math.floor(chara[1]/4)
+                  };
                 break;
               case 1:
                 if(mouseX >195 && mouseX <380 && mouseY >95 && mouseY <495){
@@ -3655,47 +3381,6 @@ Bgm.on("load", () => {
                     }else{
                       Usercrest="称号なし";
                     };
-                  }
-                cx2.clearRect(190,60,550,440)
-                var A=achieveA.findIndex(value=>value.name==Usercrest);
-                if(A>=0){
-                  if(A<20){
-                    cx2.fillStyle = "rgba(0,0,0,0.3)";
-                    cx2.fillRect(190,92+20*A,240,20);
-                  }else{
-                    cx2.fillStyle = "rgba(0,0,0,0.3)";
-                    cx2.fillRect(470,92+20*(A-20),240,20);
-                  }
-                }
-                  drawbuttom(60,80,"戦績",0,130,44);
-                  drawbuttom(60,125,"実績リスト",1,130,44);
-                  drawbuttom(60,170,"達成役一覧",0,130,44);
-                  cx2.font = "32px 'Century Gothic'";
-                  cx2.fillStyle = "black";
-                  cx2.fillText("　×",680,80)
-                  var A=achieveA.filter(value=>value.cleared>0);
-                  cx2.font = "bold 20px 'Century Gothic'";
-                  cx2.fillStyle = "black";
-                  cx2.fillText("実績 "+A.length+"/"+achieveA.length,200,85) 
-                  var X=200;
-                  var Y=110
-                  cx2.fillStyle = "black"; 
-                  for(var i=0;i<achieveA.length; i++){
-                    if(achieveA[i].cleared==0){
-                      cx2.font = "18px 'Century Gothic'";
-                      cx2.fillText("？？？",X,Y);
-                      //cx2.fillText(achieveC[i].count+"/"+achieveC[i].max,X+150,Y);
-                    }else{
-                      cx2.font = "bold 18px 'Century Gothic'";
-                      cx2.fillText(achieveA[i].name,X,Y);
-                      cx2.font = "18px 'Century Gothic'";
-                      //cx2.fillText(achieveA[i].sub,X+150,Y);
-                    }
-                    Y+=20;
-                    if(Y>=500){
-                      X+=280;
-                      Y=110;
-                    }
                   }
                 break;
               case 2:
@@ -3804,6 +3489,7 @@ Bgm.on("load", () => {
                       }
                   break;
             }
+            menuMap(2);
             break;
           case 6:
             //たいせん画面
@@ -3972,7 +3658,7 @@ Bgm.on("load", () => {
                   }
                 msgstate=0;
                   }; 
-              break;
+            break;
             }
     //ルーム関連のソケット
   //ゲームスタート
@@ -4318,6 +4004,11 @@ Bgm.on("load", () => {
   }
   });
    break;
+   default:
+    //pagesateが負の場合には正負を入れ替えて終了
+    if(debugmode){console.log(pagestate)};
+    if(pagestate<0){pagestate=-pagestate};
+    break;
     }
   }
   window.addEventListener("keyup", keyupHandler, false);
@@ -4356,8 +4047,12 @@ if(opLock==0 && gamestate ==1){
   cx4.fillStyle = "#f0f0f0";
   cx4.fillText("NO",500,280);
   }
-          }
-        }else{
+  Configmap.removeAllChildren();
+  Cbt=canvas4.toDataURL();
+  Cbutton = new createjs.Bitmap(Cbt);
+  Configmap.addChild(Cbutton);
+ }
+      }else{
         //対局を止める
         if(opLock==0 && gamestate ==1){
         opLock=2;
@@ -4382,199 +4077,162 @@ if(opLock==0 && gamestate ==1){
         cx4.fillRect(460,240,120,60)
         cx4.fillStyle = "#f0f0f0";
         cx4.fillText("NO",500,280);
+        Configmap.removeAllChildren();
+        Cbt=canvas4.toDataURL();
+        Cbutton = new createjs.Bitmap(Cbt);
+        Configmap.addChild(Cbutton);
         }}
       }
       }
   var yakumapYmax;
-  function Yakucheck2(move=0){
-    //現在所持しているものを表示
-    if(move!==0){
-    //上下移動
-    yakumapY+=move;
-    if(yakumapY<=-yakumapYmax){yakumapY=0;}
-    if(yakumapY>0){yakumapY=-yakumapYmax+60;}
-    createjs.Tween.get(yakumap2, {override: true})
-    .to({y: yakumapY}, 200, createjs.Ease.cubicInOut);
-    return false;
-  }
-    //一覧表示
-    yakumap2.removeAllChildren();
-    var rect = new createjs.Shape();
-    rect.graphics
-            .beginFill("rgba(20,20,20,0.7)")
-            .drawRect(40, 100, 580, 2800);
-    yakumap2.addChild(rect);
-    var shapeMask = new createjs.Shape();
-  shapeMask.graphics
-          .beginFill("gold")
-          .drawRect(40, 100, 620, 390);
-  var Sinagy=[
-    {id:"鋭さ",chr:[12,24,33,39,7,28,38]},
-    {id:"物理特化",chr:[27,36,5,8,35,41]},
-    {id:"魔法特化",chr:[24,1,10,16,31]},
-    {id:"敏捷さ",chr:[6,9,36,16,40,2]},
-    {id:"殴り合い",chr:[24,33,10]},
-    {id:"時空間",chr:[5,26,32]},
-    {id:"精霊の加護",chr:[6,7,8]},
-    {id:"魔族",chr:[27,28,29]},
-    {id:"ナソード研究",chr:[12,13,14,24,42]},
-    {id:"原初的な動き",chr:[0,9,21]},
-    {id:"マナ守護",chr:[4,34,20]},
-    {id:"属性鍛錬者",chr:[3,15,1,22]},
-    {id:"巨人審判者",chr:[39,30,37,2,11,17]},
-    {id:"探求する者",chr:[3,13,25,37,17,42]},
-    {id:"渇望",chr:[4,19,31,23,26,29,32]},
-    {id:"正義を貫徹する者",chr:[0,15,18,21,30]},
-    {id:"痛いから問題ない",chr:[31,34,11,23,38]},
-    {id:"戦場の天使",chr:[14,41]},
-    {id:"貫徹する足取り",chr:[18]},
-    {id:"豊かな足取り",chr:[19]},
-    {id:"上手な足取り",chr:[20]},
-    {id:"ラビィの友達",chr:[35]},
-    {id:"機械工学",chr:[42]},
-  ]
-  var t;
-  var s;
-  var X
-  var Y=120;
-  var Ary=hand1.concat(pon1);
-  function getIsDuplicate(arr1, arr2) {
-    return [...arr1, ...arr2].filter(item => arr1.includes(item) && arr2.includes(item)).length > 0
-  }
-  for(var i=0; i<Sinagy.length; i++){
-  //一つでも所持していればGO
-  if(getIsDuplicate(Ary,Sinagy[i].chr)){
-  X=110;
-  t= new createjs.Text(Sinagy[i].id, "bold 16px Arial", "white");
-  t.x=X-40;
-  t.y=Y;
-  yakumap2.addChild(t);
-  Y+=20;
-  for(var j=0; j<Sinagy[i].chr.length ; j++){
-    s= new createjs.Bitmap(eltear_src[Sinagy[i].chr[j]]);
-    s.scaleX=1/2;
-    s.scaleY=1/2;
-    s.x=X+50;
-    s.y=Y;
-    var A=Ary.findIndex(value=>value==Sinagy[i].chr[j]);
-    if(A==-1){
-      s.filters = [new createjs.ColorFilter(0.3, 1, 1, 0.3)];
-      s.cache(0,0,120,156);
-        }
-    yakumap2.addChild(s);
-    X+=65; 
-      }
-  Y+=95;
-  }};
-  t= new createjs.Text("↑ TOP ↑", "22px Arial", "white");
-  t.x=270;
-  t.y=Y+20;
-  console.log(Y);
-  yakumapYmax=Y-270;
-  yakumap2.addChild(t);
-  // マスクを適用する
-  yakumap2.mask = shapeMask;
-  }
-  //シナジー改善案
+  //シナジー改変後
   function Yakucheck(move=0){
+    if(debugmode)(console.log('Yakucheck',move,shiagytemp));
         if(move!==0){
         //上下移動
         yakumapY+=move;
-        if(yakumapY<=-2420){yakumapY=0;}
-        if(yakumapY>0){yakumapY=-2360;}
-        createjs.Tween.get(yakumap, {override: true})
+        //if(yakumapY<=-2840){yakumapY=0;}
+        //if(yakumapY>0){yakumapY=-2780;}
+        if(yakumapY<=-yakumapYmax){yakumapY=0;}
+        if(yakumapY>0){yakumapY=-yakumapYmax+60;}
+        createjs.Tween.get(yakumapMask, {override: true})
         .to({y: yakumapY}, 200, createjs.Ease.cubicInOut);
         return false;
       }
         //一覧表示
+        yakumap.removeAllChildren();
+        yakumapMask.removeAllChildren()
+        yakumap.addChild(yakumapMask);
+        yakumapY=0;
+        yakumapMask.y=0;
+        cx2.clearRect(0,0,800,600);
+        if(shiagytemp==0){
+          drawbuttom2(300,55,"一覧",0,100,44,1);    
+        }else{ 
+          drawbuttom2(300,55,"所持パイ",0,100,44,1);
+        }
+        var C=canvas2.toDataURL();
+        var Cb = new createjs.Bitmap(C);
+        yakumap.addChild(Cb);
         var rect = new createjs.Shape();
         rect.graphics
                 .beginFill("rgba(20,20,20,0.7)")
-                .drawRect(40, 100, 660, 2800);
-        yakumap.addChild(rect);
+                .drawRect(40, 100, 660, 3300);
+        yakumapMask.addChild(rect);
         var shapeMask = new createjs.Shape();
       shapeMask.graphics
               .beginFill("gold")
               .drawRect(40, 100, 660, 390);
-      var Sinagy=[
-        {id:"鋭さ",chr:[12,24,33,39,7,28,38]},
-        {id:"物理特化",chr:[27,36,5,8,35,41]},
-        {id:"魔法特化",chr:[24,1,10,16,31]},
-        {id:"敏捷さ",chr:[6,9,36,16,40,2]},
-        {id:"殴り合い",chr:[24,33,10]},
-        {id:"時空間",chr:[5,26,32]},
-        {id:"精霊の加護",chr:[6,7,8]},
-        {id:"魔族",chr:[27,28,29]},
-        {id:"ナソード研究",chr:[12,13,14,24,42]},
-        {id:"原初的な動き",chr:[0,9,21]},
-        {id:"マナ守護",chr:[4,34,20]},
-        {id:"属性鍛錬者",chr:[3,15,1,22]},
-        {id:"巨人審判者",chr:[39,30,37,2,11,17]},
-        {id:"探求する者",chr:[3,13,25,37,17,42]},
-        {id:"渇望",chr:[4,19,31,23,26,29,32]},
-        {id:"正義を貫徹する者",chr:[0,15,18,21,30]},
-        {id:"痛いから問題ない",chr:[31,34,11,23,38]},
-        {id:"戦場の天使",chr:[14,41]},
-        {id:"貫徹する足取り",chr:[18]},
-        {id:"豊かな足取り",chr:[19]},
-        {id:"上手な足取り",chr:[20]},
-        {id:"ラビィの友達",chr:[35]},
-        {id:"機械工学",chr:[42]},
-      ]
       var t;
+      var tt;
       var s;
       var X
       var Y=120;
       for(var i=0; i<Sinagy.length; i++){
+        var Ary=hand1.concat(pon1);
+        if(shiagytemp==1){
+          if(!getIsDuplicate(Ary,Sinagy[i].chr)){
+             //一つでも所持していればGO
+            continue;
+          };
+        }
       X=110;
       t= new createjs.Text(Sinagy[i].id, "bold 16px Arial", "white");
       t.x=X-40;
       t.y=Y;
-      yakumap.addChild(t);
-      Y+=20;
+      yakumapMask.addChild(t);
+      var Tx=""
+      for(var j=0;j<Sinagy[i].han.length;j++){
+        if(Sinagy[i].han[j]==1){
+          Tx+=Sinagy[i].han[j]+"枚："+(j+1)+"翻";
+        }else{
+          Tx+=Sinagy[i].han[j]+"枚以上："+(j+1)+"翻";
+        }
+        if(Sinagy[i].han.length>1 && j+1<Sinagy[i].han.length){Tx+=" / "}
+      }
+      tt= new createjs.Text(Tx, "14px Arial", "white");
+      tt.x=220;
+      tt.y=Y;
+      yakumapMask.addChild(tt);
+      Y+=15;
       for(var j=0; j<Sinagy[i].chr.length ; j++){
         s= new createjs.Bitmap(eltear_src[Sinagy[i].chr[j]]);
         s.scaleX=1/2;
         s.scaleY=1/2;
+        if(j==9){
+          X=110;
+          Y+=80;
+        }
         s.x=X-40;
         s.y=Y;
-        yakumap.addChild(s);
+        var A=Ary.findIndex(value=>value==Sinagy[i].chr[j]);
+        if(shiagytemp==1 && A==-1){
+          s.filters = [new createjs.ColorFilter(0.3, 1, 1, 0.4)];
+          s.cache(0,0,120,156);
+        }
+        yakumapMask.addChild(s);
         X+=65;
       };
-      Y+=95;
+      Y+=100;
       };
-      t= new createjs.Text("↑ TOP ↑", "22px Arial", "white");
-      t.x=X+120;
-      t.y=Y+20;
-      yakumap.addChild(t);
+      if(shiagytemp==1){yakumapYmax=Y-330}else{yakumapYmax=2840};
+      yakumapMask.addChild(t);
       // マスクを適用する
-      yakumap.mask = shapeMask;
+      yakumapMask.mask = shapeMask;
       }
+      function paiView(){
+      paiviewer.removeAllChildren();
+      var s = new createjs.Shape();
+      s.graphics.beginFill("rgba(20,20,20,0.7)");
+      s.graphics.drawRect(20,100,620,390);
+      paiviewer.addChild(s);
+      var donX=30;
+      var donY=100;
+      for(var i=0;i<eltear_src.length;i++){
+        var C = new createjs.Bitmap(eltear_src[i]);
+        C.x=donX;
+        C.y=donY;
+        C.scale=5/12;
+        paiviewer.addChild(C);
+        donX+=50;
+        if(i>0 && i%12==11){
+        donX=30;
+        donY+=65;
+        }
+      };
+      paiviewer.addChild(paiviewerMask);
+      paiviewer.alpha=0;
+      };
   function Remaincheck(num=-1){
     //残パイ
     //num -1->リスト n~->指定パイのチェック
-    var RemainPack=deck.concat(king);
+    var RemainPack=deck.concat();
     RemainPack=RemainPack.concat(hand2);
     RemainPack=RemainPack.concat(hand3);
     RemainPack=RemainPack.concat(hand4);
     RemainPack=RemainPack.concat(Extrash);
     switch(num){
       case -1:
-        cx4.fillStyle = "rgba(20,20,20,0.7)";
-        for(var i=0;i<45;i++){
-          var X=Math.floor(i%9);
-          var Y=Math.floor(i/9);
+        paiviewerMask.removeAllChildren();
+        for(var i=0;i<70;i++){
+          var X=Math.floor(i%12);
+          var Y=Math.floor(i/12);
           var A=RemainPack.filter(value=>value==i)
           if(A.length){
-            cx4.font = "26px Bold Arial";
-            cx4.lineWidth=3;
-            cx4.fillStyle = "black";
-            cx4.strokeStyle ="rgba(250,250,250,0.9)";
-            cx4.strokeText(A.length,60+60*X,150+78*Y)
-            cx4.fillText(A.length,60+60*X,150+78*Y)
+            var t = new createjs.Text(A.length, "26px Bold Arial", "black");
+            t.x=45+50*X;
+            t.y=120+65*Y;
+            t.outline=5;
+            paiviewerMask.addChild(t);
+            var t = new createjs.Text(A.length, "26px Bold Arial", "white");
+            t.x=45+50*X;
+            t.y=120+65*Y;
+            paiviewerMask.addChild(t);
           }else{
-            cx4.fillStyle = "rgba(20,20,20,0.7)";
-            cx4.fillRect(40+60*X,100+78*Y,60,78)
+            var s = new createjs.Shape();
+            s.graphics.beginFill("rgba(20,20,20,0.7)");
+            s.graphics.drawRoundRect(30+50*X,100+65*Y,50,65,6,6,);
+            paiviewerMask.addChild(s);
           }
         }
         break;
@@ -4595,28 +4253,45 @@ if(opLock==0 && gamestate ==1){
     deck[i] = deck[r]
     deck[r] = temp
   }};
-  function decklength(){
+  function decklength(op=0){
     //残り枚数と表ドラを描写
-    var DD=dora[dora.length-1]+1
-    if(DD>=45){DD=0;}
-    e7.src=eltear_src[DD]
-    e7.onload=function(){
-    cx1.clearRect(dorax,10,620-dorax,44)
-    cx1.fillStyle = "rgba(10,10,10,0.6)";
-    cx1.fillRect(dorax,10,40,44)
-    cx1.drawImage(e7,dorax,10,33,43.5)
-    cx1.fillRect(530,10,90,44)
-    cx1.font = "24px 'Century Gothic'";
-    cx1.fillStyle ="white";
-    cx1.fillText("残:"+ deck.length,540,40)
-    drawbuttom2(300,10,"シナジー",0,100,44,1);
-    drawbuttom(400,10,"残パイリスト",0,130,44);
-  }}
+    //op 0 ->テキストの更新
+    if(op==0){
+      deckText.text="残:"+ deck.length;
+      return true;
+    }
+    var DD=dora[dora.length-1]
+    var rect = new createjs.Shape();
+    rect.graphics.beginFill("rgba(10,10,10,0.6)")
+                  .drawRect(dorax, 10, 40, 44)
+                  .drawRect(530, 10, 90, 44)
+    field.addChild(rect);
+    e7 = new createjs.Bitmap(eltear_src[DD]);
+    e7.x=dorax;
+    e7.y=10;
+    e7.scale=33/120;
+    field.addChild(e7);
+    deckText.text = "残:"+ deck.length;
+    deckText.x=540;
+    deckText.y=20;
+    field.addChild(deckText);
+    var btn1 = createButton("シナジー", 100, 45,"#ffbb4d","#ff7b00","#372d23","#5e5e5e");
+        btn1.x = 300;
+        btn1.y = 10;
+        field.addChild(btn1);
+    var btn1 = createButton("残パイリスト", 130, 45);
+        btn1.x = 400;
+        btn1.y = 10;
+        field.addChild(btn1);
+  }
   function compareFunc(a,b){return a-b;}
   function compareFuncID(a,b){return(a.id - b.id);}  
   function compareFunc2(a,b){return(a.elia - b.elia);}  
   function compareFunc3(a,b){
-    if(a>=42){return 1}else{return a%3-b%3;}}
+    if(a>83){return 3}else{return a%4-b%4;}}
+  function getIsDuplicate(arr1, arr2) {
+    return [...arr1, ...arr2].filter(item => arr1.includes(item) && arr2.includes(item)).length > 0
+  };
   function AK(name){
     //実績系
       var A=achieveA.findIndex(value=>value.name==name);
@@ -4682,24 +4357,6 @@ if(opLock==0 && gamestate ==1){
             socket.emit("deck_handler",{room:RoomName[IAM.room],Deck:deck,Hand:{hand1,hand2,hand3,hand4},King:king,MPV:mpVelocity,PON:Ponrate,FEV:Fever} );
           };
       //ゲームスタート時の配牌と画面
-      cx.clearRect(0,0,800,600)
-      cx1.clearRect(0,0,800,600)
-      cx2.clearRect(0,0,800,600)
-      cx3.clearRect(0,0,800,600)
-      cx4.clearRect(0,0,800,600)
-      alpha=1
-      //背景
-      if(LP[0]==4){
-        cx.drawImage(BGimg,0,300,400,300,0,0,800,600);
-      }else{
-      cx.drawImage(BGimg,0,0,400,300,0,0,800,600);
-      }
-      cx1.fillStyle = "rgba(10,10,10,0.6)";
-      cx1.fillRect(630,400,160,80)
-      cx1.fillRect(630,10,160,350)
-      cx1.fillRect(10,100,135,400)
-      cx1.fillRect(10,10,120,44)
-      cx1.fillRect(10,60,135,34)
       cx1.font = "24px 'Century Gothic'";
       cx1.fillStyle ="white";
       cx1.fillText("ドラ",10,40)
@@ -4749,96 +4406,14 @@ if(opLock==0 && gamestate ==1){
             cx1.strokeRect(x+60,y,30,15);;
             cx1.fillStyle ="white";
            }
-      //music
-      if(auras==0 && musicset[0]!==musicnum){
-        musicnum=musicset[0]
-        if( mute=="ON" ){
-        Bgm.stop();
-      switch (musicset[0]){
-        case 1:
-          Bgm =new Music(bgm1data);
-          Bgm.playMusic();
-          break;
-        case 2:
-          Bgm =new Music(bgm2data);
-          Bgm.playMusic();
-        break;
-        case 3:
-          Bgm =new Music(bgm3data);
-          Bgm.playMusic();
-        break;
-        case 4:
-          Bgm =new Music(bgm4data);
-          Bgm.playMusic();
-        break;
-        case 5:
-          Bgm =new Music(bgm5data);
-          Bgm.playMusic();
-        break;
-        case 6:
-          Bgm =new Music(bgm6data);
-          Bgm.playMusic();
-        break;
-        case 7:
-          Bgm =new Music(bgm7data);
-          Bgm.playMusic();
-        break;
-        case 8:
-          Bgm =new Music(bgm8data);
-          Bgm.playMusic();
-        break;
-        case 9:
-          Bgm =new Music(bgm9data);
-          Bgm.playMusic();
-          break;
-        default:
-          console.log(musicnum,'bgm error!')
-          Bgm.stop();
-      }}}else if(auras==1 && musicset[2]!==musicnum){
-      musicnum=musicset[2]
-      if( mute=="ON" ){
-        Bgm.stop();
-    switch (musicset[2]){
-      case 1:
-        Bgm =new Music(bgm1data);
-        Bgm.playMusic();
-        break;
-      case 2:
-        Bgm =new Music(bgm2data);
-        Bgm.playMusic();
-      break;
-      case 3:
-        Bgm =new Music(bgm3data);
-        Bgm.playMusic();
-      break;
-      case 4:
-        Bgm =new Music(bgm4data);
-        Bgm.playMusic();
-      break;
-      case 5:
-        Bgm =new Music(bgm5data);
-        Bgm.playMusic();
-      break;
-      case 6:
-        Bgm =new Music(bgm6data);
-        Bgm.playMusic();
-      break;
-      case 7:
-        Bgm =new Music(bgm7data);
-        Bgm.playMusic();
-      break;
-      case 8:
-        Bgm =new Music(bgm8data);
-        Bgm.playMusic();
-      break;
-      case 9:
-        Bgm =new Music(bgm9data);
-        Bgm.playMusic();
-        break;
-      default:
-        console.log(musicnum,'bgm error!')
-        Bgm.stop();
-    }}};
+        //music
+        if(auras==0 && musicset[0]!==musicnum){
+          musicnum=musicset[0]
+          musicStart(musicnum);
+        }else if(auras==1 && musicset[2]!==musicnum){
+        musicnum=musicset[2]
+        musicStart(musicnum);
+      };
       cx1.font = "16px 'Century Gothic'";
       cx1.fillText("ポン",640,425)
       cx1.fillText("リーチ",640,465)
@@ -4972,18 +4547,16 @@ if(opLock==0 && gamestate ==1){
       nukiswitch =new Array(0,0,0,0,0);
       ippatu =new Array(0,0,0,0,0)
       rorder =new Array(0,0,0,0,0)
-      porder =new Array(0,0,0,0,0)
       for(var i=1; i<5;i++){
       if(LP[i]<=0){rorder[i]=2}else{rorder[i]=0}
       }
       counter=new Array(0,0,0,0,0)
       riverx=new Array(0,120,120,120,120)
       rivery=new Array(0,400,100,200,300)
-      drawDP(1)
-      drawDP(2)
-      drawDP(3)
-      drawDP(4)
+      DPlist=new Array(0,0,0,0,0);
+      drawDP();
       Buff =new Array(0,[],[],[],[])
+      Bufflist =new Array(0,[],[],[],[])
       if(LP[0]==4){
         var K=5-skillusage2[0];
         if(K>0){;
@@ -5047,12 +4620,12 @@ dorax+=40
 cx1.drawImage(e7,dorax,10,33,43.5)
     Fever=0;
     handgraph(-1,1);
-    decklength();  
+    decklength(1);  
 }}}}
 };
     }else{
       handgraph(-1,1);
-      decklength();
+      decklength(1);
     }
       //player1();
       turn =parent
@@ -5071,35 +4644,39 @@ cx1.drawImage(e7,dorax,10,33,43.5)
   
       function deckHandler(){
         //ゲームスタート時の配牌と画面
+        cx2.clearRect(0,0,800,600);
+        field.removeAllChildren();
+        guidemap.alpha=1;
+        //背景
+        if(LP[0]==4){
+          backyard.y=-600;
+        }else{
+          backyard.y=0;
+        }
+        var rect = new createjs.Shape();
+          rect.graphics.beginFill("rgba(10,10,10,0.6)")
+                        .drawRect(630, 400, 160, 80)
+                        .drawRect(630, 10, 160, 350)
+                        .drawRect(10, 100, 135, 400)
+                        .drawRect(10, 10, 120, 44)
+                        .drawRect(10, 60, 135, 34)
+        field.addChild(rect);
+        field.addChild(Csquare);
         if(pvpmode==1){
           deckHandlerP();
           return false;
         }
-        cx.clearRect(0,0,800,600)
-        cx1.clearRect(0,0,800,600)
-        cx2.clearRect(0,0,800,600)
-        cx3.clearRect(0,0,800,600)
-        cx4.clearRect(0,0,800,600)
-        alpha=1
-        //背景
-        if(LP[0]==4){
-        cx.drawImage(BGimg,0,300,400,300,0,0,800,600);
-        }else{
-        cx.drawImage(BGimg,0,0,400,300,0,0,800,600);
-        }
-        cx1.fillStyle = "rgba(10,10,10,0.6)";
-        cx1.fillRect(630,400,160,80)
-        cx1.fillRect(630,10,160,350)
-        cx1.fillRect(10,100,135,400)
-        cx1.fillRect(10,10,120,44)
-        cx1.fillRect(10,60,135,34)
-        cx1.font = "24px 'Century Gothic'";
-        cx1.fillStyle ="white";
-        cx1.fillText("ドラ",10,40)
-        skillusage2[0]+=1
+        var t = new createjs.Text("ドラ", "24px 'Century Gothic'", "white");
+        t.x=10;
+        t.y=20;
+        field.addChild(t);
+        skillusage2[0]+=1;
         auras=0;
+        var t = new createjs.Text("第"+(skillusage2[0])+"局 "+(skillusage2[5])+"本場", "24px 'Century Gothic'", "white");
+        t.x=10;
+        t.y=68;
         if(LP[0]>=0 && LP[0] <=1 && skillusage2[0]==8){
-          cx1.fillText("オーラス"+(skillusage2[5]),10,88);
+          t.text="オーラス"+(skillusage2[5]);
           auras=1;
           Dlvup.alpha=0;
           Dlvup.x=-60;
@@ -5110,130 +4687,58 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           .to({scale:1,x:0,y:0,alpha:1},150,createjs.Ease.backOut)
           .wait(1000)
           .to({scale:1.5,x:-200,y:-150,alpha:0},250,createjs.Ease.backOut);
-        }else{cx1.fillText("第"+(skillusage2[0])+"局 "+(skillusage2[5])+"本場",10,88);
-             }
+        }
+        field.addChild(t);
         //music
         if(auras==0 && musicset[0]!==musicnum){
           musicnum=musicset[0]
-          if( mute=="ON" ){
-          Bgm.stop();
-        switch (musicset[0]){
-          case 1:
-            Bgm =new Music(bgm1data);
-            Bgm.playMusic();
-            break;
-          case 2:
-            Bgm =new Music(bgm2data);
-            Bgm.playMusic();
-          break;
-          case 3:
-            Bgm =new Music(bgm3data);
-            Bgm.playMusic();
-          break;
-          case 4:
-            Bgm =new Music(bgm4data);
-            Bgm.playMusic();
-          break;
-          case 5:
-            Bgm =new Music(bgm5data);
-            Bgm.playMusic();
-          break;
-          case 6:
-            Bgm =new Music(bgm6data);
-            Bgm.playMusic();
-          break;
-          case 7:
-            Bgm =new Music(bgm7data);
-            Bgm.playMusic();
-          break;
-          case 8:
-            Bgm =new Music(bgm8data);
-            Bgm.playMusic();
-          break;
-          case 9:
-            Bgm =new Music(bgm9data);
-            Bgm.playMusic();
-            break;
-          default:
-            console.log(musicnum,'bgm error!')
-            Bgm.stop();
-        }}}else if(auras==1 && musicset[2]!==musicnum){
+          musicStart(musicnum);
+        }else if(auras==1 && musicset[2]!==musicnum){
         musicnum=musicset[2]
-        if( mute=="ON" ){
-          Bgm.stop();
-      switch (musicset[2]){
-        case 1:
-          Bgm =new Music(bgm1data);
-          Bgm.playMusic();
-          break;
-        case 2:
-          Bgm =new Music(bgm2data);
-          Bgm.playMusic();
-        break;
-        case 3:
-          Bgm =new Music(bgm3data);
-          Bgm.playMusic();
-        break;
-        case 4:
-          Bgm =new Music(bgm4data);
-          Bgm.playMusic();
-        break;
-        case 5:
-          Bgm =new Music(bgm5data);
-          Bgm.playMusic();
-        break;
-        case 6:
-          Bgm =new Music(bgm6data);
-          Bgm.playMusic();
-        break;
-        case 7:
-          Bgm =new Music(bgm7data);
-          Bgm.playMusic();
-        break;
-        case 8:
-          Bgm =new Music(bgm8data);
-          Bgm.playMusic();
-        break;
-        case 9:
-          Bgm =new Music(bgm9data);
-          Bgm.playMusic();
-          break;
-        default:
-          console.log(musicnum,'bgm error!')
-          Bgm.stop();
-      }}};
-        cx1.font = "16px 'Century Gothic'";
-        cx1.fillText("ポン",640,425)
-        //cx1.fillText("カン",720,425)
-        cx1.fillText("リーチ",640,465)
-        cx1.fillText("スキル",720,425)
-        cx1.fillText("抜き",720,465)
-        handsort=0;
-        drawbuttom(10,550,"SORT");
+        musicStart(musicnum);
+      };
+      var t = new createjs.Text("ポン", "16px 'Century Gothic'", "white");
+      t.x=640;
+      t.y=410;
+      field.addChild(t);
+      var t = new createjs.Text("リーチ", "16px 'Century Gothic'", "white");
+      t.x=640;
+      t.y=450;
+      field.addChild(t);
+      var t = new createjs.Text("スキル", "16px 'Century Gothic'", "white");
+      t.x=720;
+      t.y=410;
+      field.addChild(t);
+      var t = new createjs.Text("カン", "16px 'Century Gothic'", "white");
+      t.x=720;
+      t.y=450;
+      field.addChild(t);
         parentY =400
-        e11.src=chrimg_src[chara[1]]
-        e11.onload=function(){
-        cx1.drawImage(e11,500,0,300,600,0,parentY,100,200)
-        parentY=100
-        e12.src=chrimg_src[chara[2]]
-        e12.onload=function(){
-        cx1.drawImage(e12,500,0,300,300,0,parentY,100,100)
-        parentY+=100
-        e13.src=chrimg_src[chara[3]]
-        e13.onload=function(){
-        cx1.drawImage(e13,500,0,300,300,0,parentY,100,100)
-        parentY+=100
-        e14.src=chrimg_src[chara[4]]
-        e14.onload=function(){
-        cx1.drawImage(e14,500,0,300,300,0,parentY,100,100)
-        cx2.font = "16px 'Century Gothic'";
-        if(LP[0]>=6 && LP[0]<10){
-        cx2.fillStyle ="white";
-        cx2.strokeStyle = '#eb5600';
-        }else{
-        cx2.fillStyle ="black";
-        cx2.strokeStyle = 'white';
-        }
+        e11 = new createjs.Bitmap(chrimg_src[chara[1]]);
+        e11.sourceRect={x:500,y:0,width:300,height:600}
+        e11.x=0;
+        e11.y=400;
+        e11.scale=1/3;
+        e12 = new createjs.Bitmap(chrimg_src[chara[2]]);
+        e12.sourceRect={x:500,y:0,width:300,height:300}
+        e12.x=0;
+        e12.y=100;
+        e12.scale=1/3;
+        e13 = new createjs.Bitmap(chrimg_src[chara[3]]);
+        e13.sourceRect={x:500,y:0,width:300,height:300}
+        e13.x=0;
+        e13.y=200;
+        e13.scale=1/3;
+        e14 = new createjs.Bitmap(chrimg_src[chara[3]]);
+        e14.sourceRect={x:500,y:0,width:300,height:300}
+        e14.x=0;
+        e14.y=300;
+        e14.scale=1/3;
+        field.addChild(e11);
+        field.addChild(e12);
+        field.addChild(e13);
+        field.addChild(e14);
+        //
         for(var i=1; i<skillswitch.length;i++){
           skillswitch[i]=1;
           }
@@ -5246,53 +4751,115 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             LP[i]=75000;
           }}
             }}
-        cx1.lineWidth = 3;
-        cx1.lineJoin = 'round';
-        cx2.lineWidth = 3;
-        cx2.lineJoin = 'round';
-        parentY =170
-        cx2.strokeText(LP[2],80,parentY)
-        cx2.fillText(LP[2],80,parentY)
+        var LPlist=[];//HPテキスト
+        parentY =450;
+        var t = new createjs.Text(LP[1], "16px 'Century Gothic'", "#eb5600");
+        t.x=80;
+        t.y=450;
+        t.outline=3;
+        field.addChild(t);
+        LPlist.push(t);
+        var t = new createjs.Text(LP[1], "16px 'Century Gothic'", "white");
+        t.x=80;
+        t.y=450;
+        field.addChild(t);
+        LPlist.push(t);
+        parentY =150;
+        var t = new createjs.Text(LP[2], "16px 'Century Gothic'", "#eb5600");
+        t.x=80;
+        t.y=parentY;
+        t.outline=3;
+        field.addChild(t);
+        LPlist.push(t);
+        var t = new createjs.Text(LP[2], "16px 'Century Gothic'", "white");
+        t.x=80;
+        t.y=parentY;
+        field.addChild(t);
+        LPlist.push(t);
         parentY +=100
-        cx2.strokeText(LP[3],80,parentY)
-        cx2.fillText(LP[3],80,parentY)
+        var t = new createjs.Text(LP[3], "16px 'Century Gothic'", "#eb5600");
+        t.x=80;
+        t.y=parentY;
+        t.outline=3;
+        field.addChild(t);
+        LPlist.push(t);
+        var t = new createjs.Text(LP[3], "16px 'Century Gothic'", "white");
+        t.x=80;
+        t.y=parentY;
+        field.addChild(t);
+        LPlist.push(t);
         parentY +=100
-        cx2.strokeText(LP[4],80,parentY)
-        cx2.fillText(LP[4],80,parentY)
-        parentY +=100
-        cx2.strokeText(LP[1],80,parentY)
-        cx2.fillText(LP[1],80,parentY)
-        parentY +=100
-        cx1.fillStyle ="black";
-        cx1.strokeStyle = 'white';
-        cx1.lineWidth = 3;
-        cx1.lineJoin = 'round';
+        var t = new createjs.Text(LP[4], "16px 'Century Gothic'", "#eb5600");
+        t.x=80;
+        t.y=parentY;
+        t.outline=3;
+        field.addChild(t);
+        LPlist.push(t);
+        var t = new createjs.Text(LP[4], "16px 'Century Gothic'", "white");
+        t.x=80;
+        t.y=parentY;
+        field.addChild(t);
+        LPlist.push(t);
+        parentY =185;
+        var Ary=["CPU1","CPU2","CPU3",Username]
+        for(var i=0;i<4;i++){
+          var t = new createjs.Text(Ary[i], "16px 'Century Gothic'", "black");
+          t.x=10;
+          t.y=parentY;
+          t.outline=3;
+          field.addChild(t);
+          var t = new createjs.Text(Ary[i], "16px 'Century Gothic'", "white");
+          t.x=10;
+          t.y=parentY;
+          t.outline=1;
+          field.addChild(t);
+          parentY +=100;
+        }
         parentY =125+100*parent
-        cx1.strokeText("柔軟",110,parentY)
-        cx1.fillText("柔軟",110,parentY)
+        var Ary=["柔軟","強靭","強烈","超越"];
+        for(var i=0;i<4;i++){
+        var t = new createjs.Text(Ary[i], "16px 'Century Gothic'", "white");
+        t.x=110;
+        t.y=parentY;
+        t.outline=3;
+        field.addChild(t);
+        var t = new createjs.Text(Ary[i], "16px 'Century Gothic'", "black");
+        t.x=110;
+        t.y=parentY;
+        field.addChild(t);
         if(parentY ==425){parentY =125}else{parentY +=100}
-        cx1.strokeText("強靭",110,parentY)
-        cx1.fillText("強靭",110,parentY)
-        if(parentY ==425){parentY =125}else{parentY +=100}
-        cx1.strokeText("強烈",110,parentY)
-        cx1.fillText("強烈",110,parentY)
-        if(parentY ==425){parentY =125}else{parentY +=100}
-        cx1.strokeText("超越",110,parentY)
-        cx1.fillText("超越",110,parentY)
-        cx1.font = "18px 'Century Gothic'";
-        cx1.fillStyle ="white";
-        cx1.strokeStyle ="#d92100"
-        cx1.strokeText("親",80,parentY)
-        cx1.fillText("親",80,parentY)
-        parentY -=8
-        cx1.beginPath () ;
-        cx1.arc( 90, parentY, 18, 0 * Math.PI / 180, 360 * Math.PI / 180, false ) ;
-        cx1.strokeStyle = "red" ;
-        cx1.lineWidth = 2 ;
-        cx1.stroke();
-        cx2.fillStyle = "rgba(20,20,20,0.5)";
-        cx2.fillRect(630,400,160,80)
-        //cx2.clearRect(630,440,80,40)
+          }
+        if(parentY ==125){parentY =425}else{parentY -=100};
+        var t = new createjs.Text("親", "16px 'Century Gothic'", "white");
+        t.x=80;
+        t.y=parentY;
+        t.outline=3;
+        field.addChild(t);
+        var t = new createjs.Text("親", "16px 'Century Gothic'", "black");
+        t.x=80;
+        t.y=parentY;
+        field.addChild(t);
+        var shape = new createjs.Shape();
+        shape.graphics.beginStroke("Red");
+        shape.graphics.setStrokeStyle(2);
+        shape.graphics.drawCircle(90, parentY+8, 16); 
+        field.addChild(shape); // 表示リストに追加
+        //Cstar
+        var Cstar = new createjs.Shape(graphics);
+        Cstar.x=80;
+        Cstar.y=parentY-5;
+        Cstar.rotation=-15;
+        Cstar.scale=0.3;
+        field.addChild(Cstar)
+        var rect = new createjs.Shape();
+        rect.graphics.beginFill("rgba(20,20,20,0.5)")
+                      .drawRect(630, 400, 160, 80)
+        field.addChild(rect);
+        handsort=0;
+        var btn1 = createButton("SORT", 80, 40);
+        btn1.x = 10;
+        btn1.y = 550;
+        field.addChild(btn1);
         //初期化
         deck=[]
         dora=[]
@@ -5330,19 +4897,16 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         nukiswitch =new Array(0,0,0,0,0);
         ippatu =new Array(0,0,0,0,0)
         rorder =new Array(0,0,0,0,0)
-        porder =new Array(0,0,0,0,0)
         for(var i=1; i<5;i++){
         if(LP[i]<=0){rorder[i]=2}else{rorder[i]=0}
         }
         counter=new Array(0,0,0,0,0)
         riverx=new Array(0,120,120,120,120)
         rivery=new Array(0,400,100,200,300)
-        //DP =new Array(0,0,0,0,0)
-        drawDP(1)
-        drawDP(2)
-        drawDP(3)
-        drawDP(4)
+        DPlist=new Array(0,0,0,0,0);
+        drawDP();
         Buff =new Array(0,[],[],[],[])
+        Bufflist =new Array(0,[],[],[],[])
         if(LP[0]==4){
           var K=5-skillusage2[0];
           if(K>0){;
@@ -5352,14 +4916,12 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         }}}
       }
         Buffdraw();
-        for(var i =0; i<43; i++){
-        deck.push(i);
+        for(var i =0; i<70; i++){
         deck.push(i);
         }
-        deck.push(43);
-        deck.push(44);
+        deck.push(0,4,9,13,17,20,24,28,32,37,42,45,49,52,56);
         if(debugmode){console.log(deck.length);}
-        //expected88
+        //expected84
         //山シャッフル
         shuffle();
         //初手積み込み
@@ -5367,7 +4929,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         if(chara[1]==3 && parent==2){
           console.log("NF 1")
           for(var i=0;i<5;i++){
-          var A=deck.findIndex(value=>(value>=6 && value<=8)||(value>=39 && value<=42))
+          var A=deck.findIndex(value=>(value>=8 && value<=11)||(value>=40 && value<=43))
           var B=[1,0.9,0.6,0.3,0.2];
           var R=Math.random();
           if(R<B[i]){
@@ -5379,7 +4941,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         if(chara[2]==3 && parent==3){
           console.log("NF 2")
           for(var i=0;i<5;i++){
-            var A=deck.findIndex(value=>(value>=6 && value<=8)||(value>=39 && value<=42))
+            var A=deck.findIndex(value=>(value>=8 && value<=11)||(value>=40 && value<=43))
             var B=[1,0.9,0.6,0.3,0.2];
           var R=Math.random();
           if(R<B[i]){
@@ -5391,7 +4953,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         if(chara[3]==3 && parent==0){
           console.log("NF 3")
           for(var i=0;i<5;i++){
-            var A=deck.findIndex(value=>(value>=6 && value<=8)||(value>=39 && value<=42))
+            var A=deck.findIndex(value=>(value>=8 && value<=11)||(value>=40 && value<=43))
             var B=[1,0.9,0.6,0.3,0.2];
           var R=Math.random();
           if(R<B[i]){
@@ -5403,7 +4965,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         if(chara[4]==3 && parent==1){
           console.log("NF 4")
           for(var i=0;i<5;i++){
-            var A=deck.findIndex(value=>(value>=6 && value<=8)||(value>=39 && value<=42))
+            var A=deck.findIndex(value=>(value>=8 && value<=11)||(value>=40 && value<=43))
             var B=[1,0.9,0.6,0.3,0.2];
           var R=Math.random();
           if(R<B[i]){
@@ -5412,7 +4974,11 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           }
           }
         }
-        king =deck.splice(0,7)
+        //嶺上牌を廃止、代わりにドラをランダムに決定
+        king =[];
+        for (var i = 0; i < 10; i++) {
+          king.push(Math.floor(Math.random() * 67));
+        }
         hand1b=deck.splice(0,8-hand1.length)
         hand1=hand1.concat(hand1b)
         hand1b=deck.splice(0,8-hand2.length)
@@ -5443,19 +5009,71 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         console.log(hand3);
         console.log(hand4);
         }
-        dora.push(king[0])
+        dora=king.splice(0,1);
         if(debugmode){console.log(dora)}
       dorax=60
       handgraph(-1,1);
-      decklength();
+      decklength(1);
       turn =parent
       if(LP[turn+1]<=0){turn+=1;if(turn==4){turn=0}}
       if(LP[turn+1]<=0){turn+=1;if(turn==4){turn=0}}
       if(LP[turn+1]<=0){turn+=1;if(turn==4){turn=0}}
-      parent +=1
+      parent +=1;
       if(parent ==4){parent =0}
       ctl[turn+1]=0;
-        }}}}
+  };
+  function musicStart(num){
+    if( mute=="ON" ){
+      Bgm.stop();
+    switch (num){
+      case 1:
+        Bgm =new Music(bgm1data);
+        Bgm.playMusic();
+        break;
+      case 2:
+        Bgm =new Music(bgm2data);
+        Bgm.playMusic();
+      break;
+      case 3:
+        Bgm =new Music(bgm3data);
+        Bgm.playMusic();
+      break;
+      case 4:
+        Bgm =new Music(bgm4data);
+        Bgm.playMusic();
+      break;
+      case 5:
+        Bgm =new Music(bgm5data);
+        Bgm.playMusic();
+      break;
+      case 6:
+        Bgm =new Music(bgm6data);
+        Bgm.playMusic();
+      break;
+      case 7:
+        Bgm =new Music(bgm7data);
+        Bgm.playMusic();
+      break;
+      case 8:
+        Bgm =new Music(bgm8data);
+        Bgm.playMusic();
+      break;
+      case 9:
+        Bgm =new Music(bgm9data);
+        Bgm.playMusic();
+        break;
+      case 10:
+        Bgm =new Music(bgm10data);
+        Bgm.playMusic();
+        break;
+      case 11:
+        Bgm =new Music(bgm11data);
+        Bgm.playMusic();
+        break;
+      default:
+        console.log(musicnum,'bgm error!')
+        Bgm.stop();
+    }}
   };
       function Buffdraw(){
         if(debugmode){console.log('Buffdraw')}
@@ -5463,10 +5081,20 @@ cx1.drawImage(e7,dorax,10,33,43.5)
      var x=[0,120,120,120,120];
      var y=[0,430,130,230,330];
      for(var i=1;i<5;i++){
-      //x=[0,120,120,120,120];
-     cx2.clearRect(0,y[i],150,20);
+    //リスト初期化
+    if(Bufflist[i].length>0){
+      for(var j=0;j<Bufflist[i].length;j++){
+        field.removeChild(Bufflist[i][j]);
+      }
+    }
     if(LP[i]<0){
-        cx2.drawImage(donicon,150,0,30,30,x[i],y[i],20,20);
+        var s = new createjs.Bitmap(donicon);
+        s.sourceRect={x:150,y:0,width:30,height:30}
+        s.x=x[i];
+        s.y=y[i];
+        s.scale=2/3;
+        field.addChild(s);
+        Bufflist[i].push(s);
         x[i]-=20;
     }
      if(Buff[i].length>0){
@@ -5479,57 +5107,119 @@ cx1.drawImage(e7,dorax,10,33,43.5)
     var G=Buff[i].filter(value=>value==11);
     var H=Buff[i].filter(value=>value==7);
     if(G.length>0){
-      cx2.drawImage(donicon,150,0,30,30,x[i],y[i],20,20);
+      var s = new createjs.Bitmap(donicon);
+      s.sourceRect={x:150,y:0,width:30,height:30}
+      s.x=x[i];
+      s.y=y[i];
+      s.scale=2/3;
+      field.addChild(s);
+      Bufflist[i].push(s);
       x[i]-=20;
     };
     if(H.length>0){
-      cx2.drawImage(donicon,210,0,30,30,x[i],y[i],20,20);
-      cx2.font = "8px Arial";
-      cx2.fillStyle = "white";
-      cx2.fillText(H.length, x[i]+12,y[i]+20);
+      var s = new createjs.Bitmap(donicon);
+      s.sourceRect={x:210,y:0,width:30,height:30}
+      s.x=x[i];
+      s.y=y[i];
+      s.scale=2/3;
+      field.addChild(s);
+      Bufflist[i].push(s);
+      var t = new createjs.Text(H.length, "8px Arial", "white");
+      t.x=x[i]+12;
+      t.y=y[i]+12;
+      field.addChild(t);
+      Bufflist[i].push(t);
       x[i]-=20;
     };
         if(A.length>0){
-        cx2.drawImage(donicon,0,0,30,30,x[i],y[i],20,20);
-        cx2.font = "8px Arial";
-        cx2.fillStyle = "white";
-        cx2.fillText(A.length, x[i]+12,y[i]+20);
-        x[i]-=20;
+          var s = new createjs.Bitmap(donicon);
+          s.sourceRect={x:0,y:0,width:30,height:30}
+          s.x=x[i];
+          s.y=y[i];
+          s.scale=2/3;
+          field.addChild(s);
+          Bufflist[i].push(s);
+          var t = new createjs.Text(A.length, "8px Arial", "white");
+          t.x=x[i]+12;
+          t.y=y[i]+12;
+          field.addChild(t);
+          Bufflist[i].push(t);
+          x[i]-=20;
       };
           if(B.length>0){
-          cx2.drawImage(donicon,90,0,30,30,x[i],y[i],20,20);
-          cx2.font = "8px Arial";
-          cx2.fillStyle = "white";
-          cx2.fillText(B.length, x[i]+12,y[i]+20);
-          x[i]-=20;
+            var s = new createjs.Bitmap(donicon);
+            s.sourceRect={x:90,y:0,width:30,height:30}
+            s.x=x[i];
+            s.y=y[i];
+            s.scale=2/3;
+            field.addChild(s);
+            Bufflist[i].push(s);
+            var t = new createjs.Text(A.length, "8px Arial", "white");
+            t.x=x[i]+12;
+            t.y=y[i]+12;
+            field.addChild(t);
+            Bufflist[i].push(t);
+            x[i]-=20;
         };
             if(C.length>0){
-            cx2.drawImage(donicon,60,0,30,30,x[i],y[i],20,20);
-            cx2.font = "8px Arial";
-            cx2.fillStyle = "white";
-            cx2.fillText(C.length, x[i]+12,y[i]+20);
-            x[i]-=20;
+              var s = new createjs.Bitmap(donicon);
+              s.sourceRect={x:60,y:0,width:30,height:30}
+              s.x=x[i];
+              s.y=y[i];
+              s.scale=2/3;
+              field.addChild(s);
+              Bufflist[i].push(s);
+              var t = new createjs.Text(A.length, "8px Arial", "white");
+              t.x=x[i]+12;
+              t.y=y[i]+12;
+              field.addChild(t);
+              Bufflist[i].push(t);
+              x[i]-=20;
           };
           if(D.length>0){
-            cx2.drawImage(donicon,180,0,30,30,x[i],y[i],20,20);
-            cx2.font = "8px Arial";
-            cx2.fillStyle = "white";
-            cx2.fillText(D.length, x[i]+12,y[i]+20);
+            var s = new createjs.Bitmap(donicon);
+            s.sourceRect={x:180,y:0,width:30,height:30}
+            s.x=x[i];
+            s.y=y[i];
+            s.scale=2/3;
+            field.addChild(s);
+            Bufflist[i].push(s);
+            var t = new createjs.Text(A.length, "8px Arial", "white");
+            t.x=x[i]+12;
+            t.y=y[i]+12;
+            field.addChild(t);
+            Bufflist[i].push(t);
             x[i]-=20;
           };
             if(E.length>0){
-            cx2.drawImage(donicon,120,0,30,30,x[i],y[i],20,20);
-            cx2.font = "8px Arial";
-            cx2.fillStyle = "white";
-            cx2.fillText(E.length, x[i]+12,y[i]+20);
-            x[i]-=20;
+              var s = new createjs.Bitmap(donicon);
+              s.sourceRect={x:120,y:0,width:30,height:30}
+              s.x=x[i];
+              s.y=y[i];
+              s.scale=2/3;
+              field.addChild(s);
+              Bufflist[i].push(s);
+              var t = new createjs.Text(A.length, "8px Arial", "white");
+              t.x=x[i]+12;
+              t.y=y[i]+12;
+              field.addChild(t);
+              Bufflist[i].push(t);
+              x[i]-=20;
           };
             if(F.length>0){
-            cx2.drawImage(donicon,30,0,30,30,x[i],y[i],20,20);
-            cx2.font = "8px Arial";
-            cx2.fillStyle = "white";
-            cx2.fillText(F.length, x[i]+12,y[i]+20);
-            x[i]-=20;
+              var s = new createjs.Bitmap(donicon);
+              s.sourceRect={x:30,y:0,width:30,height:30}
+              s.x=x[i];
+              s.y=y[i];
+              s.scale=2/3;
+              field.addChild(s);
+              Bufflist[i].push(s);
+              var t = new createjs.Text(A.length, "8px Arial", "white");
+              t.x=x[i]+12;
+              t.y=y[i]+12;
+              field.addChild(t);
+              Bufflist[i].push(t);
+              x[i]-=20;
           };
     }};
     };
@@ -5620,16 +5310,20 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             se6.play();
             //cx2.clearRect(630,400,80,40)
             turntemp =turn
-            turn=4
-            e18.src=eltearB_src[3];
-            e18.onload=function(){
-              e19.src=eltearB_src[4];
-              e19.onload=function(){
-            cx3.drawImage(e18,326,348,148,142)
+            turn=4;
+            var btn1=createCircleButton("ロン",50);
+            btn1.x=320;
+            btn1.y=400;
+            ponkanmap.addChild(btn1)
+            var btn2 = createButton("キャンセル", 90, 40);
+            btn2.x = 440;
+            btn2.y = 420;
+            ponkanmap.addChild(btn2);
+            btn1.addEventListener("click", {card:2,handleEvent:TumoronBt});
+            btn2.addEventListener("click", {card:-1,handleEvent:TumoronBt});
             cLock=1;
             corsor();
             console.log('操作可',cLock)
-            }}
           }else if(hand2[0]==-2){
           //ron(2)
           turntemp=turn
@@ -5699,15 +5393,19 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           //cx2.clearRect(630,400,80,40)
           turntemp =turn
           turn=4
-          e18.src=eltearB_src[3];
-          e18.onload=function(){
-            e19.src=eltearB_src[4];
-            e19.onload=function(){
-          cx3.drawImage(e18,326,348,148,142)
+          var btn1=createCircleButton("ロン",50);
+          btn1.x=320;
+          btn1.y=400;
+          ponkanmap.addChild(btn1)
+          var btn2 = createButton("キャンセル", 90, 40);
+          btn2.x = 440;
+          btn2.y = 420;
+          ponkanmap.addChild(btn2);
+          btn1.addEventListener("click", {card:2,handleEvent:TumoronBt});
+          btn2.addEventListener("click", {card:-1,handleEvent:TumoronBt});
           cLock=1;
           corsor();
           console.log('操作可',cLock)
-          }}
         }else if(hand2[0]==-2){
         //ron(2)
         turntemp=turn
@@ -5833,11 +5531,13 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           if(turn==3 && ponsw[0]==0 && Fr1==-1 && LP[1]>=0 && ManaBreak==0){
             if(Pon(1)){
             se1.play();
-            cx2.clearRect(630,400,80,40)
             turntemp =turn
             turn=4
-            cx3.clearRect(630,400,80,40)
-            drawbuttom(630,400,"ポン")
+            ponkanmap.removeAllChildren();
+            var btn1 = createButton("ポン", 80, 40);
+            btn1.x = 630;
+            btn1.y = 400;
+            ponkanmap.addChild(btn1);
             cLock=1;
             corsor();
             console.log('操作可',cLock);
@@ -6123,7 +5823,9 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         }
       };  
       })
-  function handgraph(num,player){
+  function handgraph(num,player,op=0){
+    //捨てパイ・手札の描画
+    //op 1→一番右の手パイをずらして描きたい時
     console.log('handgraph',num,player,tumotemp)
       if(num>0){
       //e5を使って捨て牌の描写してアガリ判定後ターンを進める
@@ -6133,6 +5835,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       se16.play();
       }
       Tumoname();
+      e5= new createjs.Bitmap(eltear_src[tumotemp]);
       e5.src=eltear_src[tumotemp]
       if(counter[player]==28){
       rivery[player] +=50
@@ -6143,134 +5846,93 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       riverx[player] =110
       }
       if(chara[player]==4 && pvpmode==0){
-        if((tumotemp>=0 && tumotemp<=2)||(tumotemp>=9 && tumotemp<=11)){
+        if((tumotemp>=0 && tumotemp<=3)||(tumotemp>=12 && tumotemp<=15)){
           var MS=Buff[player].filter(value=>value==2)
           if(MS.length<3){Buff[player].push(4)}
         };
         }
       if(chara[player]==3 && pvpmode==0){
-        if((tumotemp>=6 && tumotemp<=8)||(tumotemp>=39 && tumotemp<=42)){
+        if((tumotemp>=8 && tumotemp<=11)||(tumotemp>=40 && tumotemp<=43)){
           var MS=Buff[player].filter(value=>value==2)
           if(MS.length<3){Buff[player].push(3)}
         };
         }
       if(chara[player]==2 && pvpmode==0){
-        if((tumotemp>=3 && tumotemp<=5)||(tumotemp>=15 && tumotemp<=17)){
+        if((tumotemp>=4 && tumotemp<=7)||(tumotemp>=20 && tumotemp<=23)){
           var MS=Buff[player].filter(value=>value==2)
           if(MS.length<5){Buff[player].push(2)}
         };
         }
       if(ippatu[player]==1){//守備表示
       riverx[player] +=43.5
-      e5.onload=function(){
-      cx1.translate(riverx[player], rivery[player])
-      cx1.rotate(90 * Math.PI / 180);
-      cx1.translate(10.5-riverx[player], -33-rivery[player])
-      cx1.drawImage(e5, riverx[player], rivery[player],33,43.5)
+      e5.rotation=90;
+      e5.x=riverx[player]+33;
+      e5.y=rivery[player];
+      e5.scale=33/120;
+      field.addChild(e5);
       if(ManaBreak==1){
+        var s = new createjs.Shape();
         if(player==1){
-      cx1.fillStyle = "rgba(20,20,20,0.5)";
+          s.graphics.beginFill("rgba(20,20,20,0.5)");
         }else{
-      cx1.fillStyle = "rgba(20,20,20,1)";
-      Extrash.push(tumotemp);
+          s.graphics.beginFill("#111a5e");
+          Extrash.push(tumotemp);
         }
-      cx1.fillRect(riverx[player],rivery[player],33,43.5)
-      cx1.fillStyle = "darkred";
-      cx1.font = "bold 26px 'Century Gothic'";
-      cx1.fillText("X",riverx[player]+5,rivery[player]+35);
+        s.graphics.drawRect(0, 0, 33, 43.5);
+        s.rotation=90;
+        s.x=riverx[player]+33;
+        s.y=rivery[player];
+        field.addChild(s);
+        var t = new createjs.Text("X", "bold 26px 'Century Gothic'", "darkred");
+        t.rotation=90;
+        t.x=riverx[player]+38;
+        t.y=rivery[player]+5;
+        field.addChild(t);
       }
-      cx1.translate(-10.5+riverx[player], 33+rivery[player])
-      cx1.rotate(-90 * Math.PI / 180);
-      cx1.translate(-riverx[player], -rivery[player])
       counter[player] +=1;
       if(player==parent){DP[player] +=mpVelocity*1.2}else{DP[player] +=mpVelocity};
       if(DP[player]>30){DP[player]=30}
       drawDP(player);
       if(chara[player]==1 && pvpmode==0){Buff[player].push(1)};
-      loopX=0
-      loopX2=0;
-      alpha=1;
-      e17.src=win_src[9]
-      e17.onload=function(){
-      e15.src=chrimg_src[chara[player]]
-      e15.onload=function(){
         se9.play();
         if(auras==0 && musicnum!==musicset[1]){
         musicnum=musicset[1];
-        if( mute=="ON" ){
-          Bgm.stop();
-        switch (musicset[1]){
-          case 1:
-            Bgm =new Music(bgm1data);
-            Bgm.playMusic();
-            break;
-          case 2:
-            Bgm =new Music(bgm2data);
-            Bgm.playMusic();
-          break;
-          case 3:
-            Bgm =new Music(bgm3data);
-            Bgm.playMusic();
-          break;
-          case 4:
-            Bgm =new Music(bgm4data);
-            Bgm.playMusic();
-          break;
-          case 5:
-            Bgm =new Music(bgm5data);
-            Bgm.playMusic();
-          break;
-          case 6:
-            Bgm =new Music(bgm6data);
-            Bgm.playMusic();
-          break;
-          case 7:
-            Bgm =new Music(bgm7data);
-            Bgm.playMusic();
-          break;
-          case 8:
-            Bgm =new Music(bgm8data);
-            Bgm.playMusic();
-          break;
-          case 9:
-            Bgm =new Music(bgm9data);
-            Bgm.playMusic();
-            break;
-          default:
-            console.log(musicnum,'bgm error!')
-            Bgm.stop();
-        }}}
-        window.requestAnimationFrame((ts)=>ReachAnimation(ts))
+        musicStart(musicnum);
+        };
+        ReachAnimation(player);
         //イヴ様
         for(var i=1;i<5;i++){
           if(i!==player && chara[i]==5){
             skillusage[i]=player;
           }
-        }
-    }}
       }}else{//通常
       riverx[player] +=33
-      e5.onload=function(){
-      cx1.clearRect(riverx[player],rivery[player],33,43.5)
-      cx1.drawImage(e5,riverx[player],rivery[player],33,43.5)
+      e5.x=riverx[player];
+      e5.y=rivery[player];
+      e5.scale=33/120;
+      field.addChild(e5);
+      var s = new createjs.Shape();
       if(ManaBreak==1){
       if(player==1){
-        cx1.fillStyle = "rgba(20,20,20,0.5)";
-          }else{
-        cx1.fillStyle = "rgba(20,20,20,1)";
+        s.graphics.beginFill("rgba(20,20,20,0.5)");
+      }else{
+        s.graphics.beginFill("#111a5e");
         Extrash.push(tumotemp);
-          }
-          cx1.fillRect(riverx[player],rivery[player],33,43.5)
-          cx1.fillStyle = "darkred";
-          cx1.font = "bold 26px 'Century Gothic'";
-          cx1.fillText("X",riverx[player]+5,rivery[player]+35);
+      }
+      s.graphics.drawRect(riverx[player], rivery[player], 33, 43.5);
+      field.addChild(s);
+      var t = new createjs.Text("X", "bold 26px 'Century Gothic'", "darkred");
+      t.x=riverx[player]+5;
+      t.y=rivery[player]+5;
+      field.addChild(t);
+      //
           }
       counter[player] +=1
       if(player==parent){DP[player] +=mpVelocity*1.2}else{DP[player] +=mpVelocity};
       if(DP[player]>30){DP[player]=30}
       drawDP(player);
       turnchecker();
-      }}
+      }
       }
       if(num ==0){
       reachhand=[];
@@ -6281,235 +5943,82 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       reachhand.splice(H,1)
       }
       console.log(reachhand,ponnum)
-      //handE1-handE9　reachhandをポン時に出した方が計算量減るかモ
-      hand1x =100
-      hand2x =hand1x+size*3
-      hand3x =hand2x+size*3
-      var h=1
-      var c=4
-      var d=7
-      var r1=hand1[h];;
-      handE1.src=eltear_src[reachhand[1]]
-      handE2.src=eltear_src[reachhand[2]]
-      handE3.src=eltear_src[reachhand[3]]
-      handE4.src=eltear_src[reachhand[4]]
-      handE5.src=eltear_src[reachhand[5]]
-      handE6.src=eltear_src[reachhand[6]]
-      handE7.src=eltear_src[reachhand[7]]
-      handE8.src=eltear_src[reachhand[8]]
-          //消えるのが気になるので消す前に書いとく
-          var img4 = cx2.getImageData(95,499,570,110);
-          cx3.clearRect(4,499,762,110);
-          cx3.putImageData(img4,95,499);
-          cx2.clearRect(95,499,705,110);
-      if(H ==-1){
-        handE9.src=eltear_src[reachhand[9]]
-        handE9.onload=function(){
-          cx3.clearRect(hand1x+size*8,499,size,110)
-          if(pon1.length>0){
-            //一番右のポン
-            if(ponsw[1]==1){
-          cx1.clearRect(590,450,33,43.5)
-          cx1.drawImage(handE9,590,450,33,43.5);
-          cx1.fillStyle = "rgba(20,20,20,0.2)";
-          cx1.fillRect(590,450,33,43.5)
-            }
+      //鳴いたパイは書き直さない
+      handlist=[];//左から順にパイの画像idが入る
+      handmap.removeAllChildren();
+      for(var h=1;h<hand1.length;h++){
+      e1= new createjs.Bitmap(eltear_src[hand1[h]]);
+        if(op==1 && h==hand1.length-1){
+          e1.x=690;
+          e1.y=500;
+          e1.addEventListener("mouseover", {card:100,handleEvent:handOnCorsor});
+          e1.addEventListener("mouseout", {card:-1,handleEvent:handOnCorsor});
         }else{
-          handE9.src=eltear_src[hand1[hand1.length-1]]
-          handE9.onload=function(){
-          //たぶんこ↑こ↓出番ない
-          cx2.drawImage(handE9,690,500,size,sizey);
-        }}
-        };
-      }
-      handE1.onload=function(){
-        cx2.drawImage(handE1,hand1x,hand1y,size,sizey);
-        cx3.clearRect(hand1x,499,size,110)
-      }
-      handE2.onload=function(){
-        cx3.clearRect(hand1x+size,499,size,110)
-        if(pon1.length>7){
-          if(ponsw[1]==1){
-        cx1.clearRect(359,450,33,43.5)
-        cx1.drawImage(handE2,359,450,33,43.5);
-        cx1.fillStyle = "rgba(20,20,20,0.2)";
-        cx1.fillRect(359,450,33,43.5)
-          }
-        }else if(ponsw[1]<7){
-          cx2.drawImage(handE2,hand1x+size,hand1y,size,sizey);
+          e1.x=100+size*(h-1);
+          e1.y=500;
+          e1.addEventListener("mouseover", {card:h,handleEvent:handOnCorsor});
+          e1.addEventListener("mouseout", {card:-1,handleEvent:handOnCorsor});
         }
-      }
-      handE3.onload=function(){
-        cx3.clearRect(hand1x+size*2,499,size,110)
-        if(pon1.length>6){
-          if(ponsw[1]==1){
-        cx1.clearRect(392,450,33,43.5)
-        cx1.drawImage(handE3,392,450,33,43.5);
-        cx1.fillStyle = "rgba(20,20,20,0.2)";
-        cx1.fillRect(392,450,33,43.5)
-          }
-        }else if(ponsw[1]<6){
-        cx2.drawImage(handE3,hand1x+size*2,hand1y,size,sizey);
-        }
-      }
-      handE4.onload=function(){
-        cx3.clearRect(hand1x+size*3,499,size,110)
-        if(pon1.length>5){
-          if(ponsw[1]==1){
-        cx1.clearRect(425,450,33,43.5)
-        cx1.drawImage(handE4,425,450,33,43.5);
-        cx1.fillStyle = "rgba(20,20,20,0.2)";
-        cx1.fillRect(425,450,33,43.5)
-          }
-      }else{
-        cx2.drawImage(handE4,hand1x+size*3,hand1y,size,sizey);
-      }
-      }
-      handE5.onload=function(){
-        cx3.clearRect(hand1x+size*4,499,size,110)
-        if(pon1.length>4){
-          if(ponsw[1]==1){
-        cx1.clearRect(458,450,33,43.5)
-        cx1.drawImage(handE5,458,450,33,43.5);
-        cx1.fillStyle = "rgba(20,20,20,0.2)";
-        cx1.fillRect(458,450,33,43.5)
-          }
-      }else{
-        cx2.drawImage(handE5,hand1x+size*4,hand1y,size,sizey);
-      }
-      }
-      handE6.onload=function(){
-        cx3.clearRect(hand1x+size*5,499,size,110)
-        if(pon1.length>3){
-          if(ponsw[1]==1){
-        cx1.clearRect(491,450,33,43.5)
-        cx1.drawImage(handE6,491,450,33,43.5);
-        cx1.fillStyle = "rgba(20,20,20,0.2)";
-        cx1.fillRect(491,450,33,43.5)
-          }
-      }else if(ponsw[1]<3){
-        cx2.drawImage(handE6,hand1x+size*5,hand1y,size,sizey);
-      }
-      }
-      handE7.onload=function(){
-        cx3.clearRect(hand1x+size*6,499,size,110)
-        if(pon1.length>2){
-          if(ponsw[1]==1){
-        cx1.clearRect(524,450,33,43.5)
-        cx1.drawImage(handE7,524,450,33,43.5);
-        cx1.fillStyle = "rgba(20,20,20,0.2)";
-        cx1.fillRect(524,450,33,43.5)
-          }
-      }else{
-        cx2.drawImage(handE7,hand1x+size*6,hand1y,size,sizey);
-      }
-      }
-      handE8.onload=function(){
-        cx3.clearRect(hand1x+size*7,499,size,110)
-        if(pon1.length>1){
-          //ポン
-          if(ponsw[1]==1){
-        cx1.clearRect(557,450,33,43.5)
-        cx1.drawImage(handE8,557,450,33,43.5);
-        cx1.fillStyle = "rgba(20,20,20,0.2)";
-        cx1.fillRect(557,450,33,43.5)
-          }
-      }else{
-        cx2.drawImage(handE8,hand1x+size*7,hand1y,size,sizey);
-      }
+        e1.scale=7/12;
+        handmap.addChild(e1);
+        handlist.push(e1);
       }
       }
       if(num ==-1){//最初だけ
         //e1~e4を使って自分の手札を描画
         console.log(hand1);
-        hand1x =100
-        hand2x =hand1x+size*3
-        hand3x =hand2x+size*3
-        var h=1
-        var c=4
-        var d=7
-        //cx2.clearRect(0,hand1y-5,670,60);
-        cx2.clearRect(hand1x-2,hand1y,485,sizey);
-        var r1=hand1[h];
-        e1.src=eltear_src[r1]
-        e1.onload=function(){
+        handlist=[];//左から順にパイの画像idが入る
+        handmap.removeAllChildren();
+        for(var h=1;h<10;h++){
+        e1= new createjs.Bitmap(eltear_src[hand1[h]]);
+        e1.alpha=0;
+        e1.x=100+size*(h-1);
+        e1.y=500;
+        e1.scale=7/12;
+        handmap.addChild(e1);
+        handlist.push(e1);
+        e1.addEventListener("mouseover", {card:h,handleEvent:handOnCorsor});
+        e1.addEventListener("mouseout", {card:-1,handleEvent:handOnCorsor});
+        }
           se11.play();
-          cx2.drawImage(e1,hand1x,hand1y,size,sizey);
-          //if(Hand1[h].eltype==1){draweye(hand1x+22,hand1y+29)};
-          hand1x +=size
-          h +=1
-          r1=hand1[h]
-          e1.src=eltear_src[r1]
-          e1.onload=function(){
-              cx2.drawImage(e1,hand1x,hand1y,size,sizey)
-        hand1x +=size
-              h +=1
-              r1=hand1[h]
-            e1.src=eltear_src[r1]
-            e1.onload=function(){
-              cx2.drawImage(e1,hand1x,hand1y,size,sizey)
-        hand1x +=size
-              h +=1}}};
-              //時間ラグを付ける
+          //時間ラグを付ける
+          setTimeout(
+            ()=>{
+            if(dahaiSE==1){
+              se4.play()
+            }else{
+            se16.play();
+            }
+            handlist[0].alpha=1;
+            handlist[1].alpha=1;
+            handlist[2].alpha=1;
+            },200)
         setTimeout(
           ()=>{
-        var r2=hand1[c];
-        e2.src=eltear_src[r2]
-        e2.onload=function(){
           if(dahaiSE==1){
             se4.play()
           }else{
           se16.play();
           }
-          cx2.drawImage(e2,hand2x,hand1y,size,sizey)
-        //cx2.clearRect(hand2x-8,hand1y-1,60,62)
-          hand2x +=size
-          c +=1
-          r2=hand1[c]
-          e2.src=eltear_src[r2]
-        e2.onload=function(){
-          if(dahaiSE==1){
-            se4.play()
-          }else{
-          se16.play();
-          }
-          cx2.drawImage(e2,hand2x,hand1y,size,sizey)
-        hand2x +=size
-          c +=1
-          r2=hand1[c]
-          e2.src=eltear_src[r2]
-        e2.onload=function(){
-          cx2.drawImage(e2,hand2x,hand1y,size,sizey)
-        hand2x +=size
-          c +=1}}};
+          handlist[3].alpha=1;
+          handlist[4].alpha=1;
+          handlist[5].alpha=1;
           },400)
         setTimeout(
           ()=>{
-        var r3=hand1[d]
-        e3.src=eltear_src[r3]
-        e3.onload=function(){
           if(dahaiSE==1){
             se4.play()
           }else{
           se16.play();
           }
-        cx2.drawImage(e3,hand3x,hand1y,size,sizey)
-        //cx2.clearRect(hand3x-8,hand1y-1,60,62)
-        hand3x +=size
-        d +=1
-        r3=hand1[d]
-        e3.src=eltear_src[r3]
-        e3.onload=function(){
-        cx2.drawImage(e3,hand3x,hand1y,size,sizey)
-        d +=1
-        }};
-      },800)
+          handlist[6].alpha=1;
+          handlist[7].alpha=1;
+        },800)
       setTimeout(
         ()=>{
       turnrole();
       },1000)
         }
-    
       }
   function Setup(pvp=0){
     //デュエル開始の宣言をする pvp時1に
@@ -6524,7 +6033,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
     console.log('Setup',pvp);//socketで飛ばすとなんか3回くらい呼び出される
     navisw=0;
     if(Fever!==-1){Fever=0};
-    DP =new Array(0,0,0,0,0)
+    DP =new Array(0,0,0,0,0);
     skillusage2=new Array(0,-1,-1,-1,-1,0)
     death=[
       {kill:0,assist:0,death:0,Admg:[0,0,0,0],Bdmg:[0,0,0,0]},
@@ -6537,8 +6046,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
     for(var i=0 ; i<achievetempB.length; i++){
       achievetempB[i].count=0;
     }
-    BGimg.src=bgimg_src[bgimg_src[0]]
-    BGimg.onload=function(){
     if(pvp==0){parent= Math.floor(Math.random()*4);
     switch(LP[0]){
       case 0:
@@ -6622,7 +6129,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         }
     console.log('setup',timevalue)
     deckHandler();
-    }};
+    };
     socket.on("member",(data)=>{
       //メンバーをコピー
       if(!IsHost(IAM.room)){
@@ -6756,28 +6263,18 @@ cx1.drawImage(e7,dorax,10,33,43.5)
   ctl[2]=0
   handgraph(0,1)  
   //ボタンとカーソルを消す
-  cx3.clearRect(326,348,148,142);
-  cx3.clearRect(630,400,160,80)
-  cx3.clearRect(200,370,360,120);
+  cx2.clearRect(630,440,160,80)
+  ponkanmap.removeAllChildren();
   if(hand1[0] ==-3){
     hand1[0]=-1}
   if(reach[1] ==0 || reach[1] ==1){
   reach[1]=0;
-  cx2.clearRect(630,440,80,40)
-  cx2.fillStyle = "rgba(20,20,20,0.5)";
-  cx2.fillRect(630,440,80,40)
   }
   if(nukiswitch[1]>0){
     nukiswitch[1]=0;
-      cx2.clearRect(710,440,80,40)
-      cx2.fillStyle = "rgba(20,20,20,0.5)";
-      cx2.fillRect(710,440,80,40)
   }
   if(chara[1]!==0){
     //スキル欄
-  cx2.clearRect(710,400,80,40)
-  cx2.fillStyle = "rgba(20,20,20,0.5)";
-  cx2.fillRect(710,400,80,40)
   }
   if(pvpmode==1){
     //必要な情報をポイする
@@ -6892,12 +6389,15 @@ cx1.drawImage(e7,dorax,10,33,43.5)
               }, 250);
           }
           break;
-      }     
+      };
         return false;
       }
       ponsw[0]=0;
+      tweeNsquare.paused=false;
+      Csquare.y=100*turn;
       switch(turn){
         case 0:
+          Csquare.y=400;
           var Player1 =setInterval(function(){
             player1();
             if(ctl[1]>0){
@@ -6931,17 +6431,24 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       //疲れたのでポン後は別の場所にしますわ
       //100var PE=hand1.findIndex(value=>value==100);hand1.splice(PE,1);
       judge(1);
+      ponkanmap.removeAllChildren();
       //リーチ判定だけ
       if(deck.length==0 && reach[1]!==3){reach[1]=0};
       if(reach[1] ==1){
         se1.play();
-        drawbuttom(630,440,"リーチ")};
+        var btn1 = createButton("リーチ", 80, 40);
+          btn1.x = 630;
+          btn1.y = 440;
+          ponkanmap.addChild(btn1);
+      }
       if(chara[1] !==0 && skillswitch[1]==0 && pvpmode==0){
-        drawbuttom(710,400,"スキル");
+        var btn1 = createButton("スキル", 80, 40);
+          btn1.x = 710;
+          btn1.y = 440;
+          ponkanmap.addChild(btn1);
       }
       setTimeout(()=>{
         cLock=1;
-        corsor();
         console.log('操作可',cLock)
         },100)
     if(reach[1] ==0){cx2.clearRect(630,440,80,40)}
@@ -6967,18 +6474,14 @@ cx1.drawImage(e7,dorax,10,33,43.5)
     drawcard.alpha=0;
     drawcard.x=690;
     drawcard.y=470;
-    drawcard.scaleX=7/12;
-    drawcard.scaleY=31/52;
-    field.addChild(drawcard);
+    drawcard.scale=7/12;
+    handmap.addChild(drawcard);
     createjs.Tween.get(drawcard)
       .to({alpha: 1,y:500},300)
       .call(drawstep);
   function drawstep(){
-    eltear.src=eltear_src[tumo]
-    eltear.onload=function(){
-    cx2.clearRect(690,500,size,sizey)
-    cx2.drawImage(eltear,690,500,size,sizey);
-    field.removeChild(drawcard);
+    drawcard.addEventListener("mouseover", {card:100,handleEvent:handOnCorsor});
+    drawcard.addEventListener("mouseout", {card:-1,handleEvent:handOnCorsor});
     if(reach[1] <3){
       if(skillusage[1]>0 && chara[1]==5){
       yoti(skillusage[1]);
@@ -7007,54 +6510,56 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             skillswitch[1]=0       
           }
           break;
-          default:
+        default:
           break;
-        }
       }
+      ponkanmap.removeAllChildren();
       if(chara[1] !==0 && skillswitch[1]==0 && pvpmode==0){
-        //cx2.clearRect(710,400,80,40)
-        drawbuttom(710,400,"スキル");
+        var btn1 = createButton("スキル", 80, 40);
+        btn1.x = 710;
+        btn1.y = 440;
+        ponkanmap.addChild(btn1);
       }
-      var A=hand1.findIndex(value => value==42);
-      if(A!==-1 && deck.length > 0){
-        nukiswitch[1]=1;
-        se1.play();
-        drawbuttom(710,440,"抜き")
+      //カン追加予定
       }
-      }
+    }
     if(nuki[0]==1){nuki[0]=5};
     if(judge(1)){hand1[0]=-3};
     if(deck.length==0 && reach[1]!==3){reach[1]=0};
     if(reach[1] ==1){
       if(nukiswitch[1]!==1){se1.play()};//SE同時に鳴らないように
-      drawbuttom(630,440,"リーチ")};
+      var btn1 = createButton("リーチ", 80, 40);
+      btn1.x = 630;
+      btn1.y = 440;
+      ponkanmap.addChild(btn1);
+      };
     if(reach[1]==3 && tumo ==42 && deck.length > 0){
       nukiswitch[1]=1;
-      se1.play();
-        drawbuttom(710,440,"抜き")
+      //se1.play();
+      //drawbuttom(710,440,"カン")
       }
     if(hand1[0]==-3){
       se6.play();
-      e18.src=eltearB_src[1];
-      e18.onload=function(){
-        e19.src=eltearB_src[2];
-        e19.onload=function(){
-      cx3.drawImage(e18,326,348,148,142)
-      }}
+      var btn1=createCircleButton("ツモ",50);
+      btn1.x=320;
+      btn1.y=400;
+      ponkanmap.addChild(btn1)
+      btn1.addEventListener("click", {card:1,handleEvent:TumoronBt});
     };
     setTimeout(()=>{
       cLock=1;
-      corsor();
       console.log('操作可',cLock)
       },100)
     }
-  }
     }
-    }};
-    function cpu(chr){//expected chr=2,3,4
+    }
+  };
+    function cpu(chr,timer=0){//expected chr=2,3,4
       //コピーよりも先にjudgeに行くことでエラーになっている？
       //r4も空回りしていない？大丈夫？
-          console.log('cpu',chr,ctl)
+      //無限ループ脱出用に100回ループしたらランダムに切ってもらう
+          console.log('cpu',chr,ctl,timer);
+          timer+=1;
           var cturn=chr -1
           //リーチしているならロン判定?
           if(turn !==cturn){
@@ -7153,7 +6658,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             Cpuhandtemp[PEP]=tumo2
           console.log('waitcpu',chr,ctl[chr],turn,ctlerror);
           setTimeout(()=>{
-            cpu(chr);
+            cpu(chr,timer);
             },100)
             return false;
           }
@@ -7175,9 +6680,9 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             if(ippatu[chr]==1){ippatu[chr]=2}
             }
             ctl[chr]=2
-            cpu(chr);
+            cpu(chr,timer);
             }else if(ctl[chr]==2){
-            cpuplay(chr);
+            cpuplay(chr,timer);
             }
      }};
   
@@ -7245,7 +6750,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         }
       }else{return false};
     }
-    function cpuplay(chr){
+    function cpuplay(chr,timer=0){
     //思考ルーチンに従い牌をきる
     console.log('cpuplay',chr,ctl[chr])
     if(ctl[chr] ==2){
@@ -7253,14 +6758,15 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       ctl[chr]=3;
       if(reach[chr]==3){r4=Cpuhandtemp.length-1}else{
         Cpuhandtemp.sort(compareFunc);//これいるのか分からんが
-        r4 =Cputumo(chr);//時間がかかるとしたらcputumoのこの部分
+        r4 =Cputumo(chr,timer);//時間がかかるとしたらcputumoのこの部分
+        if(timer>100){r4=Cpuhandtemp.length-1};
       }
     }
     if(ctl[chr]==3 && gamestate ==1){
       if(r4==-1){
       console.log('waitcpu play',chr,ctl[chr]);
       setTimeout(()=>{
-        cpuplay(chr);
+        cpuplay(chr,timer);
         },100)
         return false;
       }else{
@@ -7620,9 +7126,11 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       //自摸牌＋自分の手札を使ってアガれる形か否か
       //リーチ可能ならreach[player]を1にする
       //ツモ可能ならreturn trueする
+      //カンがされている場合には残りのパイでのペア、クレストのみ算定する
       //mode 0->そのまま　1->参照時点でのhandtempで上がり判定のみやる
       var Count={};
       var Line={};
+      var Color={};
       var reachR=0;
       var PonN=0
       switch(mode){
@@ -7667,22 +7175,24 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             if(C==-1){console.log('handtemp "C" error');C=0};
             var elm=donpai[C].name;//cpuでerror?
             var elm2=donpai[C].line
+            var elm3=donpai[C].color;
             Count[elm]=(Count[elm] || 0)+1
             Line[elm2]=(Line[elm2] || 0)+1
+            Color[elm3]=(Color[elm3] || 0)+1
           }
           if(debugmode){
-            console.log(Count);
+            console.log(Count);//{[キャラ名:枚数]};
             console.log(Line);
+            console.log(Color);
           }
           //リーチできるならreach[player]=1;
-          //アガリ系は3ペアorライン統一
-          //ラインチェック
-          var keyj2=Object.keys(Line);
-          //console.log(keyj2.length);//expected 1~5
           var reachj=0;//同じキャラ2枚をカウント
           var tumoj=0;//同じキャラ3枚をカウント
           var kanj=0;//同じキャラ4枚をカウント
+          //console.log(keyj2.length);//expected 1~5
           var keyj=Object.keys(Count);
+          var keyj2=Object.keys(Line);
+          var keyj3=Object.keys(Color);
           //console.log(keyj.length);
           //Count.length->undefined
           for(var j=0;j<keyj.length;j++){
@@ -7697,6 +7207,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
               kanj+=1;
             }
           }
+          console.log(keyj3[0],Color[keyj3[0]])
           if(PonN==0){
           switch(Line["0"]){
             case 2:
@@ -7729,29 +7240,29 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             break;
           }
         }
-          //3ペアチェック 同キャラ6枚は考えないことにする
+          //3ペアチェック カン裁定未
           switch(Line["0"]){
             case 2:
               //リーチとなるのは3,4 4,2,1 3,2,1,1 2,2,2,1
               if(keyj.length==4){
                 if(tumoj==1 && reachj==0){
-                  console.log('line reach')
+                  console.log('pair reach')
                   if(reach[player]==0 && reachR==0){reach[player]=1};
                 }
               }
               if(keyj.length==5){
                 if(kanj==1 && reachj==1){
-                  console.log('line reach')
+                  console.log('pair reach')
                   if(reach[player]==0 && reachR==0){reach[player]=1};
                 }
               }
               if(keyj.length==6){
                 if(tumoj==1 && reachj==1){
-                  console.log('line reach')
+                  console.log('pair reach')
                   if(reach[player]==0 && reachR==0){reach[player]=1};
                 }
                 if(tumoj==0 && reachj==3){
-                  console.log('line reach')
+                  console.log('pair reach')
                   if(reach[player]==0 && reachR==0){reach[player]=1};
                 }
               }
@@ -7773,21 +7284,21 @@ cx1.drawImage(e7,dorax,10,33,43.5)
               //リーチとなるのは4,2,2 3,4,1 3,3,1,1 3,2,2,1 
               if(keyj.length==4){
                 if(tumoj==1 && reachj==0){
-                  console.log('line reach')
+                  console.log('pair reach')
                   if(reach[player]==0 && reachR==0){reach[player]=1};
                 }
                 if(tumoj==0 && reachj==2){
-                  console.log('line reach')
+                  console.log('pair reach')
                   if(reach[player]==0 && reachR==0){reach[player]=1};
                 }
               }
               if(keyj.length==5){
                 if(tumoj==2 && reachj==0){
-                  console.log('line reach')
+                  console.log('pair reach')
                   if(reach[player]==0 && reachR==0){reach[player]=1};
                 }
                 if(tumoj==1 && reachj==2){
-                  console.log('line reach')
+                  console.log('pair reach')
                   if(reach[player]==0 && reachR==0){reach[player]=1};
                 }
               }
@@ -7813,36 +7324,44 @@ cx1.drawImage(e7,dorax,10,33,43.5)
               }
               break;
         }
-        //国士無双:エピックラインのみ、かつ同パイを含まない
-        var Kokushi=[0,3,7,10,13,15,18,21,24,28,31,34,36,41,43,44]
-        var Kreach=0;
-        var KKreach=0;
-        for(var k=1;k<handtemp.length;k++){
-          var A=Kokushi.findIndex(value=>value==handtemp[k])
-          if(A!==-1){
-            var B=handtemp.filter(value=>value==handtemp[k])
-          KKreach+=B.length-1;
-          //KKreachは0か2かそれ以上
-        }else{Kreach+=1}
-          if(Kreach>2){break;}
-          }
-        console.log(Kreach);
-        if(Kreach==1){
-          if(KKreach==0){
-            console.log('国士リーチ');
-            if(reach[player]==0 && reachR==0){reach[player]=1};
-          }
-        }
-        if(Kreach==0){
-          if(KKreach==2){
-            console.log('国士リーチ');
-            if(reach[player]==0 && reachR==0){reach[player]=1};
-          }else if(KKreach==0){
-            //国士ツモ
-            if(reach[player]==0 && reachR==0){reach[player]=1};
-            //アガリ
-            return true;
-          }
+        //クレスト：同じ属性9枚、マスターロードを含む
+        switch(Color["0"]){
+          case 2:
+          case 1:
+            //オールマイティをマスロパイ代わりにすることで判定を無視
+            if(keyj3.length==2){
+              console.log('crest tumo')
+              if(reach[player]==0 && reachR==0){reach[player]=1};
+                return true;
+            }
+            if(keyj3.length==3){
+              //keyj3[0]は0であるはず
+              if(Color[keyj3[1]]==1 || Color[keyj3[2]]==1){
+                console.log('crest reach')
+                if(reach[player]==0 && reachR==0){reach[player]=1};
+              }
+            }
+            break;
+          default:
+            if(keyj3.length==1){
+              var M=handtemp.findIndex(value=>value>=60 && value<=67)
+              if(M!==-1){
+              console.log('crest tumo'+donpai[M].name)
+              if(reach[player]==0 && reachR==0){reach[player]=1};
+                return true;
+              }else{
+                //マスロパイ待ち
+                console.log('crest reach')
+                if(reach[player]==0 && reachR==0){reach[player]=1};
+              }
+            }
+            if(keyj3.length==2){
+              if(Color[keyj3[0]]==1 || Color[keyj3[1]]==1){
+                console.log('crest reach')
+                if(reach[player]==0 && reachR==0){reach[player]=1};
+              }
+            }
+          break;
         }
         console.log('judge',player)
       }//judge
@@ -7935,22 +7454,30 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       //上がった画面描画～次のゲーム,num=0→ツモ,1~→ロン dubダブロン用
       console.log("tumoron",player,num,ctl)
       console.log(ponsw[player])
-      if(LP[0]==4){
-        //魔界ルール
         //ロンなら塗りつぶす
         if(num>=1){
-        cx1.fillStyle = "rgba(200,0,0,0.5)";
           if(ippatu[num]==1){
-          cx1.fillRect(riverx[num]-10.5,rivery[num]+10.5,43.5,33)
+            var rect = new createjs.Shape();
+            rect.graphics
+            .beginFill("rgba(200,0,0,0.5)")
+            .drawRect(riverx[num]-10.5, rivery[num]+10, 43.5, 33);
+            field.addChild(rect);
           }else{
-          cx1.fillRect(riverx[num],rivery[num],33,43.5)
+            var rect = new createjs.Shape();
+            rect.graphics
+            .beginFill("rgba(200,0,0,0.5)")
+            .drawRect(riverx[num], rivery[num], 33, 43.5);
+            field.addChild(rect);
           }
         };
+      if(LP[0]==4){
+        //魔界ルール
         Cimage = cx2.getImageData(0, 0, 800, 600);
       };
       se7.play();
       cLock=0
       gamestate=-2;
+      LoopAnimation(player,num);
       if(Fever!==-1){Fever+=1};
       vichand=[]
       var ponf=0
@@ -8018,17 +7545,22 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       function Doracheck(player){
         var result =0
         if(reach[player]==3 && dub==1 && LP[0]!==4){
-          dora.push(king[6]);
-          var DD=dora[dora.length-1]+1
-          if(DD>=45){DD=0;}
-          e7.src=eltear_src[DD]
-        e7.onload=function(){
-        dorax+=40
-        cx1.drawImage(e7,dorax,10,33,43.5)
-        }}
+          //表側表示のドラと同じ枚数だけ裏ドラを追加する
+          var Dx=dora.length;
+          if(Dx>king.length){Dx=king.length};
+          dora=king.splice(0,dora.length);
+        for(var i=Dx;i<dora.length;i++){
+          var DD=dora[i];
+        dorax+=40;
+        var e7 = new createjs.Bitmap(eltear_src[DD]);
+         e7.x=dorax;
+         e7.y=10;
+         e7.scale=33/120;
+        field.addChild(e7);
+        }
+        }
         for(var D=0 ; D< dora.length ; D++){
-        var DD=dora[D]+1
-        if(DD>=45){DD=0;}
+        var DD=dora[D];
         var dorahand =handtemp.filter(value => value== DD )
         han[player]+= dorahand.length
         result +=dorahand.length
@@ -8054,19 +7586,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       };
     }
       if(parent==0){Scorepay(player,4,num)}else{Scorepay(player,parent,num)}
-      //描画
-      e15.src=chrimg_src[chara[player]]
-      e15.onload=function(){
-      if(num==0){e16.src=win_src[7]}else{e16.src=win_src[8]}
-      e16.onload=function(){
-      cx2.clearRect(10,100,780,400)
-      cx2.drawImage(e15,10,10,780,400,10,100,780,400)
-      cx2.drawImage(e16,0,230,297,234)
-      cx2.fillStyle = "rgba(15,15,15,0.6)";
-      cx2.fillRect(10,100,780,400)
-      var haix
-      var haiy
-      //以下resultmap代行をはかる
       function PB(name,count=1,pc=0){
         //pc->1なら自分以外がアガリの場合にも考慮する
         if(player==1 || pc==1){
@@ -8147,75 +7666,45 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         PB("跳満");}
         if(rootscore==50000){
         PB("満貫");}
-      yakumap2.alpha=0;
       cx4.clearRect(0,0,800,600)
       opLock=-1;
       //gamestate=2;
       tweeNsquare.paused=true;
       Csquare.alpha=0;
+      //描画 魔界モード以外の時はResultmapで描画
       if(LP[0]==4){
         //従来通りツモ画面の描画のみ
+        e15 = new createjs.Bitmap(chrimg_src[chara[player]]);
+        e15.sourceRect={x:10,y:10,width:780,height:400};
+        e15.x=10+raidscore[1]*800;
+        e15.y=100;
+      fieldmap.addChild(e15);
+      if(num==0){
+        e16 = new createjs.Bitmap(win_src[4]);
+      }else{
+        e16 = new createjs.Bitmap(win_src[5]);
+      }
+      e16.scale=0.7;
+      e16.x=raidscore[1]*800;
+      e16.y=230;
+      fieldmap.addChild(e16);
+      var s = new createjs.Shape();
+        s.graphics.beginFill("rgba(15,15,15,0.6)");
+        s.graphics.drawRect(10, 100, 780, 400);
+        s.x=raidscore[1]*800
+      fieldmap.addChild(s);
+        for (var i=1;i<vichand.length;i++){
+        var drawcard=new createjs.Bitmap(eltear_src[vichand[i]]);
+        drawcard.x=15+size*(i-1);
+        if(i==9){drawcard.x+=15}
+        drawcard.y=120;
+        drawcard.scaleX=7/12;
+        drawcard.scaleY=31/52;
+        drawcardlist[i-1]=drawcard;
+        fieldmap.addChild(drawcard);
+        }
         var haix
         var haiy
-        var i=1
-        var hai=vichand[i];
-        console.log(hai);
-        haix =15
-        haiy =120
-        e8.src=eltear_src[hai]
-        e8.onload=function(){
-          cx2.drawImage(e8,haix,haiy,size,sizey)
-          haix +=size
-          i +=1
-          hai=vichand[i]
-          e8.src=eltear_src[hai]
-          e8.onload=function(){
-            cx2.drawImage(e8,haix,haiy,size,sizey)
-            haix +=size
-            i +=1
-          hai=vichand[i]
-          e8.src=eltear_src[hai]
-          e8.onload=function(){
-            cx2.drawImage(e8,haix,haiy,size,sizey)
-            haix +=size
-            i +=1
-          hai=vichand[i]
-          e8.src=eltear_src[hai]
-          e8.onload=function(){
-            cx2.drawImage(e8,haix,haiy,size,sizey)
-            haix +=size
-            i +=1
-        //console.log(h)
-          hai=vichand[i]
-          e8.src=eltear_src[hai]
-          e8.onload=function(){
-            cx2.drawImage(e8,haix,haiy,size,sizey)
-            haix +=size
-            i +=1
-          hai=vichand[i]
-          e8.src=eltear_src[hai]
-          e8.onload=function(){
-            cx2.drawImage(e8,haix,haiy,size,sizey)
-            haix +=size
-            i +=1
-          hai=vichand[i]
-          e8.src=eltear_src[hai]
-          e8.onload=function(){
-            cx2.drawImage(e8,haix,haiy,size,sizey)
-            haix +=size
-            i +=1
-          hai=vichand[i]
-          e8.src=eltear_src[hai]
-          e8.onload=function(){
-            cx2.drawImage(e8,haix,haiy,size,sizey)
-            haix +=size+10
-            i +=1
-        //console.log(h)
-          hai=vichand[i]
-          e8.src=eltear_src[hai]
-          e8.onload=function(){
-            cx2.drawImage(e8,haix,haiy,size,sizey)
-            i +=1;
         haix=60;
         haiy=250;
         cx2.font = "20px 'Century Gothic'";
@@ -8224,10 +7713,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         haiy+=50;
         if(counter[player] ==0){
           if(num==0){cx2.fillText('天和 4翻',haix,haiy)}
-          haiy +=25
-          }
-          if(Astyle=="国士無双"){
-          if(num==0){cx2.fillText('国士無双 6翻',haix,haiy)}
           haiy +=25
           }
         if(nuki[0]>0){
@@ -8254,10 +7739,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           cx2.fillText('ドラ '+doracheck+'翻',haix,haiy)
           haiy +=25
           }
-        if(nuki[player]>0){
-          cx2.fillText('抜き '+nuki[player]+'翻',haix,haiy)
-          haiy +=25
-        };
         if(ponsw[player] >0){
             cx2.fillText('鳴き -2翻',haix,haiy)
             haiy +=25
@@ -8302,7 +7783,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         cx2.fillText("満貫",640,360);
         PB("満貫");}
         }
-        //cx2.font = "28px 'Century Gothic'";
         cx2.strokeStyle ="#ff4c38";
         cx2.lineWidth = 5;
         cx2.lineJoin = 'round';
@@ -8332,17 +7812,11 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         cx2.fillText(LPtemp[3],430,490)
         cx2.fillText(chrlist[chara[4]],630,460)
         cx2.fillText(LPtemp[4],630,490)  
-        switch(raidscore[1]){
-          case 0:
-            N1= cx2.getImageData(10, 100, 780, 400);
-            break;
-          case 1:
-            N2= cx2.getImageData(10, 100, 780, 400);
-            break;
-          case 2:
-            N3= cx2.getImageData(10, 100, 780, 400);
-            break;
-        }
+        N1= cx2.getImageData(10, 100, 780, 400);
+        var C=canvas2.toDataURL();
+        var Cb = new createjs.Bitmap(C);
+        Cb.x=raidscore[1]*800;
+        fieldmap.addChild(Cb);
         Buff[player].push(11);
         raidscore[1]+=1;
         if(raidscore[1]>=3){
@@ -8352,20 +7826,32 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           raidscore[2]=1;
         };
         cx2.clearRect(10,100,780,400);
-      }
-        }}}};
-      }}}};
       };
-      loopX=0
-      loopX2=0;
-      alpha=1;
-        window.requestAnimationFrame((ts)=>LoopAnimation(ts,player))}
     }
-      }
-    //一つずつ描画するパターン
-    function Resultmap(player){
+    //一つずつ描画するパターン loopanimation から呼ばれる
+    function Resultmap(player,num){
       gamestate=-1;
+      guidemap.alpha=0;
       handmap.removeAllChildren();
+      e15 = new createjs.Bitmap(chrimg_src[chara[player]]);
+      e15.sourceRect={x:10,y:10,width:780,height:400};
+      e15.x=10+raidscore[1]*800;
+      e15.y=100;
+     field.addChild(e15);
+     if(num==0){
+       e16 = new createjs.Bitmap(win_src[4]);
+     }else{
+       e16 = new createjs.Bitmap(win_src[5]);
+     }
+     e16.scale=0.7;
+     e16.x=raidscore[1]*800;
+     e16.y=230;
+     field.addChild(e16);
+     var s = new createjs.Shape();
+       s.graphics.beginFill("rgba(15,15,15,0.6)");
+       s.graphics.drawRect(10, 100, 780, 400);
+       s.x=raidscore[1]*800
+     field.addChild(s);
       //handmap.alpha=1; 
       var drawcard;
       var drawcardlist=[];
@@ -8533,6 +8019,9 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         cx2.fillText(LPtemp[3],430,490)
         cx2.fillText(chrlist[chara[4]],630,460)
         cx2.fillText(LPtemp[4],630,490)
+        var C=canvas2.toDataURL();
+        var Cb = new createjs.Bitmap(C);
+        handmap.addChild(Cb);
       }
     }; 
     function Score(player){
@@ -8838,7 +8327,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         var noddes=[]
         var nodpair1
         var nodpair2
-        var nodpair3
         var resultA=[0]
         cx2.fillStyle = "white";
         var yy=210;
@@ -8857,6 +8345,27 @@ cx1.drawImage(e7,dorax,10,33,43.5)
               }
             }
           }
+          //
+          for(var k=0; k<Sinagy.length; k++){
+              if(!getIsDuplicate(handtemp,Sinagy[k].chr)){
+                 //一つでも所持していればGO
+                 continue;
+              };
+              nodpair1=Sinagy[k].chr.concat();
+              nodpair2=[];
+              for(var i=0;i<nodpair1.length;i++){
+                var A=handtemp.findIndex(value=>value==nodpair1[i]);
+                if(A!==-1){nodpair2.push(nodpair1[i])}
+              }
+              if(nodpair2.length >=Sinagy[k].han[0]){
+                var B=1+Math.floor((nodpair2.length-1)/2)
+                resultA[0]+=B
+                PA(Sinagy[k].id,nodpair2.length);  
+                resultA.push(Sinagy[k].id+nodpair2.length+"/"+nodpair1.length+" "+B+"翻")}
+          }
+          console.log(resultA)
+          return resultA
+          //以下問題なければ削除
           nodpair1=handtemp.findIndex(value=>value==18);
           if(nodpair1 !==-1){
             resultA[0]+=1;
@@ -9125,310 +8634,274 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         }
         if(mode>-1){
           //今度は逆に選択中のパイが可能な役を表示
+          //nodpair1 -> Sinagy[P].chr に置き換え
           function YakuDT(word){
             nodpair2=[];
-            for(var i=0;i<nodpair1.length;i++){
-              var A=hand1.findIndex(value=>value==nodpair1[i]);
-              if(A!==-1){nodpair2.push(nodpair1[i])}
+            var P=Sinagy.findIndex(value=>value.id==word);
+            for(var i=0;i<Sinagy[P].chr.length;i++){
+              var A=hand1.findIndex(value=>value==Sinagy[P].chr[i]);
+              if(A!==-1){nodpair2.push(Sinagy[P].chr[i])}
             }
-            if(nodpair2.length>=3 || nodpair2.length==nodpair1.length){
-              cx2.fillStyle = "#ff4c38";
+            var t = new createjs.Text(word, "bold 18px Arial", "white");
+            t.x=xx;
+            t.y=yy;
+            guidemap.addChild(t);
+            yy+=22;
+            var tt = new createjs.Text("（"+nodpair2.length+" / "+Sinagy[P].chr.length+"）", "18px Arial", "white");
+            tt.x=xx+160;
+            tt.y=yy;
+            tt.textAlign="right";
+            guidemap.addChild(tt);
+            yy+=25;
+            if(nodpair2.length>=3 || nodpair2.length==Sinagy[P].chr.length){
+              t.color= "#ff4c38";
+              tt.color= "#ff4c38";
             }else if(nodpair2.length >=2){
-              cx2.fillStyle = "#388eff";
-            }else{cx2.fillStyle = "white";}
-              cx2.font = "bold 16px Arial";
-              cx2.fillText(word+nodpair2.length+"/"+nodpair1.length,xx,yy);
-              yy+=22;
+              t.color= "#388eff";
+              tt.color= "#388eff";
             }
+          }
           switch(mode){
             case 0://エル
-              nodpair1=[0,9,21];
               YakuDT("原初的な動き");
-               nodpair1=[0,15,18,21,30];
-               YakuDT("正義を貫徹する者");
+              YakuDT("正義を貫徹する者");
               break;
             case 1:
-              nodpair1=[1,3,15,22];
               YakuDT("属性鍛錬者");
-                nodpair1=[1,10,16,24,31];
-                YakuDT("魔法特化");
+              YakuDT("魔法特化");
               break;
             case 2:
-              nodpair1=[2,6,9,16,36,40];
               YakuDT("敏捷さ");
-              nodpair1=[2,11,17,39,30,37];
               YakuDT("巨人審判者");
               break;
-            case 3://アイ
-            nodpair1=[3,13,17,25,37,42];
+            case 3:
+              YakuDT("鋭さ");
+              YakuDT("正義を貫徹する者");
+              break;
+            case 4://アイ
               YakuDT("探求する者");
-              nodpair1=[1,3,15,22];
               YakuDT("属性鍛錬者");
               break;
-            case 4:
-              nodpair1=[4,20,34];
+            case 5:
               YakuDT("マナ守護");
-              nodpair1=[4,19,23,26,29,31,32];
               YakuDT("渇望");
               break;
-            case 5:
-              nodpair1=[5,8,27,35,36,41];
+            case 6:
               YakuDT("物理特化");
-              nodpair1=[5,26,32];
               YakuDT("時空間");
               break;
-            case 6://レナ
-            nodpair1=[6,7,8];
+            case 7:
+              YakuDT("探求する者");
+              YakuDT("渇望");
+              break;
+            case 8://レナ
               YakuDT("精霊の加護");
-              nodpair1=[2,6,9,16,36,40];
               YakuDT("敏捷さ");
               break;
-            case 7:
-            nodpair1=[6,7,8];
+            case 9:
               YakuDT("精霊の加護");
-              nodpair1=[7,12,24,28,33,38,39];
               YakuDT("鋭さ");
-              break;
-            case 8:
-              nodpair1=[6,7,8];
-              YakuDT("精霊の加護");
-              nodpair1=[5,8,27,35,36,41];
-              YakuDT("物理特化");
-              break;
-            case 9://ヴン
-            nodpair1=[0,9,21];
-            YakuDT("原初的な動き");
-            nodpair1=[2,6,9,16,36,40];
-            YakuDT("敏捷さ");
               break;
             case 10:
-              nodpair1=[1,10,16,24,31];
-              YakuDT("魔法特化");
-              nodpair1=[10,24,33];
-              YakuDT("殴り合い");
+              YakuDT("精霊の加護");
+              YakuDT("物理特化");
               break;
             case 11:
-              nodpair1=[11,23,31,34,38];
-              YakuDT("痛いから問題ない");
-              nodpair1=[2,11,17,39,30,37];
-              YakuDT("巨人審判者");
+              YakuDT("精霊の加護");
+              YakuDT("魔法特化");
               break;
-            case 12://イヴ
-            nodpair1=[12,13,14,24,42];
-            YakuDT("ナソード研究");
-            nodpair1=[7,12,24,28,33,38,39];
-            YakuDT("鋭さ");
+            case 12://ヴン
+              YakuDT("原初的な動き");
+              YakuDT("敏捷さ");
               break;
             case 13:
-              nodpair1=[12,13,14,24,42];
-              YakuDT("ナソード研究");
-              nodpair1=[3,13,17,25,37,42];
-              YakuDT("探求する者");
+              YakuDT("魔法特化");
+              YakuDT("殴り合い");
               break;
             case 14:
-              nodpair1=[12,13,14,24,42];
+              YakuDT("痛いから問題ない");
+              YakuDT("巨人審判者");
+              break;
+            case 15:
+              YakuDT("渇望");
+              YakuDT("物理特化");
+              break;
+            case 16://イヴ
               YakuDT("ナソード研究");
-              nodpair1=hand1.findIndex(value=>value==14);
-              nodpair2=hand1.findIndex(value=>value==41);
-              cx2.font = "bold 16px Arial";
-              if(nodpair2 !==-1 ){
-                cx2.fillStyle = "#ff4c38";
-                cx2.fillText("戦場の天使 2/2",xx,yy)
-              }else{
-                cx2.fillStyle = "white";
-                cx2.fillText("戦場の天使 1/2",xx,yy)
-              }
-                yy+=20;
-              break;
-            case 15://ラシェ
-            nodpair1=[0,15,18,21,30];
-            YakuDT("正義を貫徹する者");
-            nodpair1=[1,3,15,22];
-            YakuDT("属性鍛錬者");
-              break;
-            case 16:
-              nodpair1=[2,6,9,16,36,40];
-              YakuDT("敏捷さ");
-              nodpair1=[1,10,16,24,31];
-              YakuDT("魔法特化");
+              YakuDT("鋭さ");
               break;
             case 17:
-              nodpair1=[3,13,17,25,37,42];
+              YakuDT("ナソード研究");
               YakuDT("探求する者");
-              nodpair1=[2,11,17,39,30,37];
+              break;
+            case 18:
+              YakuDT("ナソード研究");
+              YakuDT("戦場の天使");
+              break;
+            case 19:
+              YakuDT("鋭さ");
+              YakuDT("歪曲された視線");
+              break;
+            case 20://ラシェ
+            YakuDT("正義を貫徹する者");
+            YakuDT("属性鍛錬者");
+              break;
+            case 21:
+              YakuDT("敏捷さ");
+              YakuDT("魔法特化");
+              break;
+            case 22:
+              YakuDT("探求する者");
               YakuDT("巨人審判者");
               break;
-            case 18://アラ
-            cx2.fillStyle = "#ff4c38";
-            cx2.font = "bold 16px Arial";
-            cx2.fillText("貫徹する足取り1/1",xx,yy);
-            yy+=20;
-            nodpair1=[0,15,18,21,30];
-            YakuDT("正義を貫徹する者");
+            case 23:
+              YakuDT("痛いから問題ない");
+              YakuDT("戦場の天使");
               break;
-              case 19:
-              cx2.fillStyle = "#ff4c38";
-              cx2.font = "bold 16px Arial";
-              cx2.fillText("豊かな足取り1/1",xx,yy);
-              yy+=20;
-              nodpair1=[4,19,23,26,29,31,32];
+            case 24://アラ
+              YakuDT("貫徹する足取り");
+              YakuDT("正義を貫徹する者");
+              break;
+            case 25:
+              YakuDT("豊かな足取り");
+              YakuDT("渇望");
+              break;
+            case 26:
+              YakuDT("上手な足取り");
+              YakuDT("マナ守護");
+                break;
+            case 27:
+              YakuDT("交感の足取り");
+              YakuDT("痛いから問題ない");
+                break;
+            case 28://エリ
+              YakuDT("原初的な動き");
+              YakuDT("正義を貫徹する者");
+              break;
+            case 29:
+              YakuDT("属性鍛錬者");
+              YakuDT("鋭さ");
+                break;
+            case 30:
+              YakuDT("痛いから問題ない");
               YakuDT("渇望");
                 break;
-                case 20:
-                  cx2.fillStyle = "#ff4c38";
-                  cx2.font = "bold 16px Arial";
-                  cx2.fillText("上手な足取り1/1",xx,yy);
-                  yy+=20;
-                  nodpair1=[4,20,34];
-                  YakuDT("マナ守護");
-                    break;
-              case 21://エリ
-              nodpair1=[0,9,21];
-              YakuDT("原初的な動き");
-              nodpair1=[0,15,18,21,30];
-              YakuDT("正義を貫徹する者");
-              break;
-              case 22:
-                nodpair1=[1,3,15,22];
-                YakuDT("属性鍛錬者");
-                nodpair1=[7,12,24,28,33,38,39];
-                YakuDT("鋭さ");
+            case 31:
+              YakuDT("敏捷さ");
+              YakuDT("鋭さ");
                 break;
-              case 23:
-                nodpair1=[11,23,31,34,38];
-                YakuDT("痛いから問題ない");
-                nodpair1=[4,19,23,26,29,31,32];
-                YakuDT("渇望");
-                break;
-              case 24://エド
-              nodpair1=[1,10,16,24,31];
+            case 32://エド
               YakuDT("魔法特化");
-              nodpair1=[10,24,33];
               YakuDT("殴り合い");
               break;
-              case 25:
-                nodpair1=[3,13,17,25,37,42];
-                YakuDT("探求する者");
-                nodpair1=[12,13,14,24,42];
-                YakuDT("ナソード研究");
+            case 33:
+              YakuDT("探求する者");
+              YakuDT("ナソード研究");
               break;
-              case 26:
-                nodpair1=[5,26,32];
-                YakuDT("時空間");
-                nodpair1=[4,19,23,26,29,31,32];
-                YakuDT("渇望");
+            case 34:
+              YakuDT("時空間");
+              YakuDT("渇望");
               break;
-              case 27://ルシ
-              nodpair1=[27,28,29];
+            case 35:
+              YakuDT("探求する者");
+              YakuDT("物理特化");
+              break;
+            case 36://ルシ
               YakuDT("魔族");   
-              nodpair1=[5,8,27,35,36,41];
               YakuDT("物理特化"); 
                 break;
-              case 28:
-                nodpair1=[27,28,29];
-                YakuDT("魔族");
-                nodpair1=[7,12,24,28,33,38,39];
-                YakuDT("鋭さ");   
-                break;
-                case 29:
-                  nodpair1=[27,28,29];
-                  YakuDT("魔族");
-                  nodpair1=[4,19,23,26,29,31,32];
-                  YakuDT("渇望"); 
-                  break;
-              case 30://アイン
-              nodpair1=[0,15,18,21,30];
+            case 37:
+              YakuDT("魔族");
+              YakuDT("鋭さ");   
+              break;
+            case 38:
+              YakuDT("魔族");
+              YakuDT("渇望"); 
+              break;
+            case 39:
+              YakuDT("魔族");
+              YakuDT("痛いから問題ない"); 
+              break;
+              case 44://アイン
               YakuDT("正義を貫徹する者");
-              nodpair1=[2,11,17,39,30,37];
               YakuDT("巨人審判者");
               break;  
-              case 31:
-                nodpair1=[1,10,16,24,31];
+              case 45:
                 YakuDT("魔法特化");
-                nodpair1=[11,23,31,34,38];
                 YakuDT("痛いから問題ない");
                 break;
-              case 32:
-                nodpair1=[5,26,32];
+              case 46:
                 YakuDT("時空間");
-                nodpair1=[4,19,23,26,29,31,32];
                 YakuDT("渇望"); 
                 break;
-              case 33://らび
-              nodpair1=[10,24,33];
+              case 47:
+                YakuDT("渇望");
+                YakuDT("歪曲された視線"); 
+                break;
+              case 48://らび
               YakuDT("殴り合い");
-              nodpair1=[7,12,24,28,33,38,39];
               YakuDT("鋭さ");
                 break;
-              case 34:
-                nodpair1=[4,20,34];
+              case 49:
                 YakuDT("マナ守護");
-                nodpair1=[11,23,31,34,38];
                 YakuDT("痛いから問題ない");
                 break;
-              case 35:
-                nodpair1=[5,8,27,35,36,41];
+              case 50:
                 YakuDT("物理特化"); 
-                cx2.fillStyle = "#ff4c38";
-                cx2.font = "bold 16px Arial";
-                cx2.fillText("ラビィの友達1/1",xx,yy);
-                yy+=20;
+                YakuDT("ラビィの友達"); 
                 break;
-              case 36://ノア
-              nodpair1=[2,6,9,16,36,40];
-              YakuDT("敏捷さ");
-              nodpair1=[5,8,27,35,36,41];
-              YakuDT("物理特化"); 
-              break;
-              case 37:
-                nodpair1=[3,13,17,25,37,42];
+              case 51:
+                YakuDT("魔法特化"); 
+                YakuDT("悪戯の王"); 
+                break;
+              case 52://ノア
+                YakuDT("敏捷さ");
+                YakuDT("物理特化"); 
+                break;
+              case 53:
                 YakuDT("探求する者");
-                nodpair1=[2,11,17,39,30,37];
                 YakuDT("巨人審判者");
                 break;
-              case 38:
-                nodpair1=[11,23,31,34,38];
+              case 54:
                 YakuDT("痛いから問題ない");
-                nodpair1=[7,12,24,28,33,38,39];
                 YakuDT("鋭さ");
                 break;
-              case 39://ロゼ
-              nodpair1=[7,12,24,28,33,38,39];
+              case 55:
+                YakuDT("巨人審判者");
+                YakuDT("歪曲された視線");
+                break;
+              case 40://ロゼ
               YakuDT("鋭さ");
-              nodpair1=[2,11,17,39,30,37];
               YakuDT("巨人審判者");
                 break;
-              case 40:
-                nodpair1=[2,6,9,16,36,40];
+              case 41:
                 YakuDT("敏捷さ");
-                nodpair1=[4,19,23,26,29,31,32];
                 YakuDT("渇望"); 
                 break;
-              case 41:
-                nodpair1=[5,8,27,35,36,41];
-                YakuDT("物理特化"); 
-                nodpair1=hand1.findIndex(value=>value==41);
-                nodpair2=hand1.findIndex(value=>value==14);
-                cx2.font = "bold 16px Arial";
-                if(nodpair2 !==-1 ){
-                  cx2.fillStyle = "#ff4c38";
-                  cx2.fillText("戦場の天使 2/2",xx,yy)
-                }else{
-                  cx2.fillStyle = "white";
-                  cx2.fillText("戦場の天使 1/2",xx,yy)
-                }
-                  yy+=20;
-                break;
               case 42:
-                cx2.fillStyle = "#ff4c38";
-                cx2.font = "bold 16px Arial";
-                cx2.fillText("機械工学1/1",xx,yy);
-                yy+=20;
-                nodpair1=[3,13,17,25,37,42];
-                YakuDT("探求する者");
-                nodpair1=[12,13,14,24,42];
-                YakuDT("ナソード研究");
+                YakuDT("物理特化"); 
+                YakuDT("戦場の天使"); 
                 break;
+              case 43:
+                YakuDT("機械工学"); 
+                YakuDT("探求する者"); 
+                break;
+                case 56://リティちゃ
+                YakuDT("ナソード研究");
+                YakuDT("巨人審判者");
+                  break;
+                case 57:
+                  YakuDT("物理特化");
+                  YakuDT("痛いから問題ない"); 
+                  break;
+                case 58:
+                  YakuDT("魔法特化"); 
+                  YakuDT("鋭さ"); 
+                  break;
+                case 59:
+                  YakuDT("渇望"); 
+                  YakuDT("歪曲された視線"); 
+                  break;
                 }
         }
       }
@@ -9439,6 +8912,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       console.log('Reachwait',num)
       var Count={};
       var Line={};
+      var Color={};
       var Result=[];
       //0に○○待ちの文字、1~3に待ちパイ
       Result.push("ノーテン");
@@ -9450,16 +8924,16 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             handtemp.sort(compareFunc);
             for(var i=1; i<handtemp.length;i++){
               var C=donpai.findIndex(value=>value.id==handtemp[i])
-              var elm=donpai[C].name;//cpuでerror?
+              var elm=donpai[C].name;
               var elm2=donpai[C].line
+              var elm3=donpai[C].color;
               Count[elm]=(Count[elm] || 0)+1
               Line[elm2]=(Line[elm2] || 0)+1
+              Color[elm3]=(Color[elm3] || 0)+1
             }
-            console.log(Count);
-            console.log(Line);
             //ラインチェック
             var keyj2=Object.keys(Line);
-            //console.log(keyj2.length);//expected 1~5
+            var keyj3=Object.keys(Color);
             switch(Line["0"]){
               case 2:
               case 1:
@@ -9468,30 +8942,28 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                   if(resultF !==undefined){
                     Result[0]=resultF+"ライン待ち"
                     resultF-=1;
-                    var E=donpai.filter(value=>value.id==42 || (value.id<42 && value.id%3==resultF));
+                    var E=donpai.filter(value=>value.id<69 && value.id%4==resultF);
                     for(var i=0; i<E.length ; i++){
                   if(Remaincheck(E[i].id)){
                     Result.push(E[i].id);
                   }
-                  if(Result.length>6){break;}
+                  if(Result.length>5){break;}
                 }
                 }
               }
                 break;
               default:
-                 //0line->undefined
                 if(keyj2.length==1){
-                  console.log('line tumo')
                   var resultF=Object.keys(Line).find((key)=>Line[key]>=5);//->あればlineが帰ってくる
                   if(resultF !==undefined){
                     Result[0]=resultF+"ライン待ち"
                     resultF-=1;
-                    var E=donpai.filter(value=>value.id==42 || (value.id<42 && value.id%3==resultF));
+                    var E=donpai.filter(value=>value.id<69 && value.id%4==resultF);
                     for(var i=0; i<E.length ; i++){
                   if(Remaincheck(E[i].id)){
                     Result.push(E[i].id);
                   }
-                  if(Result.length>6){break;}
+                  if(Result.length>5){break;}
                 }
                 }
               }
@@ -9524,7 +8996,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                     var resultF=Object.keys(Count).find((key)=>Count[key]==2);//->あればキャラ名が帰ってくる
                     var resultG=Object.keys(Count).filter((key)=>Count[key]==1);//->あればキャラ名が帰ってくる
                     for(var i=0;i<resultG.length;i++){
-                      if(resultG[i]=="アリエル"||resultG[i]=="アリエル"){resultG.splice(i,1)}
+                      if(resultG[i]=="アリエル"||resultG[i]=="ルリエル"){resultG.splice(i,1)}
                     }
                     Result[0]=resultF+","+resultG[0]+"待ち"
                     var E=donpai.filter(value=>value.name==resultF ||value.name==resultG[0]);
@@ -9532,7 +9004,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                   if(Remaincheck(E[i].id)){
                     Result.push(E[i].id);
                   }
-                  if(Result.length>6){break;}
+                  if(Result.length>5){break;}
                 }
                   }
                   if(tumoj==0 && reachj==3){
@@ -9543,18 +9015,18 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                   if(Remaincheck(E[i].id)){
                     Result.push(E[i].id);
                   }
-                  if(Result.length>6){break;}
+                  if(Result.length>5){break;}
                 }
                   }
                 }
                 if(keyj.length==4){
                   if(tumoj==2){
                     Result[0]="全待ち"
-                    for(var i=0; i<45 ; i++){
+                    for(var i=0; i<70 ; i++){
                       if(Remaincheck(i)){
                         Result.push(i);
                       }
-                      if(Result.length>6){break;}
+                      if(Result.length>5){break;}
                     }
                   }
                 }
@@ -9571,7 +9043,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                   if(Remaincheck(E[i].id)){
                     Result.push(E[i].id);
                   }
-                  if(Result.length>6){break;}
+                  if(Result.length>5){break;}
                 }
                   }
                   if(tumoj==1 && reachj==2){
@@ -9583,7 +9055,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                   if(Remaincheck(E[i].id)){
                     Result.push(E[i].id);
                   }
-                  if(Result.length>6){break;}
+                  if(Result.length>5){break;}
                 }
                   }
                 }
@@ -9600,37 +9072,98 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                 if(Remaincheck(E[i].id)){
                   Result.push(E[i].id);
                 }
-                if(Result.length>6){break;}
+                if(Result.length>5){break;}
               }
                 }
                 break;
           };
-          //国士無双:エピックラインのみ、かつ同パイを含まない
-          var Kokushi=[0,3,7,10,13,15,18,21,24,28,31,34,36,41,43,44]
-          var resultF=Kokushi.concat();
-          var Kreach=0;
-          var KKreach=0;
-          for(var k=1;k<handtemp.length;k++){
-            var A=Kokushi.findIndex(value=>value==handtemp[k])
-            if(A!==-1){
-              var C=resultF.findIndex(value=>value==handtemp[k])
-              resultF.splice(C,1);
-              var B=handtemp.filter(value=>value==handtemp[k])
-            KKreach+=B.length-1;
-            //KKreachは0か2かそれ以上
-          }else{Kreach+=1}
-            if(Kreach>2){break;}
-            }
-          if(Kreach==0 && KKreach==0){
-              //国士
-              Result[0]="国士無双待ち"
-              for(var i=0; i<resultF.length ; i++){
-                if(Remaincheck(resultF[i])){
-                  Result.push(resultF[i]);
+          //クレスト：同じ属性9枚、マスターロードを含む
+          var Ary=["0","ソーレス","デニフ","ベントス","アドリアン","ガイア","ロッソ","ハルニエ"];
+        switch(Color["0"]){
+          case 2:
+          case 1:
+            //オールマイティをマスロパイ代わりにすることで判定を無視
+            if(keyj3.length==2){
+              console.log('crest tumo',keyj3[1]);
+              var resultF=Object.keys(Color).find((key)=>Color[key]>2);
+              Result[0]="クレストオブ"+Ary[resultF];
+              var E=donpai.filter(value=>value.color==resultF);
+              for(var i=0; i<E.length ; i++){
+                if(Remaincheck(E[i].id)){
+                  Result.push(E[i].id);
                 }
-                if(Result.length>6){break;}
+                if(Result.length>5){break;}
               }
-          }
+            }
+            if(keyj3.length==3){
+              if(Color[keyj3[1]]==1 || Color[keyj3[2]]==1){
+                var resultF=Object.keys(Color).find((key)=>Color[key]>2);
+                console.log(resultF);
+                Result[0]="クレストオブ"+Ary[resultF];
+              var E=donpai.filter(value=>value.color==resultF);
+              for(var i=0; i<E.length ; i++){
+                if(Remaincheck(E[i].id)){
+                  Result.push(E[i].id);
+                }
+                if(Result.length>5){break;}
+              }
+              }
+            }
+            break;
+          default:
+            if(keyj3.length==1){
+              var M=handtemp.findIndex(value=>value>=60 && value<=67);
+              var resultF=Object.keys(Color).find((key)=>Color[key]>2);
+              console.log(resultF);
+              Result[0]="クレストオブ"+Ary[resultF];
+              if(M!==-1){
+              var E=donpai.filter(value=>value.color==resultF);
+              for(var i=0; i<E.length ; i++){
+                if(Remaincheck(E[i].id)){
+                  Result.push(E[i].id);
+                }
+                if(Result.length>5){break;}
+              }
+              }else{
+                //マスロパイ待ち
+                console.log('crest reach')
+                var E=donpai.filter(value=>value.color==resultF && value.id>=60);
+                for(var i=0; i<E.length ; i++){
+                  if(Remaincheck(E[i].id)){
+                    Result.push(E[i].id);
+                  }
+                }
+              }
+            }
+            if(keyj3.length==2){
+              var M=handtemp.findIndex(value=>value>=60 && value<=67);
+              if(Color[keyj3[0]]==1 || Color[keyj3[1]]==1){
+                var resultF=Object.keys(Color).find((key)=>Color[key]>2);
+                console.log(resultF);
+                Result[0]="クレストオブ"+Ary[resultF];
+                if(M!==-1){
+                  var E=donpai.filter(value=>value.color==resultF);
+                  for(var i=0; i<E.length ; i++){
+                    if(Remaincheck(E[i].id)){
+                      Result.push(E[i].id);
+                    }
+                    if(Result.length>5){break;}
+                  }
+                  }else{
+                    //マスロパイ待ち
+                    console.log('crest reach')
+                    var E=donpai.filter(value=>value.color==resultF && value.id>=60);
+                    for(var i=0; i<E.length ; i++){
+                      if(Remaincheck(E[i].id)){
+                        Result.push(E[i].id);
+                      }
+                    }
+                  }
+              }
+            }
+          break;
+        }
+        //
           return Result;
     }
   
@@ -9642,8 +9175,8 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           //立直しているならポンできない
           return false;
         }
-        if(tumotemp==43 || tumotemp==44){
-          //オールマイティはポンできない、ポンに使えない
+        if(tumotemp>=60 && tumotemp<=69){
+          //マスターロード・オールマイティはポンできない、ポンに使えない
           return false;
         }
         handtemp=[];
@@ -9675,18 +9208,13 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             handtemp = hand4.concat();
           break;
         }
-        if(tumotemp>=39 && tumotemp<=42){
-          var B=handtemp.filter(value=>value>=39 && value<=42);
-        }else{
-          var A=Math.floor(tumotemp/3);
-          var B=handtemp.filter(value=>value>=3*A && value<3*(A+1));
-        }
-          console.log(B)
-                if(B.length>=2){ponsw[player]=1;
-                  return true;
-                }
+          var A=Math.floor(tumotemp/4);
+          var B=handtemp.filter(value=>value>=4*A && value<4*(A+1));
+          if(debugmode){console.log(B)};
+          if(B.length>=2){ponsw[player]=1;
+            return true;
+          }
               }else{
-        //ポンしますわよ
         handtemp=[];
         switch(player){
           case 1:
@@ -9713,212 +9241,152 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         case 1:
           //ポンする組み合わせは考えないものとする
           //ポンされたパイを塗りつぶす
+          var s = new createjs.Shape();
+            s.graphics.beginFill("rgba(20,20,20,0.5)");
+            if(ippatu[4]==1){
+              s.graphics.drawRect(riverx[4]-10.5, rivery[4]+10.5, 43.5, 33);
+            }else{
+              s.graphics.drawRect(riverx[4], rivery[4], 33, 43.5);
+            }
+          field.addChild(s);
           cLock=0;
-          cx1.fillStyle = "rgba(20,20,20,0.5)";
-          if(ippatu[4]==1){
-          cx1.fillRect(riverx[4]-10.5,rivery[4]+10.5,43.5,33)
-          }else{
-          cx1.fillRect(riverx[4],rivery[4],33,43.5)
-          }
           hand1.splice(pp,1)
-          if(num>=39 && num<=42){
-            var pA=hand1.findIndex(value=>value>=39 && value<=42);
-            var ponA=hand1.splice(pA,1)
-            var pB=hand1.findIndex(value=>value>=39 && value<=42);
-            var ponB=hand1.splice(pB,1)
-            pon1.unshift(num,ponA[0],ponB[0])
-          }else{
-            var A=Math.floor(num/3);
-          var pA=hand1.findIndex(value=>value>=3*A && value<3*(A+1));
+            var A=Math.floor(num/4);
+          var pA=hand1.findIndex(value=>value>=4*A && value<4*(A+1));
           var ponA=hand1.splice(pA,1)
-          var pB=hand1.findIndex(value=>value>=3*A && value<3*(A+1));
+          var pB=hand1.findIndex(value=>value>=4*A && value<4*(A+1));
           var ponB=hand1.splice(pB,1)
           pon1.unshift(num,ponA[0],ponB[0])
-          }
           console.log(hand1.length,hand1);
-              //一発を潰す
-      for(var i=1;i<5;i++){
-        if(ippatu[i]==1){
-          ippatu[i]=2;
-        }
-      }
-          loopX=0
-          loopX2=0;
-          alpha=1;
-          cx2.clearRect(630,400,80,40)
-          cx2.fillStyle = "rgba(20,20,20,0.5)";
-          cx2.fillRect(630,400,80,40)
-          e15.src=chrimg_src[chara[player]]
-          e15.onload=function(){
+          for(var i=0;i<3;i++){
+            e9 = new createjs.Bitmap(eltear_src[pon1[i]]);
+            e9.x=590-33*(pon1.length-3+i);
+            e9.y=450;
+            e9.scale=33/120;
+            field.addChild(e9);
+            var s = new createjs.Shape();
+            s.graphics.beginFill("rgba(20,20,20,0.5)");
+            s.graphics.drawRect(590-33*(pon1.length-3+i), 450, 33, 43.5);
+            field.addChild(s);
+            }
+          //一発を潰す
+          for(var i=1;i<5;i++){
+            if(ippatu[i]==1){
+              ippatu[i]=2;
+            }
+          }
             se8.play();
-            window.requestAnimationFrame((ts)=>PonAnimation(ts,0,player))
-        }
+            PonAnimation(player);
           break;
         case 2:
-          cx1.fillStyle = "rgba(20,20,20,0.5)";
+          var s = new createjs.Shape();
+          s.graphics.beginFill("rgba(20,20,20,0.5)");
           if(ippatu[1]==1){
-          cx1.fillRect(riverx[1]-10.5,rivery[1]+10.5,43.5,33)
+            s.graphics.drawRect(riverx[1]-10.5, rivery[1]+10.5, 43.5, 33);
           }else{
-          cx1.fillRect(riverx[1],rivery[1],33,43.5)
+            s.graphics.drawRect(riverx[1], rivery[1], 33, 43.5);
           }
+        field.addChild(s);
           hand2.splice(pp,1)
-          if(num>=39 && num<=42){
-            var pA=hand2.findIndex(value=>value>=39 && value<=42);
-            var ponA=hand2.splice(pA,1)
-            var pB=hand2.findIndex(value=>value>=39 && value<=42);
-            var ponB=hand2.splice(pB,1)
-            pon2.unshift(num,ponA[0],ponB[0])
-          }else{
-            var A=Math.floor(num/3);
-          var pA=hand2.findIndex(value=>value>=3*A && value<3*(A+1));
+            var A=Math.floor(num/4);
+          var pA=hand2.findIndex(value=>value>=4*A && value<4*(A+1));
           var ponA=hand2.splice(pA,1)
-          var pB=hand2.findIndex(value=>value>=3*A && value<3*(A+1));
+          var pB=hand2.findIndex(value=>value>=4*A && value<4*(A+1));
           var ponB=hand2.splice(pB,1)
           pon2.unshift(num,ponA[0],ponB[0])
+          //
+          for(var i=0;i<3;i++){
+          e9 = new createjs.Bitmap(eltear_src[pon2[i]]);
+          e9.x=590-33*(pon2.length-3+i);
+          e9.y=150;
+          e9.scale=33/120;
+          field.addChild(e9);
+          var s = new createjs.Shape();
+          s.graphics.beginFill("rgba(20,20,20,0.5)");
+          s.graphics.drawRect(590-33*(pon2.length-3+i), 150, 33, 43.5);
+          field.addChild(s);
           }
-          e9.src=eltear_src[pon2[0]]
-          e9.onload=function(){
-            var x=33*(pon2.length-3)
-            cx1.drawImage(e9,590-x,150,33,43.5);
-            cx1.fillStyle = "rgba(20,20,20,0.2)";
-            cx1.fillRect(590-x,150,33,43.5)
-              e9.src=eltear_src[pon2[1]]
-              e9.onload=function(){
-                cx1.drawImage(e9,557-x,150,33,43.5);
-                cx1.fillStyle = "rgba(20,20,20,0.2)";
-                cx1.fillRect(557-x,150,33,43.5)
-                e9.src=eltear_src[pon2[2]]
-                e9.onload=function(){
-                  cx1.drawImage(e9,524-x,150,33,43.5);
-                  cx1.fillStyle = "rgba(20,20,20,0.2)";
-                  cx1.fillRect(524-x,150,33,43.5)
-          console.log(hand2.length,hand2);
-              //一発を潰す
-      for(var i=1;i<5;i++){
-        if(ippatu[i]==1){
-          ippatu[i]=2;
-        }
-      }
-      loopX=0
-      loopX2=0;
-      alpha=1;
-      e15.src=chrimg_src[chara[player]]
-      e15.onload=function(){
+          //一発を潰す
+          for(var i=1;i<5;i++){
+            if(ippatu[i]==1){
+              ippatu[i]=2;
+            }
+          }
         se8.play();
-        window.requestAnimationFrame((ts)=>PonAnimation(ts,0,player))
-    }
-                }}}
+        PonAnimation(player);
           break;
         case 3:
-          cx1.fillStyle = "rgba(20,20,20,0.5)";
+          var s = new createjs.Shape();
+          s.graphics.beginFill("rgba(20,20,20,0.5)");
           if(ippatu[2]==1){
-          cx1.fillRect(riverx[2]-10.5,rivery[2]+10.5,43.5,33)
+            s.graphics.drawRect(riverx[2]-10.5, rivery[2]+10.5, 43.5, 33);
           }else{
-          cx1.fillRect(riverx[2],rivery[2],33,43.5)
+            s.graphics.drawRect(riverx[2], rivery[2], 33, 43.5);
           }
+        field.addChild(s);
           hand3.splice(pp,1)
-          if(num>=39 && num<=42){
-            var pA=hand3.findIndex(value=>value>=39 && value<=42);
-            var ponA=hand3.splice(pA,1)
-            var pB=hand3.findIndex(value=>value>=39 && value<=42);
-            var ponB=hand3.splice(pB,1)
-            pon3.unshift(num,ponA[0],ponB[0])
-          }else{
-            var A=Math.floor(num/3);
-          var pA=hand3.findIndex(value=>value>=3*A && value<3*(A+1));
+            var A=Math.floor(num/4);
+          var pA=hand3.findIndex(value=>value>=4*A && value<4*(A+1));
           var ponA=hand3.splice(pA,1)
-          var pB=hand3.findIndex(value=>value>=3*A && value<3*(A+1));
+          var pB=hand3.findIndex(value=>value>=4*A && value<4*(A+1));
           var ponB=hand3.splice(pB,1)
           pon3.unshift(num,ponA[0],ponB[0])
-          }
-          e9.src=eltear_src[pon3[0]]
-          e9.onload=function(){
-            var x=33*(pon3.length-3)
-            cx1.drawImage(e9,590-x,250,33,43.5);
-            cx1.fillStyle = "rgba(20,20,20,0.2)";
-            cx1.fillRect(590-x,250,33,43.5)
-              e9.src=eltear_src[pon3[1]]
-              e9.onload=function(){
-                cx1.drawImage(e9,557-x,250,33,43.5);
-                cx1.fillStyle = "rgba(20,20,20,0.2)";
-                cx1.fillRect(557-x,250,33,43.5)
-                e9.src=eltear_src[pon3[2]]
-                e9.onload=function(){
-                  cx1.drawImage(e9,524-x,250,33,43.5);
-                  cx1.fillStyle = "rgba(20,20,20,0.2)";
-                  cx1.fillRect(524-x,250,33,43.5)
-          console.log(hand3.length,hand3);
+          for(var i=0;i<3;i++){
+            e9 = new createjs.Bitmap(eltear_src[pon3[i]]);
+            e9.x=590-33*(pon3.length-3+i);
+            e9.y=250;
+            e9.scale=33/120;
+            field.addChild(e9);
+            var s = new createjs.Shape();
+            s.graphics.beginFill("rgba(20,20,20,0.5)");
+            s.graphics.drawRect(590-33*(pon3.length-3+i), 250, 33, 43.5);
+            field.addChild(s);
+            }
               //一発を潰す
-      for(var i=1;i<5;i++){
-        if(ippatu[i]==1){
-          ippatu[i]=2;
+        for(var i=1;i<5;i++){
+          if(ippatu[i]==1){
+            ippatu[i]=2;
+          }
         }
-      }
-      loopX=0
-      loopX2=0;
-      alpha=1;
-      e15.src=chrimg_src[chara[player]]
-      e15.onload=function(){
         se8.play();
-        window.requestAnimationFrame((ts)=>PonAnimation(ts,0,player))
-    }
-                }}}
+        PonAnimation(player);
           break;
         case 4:
-          cx1.fillStyle = "rgba(20,20,20,0.5)";
+          var s = new createjs.Shape();
+          s.graphics.beginFill("rgba(20,20,20,0.5)");
           if(ippatu[3]==1){
-          cx1.fillRect(riverx[3]-10.5,rivery[3]+10.5,43.5,33)
+            s.graphics.drawRect(riverx[3]-10.5, rivery[3]+10.5, 43.5, 33);
           }else{
-          cx1.fillRect(riverx[3],rivery[3],33,43.5)
+            s.graphics.drawRect(riverx[3], rivery[3], 33, 43.5);
           }
+        field.addChild(s);
           hand4.splice(pp,1)
-          if(num>=39 && num<=42){
-            var pA=hand4.findIndex(value=>value>=39 && value<=42);
-            var ponA=hand4.splice(pA,1)
-            var pB=hand4.findIndex(value=>value>=39 && value<=42);
-            var ponB=hand4.splice(pB,1)
-            pon4.unshift(num,ponA[0],ponB[0])
-          }else{
-            var A=Math.floor(num/3);
-          var pA=hand4.findIndex(value=>value>=3*A && value<3*(A+1));
+            var A=Math.floor(num/4);
+          var pA=hand4.findIndex(value=>value>=4*A && value<4*(A+1));
           var ponA=hand4.splice(pA,1)
-          var pB=hand4.findIndex(value=>value>=3*A && value<3*(A+1));
+          var pB=hand4.findIndex(value=>value>=4*A && value<4*(A+1));
           var ponB=hand4.splice(pB,1)
           pon4.unshift(num,ponA[0],ponB[0])
-          }
-          e9.src=eltear_src[pon4[0]]
-          e9.onload=function(){
-            var x=33*(pon4.length-3)
-            cx1.drawImage(e9,590-x,350,33,43.5);
-            cx1.fillStyle = "rgba(20,20,20,0.2)";
-            cx1.fillRect(590-x,350,33,43.5)
-              e9.src=eltear_src[pon4[1]]
-              e9.onload=function(){
-                cx1.drawImage(e9,557-x,350,33,43.5);
-                cx1.fillStyle = "rgba(20,20,20,0.2)";
-                cx1.fillRect(557-x,350,33,43.5)
-                e9.src=eltear_src[pon4[2]]
-                e9.onload=function(){
-                  cx1.drawImage(e9,524-x,350,33,43.5);
-                  cx1.fillStyle = "rgba(20,20,20,0.2)";
-                  cx1.fillRect(524-x,350,33,43.5)
-          console.log(hand4.length,hand4);
+          for(var i=0;i<3;i++){
+            e9 = new createjs.Bitmap(eltear_src[pon4[i]]);
+            e9.x=590-33*(pon4.length-3+i);
+            e9.y=350;
+            e9.scale=33/120;
+            field.addChild(e9);
+            var s = new createjs.Shape();
+            s.graphics.beginFill("rgba(20,20,20,0.5)");
+            s.graphics.drawRect(590-33*(pon4.length-3+i), 350, 33, 43.5);
+            field.addChild(s);
+            }
               //一発を潰す
-      for(var i=1;i<5;i++){
-        if(ippatu[i]==1){
-          ippatu[i]=2;
-        }
-      }
-      loopX=0
-      loopX2=0;
-      alpha=1;
-      e15.src=chrimg_src[chara[player]]
-      e15.onload=function(){
+          for(var i=1;i<5;i++){
+            if(ippatu[i]==1){
+              ippatu[i]=2;
+            }
+          }
         se8.play();
-        window.requestAnimationFrame((ts)=>PonAnimation(ts,0,player))
-    }
-                }}}
-          break;
+        PonAnimation(player);
+      break;
       }
     }
     }
@@ -9929,9 +9397,9 @@ cx1.drawImage(e7,dorax,10,33,43.5)
     });
     function ryukyoku(){
       //emit
-      if(pvpmode==1){
       tweeNsquare.paused=true;
       Csquare.alpha=0;
+      if(pvpmode==1){
       if(IsHost(IAM.room)){
         MEMBER[0].turnflag=1;
     for(var i=1;i<MEMBER.length;i++){
@@ -9942,15 +9410,18 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       }
     }}
     }
-    yakumap2.alpha=0;
+    yakumap.alpha=0;
     cx4.clearRect(0,0,800,600)
     opLock=-1;
     se10.play();
-    cx1.fillStyle = "rgba(20,20,20,0.5)";
-    cx1.fillRect(10,100,780,400)
-    cx2.fillStyle = "white";
-    cx2.font = "36px 'Century Gothic'";
-    cx2.fillText("流局",390,300)
+    var s = new createjs.Shape();
+              s.graphics.beginFill("rgba(20,20,20,0.5)");
+              s.graphics.drawRect(10, 100, 700, 400);
+              field.addChild(s);
+    var t = new createjs.Text("流局", "36px 'Century Gothic'", "white");
+    t.x=390;
+    t.y=300;
+    field.addChild(t);
     if(LP[0]!==4){
     if(parent ==0){parent =3}else{parent -=1}
     skillusage2[0]-=1;
@@ -9970,13 +9441,14 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       return false;
     };
     }
-
     function ResultPhase(){
       //ccanvasに保存した画像を順に見せる
       cLock=0;
       console.log('操作禁止',cLock);
       if(raidscore[2]==1){
         //はじめて
+        field.addChild(fieldmap);
+        guidemap.alpha=0;
         raidscore[2]=2;
         msgstate=0;
         cLock=1;
@@ -9986,183 +9458,155 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       console.log(msgstate);
       if(raidscore[1]<=msgstate){
         raidscore[0]=1;
-        CcanvasAry=[];
         return false;
       }
-      //ツモ画面を順番に表示するのみ
-      //cx1.fillStyle='black';
-      //cx1.fillRect(10,100,780,400);
-      alpha=1;
-      var X=100;
-      var V=20;
-      var G=0.3;
-      cx1.clearRect(0,100,800,400);
-      cx4.globalAlpha=1;
-      cx4.fillStyle='black';
-      window.requestAnimationFrame((ts)=>Step1(ts))
-      function Step1(ts,N=0){
-        alpha-=0.05;
-        cx4.globalAlpha=alpha;
-        cx4.clearRect(0,100,800,400);
-        cx4.fillRect(0,100,800,400);
-        V+=G;
-        if(V>=100){V=100}
+      //ツモ画面を順番に表示
         switch(msgstate){
           case 0:
-            X-=V;
-            if(X<=10){
-            X=10;
-            N=1;
-            };
-            cx2.clearRect(0,100,800,400);
-            cx2.putImageData(N1,X,100);
+            createjs.Tween.get(fieldmap)
+            .to({x:-800},250, createjs.Ease.cubicInOut)
+            .call(next);
             break;
           case 1:
-            if(X>10){X=10}
-            X-=V*2;
-            if(X<=-770){
-              X=-770;
-              N=1;
-            };
-            cx2.clearRect(0,100,800,400);
-            cx2.putImageData(N1,X,100);
-            cx2.putImageData(N2,X+780,100);
+            createjs.Tween.get(fieldmap)
+            .to({x:-1600},250, createjs.Ease.cubicInOut)  
+            .call(next);
             break;
           case 2:
-            if(X>10){X=10}
-            X-=V*2;
-            if(X<=-770){
-              X=-770;
-              N=1;
-            };
-            cx2.clearRect(0,100,800,400);
-            cx2.putImageData(N2,X,100);
-            cx2.putImageData(N3,X+780,100);
+            createjs.Tween.get(fieldmap)
+            .to({x:-2400},250, createjs.Ease.cubicInOut)  
+            .call(next);
             break;
           default:
             console.log(msgstate);
             return false;
         }
-        if(alpha>0 && N==0){
-          window.requestAnimationFrame((ts)=>Step1(ts,N))
-        }else{
-      cx4.clearRect(0,0,800,600);
-      cx4.globalAlpha=1;
-      msgstate+=1;
-      cLock=1;
+        function next(){
+          msgstate+=1;
+          cLock=1;
+        }
     }
+    function handOnCorsor(){
+      //手札のカーソル
+      if(debugmode){console.log('handOnCorsor',this.card)}
+      if(opLock==2){return false};//カーソル表示しない時　現在：esc中のみ非表示
+      switch(this.card){
+        case -1:
+          tweeNcor.paused=true;
+          CorsorKey.alpha=0;
+          break;
+        case 101:
+          //ソートぼたん
+          CorsorKey.scaleX=0.8;
+          CorsorKey.scaleY=0.4;
+          CorsorKey.x=10
+          CorsorKey.y=550;
+          CorsorKey.alpha=1;
+          tweeNcor.paused=false;
+          break;
+        case 100:
+          //ツモパイ
+          CorsorKey.scaleX=0.7;
+          CorsorKey.scaleY=0.91;
+          CorsorKey.x=690
+          CorsorKey.y=500;
+          CorsorKey.alpha=1;
+          tweeNcor.paused=false;
+          break;
+        default:
+          CorsorKey.scaleX=0.7;
+          CorsorKey.scaleY=0.91;
+          CorsorKey.x=100+size*(this.card-1)
+          CorsorKey.y=500;
+          CorsorKey.alpha=1;
+          tweeNcor.paused=false;      
+          break;
       }
     }
+    function TumoronBt(){
+      switch(this.card){
+        case 1:
+          //つも
+          if(hand1[0]==-3){
+          if(debugmode){console.log('アガリ',han[1])}
+          cx3.clearRect(326,348,148,142);
+          if(pvpmode==1){
+            socket.emit("tumo", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[0].id,Tumo:tumo,status:true});
+            }
+          TumoRon(1,0);
+          };
+          break;
+        case 2:
+          //ロン
+          if(hand1[0]==-2){
+            if(debugmode){console.log('アガリ',han[1])}
+            cx3.clearRect(326,348,148,142);
+            Ronturn.push(1);
+            if(pvpmode==1){
+            socket.emit("ron", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[0].id,status:true});
+            }
+              if(debugmode){console.log('ロンをスルー')}
+            se3.play();
+            cx3.clearRect(326,348,148,142);
+            if(pvpmode==1){
+            socket.emit("ron", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[0].id,status:false});
+            }
+            rorder[1]=1
+            hand1[0]=-1
+            turn=turntemp;
+            turnchecker();
+            ponkanmap.removeAllChildren();
+            }
+          break;
+        case -1:
+          //ロンをキャンセル
+          if(hand1[0]==-2){
+          if(debugmode){console.log('ロンをスルー')}
+          se3.play();
+          cx3.clearRect(326,348,148,142);
+          if(pvpmode==1){
+          socket.emit("ron", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[0].id,status:false});
+          }
+          rorder[1]=1
+          hand1[0]=-1
+          turn=turntemp;
+          turnchecker();
+          ponkanmap.removeAllChildren();
+          }
+          break;
+      }
+    };
     function corsor(){
       if(gamestate==10){
         switch(pagestate){
           case 1:
             //usercrest
-              if(mouseX >70 && mouseX <390){
-            if(mouseY >80 && mouseY < 500){
-        cx2.clearRect(80,90,300,380)
-        cx2.strokeStyle ='orange'
-        cx2.lineWidth = 2;
-        cx2.fillStyle = "black";
-        cx2.font = "18px Arial";
-            }}
-              if(mouseX >120 && mouseX <340){
-            if(mouseY >95 && mouseY < 155){
-        cx2.clearRect(80,530,670,70)
-        cx2.strokeRect(120,95,220,60)
-        cx2.fillText("あなたのプロフィールです。", 80, 550);
-        cx2.fillText("クリックで詳細表示。", 80, 570);
-            }}
-              if(mouseX >80 && mouseX <380){
-            if(mouseY >160 && mouseY < 205){
-        cx2.clearRect(80,530,670,70)
-        cx2.fillText("プレイガイド　9枚のパイで役を揃えるゲーム、", 80, 550);
-        cx2.fillText("エルコレドンジャラのルール説明です。", 80, 570)
-        drawbuttom(85,160,"プレイガイド",0,290,45,1);
-        cx2.strokeStyle ='orange'
-        cx2.lineWidth = 2;
-        cx2.strokeRect(86,161,288,43)
-            }
-            if(mouseY >205 && mouseY < 250){
-        cx2.clearRect(80,530,670,70)
-        cx2.fillText("フリーバトル　CPU3人と自由対局をします。", 80, 550);
-        cx2.fillText("半荘戦（全員が親を2回行うか誰かの戦闘力がなくなると終了）です。", 80, 570);
-        drawbuttom2(85,205,"フリーバトル",0,290,45,2);
-        cx2.strokeStyle ='orange'
-        cx2.lineWidth = 2;
-        cx2.strokeRect(86,206,288,43)
-            }
-            if(mouseY >250 && mouseY < 295){
-        cx2.clearRect(80,530,670,70)
-        cx2.fillText("たいせん　他のプレイヤーとドンジャラができます。", 80, 550);
-        cx2.fillText("クリック後、対戦ルームのロビーに移動します。", 80, 570);
-        drawbuttom2(85,250,"たいせん",0,290,45,2);
-        cx2.strokeStyle ='orange'
-        cx2.lineWidth = 2;
-        cx2.strokeRect(86,251,288,43)
-            }
-            if(mouseY >295 && mouseY < 340){
-        cx2.clearRect(80,530,670,70)
-        cx2.fillText("オプション　対局の設定や音楽の設定ができます。", 80, 550);
-        drawbuttom(85,295,"オプション",0,290,45,1);
-        cx2.strokeRect(86,296,288,43)
-            }
-            if(mouseY >340 && mouseY < 385){
-        cx2.clearRect(80,530,670,70)
-        cx2.fillText("データ出力　現在のプレイ状況をjsonファイルとして出力し、", 80, 550);
-        cx2.fillText("ダウンロードできます。バックアップ用にご利用ください。", 80, 570);
-        drawbuttom(85,340,"データ出力",0,290,45,1);
-        cx2.strokeStyle ='orange'
-        cx2.lineWidth = 2;
-        cx2.strokeRect(86,341,288,43)
-            }
-            if(mouseY >385 && mouseY < 430){
-        cx2.clearRect(80,530,670,70)
-        cx2.fillText("データ初期化　ローカルストレージをクリアし、", 80, 550);
-        cx2.fillText("セーブデータを出荷時の状態に戻します。", 80, 570);
-        if(JSON.parse(localStorage.getItem('UserData_Don')) !== null){
-        drawbuttom(85,385,"データ初期化",0,290,45,1);
-        }
-        cx2.strokeStyle ='orange'
-        cx2.lineWidth = 2;
-        cx2.strokeRect(86,386,288,43)
-            }}
-            if(mouseX >410 && mouseX <760){
-              if(mouseY >210 && mouseY < 450){
-                cx2.clearRect(80,530,670,70)
-                cx3.clearRect(675,385,100,60)
-                cx2.lineWidth = 2;
-                cx2.fillStyle = "black";
-                cx2.font = "18px Arial";
-                cx2.fillText("戦績　対局の記録です。", 80, 550);
-                cx2.fillText("詳細をクリックすると達成役一覧などを表示します。", 80, 570)
-              }}
-              if(mouseX >678 && mouseX <752 && mouseY >390 && mouseY <440){
-                cx3.strokeStyle ='orange'
-                cx3.lineWidth = 2;
-                cx3.strokeRect(676,388,78,52)
+              if(mouseX >40 && mouseX <400 && mouseY >90 && mouseY < 205){
+                Textlist[0].text="あなたのプロフィールです。";
+                Textlist[1].text="クリックすると実績画面に移動します。";
               }
+              if(mouseX >40 && mouseX <220 && mouseY >300 && mouseY < 390){
+                Textlist[0].text="読んでもよく分からないマニュアル。";
+                Textlist[1].text="エルコレドンジャラのルール説明です。";        
+              }
+            if(mouseX >40 && mouseX <220 && mouseY >210 && mouseY < 300){
+              Textlist[0].text="CPU3人と自由対局を行うフリーバトルモードです。";
+              Textlist[1].text="基本的に半荘戦（全員が親を2回行うと終了）です。";  
+            }
+            if(mouseX >220 && mouseX <400 && mouseY >210 && mouseY < 300){
+              Textlist[0].text="対戦ルームで友達とドンジャラができます。";
+              Textlist[1].text="クリック後、対戦ルームのロビーに移動します。";  
+            }
+            if(mouseX >220 && mouseX <400 && mouseY >300 && mouseY < 390){
+              Textlist[0].text="対局の設定や音楽の設定などができます。";
+              Textlist[1].text="セーブデータの外部出力や初期化もこちら。";  
+            }
           break;
           case 3:
             //フリーバトル
-        cx3.clearRect(370,70,360,440)
-        //cx2.clearRect(80,150,300,270)
-        cx3.strokeStyle ='orange'
-        cx3.lineWidth = 2;
-        cx2.fillStyle = "black";
-        cx2.font = "18px Arial";
-        cx3.font = "24px 'Century Gothic'";
-        cx3.fillStyle = "orange";
-        if(mouseX >510 && mouseX <560 && mouseY >80 && mouseY <110){
-            cx3.fillText("◀ ",520,100)//ルール
-          }
-          if(mouseX >670 && mouseX <705 && mouseY >80 && mouseY <110){
-            cx3.fillText(" ▶",670,100)
-          }
           if(mouseX >470 && mouseX <640 && mouseY >410 && mouseY <470){
-            cx3.strokeRect(470,410,170,60)
-            cx2.clearRect(80,530,670,70)
-            cx2.fillText("現在の設定でエルドンを開始します。", 80, 550);
+            Textlist[0].text="現在の設定で対局を開始します！";
+            Textlist[1].text="　";  
           }
           if(mouseX >510 && mouseX <560 && mouseY >130 && mouseY <160){
             cx3.fillText("◀ ",520,150)//pc
@@ -10193,148 +9637,84 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           cx2.clearRect(80,530,670,70)
           switch(LP[0]){
             case 0:
-            cx2.fillText(LPlist[LP[0]]+"：持ち点150,000の半荘戦です。満貫ブロックが適応されます。", 80, 550);
-            cx2.fillText("誰かの戦闘力が0になるとその時点で試合終了となります。", 80, 570);
+              Textlist[0].text=LPlist[LP[0]]+"：持ち点150,000の半荘戦で満貫ブロックが適応されます。";
+              Textlist[1].text="誰かの戦闘力がなくなった時点で試合終了となります。";  
             break;
             case 1:
-              cx2.fillText(LPlist[LP[0]]+"：持ち点300,000の半荘戦です。満貫ブロックが適応されません。", 80, 550);
-              cx2.fillText("誰かの戦闘力が0になっても試合を続行します。", 80, 570);
+              Textlist[0].text=LPlist[LP[0]]+"：持ち点300,000の半荘戦で満貫ブロックが適応されません。";
+              Textlist[1].text="誰か一人が生き残るか半荘経過まで戦いが続きます。";  
             break;
             case 2:
-              cx2.fillText(LPlist[LP[0]]+"：持ち点100,000で、誰かが戦闘力1,000,000に到達するまで続きます。", 80, 550);
-              cx2.fillText("戦闘力が0になったプレイヤーは時間経過で復活します。", 80, 570);
+              Textlist[0].text=LPlist[LP[0]]+"：持ち点100,000から始まり、誰かが1,000,000に到達するまで";
+              Textlist[1].text="続きます。戦闘力がなくなっても時間経過で復活します。";  
             break;
             case 3:
-              cx2.fillText(LPlist[LP[0]]+"：自由に打ち続けるモードです。Escキーでタイトル画面に戻れます。", 80, 550);
+              Textlist[0].text=LPlist[LP[0]]+"：際限なく自由に打ち続けるモードです。";
+              Textlist[1].text="Escキーでタイトル画面に戻ることで抜けられます。";  
             break;
             case 4:
-              cx2.fillText(LPlist[LP[0]]+"：4人中3人が和了するか、山がなくなるまで対局が続きます。", 80, 550);
-              cx2.fillText("※βテスト中/予期しないバグが起こる可能性があります。", 80, 570);
+              Textlist[0].text=LPlist[LP[0]]+"：最大3人が和了するまで一局が続きます。";
+              Textlist[1].text="適応力デバフにより、後半になるほど高得点が出やすくなります。";  
               break;
           }
         }
         if(mouseX >520 && mouseX <650 && mouseY >175 && mouseY <205){
-          cx2.clearRect(80,530,670,70)
-          cx2.fillText("CPUのキャラクター設定です。", 80, 550);
-          cx2.fillText("おまかせにするとランダムに決定されます。", 80, 570);
+          Textlist[0].text="CPUのキャラクターを設定します。";
+          Textlist[1].text="おまかせにするとランダムに決定されます。";  
         }
         if(mouseX >520 && mouseX <650 && mouseY >345 && mouseY <375){
-          cx2.clearRect(80,530,670,70)
-          cx2.fillText("CPUのアクティブスキルの設定です。", 80, 550);
-          cx2.fillText("禁止するとCPUはスキルを使用しません（パッシブスキルは適用される）", 80, 570);
+          Textlist[0].text="CPUのアクティブスキルの設定です。";
+          Textlist[1].text="禁止するとCPUはスキルを使用しません（パッシブスキルは適用される）";  
         }
             break;
           case 2:
             //オプション
-            cx3.clearRect(360,70,400,440)
-            //cx2.clearRect(80,150,300,270)
-            cx3.strokeStyle ='orange'
-            cx3.lineWidth = 2;
-            cx2.fillStyle = "black";
-            cx2.font = "18px Arial";
-            cx3.font = "24px 'Century Gothic'";
-            cx3.fillStyle = "orange";
-              if(mouseX >570 && mouseX <610 && mouseY >100 && mouseY <135){
-                cx3.fillText("◀ ",580,130)//音量
-              }
-              if(mouseX >620 && mouseX <660 && mouseY >100 && mouseY <135){
-                cx3.fillText(" ▶",627,130)
-              }
-              if(mouseX >570 && mouseX <610 && mouseY >135 && mouseY <170){
-                cx3.fillText("◀ ",580,160)
-              }
-              if(mouseX >620 && mouseX <660 && mouseY >135 && mouseY <170){
-                cx3.fillText(" ▶",627,160)
-              }
-              cx3.font = "20px 'Century Gothic'";
-              if(mouseX >370 && mouseX <430 && mouseY >240 && mouseY <270){
-                cx3.fillText("◀ ",380,260)//bgm
-              }
-              if(mouseX >370 && mouseX <430 && mouseY >310 && mouseY <340){
-                cx3.fillText("◀ ",380,330)
-              }
-              if(mouseX >370 && mouseX <430 && mouseY >380 && mouseY <410){
-                cx3.fillText("◀ ",380,400)
-              }
-              if(mouseX >690 && mouseX <750 && mouseY >240 && mouseY <270){
-                cx3.fillText(" ▶",720,260)
-              }
-              if(mouseX >690 && mouseX <750 && mouseY >310 && mouseY <340){
-                cx3.fillText(" ▶",720,330)
-              }
-              if(mouseX >690 && mouseX <750 && mouseY >380 && mouseY <410){
-                cx3.fillText(" ▶",720,400)
-              }
+            if(mouseX >650 && mouseX <750 && mouseY >70 && mouseY <170){
+              Textlist[0].text="パイを切った時に鳴る効果音です。";
+              Textlist[1].text="A：トランプっぽい音　B：麻雀牌っぽい音"
+            }
             if(mouseX >380 && mouseX <750 && mouseY >200 && mouseY <260){
-              if(mouseX >690 && mouseX <750 && mouseY >200 && mouseY <240){
-                cx3.strokeRect(690,200,60,40)
-              }
               //通常テキスト
-              cx2.clearRect(80,530,670,70)
-              cx2.fillText("通常対局時に流れるBGMを変更できます。", 80, 550);
-              cx2.fillText("曲詳細："+musiclistDT[musicset[0]].title+", "+musiclistDT[musicset[0]].elia+"（"+musiclistDT[musicset[0]].nod+"）", 80, 570);
+              Textlist[0].text="通常対局時に流れるBGMを変更できます。";
+              Textlist[1].text=musiclistDT[musicset[0]].title+", "+musiclistDT[musicset[0]].elia+", "+musiclistDT[musicset[0]].nod;  
             }
             if(mouseX >380 && mouseX <750 && mouseY >270 && mouseY <330){
-              if(mouseX >690 && mouseX <750 && mouseY >270 && mouseY <310){
-                cx3.strokeRect(690,270,60,40)
-              }
               //リーチテキスト
-              cx2.clearRect(80,530,670,70)
-              cx2.fillText("オーラスを除くリーチ時に流れるBGMを変更できます。", 80, 550);
-              cx2.fillText("曲詳細："+musiclistDT[musicset[1]].title+", "+musiclistDT[musicset[1]].elia+"（"+musiclistDT[musicset[1]].nod+"）", 80, 570);
+              Textlist[0].text="オーラスを除くリーチ時に流れるBGMを変更できます。";
+              Textlist[1].text=musiclistDT[musicset[1]].title+", "+musiclistDT[musicset[1]].elia+", "+musiclistDT[musicset[1]].nod;;
             }
             if(mouseX >380 && mouseX <750 && mouseY >340 && mouseY <400){
-              if(mouseX >690 && mouseX <750 && mouseY >340 && mouseY <380){
-                cx3.strokeRect(690,340,60,40)
-              }
               //オーラステキスト
-              cx2.clearRect(80,530,670,70)
-              cx2.fillText("オーラス時に流れるBGMを変更できます。", 80, 550);
-              cx2.fillText("曲詳細："+musiclistDT[musicset[2]].title+", "+musiclistDT[musicset[2]].elia+"（"+musiclistDT[musicset[2]].nod+"）", 80, 570);
+              Textlist[0].text="オーラス時に流れるBGMを変更できます。";
+              Textlist[1].text=musiclistDT[musicset[2]].title+", "+musiclistDT[musicset[2]].elia+", "+musiclistDT[musicset[2]].nod;;
             }
             if(mouseX >50 && mouseX <360 && mouseY >100 && mouseY <170){
-              cx2.clearRect(80,530,670,70)
-              cx2.fillText("対局中に画面内を右クリックした時の操作を", 80, 550);
-              cx2.fillText("切り替えることができます。", 80, 570);
+              Textlist[0].text="対局中に右クリックした時にツモ切りする";
+              Textlist[1].text="ショートカット機能の使用設定です。"
             }
             if(mouseX >50 && mouseX <300 && mouseY >200 && mouseY <260){
-              cx2.clearRect(80,530,670,70)
-              cx2.fillText("CPUのポンのしやすさを調節します。", 80, 550);
-              cx2.fillText("右に行くほどCPUがポンしやすくなるようです。", 80, 570);
+              Textlist[0].text="CPUのポンのしやすさを調節します。";
+              Textlist[1].text="右に行くほどCPUがポンしやすくなるようです。"
             }
             if(mouseX >50 && mouseX <350 && mouseY >260 && mouseY <350){
-              cx2.clearRect(80,530,670,70)
-              cx2.fillText("パイを切った時にMPが溜まる速度です。", 80, 550);
+              Textlist[0].text="パイを切った時にMPが溜まる速度です。";
+              Textlist[1].text="なお、MPはスキルやマナブレイクに使用します。"
             }
             if(mouseX >50 && mouseX <350 && mouseY >350 && mouseY <400){
-              cx2.clearRect(80,530,670,70)
-              cx2.fillText("（たいせんモードのみ）ありにすると特定のタイミングでFEVERが発生します。", 80, 550);
-              cx2.fillText("現在のFEVER効果：ドラ3枚追加（効果は予告なく変わる場合があります）", 80, 570);
+              Textlist[0].text="（対戦中のみ有効）ありにすると特定のタイミングで";
+              Textlist[1].text="FEVER!が発生します。 現在のFEVER効果：ドラ3枚追加"
             }
             if(mouseX >600 && mouseX <700 && mouseY >450 && mouseY <490){
-              cx3.strokeRect(600,450,100,40)
-              cx2.clearRect(80,530,670,70)
-              cx2.fillText("現在の設定を反映して戻ります。", 80, 550);
+              Textlist[0].text="現在の設定を反映して戻ります。";
+              Textlist[1].text="　"
             }
             if(mouseX >400 && mouseX <580 && mouseY >450 && mouseY <490){
-              cx3.strokeRect(400,450,180,40)
-              cx2.clearRect(80,530,670,70)
-              cx2.fillText("オプションを初回起動時の設定に戻します。", 80, 550);
-              cx2.fillText("※『音量設定』のみ初期化されません。", 80, 570);
+              Textlist[0].text="オプションを初回起動時の設定に戻します。";
+              Textlist[1].text="※『音量設定』のみ初期化されません。"
             }
           break;
           case 4:
             //プレイガイド
-            cx3.clearRect(50,50,700,460)
-            cx3.strokeStyle ='orange'
-            cx3.lineWidth = 2;
-            cx2.fillStyle = "black";
-            cx2.font = "18px Arial";
-            cx3.font = "24px 'Century Gothic'";
-            cx3.fillStyle = "orange";
-            if(mouseX >700 && mouseX <750 && mouseY >50 && mouseY <90){
-              cx3.strokeRect(710,55,30,30)
-            }
             switch(msgstate){
               case 0:
                 if(mouseX >700 && mouseX <750 && mouseY >50 && mouseY <90){
@@ -10367,97 +9747,55 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                 break;
               case 1:
                 if(mouseX >90 && mouseX <200 && mouseY >60 && mouseY <100){
-                  cx3.strokeRect(375,263,170,20)
-                  cx2.clearRect(80,530,670,70)
-                  cx2.fillText("ここにはドラパイが1枚表示されます。", 80, 550);
-                  cx2.fillText("ドラと同じパイを持っていると、いいことが……？", 80, 570);
+              Textlist[0].text="ここにはドラパイが1枚表示されます。";
+              Textlist[1].text="ドラと同じパイを持っていると、いいことが……？"
                 }
                 if(mouseX >85 && mouseX <200 && mouseY >120 && mouseY <420){
-                  cx3.strokeRect(375,193,170,20)
-                  cx2.clearRect(80,530,670,70)
-                  cx2.fillText("数字は各プレイヤーの持ち点です。ゲーム中にカーソルを当てると、", 80, 550);
-                  cx2.fillText("情報欄にそのプレイヤーのバフ状況が表示されます。", 80, 570);
+              Textlist[0].text="この数字は各プレイヤーの戦闘力（持ち点）です。";
+              Textlist[1].text="0を下回ると戦意喪失状態になってしまいます。";
                 }
                 if(mouseX >160 && mouseX <670 && mouseY >420 && mouseY <505){
-                  cx3.strokeRect(375,168,170,20)
-                  cx2.clearRect(80,530,670,70)
-                  cx2.fillText("これは何でしょう？　そう、あなたの手札のパイです！", 80, 550);
-                  cx2.fillText("自分の番になったらこの中から1枚選んで捨てましょう。", 80, 570);
+                  Textlist[0].text="これは何でしょう？　そう、あなたの手札のパイです！";
+                  Textlist[1].text="自分の番になったらこの中から1枚選んで捨てましょう。";
                 }
                 if(mouseX >200 && mouseX <370 && mouseY >120 && mouseY <420){
-                  cx3.strokeRect(375,310,170,20)
-                  cx2.clearRect(80,530,670,70)
-                  cx2.fillText("これは各プレイヤーが場に捨てたパイです。", 80, 550);
-                  cx2.fillText("山札にどんなパイが眠っているのか想像してみてください。", 80, 570);
+                  Textlist[0].text="ここは川。各プレイヤーが捨てたパイが沈んでいます。";
+                  Textlist[1].text="山札にどんなパイが眠っているのか想像してみてください。";
                 }
                 if(mouseX >560 && mouseX <690 && mouseY >350 && mouseY <420){
-                  cx3.strokeRect(375,240,170,20)
-                  cx2.clearRect(80,530,670,70)
-                  cx2.fillText("ゲーム中にポン、スキル、リーチのコマンドを使うことができます。", 80, 550);
-                  cx2.fillText("あと1つで役が揃うならリーチボタンを押してみましょう。", 80, 570);
+                  Textlist[0].text="ゲーム中に使用するポン、リーチなどのボタンです。";
+                  Textlist[1].text="あと1つで役が揃うならリーチ！　リーチ！";
                 }
                 if(mouseX >560 && mouseX <690 && mouseY >60 && mouseY <330){
-                  cx3.strokeRect(375,216,170,20)
-                  cx2.clearRect(80,530,670,70)
-                  cx2.fillText("情報欄には、現在カーソルを合わせているパイや", 80, 550);
-                  cx2.fillText("プレイヤーに関する内容が表示されます。", 80, 570);
+                  Textlist[0].text="右側の情報欄には、選択中のパイやプレイヤーに";
+                  Textlist[1].text="関する内容が表示されます。";
                 }
                 if(mouseX >390 && mouseX <560 && mouseY >60 && mouseY <100){
-                  cx3.strokeRect(375,287,170,20)
-                  cx2.clearRect(80,530,670,70)
-                  cx2.fillText("山札の残りのパイが0になると引き分けです！", 80, 550);
-                  cx2.fillText("残パイリストにはまだ捨てられていないパイが表示されます。", 80, 570);
+                  Textlist[0].text="山札の残りのパイがなくなったら、";
+                  Textlist[1].text="その局は流局（引き分け）です！";
                 }
                 break;
-  
             }
           break;
           case 5:
             //実績
-            cx3.clearRect(50,50,700,460)
-            cx3.strokeStyle ='orange'
-            cx3.lineWidth = 2;
-            cx2.fillStyle = "black";
-            cx2.font = "18px Arial";
-            cx3.font = "24px 'Century Gothic'";
-            cx3.fillStyle = "orange";
-                if(mouseX >700 && mouseX <750 && mouseY >50 && mouseY <90){
-                  cx3.strokeRect(710,55,30,30)
-                }
             switch(msgstate){
-              case 0:
-                if(mouseX >530 && mouseX <730 && mouseY >90 && mouseY <130){
-                  cx3.strokeRect(530,90,200,40)
-                }
-                if(mouseX >530 && mouseX <730 && mouseY >400 && mouseY <450){
-                  var A=Math.floor((mouseX-530)/50);
-                  cx3.strokeRect(530+50*A,400,50,50);
-                }
-                if(mouseX >530 && mouseX <630 && mouseY >450 && mouseY <500){
-                  var A=Math.floor((mouseX-530)/50);
-                  cx3.strokeRect(530+50*A,450,50,50);
-                }
-                break;
               case 1:
               if(mouseX >195 && mouseX <380 && mouseY >95 && mouseY <495){
                 var I=Math.floor((mouseY-95)/20);
-                cx3.strokeRect(190,92+I*20,240,20);
                 if(achieveA[I].cleared>0){
-                cx2.clearRect(80,530,670,70)
-                cx2.fillText(achieveA[I].name, 80, 550);
-                cx2.fillText(achieveA[I].sub, 80, 570);  
+                Textlist[0].text=achieveA[I].name;
+                Textlist[1].text=achieveA[I].sub;
                 }
               }
               if(mouseX >475 && mouseX <660 && mouseY >95 && mouseY <495){
                 var I=Math.floor((mouseY-95)/20);
-                cx3.strokeRect(470,92+I*20,240,20);
                 if(I>=achieveA.length){
                   return false;
                 }
                 if(achieveA[I+20].cleared>0){
-                cx2.clearRect(80,530,670,70)
-                cx2.fillText(achieveA[I+20].name, 80, 550);
-                cx2.fillText(achieveA[I+20].sub, 80, 570);  
+                  Textlist[0].text=achieveA[I+20].name;
+                  Textlist[1].text=achieveA[I+20].sub;
                 }
               }
                 break;
@@ -10577,147 +9915,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           }
           return false;
         }
-        if(turn ==0){
-          if(reach[1] !==3){
-          if(skillswitch[1]==0 && pvpmode==0){
-        if(mouseY >390 && mouseY< 450){
-          if(mouseX >700 && mouseX<800){
-          cx3.clearRect(4,495,762,105)
-          cx3.clearRect(710,400,80,40)
-          }}
-        if(mouseY >400 && mouseY <440){
-          if(mouseX >710 && mouseX <790){
-          cx3.strokeStyle ='yellow'
-          cx3.lineWidth = 2;
-          cx3.strokeRect(711,401,78,38)
-          }}
-        }
-          if(reach[1]==1){
-      if(mouseY >430 && mouseY <490){
-      if(mouseX >620 && mouseX <720){
-      cx3.clearRect(4,495,762,105)
-      cx3.clearRect(630,440,80,40)
-      }}
-      if(mouseY >440 && mouseY <480){
-      if(mouseX >630 && mouseX <710){
-      cx2.font = "16px Arial";
-      cx2.clearRect(630,60,160,260)
-      cx2.fillStyle = "white";
-      cx2.fillText("「リーチ」", 635, 270);
-      cx3.clearRect(4,495,762,105)
-      cx3.clearRect(630,440,80,40)
-      cx3.strokeStyle ='yellow'
-      cx3.lineWidth = 2;
-      cx3.strokeRect(631,441,78,38)
-      }}}
-          if(reach[1]==2){
-      if(mouseY >440 && mouseY <480){
-      if(mouseX >630 && mouseX <710){
-      cx3.strokeStyle ='orange'
-      cx3.lineWidth = 2;
-      cx3.strokeRect(631,441,78,38)
-      }}
-      }
-          if(mouseY >470 && mouseY < 590){
-            if(mouseX >0 && mouseX <720){
-      cx3.clearRect(4,495,762,105)
-            }}
-          if(mouseY >490 && mouseY < 590){
-      cx3.lineWidth = 2;
-      cx3.strokeStyle ='yellow'
-      //size参照100,690
-      var SX=Math.floor((mouseX+size-100)/size);
-      var SXX=100+size*(SX-1)
-      if(SXX>=100 && SXX<660){
-        cx3.clearRect(95,490,700,100)
-        if(hand1.length>SX+1){
-        cx3.strokeRect(SXX,500,size,sizey)
-        }
-        if(ponsw[1]==1 && hand1.length==SX+1){
-          cx3.strokeRect(SXX,500,size,sizey) 
-        }
-      }else if(mouseX >690 && mouseX <690+size){
-        if(ponsw[1]!==1){
-      cx3.clearRect(95,490,700,100)
-      cx3.strokeRect(690,500,size,sizey)
-        }
-      }}
-        }else if(reach[1] ==3){
-      cx3.clearRect(4,495,762,105)
-      cx3.strokeStyle ='yellow'
-      cx3.lineWidth = 2;
-      if(mouseX >690 && mouseX <690+size && mouseY >470 && mouseY < 590){
-        cx3.clearRect(95,490,700,100)
-        cx3.strokeRect(690,500,size,sizey)
-        }
-      }
-      if(nukiswitch[1]>0){
-        if(mouseY >430 && mouseY< 490){
-          if(mouseX >700 && mouseX<800){
-          cx3.clearRect(4,495,762,105)
-          cx3.clearRect(710,440,80,40)
-          }}
-        if(mouseY >440 && mouseY <480){
-          if(mouseX >710 && mouseX <790){
-          cx3.strokeStyle ='yellow'
-          cx3.lineWidth = 2;
-          cx3.strokeRect(711,441,78,38)
-          }}
-        }
-      if(hand1[0]==-3){
-      if(mouseY >348 && mouseY< 490 &&mouseX >326 && mouseX<474){    
-        if(TRswitch!==1){
-      TRswitch=1;
-      e19.src=eltearB_src[2]
-      e19.onload=function(){
-        cx3.clearRect(326,348,148,142)
-      cx3.drawImage(e19,326,348,148,142)
-      }
-        }
-      }else{
-      TRswitch=0;
-      e18.src=eltearB_src[1]
-      e18.onload=function(){
-        cx3.clearRect(326,348,148,142)
-      cx3.drawImage(e18,326,348,148,142)
-      }
-      }
-      }
-        }
-        if(turn !==0){
-      if(hand1[0]==-2){
-          if(mouseY >348 && mouseY< 490 && mouseX >326 && mouseX<474){    
-            if(TRswitch!==1){
-          TRswitch=1;
-          e19.src=eltearB_src[4]
-          e19.onload=function(){
-            cx3.clearRect(326,348,148,142)
-          cx3.drawImage(e19,326,348,148,142)
-          }
-            }
-          }else{
-            TRswitch=0;
-            e18.src=eltearB_src[3]
-            e18.onload=function(){
-              cx3.clearRect(326,348,148,142)
-            cx3.drawImage(e18,326,348,148,142)
-            }
-          }
-      }
-      if(mouseY >390 && mouseY <450){
-        if(mouseX >620 && mouseX <720){
-          cx3.clearRect(630,400,80,40)
-      if(mouseY >400 && mouseY <440 && mouseX >630 && mouseX <710){
-          if(ponsw[1]==1){
-            //cx3.clearRect(4,480,762,110)
-            cx3.clearRect(630,400,80,40)
-            cx3.strokeStyle ='yellow'
-            cx3.lineWidth = 2;
-            cx3.strokeRect(631,401,78,38)
-  //ポンボタン
-        }}
-      }}
-    }
       }
       if(gamestate ==1){
       //牌の詳細表示
@@ -10766,108 +9963,234 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             }else{
               ElnameM=num;
             };
-          cx2.font = "bold 18px Arial";
-          cx2.clearRect(630,10,160,310)
-          //expected num 1~45
+          guidemap.removeAllChildren();
           var type1=donpai.findIndex(value=>value.id==num)
           if(type1==-1){
             console.log('Donpai error!')
             return false;
           }
-          e6.src=eltear_src[type1]
-          e6.onload=function(){
-            cx2.drawImage(e6,635,15,70,93);
-          }
-          cx2.font = "bold 24px Arial";
-          cx2.fillStyle = "orange";
-          cx2.fillText(donpai[type1].name, 635, 130);
+          var e6 = new createjs.Bitmap(eltear_src[type1]);
+          e6.x=635;
+          e6.y=15;
+          e6.scale=7/12;
+          guidemap.addChild(e6);
+          var t = new createjs.Text(donpai[type1].name, "bold 24px Arial", "#ff601c");
+          t.x=635;
+          t.y=120;
+          guidemap.addChild(t);
           if(donpai[type1].sub.length>7){
-            cx2.font = "14px Arial";
+            var t = new createjs.Text("（"+donpai[type1].sub+"）", "14px Arial", "#ff601c");
           }else{
-            cx2.font = "18px Arial";
+            var t = new createjs.Text("（"+donpai[type1].sub+"）", "18px Arial", "#ff601c");
           }
-          cx2.fillText("（"+donpai[type1].sub+"）", 630, 150);
-          cx2.font = "20px Arial";
-          cx2.fillStyle = "white";
-          if(donpai[type1].line==0){
-          cx2.fillText("オールマイティ", 635, 180);
-          }else{
-          cx2.fillText("CLASS："+donpai[type1].line+"Line", 635, 180);
-          }
+          t.x=630;
+          t.y=150;
+          guidemap.addChild(t);
+          var t = new createjs.Text("CLASS："+donpai[type1].line+"Line", "20px Arial", "white");
+          if(donpai[type1].line==0){t.text="オールマイティ"};
+          t.x=635;
+          t.y=180;
+          guidemap.addChild(t);
           Nodyaku2(1,num);
           if(reach[1]==2){
             var Wait=Reachwait(numb)
             if(Wait[0]=="ノーテン"){reach[0]=1}else{reach[0]=0};
             if(debugmode){console.log(reach[0])};
-            cx2.font = "18px Arial";
-            cx2.clearRect(630,240,160,80)
-            cx2.fillStyle = "white";
-            cx2.fillText("「リーチ」", 635, 270);
-            cx2.font = "Bold 16px Arial";
-            cx2.fillStyle = "orange";
-            cx2.fillText(Wait[0],635,300)
-            cx3.clearRect(200,370,360,120);
             if(Wait.length>1){
-              cx3.fillStyle = "rgba(20,20,20,0.7)";
-              cx3.fillRect(201,371,358,118)
-              cx3.font = "Bold 20px Arial";
-              cx3.fillStyle = "orange";
-              cx3.fillText(Wait[0],220,395)
-            e9.src=eltear_src[Wait[1]]
-            e9.onload=function(){
-              cx3.drawImage(e9,210,410,60,78);
-              if(Wait.length>2){
-                e9.src=eltear_src[Wait[2]]
-                e9.onload=function(){
-                  cx3.drawImage(e9,280,410,60,78);
-                  if(Wait.length>3){
-                  e9.src=eltear_src[Wait[3]]
-                  e9.onload=function(){
-                    cx3.drawImage(e9,350,410,60,78);
-                    if(Wait.length>4){
-                      e9.src=eltear_src[Wait[4]]
-                      e9.onload=function(){
-                        cx3.drawImage(e9,420,410,60,78);
-                        if(Wait.length>5){
-                          e9.src=eltear_src[Wait[5]]
-                          e9.onload=function(){
-                            cx3.drawImage(e9,490,410,60,78);
-                      }}}}
-            }}}
-            }}}
+              var s = new createjs.Shape();
+              s.graphics.beginFill("rgba(20,20,20,0.7)");
+              s.graphics.drawRect(201, 371, 358, 118);
+              guidemap.addChild(s);
+              var t = new createjs.Text(Wait[0], "bold 20px Arial", "#ff601c");
+              t.x=220;
+              t.y=380;
+              guidemap.addChild(t);
+              for(var i=1;i<Wait.length;i++){
+              var e9 = new createjs.Bitmap(eltear_src[Wait[i]]);
+              e9.x=140+70*i;
+              e9.y=410;
+              e9.scale=1/2;
+              guidemap.addChild(e9);
+            }}
           }
-      }
-      function drawDP(p=1){
-        if(debugmode){console.log(DP[p])};
-        //mpゲージ書く
+        };
+    function drawDP(p=0){
+      if(p==0){
+      //mpゲージ書く
+        var Ary=[0,470,170,270,370];
+        for(var i=1;i<5;i++){
         var x=50;
-        var y=478;
-        switch(p){
-          case 1:
-             break;
-             case 2:
-              y-=300;
-              break;
-              case 3:
-                y-=200;
-                break;
-                case 4:
-                  y-=100;
-                  break;
-           
+        var y=Ary[i];
+        var s = new createjs.Shape();
+        s.graphics.beginFill("#0080ff");
+        s.graphics.drawRect(0, y, 90, 15);
+        s.graphics.beginFill("#75eaff");
+        s.graphics.drawRect(0, y, 90, 5);
+        s.scaleX=DP[i]/30;
+        s.x=x;
+        field.addChild(s);
+        DPlist[i]=s;
+        var s = new createjs.Shape();
+        s.graphics.beginStroke("#e3e3e3");
+        s.graphics.setStrokeStyle(2);
+        s.graphics.drawRect(x, y, 30, 15);
+        s.graphics.drawRect(x+30, y, 30, 15);
+        s.graphics.drawRect(x+60, y, 30, 15);
+        field.addChild(s);
         }
-        cx2.fillStyle="#3d3d3d";
-        cx2.clearRect(x,y,90,15);
-        cx2.fillRect(x,y,90,15);
-        cx2.fillStyle="#0080ff"
-        cx2.fillRect(x,y,90*DP[p]/30,15);
-        cx2.fillStyle="#68ceed";
-        cx2.fillRect(x,y,90*DP[p]/30,5);
-        cx2.strokeStyle="#e3e3e3"
-        cx2.strokeRect(x,y,30,15);
-        cx2.strokeRect(x+30,y,30,15);
-        cx2.strokeRect(x+60,y,30,15);;
+      }else{
+        if(debugmode){console.log(DP[p])};
+        DPlist[p].scaleX=DP[p]/30;
+        DPlist[p].x=50;
+        return true;
       }
+      //
+    }
+    function SoundConfig(event,p=0){
+      SEbuffer(-1)
+      if(!cLock && debugmode){
+        //for debug
+        cLock=true;
+      }
+      //ミュートの切り替え
+      if( mute=="OFF" ){
+        SEbuffer();
+        Bgm.mute(false);
+        musicStart(musicnum);
+        se11.play();
+        mute="ON";
+        }else{
+        Bgm.mute(true);
+        Bgm.stop();
+        mute="OFF";
+    }
+    muteshape.text=mute;
+    };
+    function createButton(text, width, height, keyColorA="#68ceed", keyColorB="#0080ff", keyColorC="#233237", keyColorD="#043342"){
+      // ボタン要素をグループ化 keycolor A,B：通常時　C,D：活性化時
+      var button = new createjs.Container();
+      button.name = text; // ボタンに参考までに名称を入れておく(必須ではない)
+      // 通常時の座布団を作成
+      var bgUp = new createjs.Shape();
+      bgUp.graphics
+      .setStrokeStyle(1.0)
+      .beginStroke(keyColorA)
+      .beginFill(keyColorB)
+      .drawRoundRect(0.5, 0.5, width - 1.0, height - 1.0, 2)
+      .beginFill(keyColorA)
+      .moveTo(1,1)
+      .lineTo(width*3/7-1,1)
+      .lineTo(1,height*4/15-1)
+      .lineTo(1,height*5/12-1)
+      .lineTo(1,1)
+      .moveTo(1,1)
+      .lineTo(width*5/17-1,1)
+      .lineTo(1,height*5/12-1)
+      .lineTo(1,1)
+      button.addChild(bgUp);
+      bgUp.visible = true; // 表示する
+      // ロールオーバー時の座布団を作成
+      var bgOver = new createjs.Shape();
+      bgOver.graphics
+      .setStrokeStyle(1.0)
+      .beginStroke(keyColorC)
+      .beginFill(keyColorD)
+      .drawRoundRect(0.5, 0.5, width - 1.0, height - 1.0, 2)
+      .beginFill(keyColorA)
+      .moveTo(1,1)
+      .lineTo(width*3/7-1,1)
+      .lineTo(1,height*4/15-1)
+      .lineTo(1,height*5/12-1)
+      .lineTo(1,1)
+      .moveTo(1,1)
+      .lineTo(width*5/17-1,1)
+      .lineTo(1,height*5/12-1)
+      .lineTo(1,1)
+      bgOver.visible = false; // 非表示にする
+      button.addChild(bgOver);
+
+      // ラベルを作成
+      var label = new createjs.Text(text, "18px sans-serif", "#ffffff");
+      label.x = width / 2;
+      label.y = height / 2;
+      label.textAlign = "center";
+      label.textBaseline = "middle";
+      button.addChild(label);
+
+      // ロールオーバーイベントを登録
+      button.addEventListener("mouseover", handleMouseOver);
+      button.addEventListener("mouseout", handleMouseOut);
+      function handleMouseOver(event) {
+        bgUp.visble = false;
+        bgOver.visible = true;
+        label.color = "white";
+      }
+
+      function handleMouseOut(event) {
+        bgUp.visble = true;
+        bgOver.visible = false;
+        label.color = "white";
+      }
+
+      return button;      
+    }
+    //
+    function createCircleButton(text, width, keyColorA="rgb(255,155,135)", keyColorB="rgb(221,84,72)", keyColorC="rgb(255,255,150)", keyColorD="rgb(223,163,0)"){
+      // ツモ・ロンのぼたん width=>径
+      var button = new createjs.Container();
+      button.name = text; // ボタンに参考までに名称を入れておく(必須ではない)
+      // 通常時の座布団を作成
+      var bgUp = new createjs.Shape();
+      bgUp.graphics
+      .beginRadialGradientFill([keyColorB, keyColorA, "rgba(255, 255, 255, 0)"], [0, 0.8, 1], width/2, width/2, 0, width/2, width/2, width)
+      //
+      .drawCircle(width/2, width/2, width)
+      button.addChild(bgUp);
+      bgUp.visible = true; // 表示する
+      // ロールオーバー時の座布団を作成
+      var bgOver = new createjs.Shape();
+      bgOver.graphics
+      .beginRadialGradientFill([keyColorD, keyColorC, "rgba(255, 255, 255, 0)"], [0, 0.8, 1], width/2, width/2, 0, width/2, width/2, width)
+      .drawCircle(width/2, width/2, width)
+      bgOver.visible = false; // 非表示にする
+      button.addChild(bgOver);
+      //くるくる
+      var s = new createjs.Bitmap("don/circle88.png");
+      s.regX = 44;
+      s.regY = 46;
+      s.x=width/2+2;
+      s.y=width/2;
+      s.scale=width/30;
+      s.compositeOperation = "lighter";
+      button.addChild(s);
+    var tweeNc;
+      tweeNc=createjs.Tween.get(s, {loop: true})
+      .to({rotation:-360},2000);
+      // ラベルを作成
+      var label = new createjs.Text(text, "20px sans-serif", "#ffffff");
+      label.x = width / 2;
+      label.y = width / 2;
+      label.textAlign = "center";
+      label.textBaseline = "middle";
+      button.addChild(label);
+      // ロールオーバーイベントを登録
+      button.addEventListener("mouseover", handleMouseOver);
+      button.addEventListener("mouseout", handleMouseOut);
+      function handleMouseOver(event) {
+        bgUp.visble = false;
+        bgOver.visible = true;
+        label.color = "white";
+      }
+
+      function handleMouseOut(event) {
+        bgUp.visble = true;
+        bgOver.visible = false;
+        label.color = "white";
+      }
+
+      return button;      
+    }
+    //
       function drawbuttom(x,y,word,type=0,w=80,z=40,R=0,context=cx2){
         //type->活性化時1に
         context.lineWidth = 2;
@@ -10966,191 +10289,195 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         cx4.fill();
         }
 
-    function LoopAnimation(ts,player){
-      cx4.globalAlpha = alpha;
-      cx4.clearRect(0,0,800,600)
-      cx4.fillStyle = "#001c0d";
-      cx4.beginPath();
-        cx4.moveTo(0,200);
-        cx4.lineTo(1600/3,0);
-        cx4.lineTo(800, 0);
-        cx4.lineTo(800,400);
-        cx4.lineTo(800/3,600)
-        cx4.lineTo(0,600)
-        cx4.fill();
-      loopX+=3
-      loopX2+=80
-      var x=loopX*4
-      var y=300
-      var loopxx=300/loopX
-      y -=loopX*1.5
-      if(x>=800){loopX=0}
-      if(loopX2>=600){loopX2=600}
-      cx4.fillStyle = "#ff4c38";
-      cx4.strokeStyle = "#ff4c38";
-      drawstar(x,y)
-      cx4.fillStyle = "#007fd9";
-      cx4.strokeStyle = "#007fd9";
-      drawstar(x*1.2+100,y*1.2+100)
-      cx4.fillStyle = "#f558e5";
-      cx4.strokeStyle = "#f558e5";
-      drawstar(x*1.1+140,y*1.1+200)
-      cx4.drawImage(e15,loopX2-600,0,800+(600/loopX2),600+(600/loopX2))
-      cx4.drawImage(e16,100,200,330+(loopxx/2),260+(loopxx*13/33))
-      cx4.strokeStyle = "white";
-      cx4.lineWidth = 6;
-      cx4.beginPath();
-      cx4.moveTo(x*3,y*3-200);
-      cx4.lineTo(x*3+240,y*3-290);
-      cx4.stroke();
-      cx4.beginPath();
-      cx4.moveTo(x*3,y*3-700);
-      cx4.lineTo(x*3+240,y*3-790);
-      cx4.stroke();
-      if(alpha>0){
-      if(gamestate==-2){window.requestAnimationFrame((ts)=>LoopAnimation(ts,player));}else{
-      alpha -=0.05
-      window.requestAnimationFrame((ts)=>LoopAnimation(ts,player));}
-      }else if(alpha <=0){
-      cx4.clearRect(0,0,800,600);
-      cx4.globalAlpha = 1;
+    function LoopAnimation(player,type=0){
+      //type->0 ツモ 1 ロン
+      var Container = new createjs.Container();
+      Container.alpha=0;
+      stage.addChild(Container);
+      var C = new createjs.Bitmap(win_src[7]);
+      C.regX=400
+      C.regY=300;
+      C.x=400;
+      C.y=300;
+      C.scale=1.5;
+      Container.addChild(C);
+      createjs.Tween.get(C)
+      .to({scale:1},200, createjs.Ease.cubicInOut);
+      var C = new createjs.Bitmap(chrimg_src[chara[player]]);
+      C.x=-600
+      C.y=0;
+      C.scaleX=14/8;
+      C.scaleY=2;
+      Container.addChild(C);
+      createjs.Tween.get(C)
+      .to({x:0, scaleX:1, scaleY:1},200, createjs.Ease.cubicInOut)
+      if(type==0){
+      var C = new createjs.Bitmap(win_src[4]);
+      }else{
+      var C = new createjs.Bitmap(win_src[5]);
+      }
+      C.x=-20
+      C.y=260;
+      C.scale=0.8
+      Container.addChild(C);
+      createjs.Tween.get(C)
+      .to({x:0,y:230,scale:0.7},60, createjs.Ease.cubicInOut)
+      .wait(800);
+      createjs.Tween.get(Container)
+      .to({alpha: 1},50)
+      .wait(1600)
+      .call(next);
+      function next(){
       opLock=0;
-      if(LP[0]!==4){Resultmap(player)
+      if(LP[0]!==4){Resultmap(player,type)
       };
+      createjs.Tween.get(Container)
+      .to({alpha: 0},500)
+      .call(end);
+      }
+      function end(){
+        Container.removeAllChildren();
+        stage.removeChild(Container);
       }
       };
   
-  function ReachAnimation(ts,A=0){
-    cx4.globalAlpha = alpha;
-    cx4.clearRect(0,0,800,600)
-    cx4.fillStyle = "#001c0d";
-    cx4.beginPath();
-      cx4.moveTo(0,200);
-      cx4.lineTo(1600/3,0);
-      cx4.lineTo(800, 0);
-      cx4.lineTo(800,400);
-      cx4.lineTo(800/3,600)
-      cx4.lineTo(0,600)
-      cx4.fill();
-    A+=1;
-    loopX+=3
-    loopX2+=80
-    var x=loopX*4
-    var xx=loopX*2
-    var y=300
-    y -=loopX*1.5
-    if(x>=800){loopX=0}
-    if(loopX2>=600){loopX2=600}
-    cx4.rotate(-20*Math.PI/180);
-    cx4.font = "bold 20px Arial";
-    cx4.fillStyle = "#919191";
+  function ReachAnimation(p){
+    var Container = new createjs.Container();
+    Container.alpha=0;
+    stage.addChild(Container);
+    var C= new createjs.Shape();
+    C.graphics.beginFill("#001c0d")
+    C.graphics.moveTo(0,200);
+    C.graphics.lineTo(1600/3,0);
+    C.graphics.lineTo(800, 0);
+    C.graphics.lineTo(800,400);
+    C.graphics.lineTo(800/3,600)
+    C.graphics.lineTo(0,600)
+    C.graphics.lineTo(0,200)
+    Container.addChild(C);
     var Reachtext='Reach! Reach! Reach! Reach! Reach! Reach! Reach! Reach! Reach! Reach! Reach! Reach! Reach! Reach! Reach! Reach! Reach! Reach! Reach! Reach!'
-    cx4.fillText(Reachtext,xx-450,230);
-    cx4.fillText(Reachtext,-xx+30,260);
-    cx4.fillText(Reachtext,xx-450,290);
-    cx4.fillText(Reachtext,-xx+30,320);
-    cx4.fillText(Reachtext,xx-450,350);
-    cx4.fillText(Reachtext,-xx-50,450);
-    cx4.fillText(Reachtext,xx-470,480);
-    cx4.fillText(Reachtext,-xx-50,510);
-    cx4.fillText(Reachtext,xx-470,540);
-    cx4.fillText(Reachtext,-xx-50,570);
-    cx4.rotate(20*Math.PI/180);
-    cx4.drawImage(e15,loopX2-600,0,800+(600/loopX2),600+(600/loopX2))
-    cx4.drawImage(e17,110,260,216,150)
-    cx4.strokeStyle = "white";
-    cx4.lineWidth = 6;
-    cx4.beginPath();
-    cx4.moveTo(x*3,y*3-200);
-    cx4.lineTo(x*3+240,y*3-290);
-    cx4.stroke();
-    cx4.beginPath();
-    cx4.moveTo(x*3,y*3-700);
-    cx4.lineTo(x*3+240,y*3-790);
-    cx4.stroke();
-    if(alpha>0){
-    if(A<50){window.requestAnimationFrame((ts)=>ReachAnimation(ts,A));}else{
-    alpha -=0.05
-    window.requestAnimationFrame((ts)=>ReachAnimation(ts,A));}
-    }else if(alpha <=0){
-    cx4.clearRect(0,0,800,600);
-    cx4.globalAlpha = 1;
-    turnchecker();
+    for(var i=0;i<5;i++){
+    var D= new createjs.Text(Reachtext, "bold 24px Arial", "#919191");
+    D.rotation=-20.5;
+    D.x=-450;
+    D.y=390+86*i;
+    Container.addChild(D);
+    createjs.Tween.get(D, {loop: true})
+    .to({x:D.x+800/3,y:D.y-100},1100);
+    }
+    for(var i=0;i<5;i++){
+      var D= new createjs.Text(Reachtext, "bold 24px Arial", "#919191");
+      D.rotation=-20.5;
+      D.x=-50;
+      D.y=280+86*i;
+      Container.addChild(D);
+      createjs.Tween.get(D, {loop: true})
+      .to({x:D.x-800/3,y:D.y+100},1100);
+      }
+      var C = new createjs.Bitmap(chrimg_src[chara[p]]);
+      C.x=-600
+      C.y=0;
+      C.scaleX=14/8;
+      C.scaleY=2;
+      Container.addChild(C);
+      createjs.Tween.get(C)
+      .to({x:0, scaleX:1, scaleY:1},200, createjs.Ease.cubicInOut)
+      .wait(800)
+      .to({x:-400, scaleX:1.1, scaleY:1.1,alpha:0.5},150);
+      var C = new createjs.Bitmap(win_src[6]);
+      C.x=110
+      C.y=260;
+      C.scale=0.7
+      Container.addChild(C);
+      createjs.Tween.get(Container)
+      .to({alpha: 1},50)
+      .wait(1000)
+      .to({alpha: 0},100)
+      .call(next);
+    //
+    function next (){
+      Container.removeAllChildren();
+      stage.removeChild(Container);
+      turnchecker();
     }
     };
   
-  function PonAnimation(ts,A=0,B){
-    //余裕あればキャラごとにYを変えたい
-      cx4.globalAlpha = alpha;
-      A+=1;
-      loopX+=3
-      loopX2+=80
-      var x=loopX*4
-      var xx=loopX*3
-      var y=300
-      y -=loopX*1.5
-      if(xx>50){xx=50};
-      if(x>=800){loopX=0}
-      if(loopX2>=500){loopX2=500}
-      cx4.clearRect(0,0,800,600)
-      cx4.fillStyle = "#001c0d";
-      cx4.fillRect(0,250-xx,800,xx*2);
-      cx4.drawImage(e15,400,200-xx,300,xx*2,loopX2,250-xx,300,xx*2)
-      cx4.strokeStyle = "white";
-      cx4.lineWidth = 6;
-      cx4.beginPath();
-      cx4.moveTo(0,250-xx);
-      cx4.lineTo(800,250-xx);
-      cx4.stroke();
-      cx4.beginPath();
-      cx4.moveTo(0,250+xx);
-      cx4.lineTo(800,250+xx);
-      cx4.stroke();
-      cx4.rotate(-15*Math.PI/180);
-      cx4.font = "bold 64px Arial";
-      cx4.fillStyle = "#919191";
-      var Reachtext='PON!'
-      cx4.strokeText(Reachtext,50,300);
-      cx4.fillText(Reachtext,50,300);
-      cx4.rotate(15*Math.PI/180);
-      if(alpha>0){
-      if(A<30){window.requestAnimationFrame((ts)=>PonAnimation(ts,A,B));}else{
-      alpha -=0.1
-      window.requestAnimationFrame((ts)=>PonAnimation(ts,A,B));}
-      }else if(alpha <=0){
-      cx4.clearRect(0,0,800,600);cx4.globalAlpha = 1;
-      if(debugmode){console.log(B)}
-      switch(B){
-        case 1:
-        handgraph(0,1)
-        turn=0;
-        if(pvpmode==1){
+  function PonAnimation(p=0){
+    var Container = new createjs.Container();
+    Container.alpha=0;
+    stage.addChild(Container);
+    // マスク
+    var rect = new createjs.Shape();
+      rect.graphics
+      .beginFill("#001c0d")
+      .drawRect(0, 0, 800, 600);
+      Container.addChild(rect);
+      var shapeMask = new createjs.Shape();
+      shapeMask.graphics
+      .beginFill("gold")
+      .drawRect(0, 0, 800, 100);
+      shapeMask.scaleY=0.1;
+      shapeMask.y=200;
+      Container.mask = shapeMask;
+    var C = new createjs.Bitmap(chrimg_src[chara[p]]);
+      C.x=-300;
+      C.y=0;
+      Container.addChild(C);
+    var t = new createjs.Text("PON!", "bold 64px Arial", "white");
+    t.rotation=-15;
+    t.x=50;
+    t.y=190;
+    t.outline=6;
+    Container.addChild(t);
+    var t = new createjs.Text("PON!", "bold 64px Arial", "#919191");
+    t.rotation=-15;
+    t.x=50;
+    t.y=190;
+    Container.addChild(t);
+    createjs.Tween.get(Container)
+    .to({alpha: 1},60)
+    .wait(700)
+    .to({alpha: 0},100)
+    .call(next);
+    createjs.Tween.get(shapeMask)
+    .to({y:150,scaleY: 1},60);
+    createjs.Tween.get(C)
+    .to({x:0},60);
+    //
+      function next(){
+        Container.removeAllChildren();
+        stage.removeChild(Container);
+        switch(p){
+          case 1:
+          handgraph(0,1)
+          turn=0;
           Csquare.y=400;
-          for(var i=0;i<MEMBER.length;i++){
-            MEMBER[i].turnflag=0;
-          }
-          MEMBER[turn].turnflag=1;
-        }
-        player1();
-        break;
-        default:
           if(pvpmode==1){
-            turn=B-1;
-              for(var i=0;i<MEMBER.length;i++){
-                MEMBER[i].turnflag=0;
-              }
-              MEMBER[turn].turnflag=1;
-              turnrole();
-          }else{
-          turn=B-1;
-          cpu(B);
+            for(var i=0;i<MEMBER.length;i++){
+              MEMBER[i].turnflag=0;
+            }
+            MEMBER[turn].turnflag=1;
           }
+          player1();
           break;
-      }
-      }
+          default:
+            if(pvpmode==1){
+              turn=p-1;
+                for(var i=0;i<MEMBER.length;i++){
+                  MEMBER[i].turnflag=0;
+                }
+                MEMBER[turn].turnflag=1;
+                turnrole();
+            }else{
+            turn=p-1;
+            cpu(p);
+            }
+            break;
+        }
+      };
     };
   function NukiAnimation(ts,A=0,B){
-      //Ponからコピー
+      //Ponからコピー カンになる予定
         cx4.globalAlpha = alpha;
         A+=1;
         loopX+=3
@@ -11301,6 +10628,10 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         se12.play();
         //cx2.fillStyle = "rgba(20,20,20,0.5)";
         drawbuttom(710,400,"スキル",1);
+        ponkanmap.removeAllChildren();
+        var C=canvas2.toDataURL();
+        var Cb = new createjs.Bitmap(C);
+        ponkanmap.addChild(Cb);
         cx3.clearRect(0,0,800,600)
         skillusage[player]+=1
         skillswitch[player]=2
@@ -11413,6 +10744,10 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       window.requestAnimationFrame((ts)=>SkillAnimation(ts));
       se12.play();
       drawbuttom(710,400,"スキル",1);
+      ponkanmap.removeAllChildren();
+      var C=canvas2.toDataURL();
+      var Cb = new createjs.Bitmap(C);
+      ponkanmap.addChild(Cb);
       skillswitch[player]=1
       skillusage[player]+=1;
       if(skillusage[player]>=4){skillswitch[player]=2}
@@ -11524,6 +10859,10 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       se12.play();
       //cx2.fillStyle = "rgba(20,20,20,0.5)";
       drawbuttom(710,400,"スキル",1);
+      ponkanmap.removeAllChildren();
+      var C=canvas2.toDataURL();
+      var Cb = new createjs.Bitmap(C);
+      ponkanmap.addChild(Cb);
       cx3.clearRect(0,0,800,600)
       skillusage[player]+=1
       skillswitch[player]=2
@@ -11608,6 +10947,10 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         se12.play();
         //cx2.fillStyle = "rgba(20,20,20,0.5)";
         drawbuttom(710,400,"スキル",1);
+        ponkanmap.removeAllChildren();
+        var C=canvas2.toDataURL();
+        var Cb = new createjs.Bitmap(C);
+        ponkanmap.addChild(Cb);
         cx3.clearRect(0,0,800,600)
         skillusage[player]+=1
         skillswitch[player]=2
@@ -11677,12 +11020,13 @@ cx1.drawImage(e7,dorax,10,33,43.5)
     }
   });
   function gameover(){//けっかはっぴょぉうする
+    tweeNsquare.paused=true;
+    Csquare.alpha=0;
+    Configmap.removeAllChildren();
+    jingle2.seek(1);
+    jingle2.play();
     if(pvpmode==1){
       cx4.clearRect(0,0,800,500);
-      jingle2.seek(1);
-      jingle2.play();
-      tweeNsquare.paused=true;
-      Csquare.alpha=0;
       if(IsHost(IAM.room)){
         socket.emit("game_over", {Token:IAM.token,room:RoomName[IAM.room],type:0,scoretemp:scoretemp[0]});
       }
@@ -11717,40 +11061,52 @@ cx1.drawImage(e7,dorax,10,33,43.5)
     if(LPresult[1].elia==LPresult[0].elia){
       RankingStr[3]=RankingStr[2];
     }
-    gamestate=3;
-    cx1.fillStyle = "#001c0d";
-    cx1.fillRect(0,0,800,600)
+    field.removeAllChildren();
+    var s = new createjs.Shape();
+    s.graphics.beginFill("#001c0d");
+    s.graphics.drawRect(0, 0, 800, 600);
+    field.addChild(s);
+    var e10 = new createjs.Bitmap(chrimg_src[LPresult[3].chara]);
+      e10.x=100;
+      e10.y=50;
+      e10.regX=400;
+      e10.regX=300;
+      e10.scale=3/4;
+      field.addChild(e10);
+      createjs.Tween.get(e10)
+      .wait(1200)
+      .to({scale:3/4}, 200, createjs.Ease.cubicInOut)
+      .call(next);
+    field.addChild(e10);
+    for(var i=0;i<3;i++){
+    var e10 = new createjs.Bitmap(chrimg_src[LPresult[2-i].chara]);
+    if(LPresult[2-i].chara==1){
+      e10.sourceRect={x:500,y:120,width:215,height:215}
+      e10.scale=60/215;
+      }else if(LPresult[2-i].chara==4){
+      e10.sourceRect={x:480,y:70,width:250,height:250}
+      e10.scale=60/250;
+      }else{
+      e10.sourceRect={x:500,y:50,width:215,height:215}
+      e10.scale=60/215;
+      }
+      e10.x=-50;
+      e10.y=201+100*i;
+      createjs.Tween.get(e10)
+        .wait(i*300)
+        .to({x: 50}, 200, createjs.Ease.cubicInOut)
+        .call(se1)
+      field.addChild(e10);
+    }
+    function se1(){
+      se14.play();
+    };
+    function next(){
+      console.log(cLock,gamestate);
+      gamestate=3;
+    }
+    //
     cx2.clearRect(0,0,800,600)
-    e10.src=chrimg_src[LPresult[3].chara]
-      e10.onload=function(){
-    cx2.drawImage(e10,0,0,800,600,100,50,600,450)
-    e10.src=chrimg_src[LPresult[2].chara]
-      e10.onload=function(){
-        if(LPresult[2].chara==1){
-          cx1.drawImage(e10,500,120,215,215,50,201,60,60)
-        }else if(LPresult[2].chara==4){
-          cx1.drawImage(e10,480,70,250,250,50,201,60,60)
-          }else{
-          cx1.drawImage(e10,500,50,215,215,50,201,60,60)
-          }
-    e10.src=chrimg_src[LPresult[1].chara]
-      e10.onload=function(){
-        if(LPresult[1].chara==1){
-          cx1.drawImage(e10,500,120,215,215,50,301,60,60)
-        }else if(LPresult[1].chara==4){
-          cx1.drawImage(e10,480,70,250,250,50,301,60,60)
-          }else{
-          cx1.drawImage(e10,500,50,215,215,50,301,60,60)
-          }
-    e10.src=chrimg_src[LPresult[0].chara]
-      e10.onload=function(){
-        if(LPresult[0].chara==1){
-          cx1.drawImage(e10,500,120,215,215,50,401,60,60)
-        }else if(LPresult[0].chara==4){
-          cx1.drawImage(e10,480,70,250,250,50,401,60,60)
-          }else{
-          cx1.drawImage(e10,500,50,215,215,50,401,60,60)
-          }
     cx2.font = "bold 45px Arial";
     cx2.fillStyle = "white";
     cx2.fillText("終　局", 350, 48);
@@ -11775,6 +11131,9 @@ cx1.drawImage(e7,dorax,10,33,43.5)
   cx2.fillText(LPresult[2].elia, 120, 260);
   cx2.fillText(LPresult[1].elia, 120, 360);
   cx2.fillText(LPresult[0].elia, 120, 460);
+  Cbt=canvas2.toDataURL();
+  Cbutton = new createjs.Bitmap(Cbt);
+  field.addChild(Cbutton)
       if(scoretemp[0]>=0){
         var A;
         if(pvpmode==1){
@@ -11859,9 +11218,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       };
       save_Local();
     };
-        }
-        }}}
-    }//
+  }//
         
   function Skillname(player,num=0){
     //num 0->キャラ情報　1->バフ情報
@@ -11899,6 +11256,10 @@ cx1.drawImage(e7,dorax,10,33,43.5)
   switch(num){
     case 0:
       drawbuttom(635,10,"スキル",1,60,20)
+      ponkanmap.removeAllChildren();
+      var C=canvas2.toDataURL();
+      var Cb = new createjs.Bitmap(C);
+      ponkanmap.addChild(Cb);
     if(p==1){
       cx2.font = "bold 16px Arial";
       cx2.fillText("ストーンスキン", 635, 110);
@@ -12156,7 +11517,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         "FEV":Fever,
       };    
   console.log(UserData_Don);
-  PopAnm("セーブ");
+  PopAnm("セーブ完了");
   localStorage.setItem('UserData_Don', JSON.stringify(UserData_Don));
     }catch(e){
       console.log('ねこ')
@@ -12200,7 +11561,12 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       achieveA[A].cleared=getdata.AchieveA[i].cleared;
     }
   }
-  achieveB=getdata.AchieveB.concat();
+  for(var i=0; i<getdata.AchieveB.length; i++){
+    A=achieveB.findIndex(value=>value.name==getdata.AchieveB[i].name);
+    if(A!==-1){
+      achieveB[A].cleared=getdata.AchieveB[i].cleared;
+    }
+  }
   highscore=getdata.Highscore.concat();
   SEbuffer();
   PopAnm("データロード完了",800,200);
@@ -12348,7 +11714,12 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         achieveA[A].cleared=data.AchieveA[i].cleared;
       }
     }
-    achieveB=data.AchieveB.concat();
+    for(var i=0; i<data.AchieveB.length; i++){
+      A=achieveB.findIndex(value=>value.name==data.AchieveB[i].name);
+      if(A!==-1){
+        achieveB[A].cleared=data.AchieveB[i].cleared;
+      }
+    }
     highscore=data.Highscore.concat();
     SEbuffer();
       jingle.seek(1);
@@ -12364,7 +11735,27 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         button_read.value = "";
     }}});
     }
-    function SEbuffer(){
+    function SEbuffer(p=0){
+      if(p!==0){
+        se1.volume(0);
+        se2.volume(0);
+        se3.volume(0);
+        se4.volume(0);
+        se5.volume(0);
+        se6.volume(0);
+        se7.volume(0);
+        se8.volume(0);
+        se9.volume(0);
+        se10.volume(0);
+        se11.volume(0);
+        se12.volume(0);
+        se13.volume(0);
+        se14.volume(0);
+        se15.volume(0);
+        se16.volume(0);
+        jingle.volume(0);
+        jingle2.volume(0);
+      }else{
       se1.volume(0.25*sBar);
       se2.volume(0.4*sBar);
       se3.volume(0.3*sBar);
@@ -12383,5 +11774,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       se16.volume(0.3*sBar);
       jingle.volume(0.3*sBar);
       jingle2.volume(0.3*sBar);
+      }
     }   
   };
