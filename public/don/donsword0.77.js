@@ -5,7 +5,7 @@
 //対戦で魔界モードのリザルトが出ないらしい
 //次→cpuルーチンの修正 リーチボタンとかの表示なおす
 //FEVER→最初に1回だけ、職変チャンス
-//いつか→se変更　不足分の画像　カン　対戦部屋の工事、マナブレ表示、スキル、プレイガイド　場の同じパイの色付け
+//いつか→不足分の画像　カン　対戦部屋の工事、マナブレ表示、スキル廃止、プレイガイド　場の同じパイの色付け
 //cpuルーチンで止まる　たぶんリーチ時
 window.onload = function(){
   draw();
@@ -142,11 +142,12 @@ window.onload = function(){
     var cx5 = canvas5.getContext("2d");
     var stage = new createjs.Stage("canvas5");//Stage
     if (createjs.Touch.isSupported() == true) {
-      createjs.Touch.enable(stage);//タップに対応するが...?
+      createjs.Touch.enable(stage);//タップに対応するがcanvas.addeventlistenerが効かなくなる？
       }
     stage.enableMouseOver();//onmouseイベントに対応
     var backyard = new createjs.Container();//背景の緑芝
     stage.addChild(backyard);
+    //backyard.addEventListener("click", {handleEvent:clickHandler})
     var field = new createjs.Container();//タイトル、メイン画面
     stage.addChild(field);
     var textmap = new createjs.Container();//メッセージ
@@ -189,6 +190,12 @@ window.onload = function(){
     Textlist.push(underText);
     //残パイ枚数テキスト
     var deckText = new createjs.Text("残:", "24px 'Century Gothic'", "white");
+    var tumonameA = new createjs.Text("　", "14px Arial", "white");
+    var tumonameB = new createjs.Text("　", "14px Arial", "white");
+    tumonameA.x=700;
+    tumonameA.y=320;
+    tumonameB.x=645;
+    tumonameB.y=335;
     //soundボタン
     var s = new createjs.Shape();
     s.graphics.beginFill("#0a3361");
@@ -1242,8 +1249,8 @@ function updateParticles() {
       mpmoving=false;
     };
     function clickHandler(e) {
-       var rect = e.target.getBoundingClientRect();
-       mouseX =  Math.floor(e.clientX - rect.left);
+      var rect = e.target.getBoundingClientRect();
+      mouseX =  Math.floor(e.clientX - rect.left);
       mouseY =  Math.floor(e.clientY - rect.top);
       if(debugmode){console.log('click!',cLock,"pagestate",pagestate,"msgstate",msgstate)};
   
@@ -1826,7 +1833,6 @@ function updateParticles() {
       switch(reach[1]){
         case 1:
           se5.play();
-          ponkanmap.removeAllChildren();
           cx2.clearRect(630,440,80,40)
           drawbuttom(630,440,"リーチ",1);
           ponkanmap.removeAllChildren();
@@ -1870,8 +1876,7 @@ function updateParticles() {
         cLock=0;
         se3.play();
         cx2.clearRect(630,400,80,40)
-        cx2.fillStyle = "rgba(20,20,20,0.5)";
-        cx2.fillRect(630,400,80,40)
+        ponkanmap.removeAllChildren();
         ponsw[1]=pon1.length;
         ponsw[0]=1;
         turn=turntemp;
@@ -4705,11 +4710,11 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       t.x=640;
       t.y=450;
       field.addChild(t);
-      var t = new createjs.Text("スキル", "16px 'Century Gothic'", "white");
+      var t = new createjs.Text("カン", "16px 'Century Gothic'", "white");
       t.x=720;
       t.y=410;
       field.addChild(t);
-      var t = new createjs.Text("カン", "16px 'Century Gothic'", "white");
+      var t = new createjs.Text("スキル", "16px 'Century Gothic'", "white");
       t.x=720;
       t.y=450;
       field.addChild(t);
@@ -4860,6 +4865,14 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         btn1.x = 10;
         btn1.y = 550;
         field.addChild(btn1);
+        var t = new createjs.Text("捨パイ：", "14px Arial", "white");
+        tumonameA.text="　"
+        tumonameB.text="　"
+        t.x=640;
+        t.y=320;
+        field.addChild(t);
+        field.addChild(tumonameA);
+        field.addChild(tumonameB);
         //初期化
         deck=[]
         dora=[]
@@ -5835,6 +5848,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       se16.play();
       }
       Tumoname();
+      if(player==1){Elname(tumotemp)};
       e5= new createjs.Bitmap(eltear_src[tumotemp]);
       e5.src=eltear_src[tumotemp]
       if(counter[player]==28){
@@ -5867,7 +5881,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       riverx[player] +=43.5
       e5.rotation=90;
       e5.x=riverx[player]+33;
-      e5.y=rivery[player];
+      e5.y=rivery[player]+5;
       e5.scale=33/120;
       field.addChild(e5);
       if(ManaBreak==1){
@@ -5881,12 +5895,12 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         s.graphics.drawRect(0, 0, 33, 43.5);
         s.rotation=90;
         s.x=riverx[player]+33;
-        s.y=rivery[player];
+        s.y=rivery[player]+5;
         field.addChild(s);
         var t = new createjs.Text("X", "bold 26px 'Century Gothic'", "darkred");
         t.rotation=90;
         t.x=riverx[player]+38;
-        t.y=rivery[player]+5;
+        t.y=rivery[player]+10;
         field.addChild(t);
       }
       counter[player] +=1;
@@ -6248,8 +6262,9 @@ cx1.drawImage(e7,dorax,10,33,43.5)
   cx1.fillStyle = "orange";
   cx1.fillText("リーチ",640,465)
   //リーチのアニメーションがあれば
-  ippatu[1]=1
-  reach[1]=3}
+  ippatu[1]=1;
+  reach[1]=3;
+  }
   }
   //cx1.clearRect(690,500,size,sizey)
   if(handsort==0){
@@ -6331,20 +6346,14 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           };  
   }
   };
-  
   function Tumoname(){
-    cx2.font = "14px Arial";
-    cx2.fillStyle = "white";
-    cx2.clearRect(630,320,160,40)
-    cx2.fillText("捨牌：", 640, 340);
     var type1=donpai.findIndex(value=>value.id==tumotemp)
     if(type1==-1){
       console.log('Donpai error!')
       return false;
     }
-    cx2.fillStyle = "white";
-    cx2.fillText(donpai[type1].name, 680, 340);
-    cx2.fillText(donpai[type1].sub,645,355);
+    tumonameA.text=donpai[type1].name;
+    tumonameB.text=donpai[type1].sub;
     }    
   function timer(t){//持ち時間をt秒とする 未使用
   if(t>0){
