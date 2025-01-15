@@ -4,12 +4,8 @@
 //対戦で魔界モードのリザルトが出ないらしい
 //次→cpuルーチンの修正 リーチボタンとかの表示なおす
 //FEVER→最初に1回だけ、職変チャンス
-<<<<<<< HEAD
 //いつか→不足分の画像　魔界モード調整　カン　対戦部屋の工事、マナブレ表示、レイガイド　場の同じパイの色付け
-=======
-//いつか→不足分の画像　カン　対戦部屋の工事、マナブレ表示、レイガイド　場の同じパイの色付け
 //cpuルーチンで止まる　たぶんリーチ時
->>>>>>> 8620a6b6802ba489bcb96e878bd5f01d05fac92a
 window.onload = function(){
   draw();
   };
@@ -6959,22 +6955,15 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         }
       }
     };
-<<<<<<< HEAD
-=======
     function Cputumo2(player,type=0){
     startTime = Date.now()
     judge(player);
     //リーチ可能であればreach->1で帰ってくる
     };
->>>>>>> 8620a6b6802ba489bcb96e878bd5f01d05fac92a
     function Cputumo(player,type=0){
     //type：未使用
     startTime = Date.now()
     reach[player]=1;
-<<<<<<< HEAD
-=======
-    //poncpu[player]=Ponrate;
->>>>>>> 8620a6b6802ba489bcb96e878bd5f01d05fac92a
     //敵の思考ルーチン
     var cputumo =Cpuhandtemp.length-1;//何番目を切るのかを返す
     //まずリーチできる場合
@@ -7024,17 +7013,10 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                   console.log('line reach')
                   //if(reach[player]==1){reach[player]=2};
                   //1枚しかないラインのやつをはじけ
-<<<<<<< HEAD
                   var A=Cpuhandtemp.filter(value=>value <68 && value %4 ==0);
                   var B=Cpuhandtemp.filter(value=>value <68 && value %4 ==1);
                   var C=Cpuhandtemp.filter(value=>value <68 && value %4 ==2);
                   var D=Cpuhandtemp.filter(value=>value <68 && value %4 ==3);
-=======
-                  var A=Cpuhandtemp.filter(value=>value <69 && value %4 ==0);
-                  var B=Cpuhandtemp.filter(value=>value <69 && value %4 ==1);
-                  var C=Cpuhandtemp.filter(value=>value <69 && value %4 ==2);
-                  var D=Cpuhandtemp.filter(value=>value <69 && value %4 ==3);
->>>>>>> 8620a6b6802ba489bcb96e878bd5f01d05fac92a
                   if(A.length==1){
                     cputumo=Cpuhandtemp.findIndex(value=>value==A[0]);
                   }else if(B.length==1){
@@ -7065,17 +7047,10 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                   console.log('line reach')
                   //if(reach[player]==1){reach[player]=2};
                   //1枚しかないラインのやつをはじけ
-<<<<<<< HEAD
                   var A=Cpuhandtemp.filter(value=>value <68 && value %4 ==0);
                   var B=Cpuhandtemp.filter(value=>value <68 && value %4 ==1);
                   var C=Cpuhandtemp.filter(value=>value <68 && value %4 ==2);
                   var D=Cpuhandtemp.filter(value=>value <68 && value %4 ==3);
-=======
-                  var A=Cpuhandtemp.filter(value=>value <69 && value %4 ==0);
-                  var B=Cpuhandtemp.filter(value=>value <69 && value %4 ==1);
-                  var C=Cpuhandtemp.filter(value=>value <69 && value %4 ==2);
-                  var D=Cpuhandtemp.filter(value=>value <69 && value %4 ==3);
->>>>>>> 8620a6b6802ba489bcb96e878bd5f01d05fac92a
                   if(A.length==1){
                     cputumo=Cpuhandtemp.findIndex(value=>value==A[0]);
                   }else if(B.length==1){
@@ -7186,10 +7161,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         if(end>0){
           console.log('end',end)
           if(reach[player]==1){reach[player]=2};
-<<<<<<< HEAD
-=======
-          //
->>>>>>> 8620a6b6802ba489bcb96e878bd5f01d05fac92a
               var resultH=[];
               var resultF=Object.keys(Count).filter((key)=>Count[key]==end);//->あればキャラ名が帰ってくる
               var F=resultF.findIndex(value=>value =="アリエル")
@@ -7222,10 +7193,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       //ライン条件該当しないなら（オールマイティ以外の）1枚しか持っていないキャラを優先して切る
       //↑2つに該当しなければ（オールマイティ以外の）ランダムに切る
       var resultF=Object.keys(Line).find((key)=>Line[key]>5);//->あればlineが帰ってくる
-<<<<<<< HEAD
-=======
-      //var resultG =[];for( const [key,value] of Object.entries(Line)){resultG.push(key,value);}console.log(resultG);//[key,value,key,value...]の配列ができる
->>>>>>> 8620a6b6802ba489bcb96e878bd5f01d05fac92a
       if(ponsw[player]<3 && resultF !==undefined){
         var resultFF=Object.keys(Line).find((key)=>Line[key]==5);//->あればlineが帰ってくる
         if(resultFF !==undefined){
@@ -7234,11 +7201,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         if(ponsw[player]<3){poncpu[player]=1};
         }
         resultF-=1;
-<<<<<<< HEAD
         var E=Cpuhandtemp.filter(value=>value>=0 && value<68 && value%4!==resultF);
-=======
-        var E=Cpuhandtemp.filter(value>=0 && value<69 && value%4!==resultF);
->>>>>>> 8620a6b6802ba489bcb96e878bd5f01d05fac92a
         console.log(E);
         //E=[]となると無限ループ？
         if(E.length==0){
@@ -7259,11 +7222,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           resultH.push(I[0])
         }
       }
-<<<<<<< HEAD
       var I=Cpuhandtemp.filter(value=>value >=60 && value < 68)
-=======
-      var I=Cpuhandtemp.filter(value=>value >=60 && value < 69)
->>>>>>> 8620a6b6802ba489bcb96e878bd5f01d05fac92a
       if(I.length==1){
         resultH.push(I[0])
       }
@@ -7276,11 +7235,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         return cputumo;
       }
       console.log('nokori')
-<<<<<<< HEAD
       var K=Cpuhandtemp.filter(value=>value>=0 && value <68)
-=======
-      var K=Cpuhandtemp.filter(value=>value>=0 && value <69)
->>>>>>> 8620a6b6802ba489bcb96e878bd5f01d05fac92a
       var KK=Math.floor(Math.random()*K.length);
       cputumo=Cpuhandtemp.findIndex(value=>value==K[KK]);
       return cputumo;
