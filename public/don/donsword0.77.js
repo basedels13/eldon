@@ -1,11 +1,10 @@
 //var1.01　season2 
 // npm run dev
 //全職75枚（エピックキャラは1枚ずつ増量）＋オールマイティ2枚＋マスター8枚（ガ、ロ、ベ、デ、ソ、ア、ハ）合計85枚→53枚スタート
-//国士無双を廃止、　クレストシリーズは手札を属性統一することで役満扱いへ
 //対戦で魔界モードのリザルトが出ないらしい
 //次→cpuルーチンの修正 リーチボタンとかの表示なおす
 //FEVER→最初に1回だけ、職変チャンス
-//いつか→不足分の画像　カン　対戦部屋の工事、マナブレ表示、スキル廃止、プレイガイド　場の同じパイの色付け
+//いつか→不足分の画像　カン　対戦部屋の工事、マナブレ表示、レイガイド　場の同じパイの色付け
 //cpuルーチンで止まる　たぶんリーチ時
 window.onload = function(){
   draw();
@@ -312,6 +311,8 @@ window.onload = function(){
   var musicnum=0
   var musicset=new Array(3,7,8);
   //通常時、自分の立直時、オーラス時
+  var musicrandom=[[1,2,3,5,9],[4,7,10],[6,8,11]];
+  //ランダム向けプレイリスト
   var vBar=1;
   var sBar=1;
   //音量調節機能を追加
@@ -322,7 +323,7 @@ window.onload = function(){
   var Ronturn=[];
   //データベース
   var LPlist=new Array("一般","ヘル","ミリオネア","∞","魔界血戦")
-  var musiclist=new Array("test","夜の迷宮の入口","決闘のテーマ","盲目のアストライア","The Evil Sacrifice Archenemies","Nine Jack","ロベリア","リーチっぽい音楽","狂乱のオーラス","エルの樹の麓","ベスマ湖","ウォーリーの城")
+  var musiclist=new Array("ランダム","夜の迷宮の入口","決闘のテーマ","盲目のアストライア","The Evil Sacrifice Archenemies","Nine Jack","ロベリア","リーチっぽい音楽","狂乱のオーラス","エルの樹の麓","ベスマ湖","ウォーリーの城")
   var chrlist=new Array("名無しさん","エルス","アイシャ","レナ","レイヴン","イヴ")//"ラシェ","アラ","エド","ラビィ")
   var chrimg_src= new Array("don/Don_chara0.png","don/Don_chara1.png","don/Don_chara2.png","don/Don_chara3.png","don/Don_chara4.png","don/Don_chara5_2.png");
   var atrbute_src= new Array("don/Don_DP.png","don/Duel_mana.png","don/Duel_sun.png","don/Duel_aqua.png","don/Duel_wind.png","don/Duel_moon.png","don/Duel_gaia.png","don/Duel_heat.png","don/Don_HA.png");
@@ -348,7 +349,7 @@ window.onload = function(){
   var donicon_src= new Array("don/Don_buff.png","don/Don_mbicon.png","don/Don_fever.png")
   var win_src= new Array("don/Don_menu1.png","don/Don_menu2.png","don/Don_menu3.png","don/Don_menu4.png","don/wintumo.png","don/winron.png","don/winreach.png","don/Don_Cutin.png");
   var musiclistDT=[
-  {title:"0",elia:"0",nod:"0"},
+  {title:"ランダム",elia:"　",nod:"　"},
   {title:"夜の迷宮の入口",elia:"提供",nod:"ラビィのテーマのイメージ"},
   {title:"決闘のテーマ",elia:"提供",nod:"from Elsword music <耳コピアレンジ>"},
   {title:"盲目のアストライア",elia:"ISAo",nod:"@ DOVA-SYNDROME"},
@@ -2088,10 +2089,141 @@ function menuMap(p=0){
       }else{
       cx2.fillText("FEVER あり",100,380);
       }
-      cx2.fillText("BGM(0-7)",430,130)
-      cx2.fillText("SE(0-7)",430,160)
-      cx2.fillText("◀ "+Math.floor(vBar*5)+" ▶",580,130)
-      cx2.fillText("◀ "+Math.floor(sBar*5)+" ▶",580,160)
+      //soundbar
+                //音量の設定
+                Barlist=[];
+                var shape = new createjs.Shape();
+                shape.graphics.beginFill("#0080ff");
+                shape.graphics.beginStroke("#68ceed");
+                shape.graphics.setStrokeStyle(3);
+                shape.graphics.drawRect(500, 110, 90*vBar, 25);
+                menu_setting.addChild(shape);
+                Barlist.push(shape);      
+                var shape = new createjs.Shape();
+                shape.graphics.beginFill("#0080ff");
+                shape.graphics.beginStroke("#68ceed");
+                shape.graphics.setStrokeStyle(3);
+                shape.graphics.drawRect(500, 140, 90*sBar, 25);
+                menu_setting.addChild(shape);
+                Barlist.push(shape);       
+                var t=new createjs.Text("BGM","24px 'Century Gothic","black");
+                t.x=410;
+                t.y=110;
+                menu_setting.addChild(t);
+                var t=new createjs.Text("SE","24px 'Century Gothic","black");
+                t.x=410;
+                t.y=140;
+                menu_setting.addChild(t);
+                //
+                var option_arrow = new createjs.Shape();
+                option_arrow.graphics.beginFill("#0080ff")
+                        .beginStroke("#68ceed")
+                        .setStrokeStyle(2)
+                        .moveTo(0, 0)
+                        .lineTo(18, -12)
+                        .lineTo(18, 12)
+                        .lineTo(0, 0)
+                option_arrow.x=475;
+                option_arrow.y=122.5;
+                menu_setting.addChild(option_arrow);
+                option_arrow.addEventListener("click", {card:1,handleEvent:SoundBar});
+                var option_arrow = new createjs.Shape();
+                option_arrow.graphics.beginFill("#0080ff")
+                        .beginStroke("#68ceed")
+                        .setStrokeStyle(2)
+                        .moveTo(0, -12)
+                        .lineTo(18, 0)
+                        .lineTo(0, 12)
+                        .lineTo(0, -12)
+                option_arrow.x=635;
+                option_arrow.y=122.5;
+                menu_setting.addChild(option_arrow);
+                option_arrow.addEventListener("click", {card:2,handleEvent:SoundBar});
+                var option_arrow = new createjs.Shape();
+                option_arrow.graphics.beginFill("#0080ff")
+                        .beginStroke("#68ceed")
+                        .setStrokeStyle(2)
+                        .moveTo(0, 0)
+                        .lineTo(18, -12)
+                        .lineTo(18, 12)
+                        .lineTo(0, 0)
+                option_arrow.x=475;
+                option_arrow.y=152.5;
+                menu_setting.addChild(option_arrow);
+                option_arrow.addEventListener("click", {card:3,handleEvent:SoundBar});
+                var option_arrow = new createjs.Shape();
+                option_arrow.graphics.beginFill("#0080ff")
+                        .beginStroke("#68ceed")
+                        .setStrokeStyle(2)
+                        .moveTo(0, -12)
+                        .lineTo(18, 0)
+                        .lineTo(0, 12)
+                        .lineTo(0, -12)
+                option_arrow.x=635;
+                option_arrow.y=152.5;
+                menu_setting.addChild(option_arrow);
+                option_arrow.addEventListener("click", {card:4,handleEvent:SoundBar});
+        function SoundBar(){
+          switch(this.card){
+            case 1:
+              if(vBar<=0.2){vBar=0}else{vBar-=0.2}
+              se3.play();
+              Bgm.volume(0.1*vBar);
+              var B=Barlist[0];
+                var shape = new createjs.Shape();
+                shape.graphics.beginFill("#0080ff");
+                shape.graphics.beginStroke("#68ceed");
+                shape.graphics.setStrokeStyle(3);
+                shape.graphics.drawRect(310, 175, 180*vBar, 30);
+                menu_setting.addChild(shape);
+                menu_setting.removeChild(B);
+                Barlist[0]=shape;
+              break;
+            case 2:
+              if(vBar>=1.4){vBar=1.4}else{vBar+=0.2}
+              se3.play();
+              Bgm.volume(0.1*vBar);
+              var B=Barlist[0];
+              var shape = new createjs.Shape();
+              shape.graphics.beginFill("#0080ff");
+              shape.graphics.beginStroke("#68ceed");
+              shape.graphics.setStrokeStyle(3);
+              shape.graphics.drawRect(310, 175, 180*vBar, 30);
+              menu_setting.addChild(shape);
+              menu_setting.removeChild(B);
+              Barlist[0]=shape;
+              break;
+            case 3:
+              if(sBar<=0.2){sBar=0}else{sBar-=0.2}
+                SEbuffer();
+                se3.play();
+                var B=Barlist[1];
+                var shape = new createjs.Shape();
+                shape.graphics.beginFill("#0080ff");
+                shape.graphics.beginStroke("#68ceed");
+                shape.graphics.setStrokeStyle(3);
+                shape.graphics.drawRect(310, 225, 180*sBar, 30);
+                menu_setting.addChild(shape);
+                menu_setting.removeChild(B);
+                Barlist[1]=shape;
+              break;
+            case 4:
+              if(sBar>=1.4){sBar=1.4}else{sBar+=0.2}
+              SEbuffer();
+              se3.play();
+              var B=Barlist[1];
+              var shape = new createjs.Shape();
+              shape.graphics.beginFill("0080ff");
+              shape.graphics.beginStroke("#68ceed");
+              shape.graphics.setStrokeStyle(3);
+              shape.graphics.drawRect(310, 225, 180*sBar, 30);
+              menu_setting.addChild(shape);
+              menu_setting.removeChild(B);
+              Barlist[1]=shape;
+              break;
+          }
+        }
+      //
       cx2.fillText("通常",430,230)
       cx2.fillText("リーチ",430,300)
       cx2.fillText("オーラス",430,370)
@@ -2921,48 +3053,30 @@ function NameChange(){
             Ponrate-=0.2;
             if(Ponrate<0){Ponrate=0};
           }
-          if(mouseX >570 && mouseX <610 && mouseY >100 && mouseY <135){
-            se3.play();
-            if(vBar<=0.2){vBar=0}else{vBar-=0.2}
-            }
-          if(mouseX >620 && mouseX <660 && mouseY >100 && mouseY <135){
-            se3.play();
-            if(vBar>=1.4){vBar=1.4}else{vBar+=0.2}
-            }
-          if(mouseX >570 && mouseX <610 && mouseY >135 && mouseY <170){
-            if(sBar<=0.2){sBar=0}else{sBar-=0.2}
-            SEbuffer();
-            se3.play();
-            }
-          if(mouseX >620 && mouseX <660 && mouseY >135 && mouseY <170){
-            if(sBar>=1.4){sBar=1.4}else{sBar+=0.2}
-            SEbuffer();
-            se3.play();
-            }
             if(mouseX >370 && mouseX <430 && mouseY >240 && mouseY <270){
               //bgm
               se3.play();
-              if(musicset[0]==1){musicset[0]=musiclist.length-1}else{musicset[0]-=1}
+              if(musicset[0]==0){musicset[0]=musiclist.length-1}else{musicset[0]-=1}
             }
             if(mouseX >370 && mouseX <430 && mouseY >310 && mouseY <340){
               se3.play();
-              if(musicset[1]==1){musicset[1]=musiclist.length-1}else{musicset[1]-=1}
+              if(musicset[1]==0){musicset[1]=musiclist.length-1}else{musicset[1]-=1}
             }
             if(mouseX >370 && mouseX <430 && mouseY >380 && mouseY <410){
               se3.play();
-              if(musicset[2]==1){musicset[2]=musiclist.length-1}else{musicset[2]-=1}
+              if(musicset[2]==0){musicset[2]=musiclist.length-1}else{musicset[2]-=1}
             }
             if(mouseX >690 && mouseX <750 && mouseY >240 && mouseY <270){
               se3.play();
-              if(musicset[0]==musiclist.length-1){musicset[0]=1}else{musicset[0]+=1}
+              if(musicset[0]==musiclist.length-1){musicset[0]=0}else{musicset[0]+=1}
             }
             if(mouseX >690 && mouseX <750 && mouseY >310 && mouseY <340){
               se3.play();
-              if(musicset[1]==musiclist.length-1){musicset[1]=1}else{musicset[1]+=1}
+              if(musicset[1]==musiclist.length-1){musicset[1]=0}else{musicset[1]+=1}
             }
             if(mouseX >690 && mouseX <750 && mouseY >380 && mouseY <410){
               se3.play();
-              if(musicset[2]==musiclist.length-1){musicset[2]=1}else{musicset[2]+=1}
+              if(musicset[2]==musiclist.length-1){musicset[2]=0}else{musicset[2]+=1}
             }
           if(mouseX >690 && mouseX <750 && mouseY >200 && mouseY <240){
             //通常play
@@ -4413,10 +4527,18 @@ if(opLock==0 && gamestate ==1){
            }
         //music
         if(auras==0 && musicset[0]!==musicnum){
-          musicnum=musicset[0]
+          if(musicset[0]==0){
+            musicnum=musicrandom[0][Math.floor(Math.random()*musicrandom[0].length)];
+          }else{
+            musicnum=musicset[0]
+          }
           musicStart(musicnum);
         }else if(auras==1 && musicset[2]!==musicnum){
-        musicnum=musicset[2]
+          if(musicset[2]==0){
+            musicnum=musicrandom[2][Math.floor(Math.random()*musicrandom[2].length)];
+          }else{
+            musicnum=musicset[2]
+          }
         musicStart(musicnum);
       };
       cx1.font = "16px 'Century Gothic'";
@@ -4696,10 +4818,18 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         field.addChild(t);
         //music
         if(auras==0 && musicset[0]!==musicnum){
-          musicnum=musicset[0]
+          if(musicset[0]==0){
+            musicnum=musicrandom[0][Math.floor(Math.random()*musicrandom[0].length)];
+          }else{
+            musicnum=musicset[0]
+          }
           musicStart(musicnum);
         }else if(auras==1 && musicset[2]!==musicnum){
-        musicnum=musicset[2]
+          if(musicset[2]==0){
+            musicnum=musicrandom[2][Math.floor(Math.random()*musicrandom[2].length)];
+          }else{
+            musicnum=musicset[2]
+          }
         musicStart(musicnum);
       };
       var t = new createjs.Text("ポン", "16px 'Century Gothic'", "white");
@@ -5910,7 +6040,11 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       if(chara[player]==1 && pvpmode==0){Buff[player].push(1)};
         se9.play();
         if(auras==0 && musicnum!==musicset[1]){
-        musicnum=musicset[1];
+          if(musicset[1]==0){
+            musicnum=musicrandom[1][Math.floor(Math.random()*musicrandom[1].length)];
+          }else{
+            musicnum=musicset[1];
+          }
         musicStart(musicnum);
         };
         ReachAnimation(player);
@@ -6816,30 +6950,36 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         handgraph(r4,chr)
         }
       }
-    //ctlerror[chr]=0;
     };
-      
+    function Cputumo2(player,type=0){
+    startTime = Date.now()
+    judge(player);
+    //リーチ可能であればreach->1で帰ってくる
+    };
     function Cputumo(player,type=0){
-      //type：未使用
-      startTime = Date.now()
-      reach[player]=1;
-      //poncpu[player]=Ponrate;
+    //type：未使用
+    startTime = Date.now()
+    reach[player]=1;
+    //poncpu[player]=Ponrate;
     //敵の思考ルーチン
     var cputumo =Cpuhandtemp.length-1;//何番目を切るのかを返す
     //まずリーチできる場合
     var Count={};
     var Line={};
+    var Color={};
     var end=0;
     for(var i=1; i<handtemp.length;i++){
       var C=donpai.findIndex(value=>value.id==handtemp[i])
       var elm=donpai[C].name;
       var elm2=donpai[C].line
+      var elm3=donpai[C].color;
       Count[elm]=(Count[elm] || 0)+1
       Line[elm2]=(Line[elm2] || 0)+1
+      Color[elm3]=(Color[elm3] || 0)+1
     }
     var keyj=Object.keys(Count);
     var keyj2=Object.keys(Line);
-    console.log(keyj2.length);//expected 1~5
+    var keyj3=Object.keys(Color);
     var reachj=0;//同じキャラ2枚をカウント
     var tumoj=0;//同じキャラ3枚をカウント
     var kanj=0;//同じキャラ4枚をカウント
@@ -6870,10 +7010,10 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                   console.log('line reach')
                   //if(reach[player]==1){reach[player]=2};
                   //1枚しかないラインのやつをはじけ
-                  var A=Cpuhandtemp.filter(value=>value <=41 && value %3 ==0);
-                  var B=Cpuhandtemp.filter(value=>value <=41 && value %3 ==1);
-                  var C=Cpuhandtemp.filter(value=>value <=41 && value %3 ==2);
-                  var D=Cpuhandtemp.filter(value=>value ==42);
+                  var A=Cpuhandtemp.filter(value=>value <69 && value %4 ==0);
+                  var B=Cpuhandtemp.filter(value=>value <69 && value %4 ==1);
+                  var C=Cpuhandtemp.filter(value=>value <69 && value %4 ==2);
+                  var D=Cpuhandtemp.filter(value=>value <69 && value %4 ==3);
                   if(A.length==1){
                     cputumo=Cpuhandtemp.findIndex(value=>value==A[0]);
                   }else if(B.length==1){
@@ -6881,7 +7021,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                   }else if(C.length==1){
                     cputumo=Cpuhandtemp.findIndex(value=>value==C[0]);
                   }else if(D.length==1){
-                    cputumo=Cpuhandtemp.findIndex(value=>value==42);
+                    cputumo=Cpuhandtemp.findIndex(value=>value==D[0]);
                   }else{
                     console.log('line error')
                     reach[player]=1;
@@ -6904,10 +7044,10 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                   console.log('line reach')
                   //if(reach[player]==1){reach[player]=2};
                   //1枚しかないラインのやつをはじけ
-                  var A=Cpuhandtemp.filter(value=>value <=41 && value %3 ==0);
-                  var B=Cpuhandtemp.filter(value=>value <=41 && value %3 ==1);
-                  var C=Cpuhandtemp.filter(value=>value <=41 && value %3 ==2);
-                  var D=Cpuhandtemp.filter(value=>value ==42);
+                  var A=Cpuhandtemp.filter(value=>value <69 && value %4 ==0);
+                  var B=Cpuhandtemp.filter(value=>value <69 && value %4 ==1);
+                  var C=Cpuhandtemp.filter(value=>value <69 && value %4 ==2);
+                  var D=Cpuhandtemp.filter(value=>value <69 && value %4 ==3);
                   if(A.length==1){
                     cputumo=Cpuhandtemp.findIndex(value=>value==A[0]);
                   }else if(B.length==1){
@@ -6915,7 +7055,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                   }else if(C.length==1){
                     cputumo=Cpuhandtemp.findIndex(value=>value==C[0]);
                   }else if(D.length==1){
-                    cputumo=Cpuhandtemp.findIndex(value=>value==42);
+                    cputumo=Cpuhandtemp.findIndex(value=>value==D[0]);
                   }else{
                     console.log('line error')
                     reach[player]=1;
@@ -7018,10 +7158,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         if(end>0){
           console.log('end',end)
           if(reach[player]==1){reach[player]=2};
-          switch(end){
-            case 2:
-            case 3:
-            case 4:
+          //
               var resultH=[];
               var resultF=Object.keys(Count).filter((key)=>Count[key]==end);//->あればキャラ名が帰ってくる
               var F=resultF.findIndex(value=>value =="アリエル")
@@ -7034,35 +7171,14 @@ cx1.drawImage(e7,dorax,10,33,43.5)
               for(var i=0; i<E.length ; i++){
                 var A=Cpuhandtemp.findIndex(value=>value==E[i].id);//ポンに含まれていない
                 if(A!==-1){
-              resultH.push(A);
+                resultH.push(A);
                 }
-            }
+              }
               if(resultH.length >0){
                 var N=Math.floor(Math.random()*resultH.length);
                 cputumo=resultH[N]
                 console.log(cputumo,N)
               }
-              break;
-            case 1:
-              var resultH=[];
-              for(var i=0;i<13;i++){
-                var I=Cpuhandtemp.filter(value=>value/3 >=i && value/3 <i+1)
-                if(I.length==1){
-                  resultH.push(I[0])
-                }
-              }
-              var J=Cpuhandtemp.filter(value=>value>=39 && value <=42)
-              if(J.length==1){
-                resultH.push(J[0])
-              }
-              if(resultH.length >0){
-                var N=Math.floor(Math.random()*resultH.length);
-                cputumo=Cpuhandtemp.findIndex(value=>value==resultH[N]);
-                console.log(cputumo,N)
-                return cputumo;
-              }
-              break;          
-          }
           clearTime = Date.now()
           thinkTime =clearTime - startTime;
           console.log(thinkTime)
@@ -7075,7 +7191,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       //ライン条件該当しないなら（オールマイティ以外の）1枚しか持っていないキャラを優先して切る
       //↑2つに該当しなければ（オールマイティ以外の）ランダムに切る
       var resultF=Object.keys(Line).find((key)=>Line[key]>5);//->あればlineが帰ってくる
-      //console.log(resultF);
       //var resultG =[];for( const [key,value] of Object.entries(Line)){resultG.push(key,value);}console.log(resultG);//[key,value,key,value...]の配列ができる
       if(ponsw[player]<3 && resultF !==undefined){
         var resultFF=Object.keys(Line).find((key)=>Line[key]==5);//->あればlineが帰ってくる
@@ -7085,7 +7200,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         if(ponsw[player]<3){poncpu[player]=1};
         }
         resultF-=1;
-        var E=Cpuhandtemp.filter(value=>value==42 || (value>=0 &&value<42 && value%3!==resultF));
+        var E=Cpuhandtemp.filter(value>=0 && value<69 && value%4!==resultF);
         console.log(E);
         //E=[]となると無限ループ？
         if(E.length==0){
@@ -7100,15 +7215,15 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       }
       //各キャラ算出
       var resultH=[];
-      for(var i=0;i<13;i++){
-        var I=Cpuhandtemp.filter(value=>value/3 >=i && value/3 <i+1)
+      for(var i=0;i<15;i++){
+        var I=Cpuhandtemp.filter(value=>value/4 >=i && value/4 <i+1)
         if(I.length==1){
           resultH.push(I[0])
         }
       }
-      var J=Cpuhandtemp.filter(value=>value>=39 && value <=42)
-      if(J.length==1){
-        resultH.push(J[0])
+      var I=Cpuhandtemp.filter(value=>value >=60 && value < 69)
+      if(I.length==1){
+        resultH.push(I[0])
       }
       //console.log(resultH);
       if(resultH.length >0){
@@ -7119,7 +7234,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         return cputumo;
       }
       console.log('nokori')
-      var K=Cpuhandtemp.filter(value=>value>=0 && value <=42)
+      var K=Cpuhandtemp.filter(value=>value>=0 && value <69)
       var KK=Math.floor(Math.random()*K.length);
       cputumo=Cpuhandtemp.findIndex(value=>value==K[KK]);
       return cputumo;
@@ -7203,7 +7318,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           var keyj2=Object.keys(Line);
           var keyj3=Object.keys(Color);
           //console.log(keyj.length);
-          //Count.length->undefined
+          //Count.length->undefined;
           for(var j=0;j<keyj.length;j++){
             //console.log(Count[keyj[j]]);
             if(Count[keyj[j]]==2){
@@ -9538,7 +9653,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           //つも
           if(hand1[0]==-3){
           if(debugmode){console.log('アガリ',han[1])}
-          cx3.clearRect(326,348,148,142);
+          ponkanmap.removeAllChildren();
           if(pvpmode==1){
             socket.emit("tumo", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[0].id,Tumo:tumo,status:true});
             }
@@ -9549,17 +9664,12 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           //ロン
           if(hand1[0]==-2){
             if(debugmode){console.log('アガリ',han[1])}
-            cx3.clearRect(326,348,148,142);
+            ponkanmap.removeAllChildren();
             Ronturn.push(1);
             if(pvpmode==1){
             socket.emit("ron", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[0].id,status:true});
             }
-              if(debugmode){console.log('ロンをスルー')}
             se3.play();
-            cx3.clearRect(326,348,148,142);
-            if(pvpmode==1){
-            socket.emit("ron", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[0].id,status:false});
-            }
             rorder[1]=1
             hand1[0]=-1
             turn=turntemp;
@@ -9572,7 +9682,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           if(hand1[0]==-2){
           if(debugmode){console.log('ロンをスルー')}
           se3.play();
-          cx3.clearRect(326,348,148,142);
+          ponkanmap.removeAllChildren();
           if(pvpmode==1){
           socket.emit("ron", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[0].id,status:false});
           }
@@ -9580,7 +9690,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           hand1[0]=-1
           turn=turntemp;
           turnchecker();
-          ponkanmap.removeAllChildren();
           }
           break;
       }
@@ -9690,12 +9799,12 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             if(mouseX >380 && mouseX <750 && mouseY >270 && mouseY <330){
               //リーチテキスト
               Textlist[0].text="オーラスを除くリーチ時に流れるBGMを変更できます。";
-              Textlist[1].text=musiclistDT[musicset[1]].title+", "+musiclistDT[musicset[1]].elia+", "+musiclistDT[musicset[1]].nod;;
+              Textlist[1].text=musiclistDT[musicset[1]].title+", "+musiclistDT[musicset[1]].elia+", "+musiclistDT[musicset[1]].nod;
             }
             if(mouseX >380 && mouseX <750 && mouseY >340 && mouseY <400){
               //オーラステキスト
               Textlist[0].text="オーラス時に流れるBGMを変更できます。";
-              Textlist[1].text=musiclistDT[musicset[2]].title+", "+musiclistDT[musicset[2]].elia+", "+musiclistDT[musicset[2]].nod;;
+              Textlist[1].text=musiclistDT[musicset[2]].title+", "+musiclistDT[musicset[2]].elia+", "+musiclistDT[musicset[2]].nod;
             }
             if(mouseX >50 && mouseX <360 && mouseY >100 && mouseY <170){
               Textlist[0].text="対局中に右クリックした時にツモ切りする";
