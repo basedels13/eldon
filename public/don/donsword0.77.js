@@ -1,12 +1,10 @@
 //var1.01　season2 
 // npm run dev
 //全職75枚（エピックキャラは1枚ずつ増量）＋オールマイティ2枚＋マスター8枚（ガ、ロ、ベ、デ、ソ、ア、ハ）合計85枚→53枚スタート
-//国士無双を廃止、　クレストシリーズは手札を属性統一することで役満扱いへ
 //対戦で魔界モードのリザルトが出ないらしい
 //次→cpuルーチンの修正 リーチボタンとかの表示なおす
 //FEVER→最初に1回だけ、職変チャンス
-//いつか→不足分の画像　カン　対戦部屋の工事、マナブレ表示、スキル廃止、プレイガイド　場の同じパイの色付け
-//cpuルーチンで止まる　たぶんリーチ時
+//いつか→不足分の画像　魔界モード調整　カン　対戦部屋の工事、マナブレ表示、レイガイド　場の同じパイの色付け
 window.onload = function(){
   draw();
   };
@@ -769,11 +767,6 @@ window.onload = function(){
   var thinkTime=0
   var timevalue=0
   var timerw=150
-  var hand1x=0
-  var hand2x=0
-  var hand3x=0
-  var hand1y=500
-  //自分の手札描画用の座標
   var size=70
   var sizey=93
   var pagestate=-1
@@ -781,9 +774,6 @@ window.onload = function(){
   var gamestate =-10;
   //-2,-1=>tumoronで使用,クリックさせたくない時 0=>クリックで1に,ゲームをしてない時 1=>game中 2=>クリックで0に,ツモのアニメーション 3=>ゲームオーバー、タイトルに戻るなどする 10=>麻雀をしていない
   var Cimage;//ツモ画面で対局画面の保存用
-  var N1;
-  var N2;
-  var N3;
   var turn =0
   var turntemp
   var parent=0
@@ -795,8 +785,6 @@ window.onload = function(){
   var tumo2
   //捨て牌
   var tumotemp
-  //ツモロンボタン
-  var TRswitch=0;
   //cputumoで使用
   var r4=0
   
@@ -864,6 +852,10 @@ window.onload = function(){
     src:"don/Don_paiset.mp3",
     volume: 0.3,
     });
+  var se17 = new Howl({
+    src:"don/suzu.mp3",
+    volume: 0.3,
+    });
   const jingle =new Howl({
       src: "don/Don_jingle.mp3",
       volume: 0.3,
@@ -900,7 +892,7 @@ window.onload = function(){
     src: "don/Nine_Jackshort.mp3",
     loopStart: 0,
     loopEnd: 181000,
-    volume: 0.1,
+    volume: 0.07,
   };
   const bgm6data ={
     src: "don/Lobelia.mp3",
@@ -1116,6 +1108,11 @@ function updateParticles() {
   t.x=340;
   t.y=380;
   field.addChild(t);
+  var shape = new createjs.Shape();
+  shape.graphics.beginFill("rgba(255,255,255,0.1)");
+  shape.graphics.drawRect(0, 0, 800, 600);
+  field.addChild(shape);
+  shape.addEventListener("click", {handleEvent:LoadtoMenu});
   gamestate=10;
   }
   function loadtitle(){
@@ -1250,28 +1247,29 @@ function updateParticles() {
         }
       mpmoving=false;
     };
-    function clickHandler(e) {
-      var rect = e.target.getBoundingClientRect();
-      mouseX =  Math.floor(e.clientX - rect.left);
-      mouseY =  Math.floor(e.clientY - rect.top);
-      if(debugmode){console.log('click!',cLock,"pagestate",pagestate,"msgstate",msgstate)};
-  
-  if(gamestate ==10){
-    //メニュー画面
-    if(pagestate==-1){
+    function LoadtoMenu(){
       for(var i=0; i<12 ; i++){
         field.removeChild(ary[i]);
       }
       ary=[];
       tweeNstar.paused=true;
       stage.removeChild(Cstar);
-    pagestate=0;
-    se6.play();
-    saveUP();
-    saveUP_Local();
+      pagestate=0;
+      se6.play();
+      saveUP();
+      saveUP_Local();
+      Menu();
     }
-    Menu();
-  }
+    function clickHandler(e) {
+      //少しずつ委託予定
+      var rect = e.target.getBoundingClientRect();
+      mouseX =  Math.floor(e.clientX - rect.left);
+      mouseY =  Math.floor(e.clientY - rect.top);
+      if(debugmode){console.log('click!',cLock,"pagestate",pagestate,"msgstate",msgstate)};  
+      if(gamestate ==10){
+        //メニュー画面
+        Menu();
+      }
 
   socket.on("game-ready", (data)=>{
     if(IsHost(IAM.room)){
@@ -1654,7 +1652,6 @@ function updateParticles() {
         if(mouseX >220 && mouseY > 240 && mouseX <340 && mouseY <300){
         se3.play();
         scoretemp[0]=-2;
-        cx4.clearRect(0,0,800,600)
         opLock=0;
         if(pvpmode==1){
         cx4.globalAlpha=1;
@@ -1662,9 +1659,10 @@ function updateParticles() {
         cx4.fillStyle = "white";
         var RsString=['ルーム長がトイレに行きました','ルーム長権限が発動しました','ルーム長がゲームを終了させました'];
         var A=Math.floor(Math.random()*RsString.length);
-        cx4.fillText(RsString[A],50,590);
-        }
+        gameover(RsString[A]);
+        }else{
         gameover();
+        }
         }
       return false;
       }
@@ -3922,7 +3920,7 @@ function NameChange(){
       se3.play();
       scoretemp[0]=-1;
       opLock=0;
-      gameover();
+      gameover('ルーム人数が変化したため、ゲームが終了しました');
     }else if(gamestate==10){
     //data.focus 0->誰かが入室してきた 1->ready 2->ゲームオーバーのあと
     if(IsHost(IAM.room) && data.focus==0){
@@ -4408,7 +4406,7 @@ if(opLock==0 && gamestate ==1){
   function compareFuncID(a,b){return(a.id - b.id);}  
   function compareFunc2(a,b){return(a.elia - b.elia);}  
   function compareFunc3(a,b){
-    if(a>83){return 3}else{return a%4-b%4;}}
+    if(a>=68){return 3}else{return a%4-b%4;}}
   function getIsDuplicate(arr1, arr2) {
     return [...arr1, ...arr2].filter(item => arr1.includes(item) && arr2.includes(item)).length > 0
   };
@@ -5167,6 +5165,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       ctl[turn+1]=0;
   };
   function musicStart(num){
+    console.log('musicStart',num,mute)
     if( mute=="ON" ){
       Bgm.stop();
     switch (num){
@@ -5212,6 +5211,10 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         break;
       case 11:
         Bgm =new Music(bgm11data);
+        Bgm.playMusic();
+        break;
+      case 17:
+        Bgm =new Music(bgm17data);
         Bgm.playMusic();
         break;
       default:
@@ -6902,8 +6905,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       ctl[chr]=3;
       if(reach[chr]==3){r4=Cpuhandtemp.length-1}else{
         Cpuhandtemp.sort(compareFunc);//これいるのか分からんが
-        r4 =Cputumo(chr,timer);//時間がかかるとしたらcputumoのこの部分
-        if(timer>100){r4=Cpuhandtemp.length-1};
+        r4 =Cputumo(chr);//時間がかかるとしたらcputumoのこの部分
       }
     }
     if(ctl[chr]==3 && gamestate ==1){
@@ -6951,30 +6953,30 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         handgraph(r4,chr)
         }
       }
-    //ctlerror[chr]=0;
     };
-      
     function Cputumo(player,type=0){
-      //type：未使用
-      startTime = Date.now()
-      reach[player]=1;
-      //poncpu[player]=Ponrate;
+    //type：未使用
+    startTime = Date.now()
+    reach[player]=1;
     //敵の思考ルーチン
     var cputumo =Cpuhandtemp.length-1;//何番目を切るのかを返す
     //まずリーチできる場合
     var Count={};
     var Line={};
+    var Color={};
     var end=0;
     for(var i=1; i<handtemp.length;i++){
       var C=donpai.findIndex(value=>value.id==handtemp[i])
       var elm=donpai[C].name;
       var elm2=donpai[C].line
+      var elm3=donpai[C].color;
       Count[elm]=(Count[elm] || 0)+1
       Line[elm2]=(Line[elm2] || 0)+1
+      Color[elm3]=(Color[elm3] || 0)+1
     }
     var keyj=Object.keys(Count);
     var keyj2=Object.keys(Line);
-    console.log(keyj2.length);//expected 1~5
+    var keyj3=Object.keys(Color);
     var reachj=0;//同じキャラ2枚をカウント
     var tumoj=0;//同じキャラ3枚をカウント
     var kanj=0;//同じキャラ4枚をカウント
@@ -7005,10 +7007,10 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                   console.log('line reach')
                   //if(reach[player]==1){reach[player]=2};
                   //1枚しかないラインのやつをはじけ
-                  var A=Cpuhandtemp.filter(value=>value <=41 && value %3 ==0);
-                  var B=Cpuhandtemp.filter(value=>value <=41 && value %3 ==1);
-                  var C=Cpuhandtemp.filter(value=>value <=41 && value %3 ==2);
-                  var D=Cpuhandtemp.filter(value=>value ==42);
+                  var A=Cpuhandtemp.filter(value=>value <68 && value %4 ==0);
+                  var B=Cpuhandtemp.filter(value=>value <68 && value %4 ==1);
+                  var C=Cpuhandtemp.filter(value=>value <68 && value %4 ==2);
+                  var D=Cpuhandtemp.filter(value=>value <68 && value %4 ==3);
                   if(A.length==1){
                     cputumo=Cpuhandtemp.findIndex(value=>value==A[0]);
                   }else if(B.length==1){
@@ -7016,7 +7018,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                   }else if(C.length==1){
                     cputumo=Cpuhandtemp.findIndex(value=>value==C[0]);
                   }else if(D.length==1){
-                    cputumo=Cpuhandtemp.findIndex(value=>value==42);
+                    cputumo=Cpuhandtemp.findIndex(value=>value==D[0]);
                   }else{
                     console.log('line error')
                     reach[player]=1;
@@ -7039,10 +7041,10 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                   console.log('line reach')
                   //if(reach[player]==1){reach[player]=2};
                   //1枚しかないラインのやつをはじけ
-                  var A=Cpuhandtemp.filter(value=>value <=41 && value %3 ==0);
-                  var B=Cpuhandtemp.filter(value=>value <=41 && value %3 ==1);
-                  var C=Cpuhandtemp.filter(value=>value <=41 && value %3 ==2);
-                  var D=Cpuhandtemp.filter(value=>value ==42);
+                  var A=Cpuhandtemp.filter(value=>value <68 && value %4 ==0);
+                  var B=Cpuhandtemp.filter(value=>value <68 && value %4 ==1);
+                  var C=Cpuhandtemp.filter(value=>value <68 && value %4 ==2);
+                  var D=Cpuhandtemp.filter(value=>value <68 && value %4 ==3);
                   if(A.length==1){
                     cputumo=Cpuhandtemp.findIndex(value=>value==A[0]);
                   }else if(B.length==1){
@@ -7050,7 +7052,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                   }else if(C.length==1){
                     cputumo=Cpuhandtemp.findIndex(value=>value==C[0]);
                   }else if(D.length==1){
-                    cputumo=Cpuhandtemp.findIndex(value=>value==42);
+                    cputumo=Cpuhandtemp.findIndex(value=>value==D[0]);
                   }else{
                     console.log('line error')
                     reach[player]=1;
@@ -7153,10 +7155,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         if(end>0){
           console.log('end',end)
           if(reach[player]==1){reach[player]=2};
-          switch(end){
-            case 2:
-            case 3:
-            case 4:
               var resultH=[];
               var resultF=Object.keys(Count).filter((key)=>Count[key]==end);//->あればキャラ名が帰ってくる
               var F=resultF.findIndex(value=>value =="アリエル")
@@ -7169,49 +7167,26 @@ cx1.drawImage(e7,dorax,10,33,43.5)
               for(var i=0; i<E.length ; i++){
                 var A=Cpuhandtemp.findIndex(value=>value==E[i].id);//ポンに含まれていない
                 if(A!==-1){
-              resultH.push(A);
+                resultH.push(A);
                 }
-            }
+              }
               if(resultH.length >0){
                 var N=Math.floor(Math.random()*resultH.length);
                 cputumo=resultH[N]
                 console.log(cputumo,N)
               }
-              break;
-            case 1:
-              var resultH=[];
-              for(var i=0;i<13;i++){
-                var I=Cpuhandtemp.filter(value=>value/3 >=i && value/3 <i+1)
-                if(I.length==1){
-                  resultH.push(I[0])
-                }
-              }
-              var J=Cpuhandtemp.filter(value=>value>=39 && value <=42)
-              if(J.length==1){
-                resultH.push(J[0])
-              }
-              if(resultH.length >0){
-                var N=Math.floor(Math.random()*resultH.length);
-                cputumo=Cpuhandtemp.findIndex(value=>value==resultH[N]);
-                console.log(cputumo,N)
-                return cputumo;
-              }
-              break;          
-          }
           clearTime = Date.now()
           thinkTime =clearTime - startTime;
           console.log(thinkTime)
           return cputumo;
         }
-    //非テンパイ時 -1になってる原因この辺にありそう
+    //非テンパイ時
     if(type ==0){
       //1つのライン6枚以上あればラインを狙いに行く,ポンしない
       //1つのライン5枚以上あればラインを狙いに行き,ponRateの確率でポンしない
       //ライン条件該当しないなら（オールマイティ以外の）1枚しか持っていないキャラを優先して切る
       //↑2つに該当しなければ（オールマイティ以外の）ランダムに切る
       var resultF=Object.keys(Line).find((key)=>Line[key]>5);//->あればlineが帰ってくる
-      //console.log(resultF);
-      //var resultG =[];for( const [key,value] of Object.entries(Line)){resultG.push(key,value);}console.log(resultG);//[key,value,key,value...]の配列ができる
       if(ponsw[player]<3 && resultF !==undefined){
         var resultFF=Object.keys(Line).find((key)=>Line[key]==5);//->あればlineが帰ってくる
         if(resultFF !==undefined){
@@ -7220,7 +7195,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         if(ponsw[player]<3){poncpu[player]=1};
         }
         resultF-=1;
-        var E=Cpuhandtemp.filter(value=>value==42 || (value>=0 &&value<42 && value%3!==resultF));
+        var E=Cpuhandtemp.filter(value=>value>=0 && value<68 && value%4!==resultF);
         console.log(E);
         //E=[]となると無限ループ？
         if(E.length==0){
@@ -7235,17 +7210,17 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       }
       //各キャラ算出
       var resultH=[];
-      for(var i=0;i<13;i++){
-        var I=Cpuhandtemp.filter(value=>value/3 >=i && value/3 <i+1)
+      for(var i=0;i<15;i++){
+        var I=Cpuhandtemp.filter(value=>value/4 >=i && value/4 <i+1)
         if(I.length==1){
           resultH.push(I[0])
         }
       }
-      var J=Cpuhandtemp.filter(value=>value>=39 && value <=42)
-      if(J.length==1){
-        resultH.push(J[0])
+      var I=Cpuhandtemp.filter(value=>value >=60 && value < 68)
+      if(I.length==1){
+        resultH.push(I[0])
       }
-      //console.log(resultH);
+      console.log(resultH);
       if(resultH.length >0){
         var N=Math.floor(Math.random()*resultH.length);
         cputumo=Cpuhandtemp.findIndex(value=>value==resultH[N]);
@@ -7254,7 +7229,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         return cputumo;
       }
       console.log('nokori')
-      var K=Cpuhandtemp.filter(value=>value>=0 && value <=42)
+      var K=Cpuhandtemp.filter(value=>value>=0 && value <68)
       var KK=Math.floor(Math.random()*K.length);
       cputumo=Cpuhandtemp.findIndex(value=>value==K[KK]);
       return cputumo;
@@ -7262,6 +7237,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       //ランダムに切るだけ
       cputumo =1+ Math.floor(Math.random()*(Cpuhandtemp.length-1));
     }
+    //ここには飛んでこないはず
     console.log('Cputumo',player,type,cputumo)
     return cputumo;
     }
@@ -7315,7 +7291,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       }
           for(var i=1; i<handtemp.length;i++){
             var C=donpai.findIndex(value=>value.id==handtemp[i])
-            console.log(i,C);
+            //console.log(i,C);
             if(C==-1){console.log('handtemp "C" error');C=0};
             var elm=donpai[C].name;//cpuでerror?
             var elm2=donpai[C].line
@@ -7338,7 +7314,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           var keyj2=Object.keys(Line);
           var keyj3=Object.keys(Color);
           //console.log(keyj.length);
-          //Count.length->undefined
+          //Count.length->undefined;
           for(var j=0;j<keyj.length;j++){
             //console.log(Count[keyj[j]]);
             if(Count[keyj[j]]==2){
@@ -9086,7 +9062,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                   if(resultF !==undefined){
                     Result[0]=resultF+"ライン待ち"
                     resultF-=1;
-                    var E=donpai.filter(value=>value.id<69 && value.id%4==resultF);
+                    var E=donpai.filter(value=>value.id<68 && value.id%4==resultF);
                     for(var i=0; i<E.length ; i++){
                   if(Remaincheck(E[i].id)){
                     Result.push(E[i].id);
@@ -9102,7 +9078,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                   if(resultF !==undefined){
                     Result[0]=resultF+"ライン待ち"
                     resultF-=1;
-                    var E=donpai.filter(value=>value.id<69 && value.id%4==resultF);
+                    var E=donpai.filter(value=>value.id<68 && value.id%4==resultF);
                     for(var i=0; i<E.length ; i++){
                   if(Remaincheck(E[i].id)){
                     Result.push(E[i].id);
@@ -9656,6 +9632,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           CorsorKey.y=500;
           CorsorKey.alpha=1;
           tweeNcor.paused=false;
+          Elname(hand1[hand1.length-1],hand1.length-1)
           break;
         default:
           CorsorKey.scaleX=0.7;
@@ -9663,7 +9640,8 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           CorsorKey.x=100+size*(this.card-1)
           CorsorKey.y=500;
           CorsorKey.alpha=1;
-          tweeNcor.paused=false;      
+          tweeNcor.paused=false;    
+          Elname(hand1[this.card],this.card)  
           break;
       }
     }
@@ -10055,22 +10033,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         }
       }
       if(gamestate ==1){
-      //牌の詳細表示
-      var SX=Math.floor((mouseX+size-100)/size);
-      if(mouseY >490 && mouseY < 590){
-            if(mouseX >100 && mouseX <660){
-              if(hand1.length>SX+1){
-      Elname(hand1[SX],SX);//描画まで行う
-              }
-              if(ponsw[1]==1 && hand1.length==SX+1){
-                Elname(hand1[SX],SX);//描画まで行う
-              }
-            }else if(mouseX >690 && mouseX <690+size){
-              if(turn==0){
-      Elname(hand1[hand1.length-1],hand1.length-1);//描画まで行う
-              }
-            }
-        };
       //スキルは右下に移動
         if(mouseY >400 && mouseY< 440){
           if(mouseX >710 && mouseX<790){
@@ -10095,7 +10057,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         }
       };
     function Elname(num,numb=0){
-            //num->id の説明文を右枠に　numb->hand1の何番目
+            //num->id の説明文を右枠に　numb->リーチ時の待ち　hand1の何番目
             if(num==ElnameM){
               return false;
             }else{
@@ -10194,9 +10156,9 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       if( mute=="OFF" ){
         SEbuffer();
         Bgm.mute(false);
-        musicStart(musicnum);
-        se11.play();
         mute="ON";
+        se11.play();
+        musicStart(musicnum);
         }else{
         Bgm.mute(true);
         Bgm.stop();
@@ -11157,10 +11119,12 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       gameover();
     }
   });
-  function gameover(){//けっかはっぴょぉうする
+  function gameover(word="クリックで進む"){//けっかはっぴょぉうする
     tweeNsquare.paused=true;
     Csquare.alpha=0;
     Configmap.removeAllChildren();
+    guidemap.removeAllChildren();
+    handmap.removeAllChildren();
     jingle2.seek(1);
     jingle2.play();
     if(pvpmode==1){
@@ -11205,15 +11169,14 @@ cx1.drawImage(e7,dorax,10,33,43.5)
     s.graphics.drawRect(0, 0, 800, 600);
     field.addChild(s);
     var e10 = new createjs.Bitmap(chrimg_src[LPresult[3].chara]);
-      e10.x=100;
+      e10.x=-100;
       e10.y=50;
-      e10.regX=400;
-      e10.regX=300;
-      e10.scale=3/4;
+      e10.scale=1.2;
+      e10.alpha=0;
       field.addChild(e10);
       createjs.Tween.get(e10)
-      .wait(1200)
-      .to({scale:3/4}, 200, createjs.Ease.cubicInOut)
+      .wait(1800)
+      .to({alpha:1,x:100,scale:3/4}, 200, createjs.Ease.cubicInOut)
       .call(next);
     field.addChild(e10);
     for(var i=0;i<3;i++){
@@ -11228,10 +11191,10 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       e10.sourceRect={x:500,y:50,width:215,height:215}
       e10.scale=60/215;
       }
-      e10.x=-50;
+      e10.x=-100;
       e10.y=201+100*i;
       createjs.Tween.get(e10)
-        .wait(i*300)
+        .wait(600*(2-i))
         .to({x: 50}, 200, createjs.Ease.cubicInOut)
         .call(se1)
       field.addChild(e10);
@@ -11241,7 +11204,12 @@ cx1.drawImage(e7,dorax,10,33,43.5)
     };
     function next(){
       console.log(cLock,gamestate);
+      se17.play();
       gamestate=3;
+      var D= new createjs.Text(word, "26px Arial", "white");
+      D.x=50;
+      D.y=530;    
+      field.addChild(D);
     }
     //
     cx2.clearRect(0,0,800,600)
@@ -11254,8 +11222,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
     cx2.fillText(RankingStr[1], 50, 200);
     cx2.fillText(RankingStr[2], 50, 300);
     cx2.fillText(RankingStr[3], 50, 400);
-    cx2.font = "26px Arial";
-    cx2.fillText("クリックで進む", 50, 550);
     //1位
     cx2.font = "bold 30px Arial";
     cx2.fillText(LPresult[3].pc, 120, 130);
@@ -11891,6 +11857,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         se14.volume(0);
         se15.volume(0);
         se16.volume(0);
+        se17.volume(0);
         jingle.volume(0);
         jingle2.volume(0);
       }else{
@@ -11910,6 +11877,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       se14.volume(0.3*sBar);
       se15.volume(0.3*sBar);
       se16.volume(0.3*sBar);
+      se17.volume(0.3*sBar);
       jingle.volume(0.3*sBar);
       jingle2.volume(0.3*sBar);
       }
