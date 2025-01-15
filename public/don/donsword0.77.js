@@ -1,4 +1,4 @@
-//var1.01　season2 
+//var1.015　season2 
 // npm run dev
 //全職75枚（エピックキャラは1枚ずつ増量）＋オールマイティ2枚＋マスター8枚（ガ、ロ、ベ、デ、ソ、ア、ハ）合計85枚→53枚スタート
 //対戦で魔界モードのリザルトが出ないらしい
@@ -11,6 +11,7 @@ window.onload = function(){
   };
   
   function draw(){
+  var titletext="v1.015/Click to START";
   var debugmode=true;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にfalseに
   //自分自身の情報を入れる箱
   var IAM = {
@@ -1105,7 +1106,7 @@ function updateParticles() {
   shape.graphics.beginFill("#007fd9");
   shape.graphics.drawRect(100, 380, 600, 25);
   field.addChild(shape);
-  var t = new createjs.Text("click to start", "24px 'Century Gothic'", "#e4e4e4");
+  var t = new createjs.Text(titletext, "24px 'Century Gothic'", "#e4e4e4");
   t.x=340;
   t.y=380;
   field.addChild(t);
