@@ -301,7 +301,7 @@ window.onload = function(){
   var drawcard;
   var Cskillprepare=[0,0,0,0,0];
   //chara0 0->cpuランダム 1->cpu決める
-  //MPゲージ0-30
+  //MPゲージ0-30 DPlist->create用 0->マナブレゲージ
   var DP =new Array(0,0,0,0,0)
   var DPlist=new Array(0,0,0,0,0)
   //バフ 1スキン 2マナシールド 3ネイチャ 4ナソコア 5やけど 6凍結 7適応力
@@ -665,7 +665,7 @@ window.onload = function(){
   //属性マーク
   var Aicon=new Image();
   //マナブレアイコン
-  var MBicon= new Image();
+  var MBicon= new createjs.Bitmap("don/Don_mbicon.png");
   var epic= new Image();
   var zoom=  new createjs.Bitmap("don/zoom650.png");
   zoom.scale=0.4;
@@ -1014,9 +1014,16 @@ function handleComplete() {
 canvas5.onmousedown = mouseDownListener;
 function mouseDownListener(e) {
   createjs.Ticker.addEventListener("tick", MouseCircle);
+  if(gamestate==1 && cLock==1 && opLock>=0 && opLock !==2){
+    mpC=-2;
+    mpmoving=true;
+  }
 };
 canvas5.onmouseup = mouseUpListener;
 function mouseUpListener(e) {
+  if(mpmoving){
+    mpmoving=false;
+  }
   createjs.Ticker.removeEventListener("tick", MouseCircle);
 };
 createjs.Ticker.addEventListener("tick", UpdateParticles);
@@ -1025,6 +1032,23 @@ function UpdateParticles(event){
 }
 function MouseCircle(event){
   //クリックした場所を教える
+  //プレイ中はマナブレも
+  //console.log(mpC,'mpmoving',mpmoving);
+  if(mpmoving){
+  mpC+=0.4;
+  if(mpC>DP[1]){mpC=DP[1]};
+    if(mpC>0){
+    DPlist[0].scaleX=mpC/30;
+    DPlist[0].x=50;
+    }else{
+    DPlist[0].scaleX=0;
+    DPlist[0].x=50;      
+    }
+  }else{
+    mpC=-2;
+    DPlist[0].scaleX=0;
+    DPlist[0].x=50;
+  }
   //create化する
   emitParticles();
   // パーティクルを更新
@@ -1203,51 +1227,11 @@ function updateParticles() {
       if(debugmode){
       console.log("X座標：" + mouseX,"Y座標：" + mouseY);
       }
-      if(gamestate ==1){
-        //mpチャージ
-        if(cLock==1 && opLock>=0 && opLock !==2){
-          mpC=-2;
-          mpmoving=true;
-        window.requestAnimationFrame((ts)=>mpMove(ts,mpC))
-        }
-          }
     };
-    function mpMove(ts,start){
-      if(mpmoving){
-        mpC+=0.4;
-        //mpゲージ書く
-        var x=50;
-        var y=478;
-        if(mpC>DP[1]){
-          mpC=DP[1]
-        };
-        if(mpC>=0){
-        cx2.fillStyle="#3d3d3d";
-        cx2.clearRect(x,y,90,15);
-        cx2.fillRect(x,y,90,15);
-        cx2.fillStyle="#0080ff"
-        cx2.fillRect(x,y,90*DP[1]/30,15);
-        cx2.fillStyle="#68ceed";
-        cx2.fillRect(x,y,90*DP[1]/30,5);
-        cx2.fillStyle="#00ff66";
-        cx2.fillRect(x,y,90*mpC/30,15);
-        cx2.fillStyle="#99ed68";
-        cx2.fillRect(x,y,90*mpC/30,5);
-        cx2.strokeStyle="#e3e3e3"
-        cx2.strokeRect(x,y,30,15);
-        cx2.strokeRect(x+30,y,30,15);
-        cx2.strokeRect(x+60,y,30,15);;
-        };
-        window.requestAnimationFrame((ts)=>mpMove(ts,mpC))
-      }else{
-        mpC=0;
-        drawDP(1);
-      }};
     function mouseUpHandler(e) {
       if(debugmode){
         console.log("mouseup");
         }
-      mpmoving=false;
     };
     function LoadtoMenu(){
       for(var i=0; i<12 ; i++){
@@ -1927,6 +1911,15 @@ function menuMap(p=0){
       bt.x=470;
       bt.y=410;
       menu_solo.addChild(bt);
+      bt.addEventListener("click", {handleEvent:ToSetup});
+      function ToSetup(){
+        if(gamestate!==1){
+          gamestate=1;
+          field.removeAllChildren();
+          textmap.alpha=0;
+          Setup();
+        }
+      }
       var t = new createjs.Text("ルール", "26px 'Century Gothic'", "black");
       t.x=390;
       t.y=80;
@@ -2861,15 +2854,6 @@ function NameChange(){
             se2.play();
             pagestate=0;
             Menu();
-          }
-          if(mouseX >470 && mouseX <640 && mouseY >410 && mouseY <470){
-          gamestate=1;
-          field.removeAllChildren();
-          textmap.alpha=0;
-          Bgm =new Music(bgm2data);
-          musicnum=2;
-          //bgm1.fade(0, 0.4, 100);
-          Setup();
           }
           if(mouseX >510 && mouseX <560 && mouseY >80 && mouseY <110){
           se3.play();
@@ -4865,7 +4849,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         e13.x=0;
         e13.y=200;
         e13.scale=1/3;
-        e14 = new createjs.Bitmap(chrimg_src[chara[3]]);
+        e14 = new createjs.Bitmap(chrimg_src[chara[4]]);
         e14.sourceRect={x:500,y:0,width:300,height:300}
         e14.x=0;
         e14.y=300;
@@ -5913,65 +5897,56 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         if(N>4){N-=4};
     //manabreak
     if(ManaBreak>0){
-      e15.src=chrimg_src[chara[N]]
-      e15.onload=function(){
-        var B=450;
-        switch(N){
-          case 2:
-            B=150;
-            break;
-          case 3:
-            B=250;
-            break;
-          case 4:
-            B=350;
-            break;
-        }
-      loopX=0
-      loopX2=0;
-      alpha=1;
+      var Ary=[0,450,150,250,350]
       se12.play();
-      window.requestAnimationFrame((ts)=>ManaAnimation(ts,0,B));
-      };
+      ManaAnimation(N,data.Num,Ary[N]);
     }else{
-        handgraph(data.Num,N);
+      handgraph(data.Num,N);
     };
-    function ManaAnimation(ts,A=0,B=100){
-        cx4.globalAlpha = alpha;
-        A+=1;
-        loopX+=3
-        loopX2+=50
-        var x=loopX*4
-        var xx=loopX*3
-        if(xx>50){xx=50};
-        if(x>=800){loopX=0}
-        if(loopX2>=150){loopX2=150}
-        cx4.clearRect(0,0,800,600)
-        cx4.fillStyle = "#001c0d";
-        cx4.fillRect(0,B-xx,200,xx*2);
-        cx4.drawImage(e15,400,200-xx,300,xx*2,loopX2-250,B-xx,300,xx*2)
-        cx4.strokeStyle = "white";
-        cx4.lineWidth = 5;
-        cx4.beginPath();
-        cx4.moveTo(0,B-xx);
-        cx4.lineTo(200,B-xx);
-        cx4.stroke();
-        cx4.beginPath();
-        cx4.moveTo(0,B+xx);
-        cx4.lineTo(200,B+xx);
-        cx4.stroke();
-        cx4.drawImage(MBicon,160,B-100,200,100);
-        if(alpha>0){
-        if(A<45){window.requestAnimationFrame((ts)=>ManaAnimation(ts,A,B));}else{
-        alpha -=0.1
-        window.requestAnimationFrame((ts)=>ManaAnimation(ts,A,B));}
-        }else if(alpha <=0){
-        cx4.clearRect(0,0,800,600);
-        cx4.globalAlpha = 1;
-        handgraph(data.Num,N);
+  });
+  function ManaAnimation(p=0,A=0,B=100){
+    var Container = new createjs.Container();
+  Container.alpha=0;
+  stage.addChild(Container);
+  // マスク
+  var rect = new createjs.Shape();
+    rect.graphics
+    .beginFill("#001c0d")
+    .drawRect(0, 0, 800, 600);
+    Container.addChild(rect);
+    var shapeMask = new createjs.Shape();
+    shapeMask.graphics
+    .beginFill("gold")
+    .drawRect(140, 0, 660, 100);
+    shapeMask.scaleY=0.1;
+    shapeMask.y=B;
+    Container.mask = shapeMask;
+    var C = new createjs.Bitmap(chrimg_src[chara[p]]);
+    C.x=-300;
+    C.y=B-250;
+    Container.addChild(C);
+    createjs.Tween.get(C)
+    .to({x:0},60);
+    MBicon.x=160;
+    MBicon.y=B-50;
+    Container.addChild(MBicon);
+    createjs.Tween.get(Container)
+    .to({alpha: 1},60)
+    .wait(700)
+    .to({alpha: 0},100)
+    .call(next);
+    createjs.Tween.get(shapeMask)
+    .to({y:B-50,scaleY: 1},60);
+    function next(){
+      Container.removeAllChildren();
+      stage.removeChild(Container);
+      if(pvpmode==1){
+        handgraph(A,p);
+        }else{
+        handgraph(1,1);
         }
-      };  
-      })
+    }
+  }
   function handgraph(num,player,op=0){
     //捨てパイ・手札の描画
     //op 1→一番右の手パイをずらして描きたい時
@@ -6386,6 +6361,8 @@ cx1.drawImage(e7,dorax,10,33,43.5)
     drawDP(1);
     ManaBreak=Math.floor(mpC/10);
   }
+  DPlist[0].scaleX=0;
+  DPlist[0].x=50;
   cLock=0;
   console.log('操作禁止',cLock);
   //切った後の整列描画と自分の捨て牌リスト
@@ -6437,53 +6414,11 @@ cx1.drawImage(e7,dorax,10,33,43.5)
   }else{
         //manabreak
         if(ManaBreak>0){
-          e15.src=chrimg_src[chara[1]]
-          e15.onload=function(){
-            var B=450;
-          loopX=0
-          loopX2=0;
-          alpha=1;
           se12.play();
-          window.requestAnimationFrame((ts)=>ManaAnimation(ts,0,B));
-          };
+          ManaAnimation(1,0,450);
         }else{
             handgraph(1,1);
         };
-        function ManaAnimation(ts,A=0,B=100){
-            cx4.globalAlpha = alpha;
-            A+=1;
-            loopX+=3
-            loopX2+=50
-            var x=loopX*4
-            var xx=loopX*3
-            if(xx>50){xx=50};
-            if(x>=800){loopX=0}
-            if(loopX2>=150){loopX2=150}
-            cx4.clearRect(0,0,800,600)
-            cx4.fillStyle = "#001c0d";
-            cx4.fillRect(0,B-xx,200,xx*2);
-            cx4.drawImage(e15,400,200-xx,300,xx*2,loopX2-250,B-xx,300,xx*2)
-            cx4.strokeStyle = "white";
-            cx4.lineWidth = 5;
-            cx4.beginPath();
-            cx4.moveTo(0,B-xx);
-            cx4.lineTo(200,B-xx);
-            cx4.stroke();
-            cx4.beginPath();
-            cx4.moveTo(0,B+xx);
-            cx4.lineTo(200,B+xx);
-            cx4.stroke();
-            cx4.drawImage(MBicon,160,B-100,200,100);
-            if(alpha>0){
-            if(A<45){window.requestAnimationFrame((ts)=>ManaAnimation(ts,A,B));}else{
-            alpha -=0.1
-            window.requestAnimationFrame((ts)=>ManaAnimation(ts,A,B));}
-            }else if(alpha <=0){
-            cx4.clearRect(0,0,800,600);
-            cx4.globalAlpha = 1;
-            handgraph(1,1);
-            }
-          };  
   }
   };
   function Tumoname(){
@@ -10137,6 +10072,17 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         s.x=x;
         field.addChild(s);
         DPlist[i]=s;
+        if(i==1){
+          var s = new createjs.Shape();
+          s.graphics.beginFill("#99ed68");
+          s.graphics.drawRect(0, y, 90, 15);
+          s.graphics.beginFill("#e3e3e3");
+          s.graphics.drawRect(0, y, 90, 5);
+          s.scaleX=0;
+          s.x=x;
+          field.addChild(s);
+          DPlist[0]=s;
+          }
         var s = new createjs.Shape();
         s.graphics.beginStroke("#e3e3e3");
         s.graphics.setStrokeStyle(2);
