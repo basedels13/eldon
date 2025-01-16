@@ -1,17 +1,17 @@
-//var1.015　season2 
+//var1.016　season2 
 // npm run dev
 //全職75枚（エピックキャラは1枚ずつ増量）＋オールマイティ2枚＋マスター8枚（ガ、ロ、ベ、デ、ソ、ア、ハ）合計85枚→53枚スタート
 //対戦で魔界モードのリザルトが出ないらしい
 //次→cpuルーチンの修正 リーチボタンとかの表示なおす
 //FEVER→最初に1回だけ、職変チャンス
-//いつか→不足分の画像　魔界モード調整　カン　対戦部屋の工事、マナブレ表示、レイガイド　場の同じパイの色付け
+//いつか→不足分の画像　魔界モード調整　カン　対戦部屋の工事、プレイガイド　場の同じパイの色付け
 //cpuルーチンで止まる　たぶんリーチ時
 window.onload = function(){
   draw();
   };
   
   function draw(){
-  var titletext="v1.015/Click to START";
+  var titletext="v1.016/Click to START";
   var debugmode=true;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にfalseに
   //自分自身の情報を入れる箱
   var IAM = {
@@ -188,6 +188,13 @@ window.onload = function(){
     underText.y=560;
     textmap.addChild(underText);
     Textlist.push(underText);
+    var OKtext1 = new createjs.Text("OK (1)", "bold 16px 'メイリオ'", "white");
+    OKtext1.x=730;
+    OKtext1.y=520;
+    OKtext1.outline=5;
+    var OKtext2 = new createjs.Text("OK (1)", "bold 16px 'メイリオ'", "black");
+    OKtext2.x=730;
+    OKtext2.y=520;
     //残パイ枚数テキスト
     var deckText = new createjs.Text("残:", "24px 'Century Gothic'", "white");
     var tumonameA = new createjs.Text("　", "14px Arial", "white");
@@ -287,6 +294,7 @@ window.onload = function(){
     }
   var LP =new Array(0,75000,75000,75000,75000);
   //LP[0]:0->半荘150000/スキルあり 1->半荘300000/スキルあり 2->ミリオネア 3->無限 4->血戦
+  var LPtextlist=[];//HPテキスト
   var LPtemp=new Array(0,0,0,0,0)
   var chara =new Array(0,0,0,0,0)
   //mpmove
@@ -301,7 +309,7 @@ window.onload = function(){
   var drawcard;
   var Cskillprepare=[0,0,0,0,0];
   //chara0 0->cpuランダム 1->cpu決める
-  //MPゲージ0-30
+  //MPゲージ0-30 DPlist->create用 0->マナブレゲージ
   var DP =new Array(0,0,0,0,0)
   var DPlist=new Array(0,0,0,0,0)
   //バフ 1スキン 2マナシールド 3ネイチャ 4ナソコア 5やけど 6凍結 7適応力
@@ -665,7 +673,7 @@ window.onload = function(){
   //属性マーク
   var Aicon=new Image();
   //マナブレアイコン
-  var MBicon= new Image();
+  var MBicon= new createjs.Bitmap("don/Don_mbicon.png");
   var epic= new Image();
   var zoom=  new createjs.Bitmap("don/zoom650.png");
   zoom.scale=0.4;
@@ -775,7 +783,6 @@ window.onload = function(){
   var msgstate=0
   var gamestate =-10;
   //-2,-1=>tumoronで使用,クリックさせたくない時 0=>クリックで1に,ゲームをしてない時 1=>game中 2=>クリックで0に,ツモのアニメーション 3=>ゲームオーバー、タイトルに戻るなどする 10=>麻雀をしていない
-  var Cimage;//ツモ画面で対局画面の保存用
   var turn =0
   var turntemp
   var parent=0
@@ -1014,9 +1021,16 @@ function handleComplete() {
 canvas5.onmousedown = mouseDownListener;
 function mouseDownListener(e) {
   createjs.Ticker.addEventListener("tick", MouseCircle);
+  if(gamestate==1 && cLock==1 && opLock>=0 && opLock !==2){
+    mpC=-2;
+    mpmoving=true;
+  }
 };
 canvas5.onmouseup = mouseUpListener;
 function mouseUpListener(e) {
+  if(mpmoving){
+    mpmoving=false;
+  }
   createjs.Ticker.removeEventListener("tick", MouseCircle);
 };
 createjs.Ticker.addEventListener("tick", UpdateParticles);
@@ -1025,6 +1039,23 @@ function UpdateParticles(event){
 }
 function MouseCircle(event){
   //クリックした場所を教える
+  //プレイ中はマナブレも
+  //console.log(mpC,'mpmoving',mpmoving);
+  if(mpmoving){
+  mpC+=0.4;
+  if(mpC>DP[1]){mpC=DP[1]};
+    if(mpC>0){
+    DPlist[0].scaleX=mpC/30;
+    DPlist[0].x=50;
+    }else{
+    DPlist[0].scaleX=0;
+    DPlist[0].x=50;      
+    }
+  }else{
+    mpC=-2;
+    DPlist[0].scaleX=0;
+    DPlist[0].x=50;
+  }
   //create化する
   emitParticles();
   // パーティクルを更新
@@ -1203,51 +1234,11 @@ function updateParticles() {
       if(debugmode){
       console.log("X座標：" + mouseX,"Y座標：" + mouseY);
       }
-      if(gamestate ==1){
-        //mpチャージ
-        if(cLock==1 && opLock>=0 && opLock !==2){
-          mpC=-2;
-          mpmoving=true;
-        window.requestAnimationFrame((ts)=>mpMove(ts,mpC))
-        }
-          }
     };
-    function mpMove(ts,start){
-      if(mpmoving){
-        mpC+=0.4;
-        //mpゲージ書く
-        var x=50;
-        var y=478;
-        if(mpC>DP[1]){
-          mpC=DP[1]
-        };
-        if(mpC>=0){
-        cx2.fillStyle="#3d3d3d";
-        cx2.clearRect(x,y,90,15);
-        cx2.fillRect(x,y,90,15);
-        cx2.fillStyle="#0080ff"
-        cx2.fillRect(x,y,90*DP[1]/30,15);
-        cx2.fillStyle="#68ceed";
-        cx2.fillRect(x,y,90*DP[1]/30,5);
-        cx2.fillStyle="#00ff66";
-        cx2.fillRect(x,y,90*mpC/30,15);
-        cx2.fillStyle="#99ed68";
-        cx2.fillRect(x,y,90*mpC/30,5);
-        cx2.strokeStyle="#e3e3e3"
-        cx2.strokeRect(x,y,30,15);
-        cx2.strokeRect(x+30,y,30,15);
-        cx2.strokeRect(x+60,y,30,15);;
-        };
-        window.requestAnimationFrame((ts)=>mpMove(ts,mpC))
-      }else{
-        mpC=0;
-        drawDP(1);
-      }};
     function mouseUpHandler(e) {
       if(debugmode){
         console.log("mouseup");
         }
-      mpmoving=false;
     };
     function LoadtoMenu(){
       for(var i=0; i<12 ; i++){
@@ -1263,11 +1254,11 @@ function updateParticles() {
       Menu();
     }
     function clickHandler(e) {
-      //少しずつ委託予定
+      //少しずつ外部委託予定
       var rect = e.target.getBoundingClientRect();
       mouseX =  Math.floor(e.clientX - rect.left);
       mouseY =  Math.floor(e.clientY - rect.top);
-      if(debugmode){console.log('click!',cLock,"pagestate",pagestate,"msgstate",msgstate)};  
+      if(debugmode){console.log('click!',cLock,"pagestate",pagestate,"msgstate",msgstate,"gamestate",gamestate)};  
       if(gamestate ==10){
         //メニュー画面
         Menu();
@@ -1279,20 +1270,14 @@ function updateParticles() {
     MEMBER[N].turnflag=2;
     var M=MEMBER.filter(value=>value.turnflag==2)
     var MM=4-M.length
-    cx4.clearRect(0,0,800,600)
-    cx4.font = "bold 16px 'メイリオ'";
-    cx4.fillStyle = "black";
-    cx4.strokeStyle ="rgba(250,250,250,0.9)";
-    cx4.lineWidth=5;
-      cx4.strokeText("OK ("+MM+")",730,520);
-      cx4.fillText("OK ("+MM+")",730,520);
+    //どこかでOKtextをaddする
+    OKtext1.text="OK ("+MM+")";
+    OKtext2.text="OK ("+MM+")";
     }
   });
   if(gamestate ==0){//ほんぺ
     //ニューゲーム
-    cx5.globalAlpha = 1;
     handmap.removeAllChildren();
-    //handmap.alpha=0;
     //と言いたいけどダブロンがあればその処理
     if(Ronturn.length>0){
       gamestate=1;
@@ -1305,13 +1290,8 @@ function updateParticles() {
       MEMBER[0].turnflag=2;
       var M=MEMBER.filter(value=>value.turnflag==2)
       var MM=4-M.length
-      cx4.clearRect(0,0,800,600)
-      cx4.font = "bold 16px 'メイリオ'";
-      cx4.fillStyle = "black";
-      cx4.strokeStyle ="rgba(250,250,250,0.9)";
-      cx4.lineWidth=5;
-      cx4.strokeText("OK ("+MM+")",730,520);
-      cx4.fillText("OK ("+MM+")",730,520);
+      OKtext1.text="OK ("+MM+")";
+      OKtext2.text="OK ("+MM+")";
       for(var i=0;i<MEMBER.length;i++){
         if(MEMBER[i].turnflag!==2){
           console.log(MEMBER);
@@ -1323,15 +1303,8 @@ function updateParticles() {
       //ホスト以外は待機
       gamestate =1;
         socket.emit("game_ready", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[0].id});
-      cx4.globalAlpha=1;
-        cx4.fillStyle = "rgba(20,20,20,0.7)";
-        cx4.fillRect(0,0,800,600)
-        cx4.font = "bold 26px 'メイリオ'";
-        cx4.fillStyle = "black";
-        cx4.strokeStyle ="rgba(250,250,250,0.9)";
-        cx4.lineWidth=5;
-        cx4.strokeText("ホストを待っています…",240,200);
-        cx4.fillText("ホストを待っています…",240,200);
+        OKtext1.text="waiting…"
+        OKtext2.text="waiting…"
         return false;
     };
     //一般ルール
@@ -1435,146 +1408,11 @@ function updateParticles() {
           break;
     }
   }else if(gamestate ==-2){
-    //ツモ画面切り替え
-    if(LP[0]==4){
-      if(raidscore[0]==0 && raidscore[2] ==0){
-        cx2.clearRect(0,0,800,600);
-        //引き継ぎ
-        cx3.clearRect(326,348,148,142);
-        cx2.putImageData(Cimage,0,0);
-        gamestate=1;
-        ctl=new Array(0,0,0,0,0)
-        ctlerror=new Array(0,0,0,0,0)
-        ponsw[0]=1;
-          cx2.font = "16px 'Century Gothic'";
-          cx2.strokeStyle ="white";
-          cx2.fillStyle ="black";
-          var Mary=[0,0,0,0,0];
-          var Vmax=60;
-        window.requestAnimationFrame((ts)=>scoreMove(ts))
-        function scoreMove(ts,n=0){
-          if(alpha>0){
-            //loopanime終わるまで待機
-            window.requestAnimationFrame((ts)=>scoreMove(ts,n))
-            return false;
-          }
-          var Y=170;
-          cx4.globalAlpha=1;
-          cx4.font = "16px 'Century Gothic'";
-          cx4.strokeStyle = 'white';
-            for(var i=1;i<LPtemp.length;i++){
-              if(LPtemp[i]>0){
-                cx4.fillStyle ="red";
-                switch(i){
-                  case 1:
-                    Y=470;
-                    break;
-                  case 2:
-                    Y=170;
-                    break;
-                  case 3:
-                    Y=270;
-                    break;
-                  case 4:
-                    Y=370;
-                    break;
-                }
-                cx4.strokeText("+"+LPtemp[i],165,Y)
-                cx4.fillText("+"+LPtemp[i],165,Y)
-              }else if(LPtemp[i]<0){
-                cx4.fillStyle ="blue";
-                switch(i){
-                  case 1:
-                    Y=470;
-                    break;
-                  case 2:
-                    Y=170;
-                    break;
-                  case 3:
-                    Y=270;
-                    break;
-                  case 4:
-                    Y=370;
-                    break;
-                }
-                cx4.strokeText(LPtemp[i],160,Y)
-                cx4.fillText(LPtemp[i],160,Y)
-              }
-            }
-          n+=1;
-          var M=n/Vmax;
-          if(M>1){M==1};
-          for(var i=1;i<LPtemp.length;i++){
-            if(LPtemp[i]!==0){
-              switch(i){
-                case 1:
-                  Y=470;
-                  break;
-                case 2:
-                  Y=170;
-                  break;
-                case 3:
-                  Y=270;
-                  break;
-                case 4:
-                  Y=370;
-                  break;
-              }
-              Mary[i]=Math.floor(LP[i]-LPtemp[i]+(LPtemp[i]*M));
-              cx2.clearRect(75,Y-20,75,23);
-              cx2.strokeText(Mary[i],80,Y)
-              cx2.fillText(Mary[i],80,Y)
-            }
-          } 
-          if(n>Vmax){
-            cx4.clearRect(0,0,800,600);
-            cx4.globalAlpha=0;
-            for(var i=1;i<LPtemp.length;i++){
-              if(LPtemp[i]!==0){
-                switch(i){
-                  case 1:
-                    Y=470;
-                    break;
-                  case 2:
-                    Y=170;
-                    break;
-                  case 3:
-                    Y=270;
-                    break;
-                  case 4:
-                    Y=370;
-                    break;
-                }
-                cx2.clearRect(75,Y-20,75,23);
-                cx2.strokeText(LP[i],80,Y)
-                cx2.fillText(LP[i],80,Y)
-              }
-            } 
-            turnchecker();
-          }else{
-            window.requestAnimationFrame((ts)=>scoreMove(ts,n))
-          }
-        }
-        return false;
-        //turnchecker();
-      }else{
-        if(raidscore[2]==1){
-          se10.play();
-          var s = new createjs.Shape();
-          s.graphics.beginFill("rgba(20,20,20,0.5)");
-          s.graphics.drawRect(10, 100, 700, 400);
-          field.addChild(s);
-          var t = new createjs.Text("TIME UP", "36px 'Century Gothic'", "white");
-          t.x=320;
-          t.y=300;
-          field.addChild(t);
-          gamestate=2;
-          }
-      }
-    }else{
-      gamestate=-1;
-    }
+    //ツモのアニメーション中
+    //gamestate=-1;
     }else if(gamestate ==2){//次のゲームへ
+    field.addChild(OKtext1);
+    field.addChild(OKtext2);
     if(pvpmode==1 && IsHost(IAM.room)){
       MEMBER[0].turnflag=1;
   for(var i=1;i<MEMBER.length;i++){
@@ -1927,6 +1765,15 @@ function menuMap(p=0){
       bt.x=470;
       bt.y=410;
       menu_solo.addChild(bt);
+      bt.addEventListener("click", {handleEvent:ToSetup});
+      function ToSetup(){
+        if(gamestate!==1){
+          gamestate=1;
+          field.removeAllChildren();
+          textmap.alpha=0;
+          Setup();
+        }
+      }
       var t = new createjs.Text("ルール", "26px 'Century Gothic'", "black");
       t.x=390;
       t.y=80;
@@ -2861,15 +2708,6 @@ function NameChange(){
             se2.play();
             pagestate=0;
             Menu();
-          }
-          if(mouseX >470 && mouseX <640 && mouseY >410 && mouseY <470){
-          gamestate=1;
-          field.removeAllChildren();
-          textmap.alpha=0;
-          Bgm =new Music(bgm2data);
-          musicnum=2;
-          //bgm1.fade(0, 0.4, 100);
-          Setup();
           }
           if(mouseX >510 && mouseX <560 && mouseY >80 && mouseY <110){
           se3.play();
@@ -4865,7 +4703,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         e13.x=0;
         e13.y=200;
         e13.scale=1/3;
-        e14 = new createjs.Bitmap(chrimg_src[chara[3]]);
+        e14 = new createjs.Bitmap(chrimg_src[chara[4]]);
         e14.sourceRect={x:500,y:0,width:300,height:300}
         e14.x=0;
         e14.y=300;
@@ -4887,55 +4725,55 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             LP[i]=75000;
           }}
             }}
-        var LPlist=[];//HPテキスト
+        LPtextlist=[];//HPテキスト
         parentY =450;
         var t = new createjs.Text(LP[1], "16px 'Century Gothic'", "#eb5600");
         t.x=80;
         t.y=450;
         t.outline=3;
         field.addChild(t);
-        LPlist.push(t);
+        LPtextlist.push(t);
         var t = new createjs.Text(LP[1], "16px 'Century Gothic'", "white");
         t.x=80;
         t.y=450;
         field.addChild(t);
-        LPlist.push(t);
+        LPtextlist.push(t);
         parentY =150;
         var t = new createjs.Text(LP[2], "16px 'Century Gothic'", "#eb5600");
         t.x=80;
         t.y=parentY;
         t.outline=3;
         field.addChild(t);
-        LPlist.push(t);
+        LPtextlist.push(t);
         var t = new createjs.Text(LP[2], "16px 'Century Gothic'", "white");
         t.x=80;
         t.y=parentY;
         field.addChild(t);
-        LPlist.push(t);
+        LPtextlist.push(t);
         parentY +=100
         var t = new createjs.Text(LP[3], "16px 'Century Gothic'", "#eb5600");
         t.x=80;
         t.y=parentY;
         t.outline=3;
         field.addChild(t);
-        LPlist.push(t);
+        LPtextlist.push(t);
         var t = new createjs.Text(LP[3], "16px 'Century Gothic'", "white");
         t.x=80;
         t.y=parentY;
         field.addChild(t);
-        LPlist.push(t);
+        LPtextlist.push(t);
         parentY +=100
         var t = new createjs.Text(LP[4], "16px 'Century Gothic'", "#eb5600");
         t.x=80;
         t.y=parentY;
         t.outline=3;
         field.addChild(t);
-        LPlist.push(t);
+        LPtextlist.push(t);
         var t = new createjs.Text(LP[4], "16px 'Century Gothic'", "white");
         t.x=80;
         t.y=parentY;
         field.addChild(t);
-        LPlist.push(t);
+        LPtextlist.push(t);
         parentY =185;
         var Ary=["CPU1","CPU2","CPU3",Username]
         for(var i=0;i<4;i++){
@@ -5913,65 +5751,56 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         if(N>4){N-=4};
     //manabreak
     if(ManaBreak>0){
-      e15.src=chrimg_src[chara[N]]
-      e15.onload=function(){
-        var B=450;
-        switch(N){
-          case 2:
-            B=150;
-            break;
-          case 3:
-            B=250;
-            break;
-          case 4:
-            B=350;
-            break;
-        }
-      loopX=0
-      loopX2=0;
-      alpha=1;
+      var Ary=[0,450,150,250,350]
       se12.play();
-      window.requestAnimationFrame((ts)=>ManaAnimation(ts,0,B));
-      };
+      ManaAnimation(N,data.Num,Ary[N]);
     }else{
-        handgraph(data.Num,N);
+      handgraph(data.Num,N);
     };
-    function ManaAnimation(ts,A=0,B=100){
-        cx4.globalAlpha = alpha;
-        A+=1;
-        loopX+=3
-        loopX2+=50
-        var x=loopX*4
-        var xx=loopX*3
-        if(xx>50){xx=50};
-        if(x>=800){loopX=0}
-        if(loopX2>=150){loopX2=150}
-        cx4.clearRect(0,0,800,600)
-        cx4.fillStyle = "#001c0d";
-        cx4.fillRect(0,B-xx,200,xx*2);
-        cx4.drawImage(e15,400,200-xx,300,xx*2,loopX2-250,B-xx,300,xx*2)
-        cx4.strokeStyle = "white";
-        cx4.lineWidth = 5;
-        cx4.beginPath();
-        cx4.moveTo(0,B-xx);
-        cx4.lineTo(200,B-xx);
-        cx4.stroke();
-        cx4.beginPath();
-        cx4.moveTo(0,B+xx);
-        cx4.lineTo(200,B+xx);
-        cx4.stroke();
-        cx4.drawImage(MBicon,160,B-100,200,100);
-        if(alpha>0){
-        if(A<45){window.requestAnimationFrame((ts)=>ManaAnimation(ts,A,B));}else{
-        alpha -=0.1
-        window.requestAnimationFrame((ts)=>ManaAnimation(ts,A,B));}
-        }else if(alpha <=0){
-        cx4.clearRect(0,0,800,600);
-        cx4.globalAlpha = 1;
-        handgraph(data.Num,N);
+  });
+  function ManaAnimation(p=0,A=0,B=100){
+    var Container = new createjs.Container();
+  Container.alpha=0;
+  stage.addChild(Container);
+  // マスク
+  var rect = new createjs.Shape();
+    rect.graphics
+    .beginFill("#001c0d")
+    .drawRect(0, 0, 800, 600);
+    Container.addChild(rect);
+    var shapeMask = new createjs.Shape();
+    shapeMask.graphics
+    .beginFill("gold")
+    .drawRect(140, 0, 660, 100);
+    shapeMask.scaleY=0.1;
+    shapeMask.y=B;
+    Container.mask = shapeMask;
+    var C = new createjs.Bitmap(chrimg_src[chara[p]]);
+    C.x=-300;
+    C.y=B-250;
+    Container.addChild(C);
+    createjs.Tween.get(C)
+    .to({x:0},60);
+    MBicon.x=160;
+    MBicon.y=B-50;
+    Container.addChild(MBicon);
+    createjs.Tween.get(Container)
+    .to({alpha: 1},60)
+    .wait(700)
+    .to({alpha: 0},100)
+    .call(next);
+    createjs.Tween.get(shapeMask)
+    .to({y:B-50,scaleY: 1},60);
+    function next(){
+      Container.removeAllChildren();
+      stage.removeChild(Container);
+      if(pvpmode==1){
+        handgraph(A,p);
+        }else{
+        handgraph(1,1);
         }
-      };  
-      })
+    }
+  }
   function handgraph(num,player,op=0){
     //捨てパイ・手札の描画
     //op 1→一番右の手パイをずらして描きたい時
@@ -6386,6 +6215,8 @@ cx1.drawImage(e7,dorax,10,33,43.5)
     drawDP(1);
     ManaBreak=Math.floor(mpC/10);
   }
+  DPlist[0].scaleX=0;
+  DPlist[0].x=50;
   cLock=0;
   console.log('操作禁止',cLock);
   //切った後の整列描画と自分の捨て牌リスト
@@ -6437,53 +6268,11 @@ cx1.drawImage(e7,dorax,10,33,43.5)
   }else{
         //manabreak
         if(ManaBreak>0){
-          e15.src=chrimg_src[chara[1]]
-          e15.onload=function(){
-            var B=450;
-          loopX=0
-          loopX2=0;
-          alpha=1;
           se12.play();
-          window.requestAnimationFrame((ts)=>ManaAnimation(ts,0,B));
-          };
+          ManaAnimation(1,0,450);
         }else{
             handgraph(1,1);
         };
-        function ManaAnimation(ts,A=0,B=100){
-            cx4.globalAlpha = alpha;
-            A+=1;
-            loopX+=3
-            loopX2+=50
-            var x=loopX*4
-            var xx=loopX*3
-            if(xx>50){xx=50};
-            if(x>=800){loopX=0}
-            if(loopX2>=150){loopX2=150}
-            cx4.clearRect(0,0,800,600)
-            cx4.fillStyle = "#001c0d";
-            cx4.fillRect(0,B-xx,200,xx*2);
-            cx4.drawImage(e15,400,200-xx,300,xx*2,loopX2-250,B-xx,300,xx*2)
-            cx4.strokeStyle = "white";
-            cx4.lineWidth = 5;
-            cx4.beginPath();
-            cx4.moveTo(0,B-xx);
-            cx4.lineTo(200,B-xx);
-            cx4.stroke();
-            cx4.beginPath();
-            cx4.moveTo(0,B+xx);
-            cx4.lineTo(200,B+xx);
-            cx4.stroke();
-            cx4.drawImage(MBicon,160,B-100,200,100);
-            if(alpha>0){
-            if(A<45){window.requestAnimationFrame((ts)=>ManaAnimation(ts,A,B));}else{
-            alpha -=0.1
-            window.requestAnimationFrame((ts)=>ManaAnimation(ts,A,B));}
-            }else if(alpha <=0){
-            cx4.clearRect(0,0,800,600);
-            cx4.globalAlpha = 1;
-            handgraph(1,1);
-            }
-          };  
   }
   };
   function Tumoname(){
@@ -7597,10 +7386,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             field.addChild(rect);
           }
         };
-      if(LP[0]==4){
-        //魔界ルール
-        Cimage = cx2.getImageData(0, 0, 800, 600);
-      };
       se7.play();
       cLock=0
       gamestate=-2;
@@ -7795,7 +7580,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         PB("満貫");}
       cx4.clearRect(0,0,800,600)
       opLock=-1;
-      //gamestate=2;
+      //gamestate =2;
       tweeNsquare.paused=true;
       Csquare.alpha=0;
       //描画 魔界モード以外の時はResultmapで描画
@@ -7827,7 +7612,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         drawcard.y=120;
         drawcard.scaleX=7/12;
         drawcard.scaleY=31/52;
-        drawcardlist[i-1]=drawcard;
         fieldmap.addChild(drawcard);
         }
         var haix
@@ -8132,12 +7916,12 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           cx2.fillText(MEMBER[i].name, x, y);
           x+=200;
           };
-    }else{
+        }else{
         cx2.fillText(Username,30,430)
           cx2.fillText("ＣＰＵ１",230,430)
             cx2.fillText("ＣＰＵ２",430,430)
               cx2.fillText("ＣＰＵ３",630,430)
-    }
+        }
         cx2.fillText(chrlist[chara[1]],30,460)
         cx2.fillText(LPtemp[1],30,490)
         cx2.fillText(chrlist[chara[2]],230,460)
@@ -9371,7 +9155,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           var s = new createjs.Shape();
             s.graphics.beginFill("rgba(20,20,20,0.5)");
             if(ippatu[4]==1){
-              s.graphics.drawRect(riverx[4]-10.5, rivery[4]+10.5, 43.5, 33);
+              s.graphics.drawRect(riverx[4]-10.5, rivery[4]+5.25, 43.5, 33);
             }else{
               s.graphics.drawRect(riverx[4], rivery[4], 33, 43.5);
             }
@@ -9409,7 +9193,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           var s = new createjs.Shape();
           s.graphics.beginFill("rgba(20,20,20,0.5)");
           if(ippatu[1]==1){
-            s.graphics.drawRect(riverx[1]-10.5, rivery[1]+10.5, 43.5, 33);
+            s.graphics.drawRect(riverx[1]-10.5, rivery[1]+5.25, 43.5, 33);
           }else{
             s.graphics.drawRect(riverx[1], rivery[1], 33, 43.5);
           }
@@ -9446,7 +9230,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           var s = new createjs.Shape();
           s.graphics.beginFill("rgba(20,20,20,0.5)");
           if(ippatu[2]==1){
-            s.graphics.drawRect(riverx[2]-10.5, rivery[2]+10.5, 43.5, 33);
+            s.graphics.drawRect(riverx[2]-10.5, rivery[2]+5.25, 43.5, 33);
           }else{
             s.graphics.drawRect(riverx[2], rivery[2], 33, 43.5);
           }
@@ -9482,7 +9266,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           var s = new createjs.Shape();
           s.graphics.beginFill("rgba(20,20,20,0.5)");
           if(ippatu[3]==1){
-            s.graphics.drawRect(riverx[3]-10.5, rivery[3]+10.5, 43.5, 33);
+            s.graphics.drawRect(riverx[3]-10.5, rivery[3]+5.25, 43.5, 33);
           }else{
             s.graphics.drawRect(riverx[3], rivery[3], 33, 43.5);
           }
@@ -10137,6 +9921,17 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         s.x=x;
         field.addChild(s);
         DPlist[i]=s;
+        if(i==1){
+          var s = new createjs.Shape();
+          s.graphics.beginFill("#99ed68");
+          s.graphics.drawRect(0, y, 90, 15);
+          s.graphics.beginFill("#e3e3e3");
+          s.graphics.drawRect(0, y, 90, 5);
+          s.scaleX=0;
+          s.x=x;
+          field.addChild(s);
+          DPlist[0]=s;
+          }
         var s = new createjs.Shape();
         s.graphics.beginStroke("#e3e3e3");
         s.graphics.setStrokeStyle(2);
@@ -10436,7 +10231,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       .call(next);
       function next(){
       opLock=0;
-      if(LP[0]!==4){Resultmap(player,type)
+      if(LP[0]!==4){Resultmap(player,type);
       };
       createjs.Tween.get(Container)
       .to({alpha: 0},500)
@@ -10445,9 +10240,85 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       function end(){
         Container.removeAllChildren();
         stage.removeChild(Container);
+        if(LP[0]==4){Raidscore()};
       }
       };
-  
+      function Raidscore(){
+          if(raidscore[0]==0 && raidscore[2] ==0){
+            gamestate=1;
+            ctl=new Array(0,0,0,0,0)
+            ctlerror=new Array(0,0,0,0,0)
+            ponsw[0]=1;
+              var Mary=[0,0,0,0,0];
+              var Vmax=60;
+              var count = 0
+              createjs.Ticker.addEventListener("tick", handleTick);
+            return false;
+          }else{
+            if(raidscore[2]==1){
+              se10.play();
+              var s = new createjs.Shape();
+              s.graphics.beginFill("rgba(20,20,20,0.5)");
+              s.graphics.drawRect(10, 100, 700, 400);
+              field.addChild(s);
+              var t = new createjs.Text("TIME UP", "36px 'Century Gothic'", "white");
+              t.x=320;
+              t.y=300;
+              field.addChild(t);
+              gamestate =2;
+              }
+          };
+        function handleTick(){
+          var Container = new createjs.Container();
+          field.addChild(Container);
+            var Ary=[0,450,150,250,350]
+            for(var i=1;i<LPtemp.length;i++){
+              if(LPtemp[i]>0){
+                var t = new createjs.Text("+"+LPtemp[i], "16px 'Century Gothic'", "white");
+                t.x=165;
+                t.y=Ary[i];
+                t.outline=3;
+                Container.addChild(t);
+                var t = new createjs.Text("+"+LPtemp[i], "16px 'Century Gothic'", "red");
+                t.x=165;
+                t.y=Ary[i];
+                Container.addChild(t);
+              }else if(LPtemp[i]<0){
+                var t = new createjs.Text("-"+LPtemp[i], "16px 'Century Gothic'", "white");
+                t.x=165;
+                t.y=Ary[i];
+                t.outline=3;
+                Container.addChild(t);
+                var t = new createjs.Text("-"+LPtemp[i], "16px 'Century Gothic'", "blue");
+                t.x=165;
+                t.y=Ary[i];
+                Container.addChild(t);
+              }
+            }
+          count+=1;
+          var M=count/Vmax;
+          if(M>1){M==1};
+          for(var i=1;i<LPtemp.length;i++){
+            if(LPtemp[i]!==0){
+              Mary[i]=Math.floor(LP[i]-LPtemp[i]+(LPtemp[i]*M));
+              LPtextlist[i*2-2].text=Mary[i];
+              LPtextlist[i*2-1].text=Mary[i];
+            }
+          } 
+          if(count>Vmax){
+            for(var i=1;i<LPtemp.length;i++){
+              if(LPtemp[i]!==0){
+                LPtextlist[i*2-2].text=LP[i];
+                LPtextlist[i*2-1].text=LP[i];
+              }
+            };
+            createjs.Ticker.removeEventListener("tick", handleTick);
+            field.removeChild(Container);
+            turnchecker();
+          }
+            stage.update();
+        }
+      }
   function ReachAnimation(p){
     var Container = new createjs.Container();
     Container.alpha=0;
