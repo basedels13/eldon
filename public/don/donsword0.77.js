@@ -2,10 +2,9 @@
 // npm run dev
 //全職75枚（エピックキャラは1枚ずつ増量）＋オールマイティ2枚＋マスター8枚（ガ、ロ、ベ、デ、ソ、ア、ハ）合計85枚→53枚スタート
 //対戦で魔界モードのリザルトが出ないらしい
-//次→cpuルーチンの修正 リーチボタンとかの表示なおす
 //FEVER→最初に1回だけ、職変チャンス
-//いつか→不足分の画像　魔界モード調整　カン　対戦部屋の工事、プレイガイド　場の同じパイの色付け
-//cpuルーチンで止まる　たぶんリーチ時
+//いつか→魔界モードのリザルトのスライド 不足分の画像　対戦部屋の工事、プレイガイド　場の同じパイの色付け
+//クレスト役の判定がおかしい　リーチの前の段階でリーチにかかってしまう
 window.onload = function(){
   draw();
   };
@@ -318,9 +317,9 @@ window.onload = function(){
   var Bufflist =new Array(0,[],[],[],[])
   var mode=0
   var musicnum=0
-  var musicset=new Array(3,7,8);
+  var musicset=new Array(0,0,0);
   //通常時、自分の立直時、オーラス時
-  var musicrandom=[[1,2,3,5,9],[4,7,10],[6,8,11]];
+  var musicrandom=[[1,2,5,6,7],[3,8,9,11],[4,10,12]];
   //ランダム向けプレイリスト
   var vBar=1;
   var sBar=1;
@@ -332,7 +331,7 @@ window.onload = function(){
   var Ronturn=[];
   //データベース
   var LPlist=new Array("一般","ヘル","ミリオネア","∞","魔界血戦")
-  var musiclist=new Array("ランダム","夜の迷宮の入口","決闘のテーマ","盲目のアストライア","The Evil Sacrifice Archenemies","Nine Jack","ロベリア","リーチっぽい音楽","狂乱のオーラス","エルの樹の麓","ベスマ湖","ウォーリーの城")
+  var musiclist=new Array("ランダム","盲目のアストライア","Nine Jack","The Evil Sacrifice Archenemies","ロベリア","夜の迷宮の入口","決闘のテーマ","エルの樹の麓","リーチっぽい音楽","ベスマ湖","ウォーリーの城","歎きの塔Phase3","狂乱のオーラス","リーチっぽい音楽R")
   var chrlist=new Array("名無しさん","エルス","アイシャ","レナ","レイヴン","イヴ")//"ラシェ","アラ","エド","ラビィ")
   var chrimg_src= new Array("don/Don_chara0.png","don/Don_chara1.png","don/Don_chara2.png","don/Don_chara3.png","don/Don_chara4.png","don/Don_chara5_2.png");
   var atrbute_src= new Array("don/Don_DP.png","don/Duel_mana.png","don/Duel_sun.png","don/Duel_aqua.png","don/Duel_wind.png","don/Duel_moon.png","don/Duel_gaia.png","don/Duel_heat.png","don/Don_HA.png");
@@ -358,18 +357,20 @@ window.onload = function(){
   var donicon_src= new Array("don/Don_buff.png","don/Don_mbicon.png","don/Don_fever.png")
   var win_src= new Array("don/Don_menu1.png","don/Don_menu2.png","don/Don_menu3.png","don/Don_menu4.png","don/wintumo.png","don/winron.png","don/winreach.png","don/Don_Cutin.png");
   var musiclistDT=[
-  {title:"ランダム",elia:"　",nod:"　"},
+  {title:"ランダム",elia:"ランダムにbgmが流れます",nod:"　"},
+  {title:"盲目のアストライア",elia:"ISAo",nod:"@ DOVA-SYNDROME"},
+  {title:"Nine Jack",elia:"まんぼう二等兵",nod:"@ DOVA-SYNDROME"},
+  {title:"The Evil Sacrifice Archenemies",elia:"ISAo",nod:"@ DOVA-SYNDROME"},
+  {title:"ロベリア",elia:"まんぼう二等兵",nod:"@ DOVA-SYNDROME"},
   {title:"夜の迷宮の入口",elia:"提供",nod:"ラビィのテーマのイメージ"},
   {title:"決闘のテーマ",elia:"提供",nod:"from Elsword music <耳コピアレンジ>"},
-  {title:"盲目のアストライア",elia:"ISAo",nod:"@ DOVA-SYNDROME"},
-  {title:"The Evil Sacrifice Archenemies",elia:"ISAo",nod:"@ DOVA-SYNDROME"},
-  {title:"Nine Jack",elia:"まんぼう二等兵",nod:"@ DOVA-SYNDROME"},
-  {title:"ロベリア",elia:"まんぼう二等兵",nod:"@ DOVA-SYNDROME"},
-  {title:"リーチっぽい音楽",elia:"提供",nod:"アトラスシティーのイメージ"},
-  {title:"狂乱のオーラス",elia:"提供",nod:"from Elsword music <耳コピアレンジ>"},
   {title:"エルの樹の麓",elia:"提供",nod:"from Elsword music <耳コピアレンジ>"},
+  {title:"リーチっぽい音楽",elia:"提供",nod:"アトラスシティーのイメージ"},
   {title:"ベスマ湖",elia:"提供",nod:"from Elsword music <耳コピアレンジ>"},
-  {title:"ウォーリーの城",elia:"提供",nod:"from Elsword music <耳コピアレンジ>"},
+  {title:"ウォーリーの城",elia:"提供",nod:"from Elsword music <アレンジメドレー>"},
+  {title:"歎きの塔Phase3",elia:"提供",nod:"from Elsword music <耳コピアレンジ>"},
+  {title:"狂乱のオーラス",elia:"提供",nod:"from Elsword music <耳コピアレンジ>"},
+  {title:"リーチっぽい音楽R",elia:"提供",nod:"（おまけトラック）"},
   ]
   var skilltext=[{fir:"0",sec:"0",thr:"0"},
   {fir:"フレイムガイザー",sec:"FLAME GEYSER",thr:"0"},
@@ -705,6 +706,9 @@ window.onload = function(){
   var pon2=[];
   var pon3=[];
   var pon4=[];
+  //カンカカン 未実装
+  var kansw=[0,0,0,0,0]
+  var kan1=[];
   //描画用
   var reachhand=[];
   //ツモロン判定用
@@ -823,7 +827,7 @@ window.onload = function(){
     });
   var se7 = new Howl({
     src:"don/skillSE.mp3",
-    volume: 0.18,
+    volume: 0.15,
     });
   var se8 = new Howl({
     src:"don/jidaigeki3.mp3",
@@ -874,70 +878,82 @@ window.onload = function(){
       volume: 0.3,
     });
   const bgm1data ={
-      src: "don/nishaint.mp3",
-      loopStart: 6460,
-      loopEnd: 44870,
-      volume: 0.4,
-    };
-  const bgm2data ={
-    src: "don/Duel.mp3",
-    loopStart: 10200,
-    loopEnd: 111250,
-    volume: 0.45,
-  };
-  const bgm3data ={
     src: "don/Astraea.mp3",
     loopStart: 0,
     loopEnd: 98000,
     volume: 0.12,
   };
-  const bgm4data ={
-    src: "don/The_Evil_Sacrifice_Archenemies.mp3",
-    loopStart: 0,
-    loopEnd: 100000,
-    volume: 0.08,
-  };
-  const bgm5data ={
+  const bgm2data ={
     src: "don/Nine_Jackshort.mp3",
     loopStart: 0,
     loopEnd: 181000,
     volume: 0.07,
   };
-  const bgm6data ={
+  const bgm3data ={
+    src: "don/The_Evil_Sacrifice_Archenemies.mp3",
+    loopStart: 0,
+    loopEnd: 100000,
+    volume: 0.08,
+  };
+  const bgm4data ={
     src: "don/Lobelia.mp3",
     loopStart: 0,
     loopEnd: 169000,
     volume: 0.05,
   };
+  const bgm5data ={
+      src: "don/nisha_intro.mp3",
+      loopStart: 5040,
+      loopEnd: 81870,
+      volume: 0.6,
+    };
+  const bgm6data ={
+    src: "don/Duel.mp3",
+    loopStart: 10200,
+    loopEnd: 111250,
+    volume: 0.45,
+  };
   const bgm7data ={
-    src: "don/Reach.mp3",
-    loopStart: 6290,
-    loopEnd: 74750,
-    volume: 0.5,
-  };
-  const bgm8data ={
-    src: "don/Victoria.mp3",
-    loopStart: 8540,
-    loopEnd: 129250,
-    volume: 0.3,
-  };
-  const bgm9data ={
     src: "don/Sortie_Rena.mp3",
     loopStart: 10200,
     loopEnd: 171500,
     volume: 0.3,
   };
-  const bgm10data ={
+  const bgm8data ={
+    src: "don/Reach.mp3",
+    loopStart: 6290,
+    loopEnd: 74750,
+    volume: 0.5,
+  };
+  const bgm9data ={
     src: "don/Stage_Bethma.mp3",
     loopStart: 1150,
     loopEnd: 98610,
     volume: 0.15,
   };
-  const bgm11data ={
+  const bgm10data ={
     src: "don/Unrest_KBF_li.mp3",
     loopStart: 14250,
     loopEnd: 173120,
     volume: 0.4,
+  };
+  const bgm11data ={
+    src: "don/rosso_A.mp3",
+    loopStart: 9950,
+    loopEnd: 158540,
+    volume: 0.3,
+  };
+  const bgm12data ={
+    src: "don/Victoria.mp3",
+    loopStart: 8540,
+    loopEnd: 129250,
+    volume: 0.3,
+  };
+  const bgm13data ={
+    src: "don/Reach_R.mp3",
+    loopStart: 7200,
+    loopEnd: 74580,
+    volume: 0.5,
   };
   const bgm17data ={
     src: "don/STARDUST_LEMON.mp3",
@@ -1030,6 +1046,8 @@ canvas5.onmouseup = mouseUpListener;
 function mouseUpListener(e) {
   if(mpmoving){
     mpmoving=false;
+    DPlist[0].scaleX=0;
+    DPlist[0].x=50;
   }
   createjs.Ticker.removeEventListener("tick", MouseCircle);
 };
@@ -1138,7 +1156,8 @@ function updateParticles() {
   shape.graphics.drawRect(100, 380, 600, 25);
   field.addChild(shape);
   var t = new createjs.Text(titletext, "24px 'Century Gothic'", "#e4e4e4");
-  t.x=340;
+  t.textAlign="center"
+  t.x=400;
   t.y=380;
   field.addChild(t);
   var shape = new createjs.Shape();
@@ -1644,27 +1663,23 @@ function updateParticles() {
         }
       }
     }else{//reach[1] ==3
-    if(mouseY >348 && mouseY< 454){
-    if(mouseX >326 && mouseX<474){
-    if(hand1[0] <-1){
-      if(debugmode){console.log('5アガリ',han[1])}}
-    }}
+
     if(mouseY >490 && mouseY < 590){
       if(mouseX >690 && mouseX <760){
         PlayertoCpu(hand1.length-1);
       }}
     }
-    //抜き
-    if(mouseY >440 && mouseY <480){
+    //カン
+    if(mouseY >400 && mouseY <440){
       if(mouseX >710 && mouseX <790){
         if(debugmode){console.log(nukiswitch)};
         if(nukiswitch[1]==1){
-          if(pvpmode==1){
-          socket.emit("nuki", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[0].id});
-          }
-          cLock=0;
-          console.log('操作禁止',cLock);
-          NukiSkill(1);
+          //if(pvpmode==1){
+          //socket.emit("nuki", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[0].id});
+          //}
+          //cLock=0;
+          //console.log('操作禁止',cLock);
+          //Kan(1,2);//自ターンか相手ターンかで挙動が変わる
         };
     }}
     //リーチボタン
@@ -1771,6 +1786,7 @@ function menuMap(p=0){
           gamestate=1;
           field.removeAllChildren();
           textmap.alpha=0;
+          musicnum=-1;
           Setup();
         }
       }
@@ -1865,17 +1881,17 @@ function menuMap(p=0){
       e.y=30;
       e.scale=1.1;
       menu_setting.addChild(e);   
-      if(musicnum==musicset[0]){
+      if(musicnum==musicset[0] || musicset[0]==0){
         drawbuttom(690,200,"Play",1,60,40)
         }else{
         drawbuttom(690,200,"Play",0,60,40)
       }
-      if(musicnum==musicset[1]){
+      if(musicnum==musicset[1] || musicset[1]==0){
         drawbuttom(690,270,"Play",1,60,40)
         }else{
         drawbuttom(690,270,"Play",0,60,40)
       }
-      if(musicnum==musicset[2]){
+      if(musicnum==musicset[2] || musicset[2]==0){
         drawbuttom(690,340,"Play",1,60,40)
       }else{
         drawbuttom(690,340,"Play",0,60,40)
@@ -2016,7 +2032,7 @@ function menuMap(p=0){
             case 1:
               if(vBar<=0.2){vBar=0}else{vBar-=0.2}
               se3.play();
-              Bgm.volume(0.1*vBar);
+              musicVolume();
               var B=Barlist[0];
                 var shape = new createjs.Shape();
                 shape.graphics.beginFill("#0080ff");
@@ -2030,7 +2046,7 @@ function menuMap(p=0){
             case 2:
               if(vBar>=1.4){vBar=1.4}else{vBar+=0.2}
               se3.play();
-              Bgm.volume(0.1*vBar);
+              musicVolume();
               var B=Barlist[0];
               var shape = new createjs.Shape();
               shape.graphics.beginFill("#0080ff");
@@ -4612,6 +4628,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         //ゲームスタート時の配牌と画面
         cx2.clearRect(0,0,800,600);
         field.removeAllChildren();
+        guidemap.removeAllChildren();
         guidemap.alpha=1;
         //背景
         if(LP[0]==4){
@@ -4656,6 +4673,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         }
         field.addChild(t);
         //music
+        console.log(auras,musicset)
         if(auras==0 && musicset[0]!==musicnum){
           if(musicset[0]==0){
             musicnum=musicrandom[0][Math.floor(Math.random()*musicrandom[0].length)];
@@ -4671,6 +4689,10 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           }
         musicStart(musicnum);
       };
+      //リーチの選曲も予め入力
+      if(musicset[1]<=0){
+        musicset[1]=-musicrandom[1][Math.floor(Math.random()*musicrandom[1].length)];
+      }
       var t = new createjs.Text("ポン", "16px 'Century Gothic'", "white");
       t.x=640;
       t.y=410;
@@ -4679,10 +4701,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       t.x=640;
       t.y=450;
       field.addChild(t);
-      var t = new createjs.Text("カン", "16px 'Century Gothic'", "white");
-      t.x=720;
-      t.y=410;
-      field.addChild(t);
+      //var t = new createjs.Text("カン", "16px 'Century Gothic'", "white");
       var t = new createjs.Text("スキル", "16px 'Century Gothic'", "white");
       t.x=720;
       t.y=450;
@@ -5005,7 +5024,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       ctl[turn+1]=0;
   };
   function musicStart(num){
-    console.log('musicStart',num,mute)
+    if(debugmode){console.log('musicStart',num,mute)}
     if( mute=="ON" ){
       Bgm.stop();
     switch (num){
@@ -5053,6 +5072,14 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         Bgm =new Music(bgm11data);
         Bgm.playMusic();
         break;
+      case 12:
+        Bgm =new Music(bgm12data);
+        Bgm.playMusic();
+        break;
+      case 13:
+        Bgm =new Music(bgm13data);
+        Bgm.playMusic();
+        break;
       case 17:
         Bgm =new Music(bgm17data);
         Bgm.playMusic();
@@ -5062,6 +5089,53 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         Bgm.stop();
     }}
   };
+  function musicVolume(){
+    var N;
+    switch(musicnum){
+      case 1:
+        N=0.12;
+        break;
+      case 2:
+        N=0.07;
+        break;
+      case 3:
+        N=0.08;
+        break;
+      case 4:
+        N=0.05;
+        break;
+      case 5:
+        N=0.6;
+        break;
+      case 6:
+        N=0.45;
+        break;
+      case 7:
+        N=0.3
+        break;
+      case 8:
+        N=0.5;
+        break;
+      case 9:
+        N=0.15
+        break;
+      case 10:
+        N=0.4
+        break;
+      case 11:
+        N=0.3;
+        break;
+      case 12:
+        N=0.3;
+        break;
+      case 13:
+        N=0.5;
+        break;
+      default:
+        return false;
+    }
+    Bgm.volume(N*vBar);
+  }
       function Buffdraw(){
         if(debugmode){console.log('Buffdraw')}
      //バフアイコンを描画する
@@ -5874,13 +5948,9 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       drawDP(player);
       if(chara[player]==1 && pvpmode==0){Buff[player].push(1)};
         se9.play();
-        if(auras==0 && musicnum!==musicset[1]){
-          if(musicset[1]==0){
-            musicnum=musicrandom[1][Math.floor(Math.random()*musicrandom[1].length)];
-          }else{
-            musicnum=musicset[1];
-          }
-        musicStart(musicnum);
+        if(auras==0 && musicnum!==Math.abs(musicset[1])){
+          musicnum=Math.abs(musicset[1]);
+          musicStart(musicnum);
         };
         ReachAnimation(player);
         //イヴ様
@@ -6227,7 +6297,17 @@ cx1.drawImage(e7,dorax,10,33,43.5)
   if(debugmode){console.log(tumotemp,hand1.length-1,hand1[num],hand1[hand1.length-1])};
   if(turn ==0 && ctl[1]==0){
   if(ippatu[1]==1){ippatu[1]=2}
-  if(nuki[0]==5){nuki[0]=0};
+  if(nuki[0]==5){
+    nuki[0]=0;
+    //ドラを1枚追加
+    dora.push(king.splice(0,1));
+    dorax+=40;
+    e7 = new createjs.Bitmap(eltear_src[dora[dora.length-1]]);
+    e7.x=dorax;
+    e7.y=10;
+    e7.scale=33/120;
+    field.addChild(e7);
+  };
   if(reach[1] ==2){
   cx1.font = "bold 16px 'Century Gothic'";
   cx1.fillStyle = "orange";
@@ -6391,23 +6471,29 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         },100)
     if(reach[1] ==0){cx2.clearRect(630,440,80,40)}
     }else{
-    //山から1枚引いてくる
-    if(deck.length<=0){
-      console.log('deckerror');
-      if(pvpmode==1){
-        //error？
-        socket.emit("ryukyoku", {Token:IAM.token,room:RoomName[IAM.room]});
-      };    
-    ryukyoku();
+    //山から1枚引いてくる nuki>0の場合はデッキ外からドロー
+    if(nuki[0]>0){
+      tumo=Math.floor(Math.random()*60);
     }else{
+    if(deck.length<=0){
+        console.log('deckerror');
+        if(pvpmode==1){
+          //error？
+          socket.emit("ryukyoku", {Token:IAM.token,room:RoomName[IAM.room]});
+        };    
+      ryukyoku();
+      return false;
+    }else{
+      tumo =deck.shift();
+      if(pvpmode==1){
+        socket.emit("deck_length",{Token:IAM.token,room:RoomName[IAM.room],Deck:deck});
+      }
+    decklength();
+    }
+  }
     ctl[1]=1
-    tumo =deck.shift();
     var PE=hand1.findIndex(value=>value==100);
     hand1[PE]=tumo;
-    if(pvpmode==1){
-      socket.emit("deck_length",{Token:IAM.token,room:RoomName[IAM.room],Deck:deck});
-    }
-    decklength();
     drawcard= new createjs.Bitmap(eltear_src[tumo]);
     drawcard.alpha=0;
     drawcard.x=690;
@@ -6458,7 +6544,18 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         btn1.y = 440;
         ponkanmap.addChild(btn1);
       }
-      //カン追加予定
+      if(Kan(1,-2)){
+        nukiswitch[1]=1;//嶺上開花判定に使用
+        var btn1 = createButton("カン", 80, 40);
+        btn1.x = 710;
+        btn1.y = 400;
+        ponkanmap.addChild(btn1);
+        //btn1.addEventListener("click",{ToKan});今はまだ座標で判定している
+        function ToKan(){
+          ponkanmap.removeAllChildren();
+          Kan(1,2);
+        }
+      }
       }
     }
     if(nuki[0]==1){nuki[0]=5};
@@ -6471,11 +6568,13 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       btn1.y = 440;
       ponkanmap.addChild(btn1);
       };
-    if(reach[1]==3 && tumo ==42 && deck.length > 0){
-      nukiswitch[1]=1;
-      //se1.play();
-      //drawbuttom(710,440,"カン")
-      }
+    if(Kan(1,-2,tumo)){
+      nukiswitch[1]=1;//嶺上開花判定に使用？
+      var btn1 = createButton("カン", 80, 40);
+      btn1.x = 710;
+      btn1.y = 400;
+      ponkanmap.addChild(btn1);
+    }
     if(hand1[0]==-3){
       se6.play();
       var btn1=createCircleButton("ツモ",50);
@@ -6490,16 +6589,13 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       },100)
     }
     }
-    }
   };
     function cpu(chr,timer=0){//expected chr=2,3,4
       //コピーよりも先にjudgeに行くことでエラーになっている？
       //r4も空回りしていない？大丈夫？
-      //無限ループ脱出用に100回ループしたらランダムに切ってもらう
           console.log('cpu',chr,ctl,timer);
           timer+=1;
           var cturn=chr -1
-          //リーチしているならロン判定?
           if(turn !==cturn){
             switch(chr){
               case 2:
@@ -6524,7 +6620,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                 };
                 break;
             }
-            //***
           }
           if(turn ==cturn){//cpuの自分ターン
           if(ctl[chr] ==0){
@@ -6553,7 +6648,11 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           }
           //cpuponここから
           if(ponsw[chr]!==1){
-          tumo2=deck.shift();
+            if(nuki[0]>0){
+              tumo2=Math.floor(Math.random()*60);
+            }else{
+              tumo2=deck.shift();
+            }
           var PEP=handtemp.findIndex(value=>value==100);
           handtemp[PEP]=tumo2
           Cpuhandtemp[PEP]=tumo2
@@ -6744,11 +6843,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         handgraph(r4,chr)
         }
       }
-    };
-    function Cputumo2(player,type=0){
-    startTime = Date.now()
-    judge(player);
-    //リーチ可能であればreach->1で帰ってくる
     };
     function Cputumo(player,type=0){
     //type：未使用
@@ -7112,7 +7206,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           //console.log(keyj.length);
           //Count.length->undefined;
           for(var j=0;j<keyj.length;j++){
-            //console.log(Count[keyj[j]]);
+          //console.log(Count[keyj[j]]);
             if(Count[keyj[j]]==2){
               reachj+=1;
             }
@@ -7156,7 +7250,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             break;
           }
         }
-          //3ペアチェック カン裁定未
+          //3ペアチェック
           switch(Line["0"]){
             case 2:
               //リーチとなるのは3,4 4,2,1 3,2,1,1 2,2,2,1
@@ -7457,19 +7551,14 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       function Doracheck(player){
         var result =0
         if(reach[player]==3 && dub==1 && LP[0]!==4){
-          //表側表示のドラと同じ枚数だけ裏ドラを追加する
-          var Dx=dora.length;
-          if(Dx>king.length){Dx=king.length};
-          dora=king.splice(0,dora.length);
-        for(var i=Dx;i<dora.length;i++){
-          var DD=dora[i];
-        dorax+=40;
-        var e7 = new createjs.Bitmap(eltear_src[DD]);
-         e7.x=dorax;
-         e7.y=10;
-         e7.scale=33/120;
-        field.addChild(e7);
-        }
+          //裏ドラを1枚追加する
+          dora.push(king.splice(0,1));
+          dorax+=40;
+          e7 = new createjs.Bitmap(eltear_src[dora[dora.length-1]]);
+          e7.x=dorax;
+          e7.y=10;
+          e7.scale=33/120;
+          field.addChild(e7);
         }
         for(var D=0 ; D< dora.length ; D++){
         var DD=dora[D];
@@ -7743,6 +7832,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
     function Resultmap(player,num){
       gamestate=-1;
       guidemap.alpha=0;
+      cx2.clearRect(0,0,800,600);
       handmap.removeAllChildren();
       e15 = new createjs.Bitmap(chrimg_src[chara[player]]);
       e15.sourceRect={x:10,y:10,width:780,height:400};
@@ -8276,272 +8366,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           }
           console.log(resultA)
           return resultA
-          //以下問題なければ削除
-          nodpair1=handtemp.findIndex(value=>value==18);
-          if(nodpair1 !==-1){
-            resultA[0]+=1;
-            PA("貫徹する足取り",1);
-            resultA.push("貫徹する足取り1/1 1翻")}
-            nodpair1=handtemp.findIndex(value=>value==19);
-            if(nodpair1 !==-1){
-              resultA[0]+=1
-              PA("豊かな足取り",1);
-              resultA.push("豊かな足取り1/1 1翻")}
-              nodpair1=handtemp.findIndex(value=>value==20);
-              if(nodpair1 !==-1){
-                resultA[0]+=1
-                PA("上手な足取り",1);
-                resultA.push("上手な足取り1/1 1翻")}
-        nodpair1=handtemp.findIndex(value=>value==35);
-        if(nodpair1 !==-1){
-          resultA[0]+=1
-          PA("ラビィの友達",1);
-          resultA.push("ラビィの友達1/1 1翻")}
-        nodpair1=handtemp.findIndex(value=>value==42);
-        if(nodpair1 !==-1){
-          resultA[0]+=1
-          PA("機械工学",1);        
-          resultA.push("機械工学1/1 1翻")}
-        nodpair1=handtemp.findIndex(value=>value==14);
-        nodpair2=handtemp.findIndex(value=>value==41);
-        if(nodpair1 !==-1 && nodpair2 !==-1 ){
-          resultA[0]+=1
-          PA("戦場の天使",2);   
-          resultA.push("戦場の天使2/2 1翻")}
-        nodpair1=[11,23,31,34,38];
-        nodpair2=[];
-        for(var i=0;i<nodpair1.length;i++){
-          var A=handtemp.findIndex(value=>value==nodpair1[i]);
-          if(A!==-1){nodpair2.push(nodpair1[i])}
-        }
-        if(nodpair2.length >=2){
-          var B=1+Math.floor((nodpair2.length-1)/2)
-          resultA[0]+=B
-          PA("痛いから問題ない",nodpair2.length);   
-          resultA.push("痛いから問題ない"+nodpair2.length+"/"+nodpair1.length+" "+B+"翻")}
-        nodpair1=[1,3,15,22];
-        nodpair2=[];
-        for(var i=0;i<nodpair1.length;i++){
-          var A=handtemp.findIndex(value=>value==nodpair1[i]);
-          if(A!==-1){nodpair2.push(nodpair1[i])}
-        }
-        if(nodpair2.length >=2){
-          var B=1+Math.floor((nodpair2.length-1)/2)
-          resultA[0]+=B
-          PA("属性鍛錬者",nodpair2.length);  
-          resultA.push("属性鍛錬者"+nodpair2.length+"/"+nodpair1.length+" "+B+"翻")}
-    
-        nodpair1=[4,19,23,26,29,31,32];
-        nodpair2=[];
-        for(var i=0;i<nodpair1.length;i++){
-          var A=handtemp.findIndex(value=>value==nodpair1[i]);
-          if(A!==-1){nodpair2.push(nodpair1[i])}
-        }
-        if(nodpair2.length >=2){
-          var B=1+Math.floor((nodpair2.length-1)/2)
-          resultA[0]+=B
-          PA("渇望",nodpair2.length);  
-          resultA.push("渇望"+nodpair2.length+"/"+nodpair1.length+" "+B+"翻")}
-        nodpair1=[0,9,21];
-        nodpair2=[];
-        for(var i=0;i<nodpair1.length;i++){
-          var A=handtemp.findIndex(value=>value==nodpair1[i]);
-          if(A!==-1){nodpair2.push(nodpair1[i])}
-        }
-        if(nodpair2.length >=2){
-          var B=1+Math.floor((nodpair2.length-1)/2)
-          resultA[0]+=B
-          PA("原初的な動き",nodpair2.length);  
-          resultA.push("原初的な動き"+nodpair2.length+"/"+nodpair1.length+" "+B+"翻")}
-        nodpair1=[3,13,17,25,37,42];
-        nodpair2=[];
-        for(var i=0;i<nodpair1.length;i++){
-          var A=handtemp.findIndex(value=>value==nodpair1[i]);
-          if(A!==-1){nodpair2.push(nodpair1[i])}
-        }
-        if(nodpair2.length >=2){
-          var B=1+Math.floor((nodpair2.length-1)/2)
-          resultA[0]+=B
-          PA("探求する者",nodpair2.length);  
-          resultA.push("探求する者"+nodpair2.length+"/"+nodpair1.length+" "+B+"翻")}
-        nodpair1=[4,20,34];
-        nodpair2=[];
-        for(var i=0;i<nodpair1.length;i++){
-          var A=handtemp.findIndex(value=>value==nodpair1[i]);
-          if(A!==-1){nodpair2.push(nodpair1[i])}
-        }
-        if(nodpair2.length >=2){
-          var B=1+Math.floor((nodpair2.length-1)/2)
-          resultA[0]+=B
-          PA("マナ守護",nodpair2.length); 
-          resultA.push("マナ守護"+nodpair2.length+"/"+nodpair1.length+" "+B+"翻")}
-        nodpair1=[2,11,17,39,30,37];
-        nodpair2=[];
-        for(var i=0;i<nodpair1.length;i++){
-          var A=handtemp.findIndex(value=>value==nodpair1[i]);
-          if(A!==-1){nodpair2.push(nodpair1[i])}
-        }
-        if(nodpair2.length >=2){
-          var B=1+Math.floor((nodpair2.length-1)/2)
-          resultA[0]+=B
-          PA("巨人審判者",nodpair2.length);         
-          resultA.push("巨人審判者"+nodpair2.length+"/"+nodpair1.length+" "+B+"翻")}
-        nodpair1=[27,28,29];
-        nodpair2=[];
-        for(var i=0;i<nodpair1.length;i++){
-          var A=handtemp.findIndex(value=>value==nodpair1[i]);
-          if(A!==-1){nodpair2.push(nodpair1[i])}
-        }
-        if(nodpair2.length >=2){
-          var B=1+Math.floor((nodpair2.length-1)/2)
-          resultA[0]+=B
-          PA("魔族",nodpair2.length);       
-          resultA.push("魔族"+nodpair2.length+"/"+nodpair1.length+" "+B+"翻")}
-          nodpair1=[6,7,8];
-          nodpair2=[];
-          for(var i=0;i<nodpair1.length;i++){
-            var A=handtemp.findIndex(value=>value==nodpair1[i]);
-            if(A!==-1){nodpair2.push(nodpair1[i])}
-          }
-          if(nodpair2.length >=2){
-            var B=1+Math.floor((nodpair2.length-1)/2)
-            resultA[0]+=B
-            PA("精霊の加護",nodpair2.length); 
-            resultA.push("精霊の加護"+nodpair2.length+"/"+nodpair1.length+" "+B+"翻")}
-            nodpair1=[12,13,14,24,42];
-            nodpair2=[];
-            for(var i=0;i<nodpair1.length;i++){
-              var A=handtemp.findIndex(value=>value==nodpair1[i]);
-              if(A!==-1){nodpair2.push(nodpair1[i])}
-            }
-            if(nodpair2.length >=2){
-              var B=1+Math.floor((nodpair2.length-1)/2)
-              resultA[0]+=B
-              PA("ナソード研究",nodpair2.length);           
-              resultA.push("ナソード研究"+nodpair2.length+"/"+nodpair1.length+" "+B+"翻")}
-        nodpair1=[5,26,32];
-        nodpair2=[];
-        for(var i=0;i<nodpair1.length;i++){
-          var A=handtemp.findIndex(value=>value==nodpair1[i]);
-          if(A!==-1){nodpair2.push(nodpair1[i])}
-        }
-        if(nodpair2.length >=2){
-          var B=1+Math.floor((nodpair2.length-1)/2)
-          resultA[0]+=B
-          PA("時空間",nodpair2.length);   
-          resultA.push("時空間"+nodpair2.length+"/"+nodpair1.length+" "+B+"翻")}
-        nodpair1=[10,24,33];
-        nodpair2=[];
-        for(var i=0;i<nodpair1.length;i++){
-          var A=handtemp.findIndex(value=>value==nodpair1[i]);
-          if(A!==-1){nodpair2.push(nodpair1[i])}
-        }
-        if(nodpair2.length >=2){
-          var B=1+Math.floor((nodpair2.length-1)/2)
-          resultA[0]+=B
-          PA("殴り合い",nodpair2.length);   
-          resultA.push("殴り合い"+nodpair2.length+"/"+nodpair1.length+" "+B+"翻")}
-        nodpair1=[0,15,18,21,30];
-        nodpair2=[];
-        for(var i=0;i<nodpair1.length;i++){
-          var A=handtemp.findIndex(value=>value==nodpair1[i]);
-          if(A!==-1){nodpair2.push(nodpair1[i])}
-        }
-        if(nodpair2.length >=2){
-          var B=1+Math.floor((nodpair2.length-1)/2)
-          resultA[0]+=B
-          PA("正義を貫徹する者",nodpair2.length);   
-          resultA.push("正義を貫徹する者"+nodpair2.length+"/"+nodpair1.length+" "+B+"翻")}
-        nodpair1=[2,6,9,16,36,40];
-        nodpair2=[];
-        for(var i=0;i<nodpair1.length;i++){
-          var A=handtemp.findIndex(value=>value==nodpair1[i]);
-          if(A!==-1){nodpair2.push(nodpair1[i])}
-        }
-        if(nodpair2.length >=2){
-          var B=1+Math.floor((nodpair2.length-1)/2)
-          resultA[0]+=B
-          PA("敏捷さ",nodpair2.length);   
-          resultA.push("敏捷さ"+nodpair2.length+"/"+nodpair1.length+" "+B+"翻")}
-        nodpair1=[1,10,16,24,31];
-        nodpair2=[];
-        for(var i=0;i<nodpair1.length;i++){
-          var A=handtemp.findIndex(value=>value==nodpair1[i]);
-          if(A!==-1){nodpair2.push(nodpair1[i])}
-        }
-        if(nodpair2.length >=2){
-          var B=1+Math.floor((nodpair2.length-1)/2)
-          resultA[0]+=B
-          PA("魔法特化",nodpair2.length);   
-          resultA.push("魔法特化"+nodpair2.length+"/"+nodpair1.length+" "+B+"翻")}
-        nodpair1=[5,8,27,35,36,41];
-        nodpair2=[];
-        for(var i=0;i<nodpair1.length;i++){
-          var A=handtemp.findIndex(value=>value==nodpair1[i]);
-          if(A!==-1){nodpair2.push(nodpair1[i])}
-        }
-        if(nodpair2.length >=2){
-          var B=1+Math.floor((nodpair2.length-1)/2)
-          resultA[0]+=B
-          PA("物理特化",nodpair2.length); 
-          resultA.push("物理特化"+nodpair2.length+"/"+nodpair1.length+" "+B+"翻")}
-          nodpair1=[7,12,24,28,33,38,39];
-          nodpair2=[];
-          for(var i=0;i<nodpair1.length;i++){
-            var A=handtemp.findIndex(value=>value==nodpair1[i]);
-            if(A!==-1){nodpair2.push(nodpair1[i])}
-          }
-          if(nodpair2.length >=2){
-            var B=1+Math.floor((nodpair2.length-1)/2)
-            resultA[0]+=B
-            PA("鋭さ",nodpair2.length); 
-            resultA.push("鋭さ"+nodpair2.length+"/"+nodpair1.length+" "+B+"翻")}
-            //属性枠
-            nodpair1=handtemp.filter(value=>value>=0 && value<=2);
-            nodpair2=handtemp.filter(value=>value>=9 && value<=11);
-            if(nodpair1.length==3 && nodpair2.length==3){
-              resultA[0]+=1
-            PA("クレストオブソーレス",1); 
-              resultA.push("クレストオブソーレス 1翻")}
-            nodpair1=handtemp.filter(value=>value>=3 && value<=5);
-            nodpair2=handtemp.filter(value=>value>=15 && value<=17);
-            if(nodpair1.length==3 && nodpair2.length==3){
-              resultA[0]+=1
-              PA("クレストオブデニフ",1); 
-              resultA.push("クレストオブデニフ 1翻")}
-            nodpair1=handtemp.filter(value=>value>=6 && value<=8);
-            nodpair2=handtemp.filter(value=>value>=39 && value<=42);
-            if(nodpair1.length==3 && nodpair2.length==3){
-              resultA[0]+=1
-              PA("クレストオブベントス",1); 
-              resultA.push("クレストオブベントス 1翻")}
-            nodpair1=handtemp.filter(value=>value>=12 && value<=14);
-            nodpair2=handtemp.filter(value=>value>=24 && value<=26);
-            if(nodpair1.length==3 && nodpair2.length==3){
-              resultA[0]+=1
-              PA("クレストオブアドリアン",1); 
-              resultA.push("クレストオブアドリアン 1翻")}
-            nodpair1=handtemp.filter(value=>value>=21 && value<=23);
-            nodpair2=handtemp.filter(value=>value>=27 && value<=29);
-            if(nodpair1.length==3 && nodpair2.length==3){
-              resultA[0]+=1
-              PA("クレストオブロッソ",1); 
-              resultA.push("クレストオブロッソ 1翻")}
-            nodpair1=handtemp.filter(value=>value>=18 && value<=20);
-            nodpair2=handtemp.filter(value=>value>=33 && value<=35);
-            if(nodpair1.length==3 && nodpair2.length==3){
-              resultA[0]+=1
-              PA("クレストオブガイア",1); 
-              resultA.push("クレストオブガイア 1翻")}
-            nodpair1=handtemp.filter(value=>value>=30 && value<=32);
-            nodpair2=handtemp.filter(value=>value>=36 && value<=38);
-            if(nodpair1.length==3 && nodpair2.length==3){
-              resultA[0]+=1
-              PA("クレストオブハルニエ",1); 
-              resultA.push("クレストオブハルニエ 1翻")}
-  
-          console.log(resultA)
-          return resultA
         }
         if(mode>-1){
           //今度は逆に選択中のパイが可能な役を表示
@@ -8827,7 +8651,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       var Result=[];
       //0に○○待ちの文字、1~3に待ちパイ
       Result.push("ノーテン");
-              handtemp = hand1.concat(pon1);
+        handtemp = hand1.concat(pon1);
             //下でCがエラー吐いたので
             handtemp.splice(num,1);
             var HH=handtemp.findIndex(value=>value==100);
@@ -9074,10 +8898,8 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             }
           break;
         }
-        //
           return Result;
-    }
-  
+    }  
     function Pon(player,num=-1){//自分の同じキャラ2枚+前の人が切った同じキャラを除外
       if(num==-1){
         //ポンできるかどうかの判定
@@ -9301,6 +9123,346 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       }
     }
     }
+    function Kan(player,num=-1,tumo=-1){
+      //カンすると役が作れないため現在未実装
+    if(num==-2){
+      return false;
+      var handtest=[];
+      handtest=hand1.concat(pon1);
+      if(tumo>=0){
+          if(tumo>=60){
+          //マスターロード・オールマイティはカンできない
+          return false
+          }
+          var A=Math.floor(tumo/4);
+          var B=handtest.filter(value=>value>=4*A && value<4*(A+1));
+            if(debugmode){console.log(B)};
+            if(B.length>=4){
+              return true;
+            }
+      }else{
+          var Count={};
+          for(var i=1; i<handtest.length;i++){
+          var C=donpai.findIndex(value=>value.id==handtest[i])
+          var elm=donpai[C].name;
+          Count[elm]=(Count[elm] || 0)+1
+          }
+          var keyj=Object.keys(Count);
+          for(var j=0;j<keyj.length;j++){
+          if(Count[keyj[j]]>=4){
+            //同じキャラ4枚以上をカウント
+            return true;
+          }
+        }
+      }
+    }else if(num==-1){
+        //相手ターン未調整
+        return false;
+        console.log('pon'+player,reach[player]);
+        if(reach[player]==3){
+          //立直しているなら明カンできない
+          return false;
+        }
+        if(tumotemp>=60 && tumotemp<=69){
+          //マスターロード・オールマイティはカンできない
+          return false;
+        }
+        handtemp=[];
+        switch(player){
+          case 1:
+            if(pon1.length>=6){
+              //ポンすると手札がなくなるZE
+              return false;
+            }
+            //ponsw[1]=0;
+            handtemp = hand1.concat();
+          break;
+          case 2:
+            if(pon2.length>=6){
+              return false;
+            }
+            handtemp = hand2.concat();
+          break;
+          case 3:
+            if(pon3.length>=6){
+              return false;
+            }
+            handtemp = hand3.concat();
+          break;
+          case 4:
+            if(pon4.length>=6){
+              return false;
+            }
+            handtemp = hand4.concat();
+          break;
+        }
+          var A=Math.floor(tumotemp/4);
+          var B=handtemp.filter(value=>value>=4*A && value<4*(A+1));
+          if(debugmode){console.log(B)};
+          if(B.length>=3){kansw[player]=1;
+            return true;
+          }
+      }else{
+        //実際にカンする動き
+        //自分ターン
+        if(num==2){
+          //ポンしているパイでカンできる時はそっちを優先
+          if(pon1.length>=3){
+            var A=Math.floor(pon1[0]/4);
+            var B=hand1.findIndex(value=>value>=4*A && value<4*(A+1));
+            if(B!==-1){
+              var N=hand1.splice(B,1);
+              kan1.unshift(N,pon1[0],pon1[1],pon1[2]);
+              pon1=pon1.splice(0,3);
+              for(var i=0;i<4;i++){
+                e9 = new createjs.Bitmap(eltear_src[kan1[i]]);
+                e9.x=590-33*(kan1.length-4+pon1.length-3+i);
+                e9.y=450;
+                e9.scale=33/120;
+                field.addChild(e9);
+                var s = new createjs.Shape();
+                s.graphics.beginFill("rgba(20,20,20,0.5)");
+                s.graphics.drawRect(590-33*(kan1.length-4+pon1.length-3+i), 450, 33, 43.5);
+                field.addChild(s);
+                }
+              se8.play();
+              NukiAnimation(player);
+              return true;
+            }
+          };
+          if(pon1.length>=6){
+            var A=Math.floor(pon1[3]/4);
+            var B=hand1.findIndex(value=>value>=4*A && value<4*(A+1));
+            if(B!==-1){
+              var N=hand1.splice(B,1);
+              kan1.unshift(N,pon1[0],pon1[1],pon1[2]);
+              pon1=pon1.splice(0,3);
+              for(var i=0;i<4;i++){
+                e9 = new createjs.Bitmap(eltear_src[kan1[i]]);
+                e9.x=590-33*(kan1.length-4+pon1.length-3+i);
+                e9.y=450;
+                e9.scale=33/120;
+                field.addChild(e9);
+                var s = new createjs.Shape();
+                s.graphics.beginFill("rgba(20,20,20,0.5)");
+                s.graphics.drawRect(590-33*(kan1.length-4+pon1.length-3+i), 450, 33, 43.5);
+                field.addChild(s);
+                }
+              se8.play();
+              NukiAnimation(player);
+              return true;
+            }
+          };
+          //手札のみ4枚 この場合は槍槓できないのでまた挙動が変わる　悲しい
+          var handtest=[];
+          var A;
+          handtest=hand1.concat();
+          var Count={};
+          for(var i=1; i<handtest.length;i++){
+          var C=donpai.findIndex(value=>value.id==handtest[i])
+          var elm=donpai[C].name;
+          Count[elm]=(Count[elm] || 0)+1
+          }
+          var resultF=Object.keys(Count).filter((key)=>Count[key]>=4);
+          if(resultF.length){
+            var E=donpai.findIndex(value=>value.name==resultF[0]);
+
+            for(var i=0;i<4;i++){
+              var pA=hand1.findIndex(value=>value>=E && value<E+4);
+              var kanA=hand1.splice(pA,1);
+              kan1.unshift(kanA);
+              e9 = new createjs.Bitmap(eltear_src[kan1[0]]);
+              e9.x=590-33*(kan1.length+pon1.length-7);
+              e9.y=450;
+              e9.scale=33/120;
+              field.addChild(e9);
+              var s = new createjs.Shape();
+              s.graphics.beginFill("rgba(20,20,20,0.5)");
+              s.graphics.drawRect(590-33*(kan1.length+pon1.length-7), 450, 33, 43.5);
+              field.addChild(s);
+              }
+            se8.play();
+            NukiAnimation(player,-1,0);
+          }
+        }
+        //相手ターン
+        if(num==1){
+        handtemp=[];
+        switch(player){
+          case 1:
+            handtemp = hand1.concat();
+          break;
+          case 2:
+            handtemp = hand2.concat();
+          break;
+          case 3:
+            handtemp = hand3.concat();
+          break;
+          case 4:
+            handtemp = hand4.concat();
+          break;
+        }
+        var pp=handtemp.findIndex(value=>value==100);
+        if(pp==-1){
+          console.log('pon error!',handtemp)
+          return false;
+        }
+          handtemp[pp]=tumotemp;
+          handtemp.sort(compareFunc);
+      switch(player){
+        case 1:
+          //ポンする組み合わせは考えないものとする
+          //ポンされたパイを塗りつぶす
+          var s = new createjs.Shape();
+            s.graphics.beginFill("rgba(20,20,20,0.5)");
+            if(ippatu[4]==1){
+              s.graphics.drawRect(riverx[4]-10.5, rivery[4]+5.25, 43.5, 33);
+            }else{
+              s.graphics.drawRect(riverx[4], rivery[4], 33, 43.5);
+            }
+          field.addChild(s);
+          cLock=0;
+          hand1.splice(pp,1)
+            var A=Math.floor(num/4);
+          var pA=hand1.findIndex(value=>value>=4*A && value<4*(A+1));
+          var ponA=hand1.splice(pA,1)
+          var pB=hand1.findIndex(value=>value>=4*A && value<4*(A+1));
+          var ponB=hand1.splice(pB,1)
+          pon1.unshift(num,ponA[0],ponB[0])
+          console.log(hand1.length,hand1);
+          for(var i=0;i<3;i++){
+            e9 = new createjs.Bitmap(eltear_src[pon1[i]]);
+            e9.x=590-33*(pon1.length-3+i);
+            e9.y=450;
+            e9.scale=33/120;
+            field.addChild(e9);
+            var s = new createjs.Shape();
+            s.graphics.beginFill("rgba(20,20,20,0.5)");
+            s.graphics.drawRect(590-33*(pon1.length-3+i), 450, 33, 43.5);
+            field.addChild(s);
+            }
+          //一発を潰す
+          for(var i=1;i<5;i++){
+            if(ippatu[i]==1){
+              ippatu[i]=2;
+            }
+          }
+            se8.play();
+            PonAnimation(player);
+          break;
+        case 2:
+          var s = new createjs.Shape();
+          s.graphics.beginFill("rgba(20,20,20,0.5)");
+          if(ippatu[1]==1){
+            s.graphics.drawRect(riverx[1]-10.5, rivery[1]+5.25, 43.5, 33);
+          }else{
+            s.graphics.drawRect(riverx[1], rivery[1], 33, 43.5);
+          }
+        field.addChild(s);
+          hand2.splice(pp,1)
+            var A=Math.floor(num/4);
+          var pA=hand2.findIndex(value=>value>=4*A && value<4*(A+1));
+          var ponA=hand2.splice(pA,1)
+          var pB=hand2.findIndex(value=>value>=4*A && value<4*(A+1));
+          var ponB=hand2.splice(pB,1)
+          pon2.unshift(num,ponA[0],ponB[0])
+          //
+          for(var i=0;i<3;i++){
+          e9 = new createjs.Bitmap(eltear_src[pon2[i]]);
+          e9.x=590-33*(pon2.length-3+i);
+          e9.y=150;
+          e9.scale=33/120;
+          field.addChild(e9);
+          var s = new createjs.Shape();
+          s.graphics.beginFill("rgba(20,20,20,0.5)");
+          s.graphics.drawRect(590-33*(pon2.length-3+i), 150, 33, 43.5);
+          field.addChild(s);
+          }
+          //一発を潰す
+          for(var i=1;i<5;i++){
+            if(ippatu[i]==1){
+              ippatu[i]=2;
+            }
+          }
+        se8.play();
+        PonAnimation(player);
+          break;
+        case 3:
+          var s = new createjs.Shape();
+          s.graphics.beginFill("rgba(20,20,20,0.5)");
+          if(ippatu[2]==1){
+            s.graphics.drawRect(riverx[2]-10.5, rivery[2]+5.25, 43.5, 33);
+          }else{
+            s.graphics.drawRect(riverx[2], rivery[2], 33, 43.5);
+          }
+        field.addChild(s);
+          hand3.splice(pp,1)
+            var A=Math.floor(num/4);
+          var pA=hand3.findIndex(value=>value>=4*A && value<4*(A+1));
+          var ponA=hand3.splice(pA,1)
+          var pB=hand3.findIndex(value=>value>=4*A && value<4*(A+1));
+          var ponB=hand3.splice(pB,1)
+          pon3.unshift(num,ponA[0],ponB[0])
+          for(var i=0;i<3;i++){
+            e9 = new createjs.Bitmap(eltear_src[pon3[i]]);
+            e9.x=590-33*(pon3.length-3+i);
+            e9.y=250;
+            e9.scale=33/120;
+            field.addChild(e9);
+            var s = new createjs.Shape();
+            s.graphics.beginFill("rgba(20,20,20,0.5)");
+            s.graphics.drawRect(590-33*(pon3.length-3+i), 250, 33, 43.5);
+            field.addChild(s);
+            }
+              //一発を潰す
+        for(var i=1;i<5;i++){
+          if(ippatu[i]==1){
+            ippatu[i]=2;
+          }
+        }
+        se8.play();
+        PonAnimation(player);
+          break;
+        case 4:
+          var s = new createjs.Shape();
+          s.graphics.beginFill("rgba(20,20,20,0.5)");
+          if(ippatu[3]==1){
+            s.graphics.drawRect(riverx[3]-10.5, rivery[3]+5.25, 43.5, 33);
+          }else{
+            s.graphics.drawRect(riverx[3], rivery[3], 33, 43.5);
+          }
+        field.addChild(s);
+          hand4.splice(pp,1)
+            var A=Math.floor(num/4);
+          var pA=hand4.findIndex(value=>value>=4*A && value<4*(A+1));
+          var ponA=hand4.splice(pA,1)
+          var pB=hand4.findIndex(value=>value>=4*A && value<4*(A+1));
+          var ponB=hand4.splice(pB,1)
+          pon4.unshift(num,ponA[0],ponB[0])
+          for(var i=0;i<3;i++){
+            e9 = new createjs.Bitmap(eltear_src[pon4[i]]);
+            e9.x=590-33*(pon4.length-3+i);
+            e9.y=350;
+            e9.scale=33/120;
+            field.addChild(e9);
+            var s = new createjs.Shape();
+            s.graphics.beginFill("rgba(20,20,20,0.5)");
+            s.graphics.drawRect(590-33*(pon4.length-3+i), 350, 33, 43.5);
+            field.addChild(s);
+            }
+              //一発を潰す
+          for(var i=1;i<5;i++){
+            if(ippatu[i]==1){
+              ippatu[i]=2;
+            }
+          }
+        se8.play();
+        PonAnimation(player);
+      break;
+      }
+    }
+    }
+    }
     socket.on("ryukyoku", (data)=>{
       if(IAM.token!==data.Token){
         ryukyoku();
@@ -9399,7 +9561,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
     }
     function handOnCorsor(){
       //手札のカーソル
-      if(debugmode){console.log('handOnCorsor',this.card)}
+      //if(debugmode){console.log('handOnCorsor',this.card)}
       if(opLock==2){return false};//カーソル表示しない時　現在：esc中のみ非表示
       switch(this.card){
         case -1:
@@ -9552,8 +9714,8 @@ cx1.drawImage(e7,dorax,10,33,43.5)
               Textlist[1].text="誰か一人が生き残るか半荘経過まで戦いが続きます。";  
             break;
             case 2:
-              Textlist[0].text=LPlist[LP[0]]+"：持ち点100,000から始まり、誰かが1,000,000に到達するまで";
-              Textlist[1].text="続きます。戦闘力がなくなっても時間経過で復活します。";  
+              Textlist[0].text=LPlist[LP[0]]+"：持ち点100,000から開始し、";
+              Textlist[1].text="誰かが1,000,000に到達するまで続きます。";  
             break;
             case 3:
               Textlist[0].text=LPlist[LP[0]]+"：際限なく自由に打ち続けるモードです。";
@@ -9855,6 +10017,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
               ElnameM=num;
             };
           guidemap.removeAllChildren();
+          cx2.clearRect(0,0,800,600);
           var type1=donpai.findIndex(value=>value.id==num)
           if(type1==-1){
             console.log('Donpai error!')
@@ -9885,9 +10048,10 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           Nodyaku2(1,num);
           if(reach[1]==2){
             var Wait=Reachwait(numb)
-            if(Wait[0]=="ノーテン"){reach[0]=1}else{reach[0]=0};
-            if(debugmode){console.log(reach[0])};
-            if(Wait.length>1){
+            if(Wait[0]=="ノーテン"){
+              reach[0]=1;
+            }else{
+              reach[0]=0;
               var s = new createjs.Shape();
               s.graphics.beginFill("rgba(20,20,20,0.7)");
               s.graphics.drawRect(201, 371, 358, 118);
@@ -9896,6 +10060,8 @@ cx1.drawImage(e7,dorax,10,33,43.5)
               t.x=220;
               t.y=380;
               guidemap.addChild(t);
+            };
+            if(Wait.length>1){
               for(var i=1;i<Wait.length;i++){
               var e9 = new createjs.Bitmap(eltear_src[Wait[i]]);
               e9.x=140+70*i;
@@ -10252,6 +10418,8 @@ cx1.drawImage(e7,dorax,10,33,43.5)
               var Mary=[0,0,0,0,0];
               var Vmax=60;
               var count = 0
+              var Container = new createjs.Container();
+              field.addChild(Container);
               createjs.Ticker.addEventListener("tick", handleTick);
             return false;
           }else{
@@ -10269,8 +10437,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
               }
           };
         function handleTick(){
-          var Container = new createjs.Container();
-          field.addChild(Container);
             var Ary=[0,450,150,250,350]
             for(var i=1;i<LPtemp.length;i++){
               if(LPtemp[i]>0){
@@ -10284,12 +10450,12 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                 t.y=Ary[i];
                 Container.addChild(t);
               }else if(LPtemp[i]<0){
-                var t = new createjs.Text("-"+LPtemp[i], "16px 'Century Gothic'", "white");
+                var t = new createjs.Text(LPtemp[i], "16px 'Century Gothic'", "white");
                 t.x=165;
                 t.y=Ary[i];
                 t.outline=3;
                 Container.addChild(t);
-                var t = new createjs.Text("-"+LPtemp[i], "16px 'Century Gothic'", "blue");
+                var t = new createjs.Text(LPtemp[i], "16px 'Century Gothic'", "blue");
                 t.x=165;
                 t.y=Ary[i];
                 Container.addChild(t);
@@ -10454,49 +10620,95 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         }
       };
     };
-  function NukiAnimation(ts,A=0,B){
+  function NukiAnimation(p=0,pai=0,type=0){
       //Ponからコピー カンになる予定
-        cx4.globalAlpha = alpha;
-        A+=1;
-        loopX+=3
-        loopX2+=80
-        var x=loopX*4
-        var xx=loopX*3
-        var y=300
-        y -=loopX*1.5
-        if(xx>50){xx=50};
-        if(x>=800){loopX=0}
-        if(loopX2>=500){loopX2=500}
-        cx4.clearRect(0,0,800,600)
-        cx4.fillStyle = "#001c0d";
-        cx4.fillRect(0,250-xx,800,xx*2);
-        cx4.drawImage(e15,400,200-xx,300,xx*2,loopX2,250-xx,300,xx*2)
-        cx4.strokeStyle = "white";
-        cx4.lineWidth = 6;
-        cx4.beginPath();
-        cx4.moveTo(0,250-xx);
-        cx4.lineTo(800,250-xx);
-        cx4.stroke();
-        cx4.beginPath();
-        cx4.moveTo(0,250+xx);
-        cx4.lineTo(800,250+xx);
-        cx4.stroke();
-        cx4.rotate(-15*Math.PI/180);
-        cx4.font = "bold 64px Arial";
-        cx4.fillStyle = "#919191";
-        var Reachtext='抜き'
-        cx4.strokeText(Reachtext,50,300);
-        cx4.fillText(Reachtext,50,300);
-        cx4.rotate(15*Math.PI/180);
-        if(alpha>0){
-        if(A<30){window.requestAnimationFrame((ts)=>NukiAnimation(ts,A,B));}else{
-        alpha -=0.1
-        window.requestAnimationFrame((ts)=>NukiAnimation(ts,A,B));}
-        }else if(alpha <=0){
-        cx4.clearRect(0,0,800,600);cx4.globalAlpha = 1;
-        if(debugmode){console.log(B)}
-        NukiSkill(B,1);
-        }
+      //pai-> カンしたパイ -1時は暗カンとしてもう一度自分のターン
+      // type 0->自分のターン
+      console.log('Kan!',p,pai,type)
+      var Container = new createjs.Container();
+      Container.alpha=0;
+      stage.addChild(Container);
+      // マスク
+      var rect = new createjs.Shape();
+        rect.graphics
+        .beginFill("#001c0d")
+        .drawRect(0, 0, 800, 600);
+        Container.addChild(rect);
+        var shapeMask = new createjs.Shape();
+        shapeMask.graphics
+        .beginFill("gold")
+        .drawRect(0, 0, 800, 100);
+        shapeMask.scaleY=0.1;
+        shapeMask.y=200;
+        Container.mask = shapeMask;
+      var C = new createjs.Bitmap(chrimg_src[chara[p]]);
+        C.x=-300;
+        C.y=0;
+        Container.addChild(C);
+      var t = new createjs.Text("カン", "bold 64px Arial", "white");
+      t.rotation=-15;
+      t.x=50;
+      t.y=190;
+      t.outline=6;
+      Container.addChild(t);
+      var t = new createjs.Text("カン", "bold 64px Arial", "#919191");
+      t.rotation=-15;
+      t.x=50;
+      t.y=190;
+      Container.addChild(t);
+      createjs.Tween.get(Container)
+      .to({alpha: 1},60)
+      .wait(700)
+      .to({alpha: 0},100)
+      .call(next);
+      createjs.Tween.get(shapeMask)
+      .to({y:150,scaleY: 1},60);
+      createjs.Tween.get(C)
+      .to({x:0},60);
+      //
+        function next(){
+          Container.removeAllChildren();
+          stage.removeChild(Container);
+          if(pai==-1){
+            nuki[1]+=1;
+            nuki[0]=p;   
+            switch(p){
+              case 1:
+              handgraph(0,1)
+              turn=0;
+              Csquare.y=400;
+              if(pvpmode==1){
+                for(var i=0;i<MEMBER.length;i++){
+                  MEMBER[i].turnflag=0;
+                }
+                MEMBER[turn].turnflag=1;
+              }
+              player1();
+              break;
+              default:
+                if(pvpmode==1){
+                  turn=p-1;
+                    for(var i=0;i<MEMBER.length;i++){
+                      MEMBER[i].turnflag=0;
+                    }
+                    MEMBER[turn].turnflag=1;
+                    turnrole();
+                }else{
+                turn=p-1;
+                cpu(p);
+                }
+                break;
+            }         
+            return false;
+          }
+          if(type==0){
+            //reach[1]=0;
+            nuki[1]+=1;
+            nuki[0]=p;
+            PlayertoCpu(pai);
+            return false;
+          }
+        };
       };    
   function SkillAnimation(ts){
     cx4.globalAlpha = alpha;
@@ -10937,49 +11149,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         }
     }
     }//specialskill
-   
-  
-  socket.on("nuki-pai", (data)=>{
-    //非送信者なら抜きのアニメーションを表示する
-    if(IAM.token!==data.Token){
-      var N=1+MEMBER.findIndex(value=>value.id==data.who);
-      nuki[N]+=1;
-      nuki[0]=N;
-      NukiSkill(N,2);
-    }
-  });
-  function NukiSkill(player,n=0){
-  //42を切ったあと、もう一度自分のターンとなる
-  //nアニメ回した後に行う処理
-  console.log('Nukiskill',player,n);
-  if(nukiswitch[player]==0 && n !==2){
-    console.log('おまじない')
-    return false;
-  }
-  if(n==0 || n==2){
-    //まずアニメーションへ
-    loopX=0
-    loopX2=0;
-    alpha=1;
-    cx2.clearRect(630,400,80,40)
-    cx2.fillStyle = "rgba(20,20,20,0.5)";
-    cx2.fillRect(630,400,80,40)
-    e15.src=chrimg_src[chara[player]]
-    e15.onload=function(){
-      se8.play();
-      window.requestAnimationFrame((ts)=>NukiAnimation(ts,0,player))
-  }
-  }else{
-  switch(player){
-    case 1:
-    var N=hand1.findIndex(value=>value==42);
-    //reach[1]=0;
-    nuki[1]+=1;
-    nuki[0]=player;
-    PlayertoCpu(N);
-      break;
-  }
-  }};
   socket.on("game-over", (data)=>{
     if(IAM.token!==data.Token){
       if(data.scoretemp==-1){
@@ -11005,6 +11174,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
     handmap.removeAllChildren();
     jingle2.seek(1);
     jingle2.play();
+    if(musicset[1]<=0){musicset[1]=0};
     if(pvpmode==1){
       cx4.clearRect(0,0,800,500);
       if(IsHost(IAM.room)){
@@ -11270,7 +11440,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       cx2.fillText("対象:手札のパイ1つ", 635, 190);
       cx2.fillText("(オールマイティ以外)", 635, 210);
       if(skillusage2[player]==-1){
-        cx2.fillText("効果：①MPを1ゲージ", 635, 230);
+        cx2.fillText("効果:MPを1ゲージ", 635, 230);
         cx2.fillText("消費し,対象のパイを", 635, 250);
         cx2.fillText("メモしてから切る.", 635, 270);
         cx2.fillText("メモしたパイは,", 635, 290);
@@ -11324,7 +11494,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       cx2.fillText("察知できない.", 635, 190);
       cx2.fillText("・新たにリーチが", 635, 210);
       cx2.fillText("発生した場合,効果は.", 635, 230);
-      cx2.fillText("上書きされる.", 635, 230);
+      cx2.fillText("上書きされる.", 635, 250);
       if(skillusage[player]>0){
       switch(skillusage[player]){
         case 1:
@@ -11449,6 +11619,10 @@ cx1.drawImage(e7,dorax,10,33,43.5)
     }
     break;
   }
+  guidemap.removeAllChildren();
+  var C=canvas2.toDataURL();
+  var Cb = new createjs.Bitmap(C);
+  guidemap.addChild(Cb);
   };
   function PopAnm(word=0,delay=800,width=135,height=35,x=30,y=20){
     //少しの時間だけ情報を表示する
@@ -11745,7 +11919,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       se4.volume(0.3*sBar);
       se5.volume(0.2*sBar);
       se6.volume(0.25*sBar);
-      se7.volume(0.18*sBar);
+      se7.volume(0.15*sBar);
       se8.volume(0.2*sBar);
       se9.volume(0.3*sBar);
       se10.volume(0.3*sBar);
