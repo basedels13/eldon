@@ -4,14 +4,14 @@
 //対戦で魔界モードのリザルトが出ないらしい
 //次→cpuルーチンの修正 リーチボタンとかの表示なおす
 //FEVER→最初に1回だけ、職変チャンス
-//いつか→不足分の画像　魔界モード調整　カン　対戦部屋の工事、マナブレ表示、レイガイド　場の同じパイの色付け
+//いつか→不足分の画像　魔界モード調整　カン　対戦部屋の工事、プレイガイド　場の同じパイの色付け
 //cpuルーチンで止まる　たぶんリーチ時
 window.onload = function(){
   draw();
   };
   
   function draw(){
-  var titletext="v1.015/Click to START";
+  var titletext="v1.016/Click to START";
   var debugmode=true;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にfalseに
   //自分自身の情報を入れる箱
   var IAM = {
@@ -188,6 +188,13 @@ window.onload = function(){
     underText.y=560;
     textmap.addChild(underText);
     Textlist.push(underText);
+    var OKtext1 = new createjs.Text("OK (1)", "bold 16px 'メイリオ'", "white");
+    OKtext1.x=730;
+    OKtext1.y=520;
+    OKtext1.outline=5;
+    var OKtext2 = new createjs.Text("OK (1)", "bold 16px 'メイリオ'", "black");
+    OKtext2.x=730;
+    OKtext2.y=520;
     //残パイ枚数テキスト
     var deckText = new createjs.Text("残:", "24px 'Century Gothic'", "white");
     var tumonameA = new createjs.Text("　", "14px Arial", "white");
@@ -287,6 +294,7 @@ window.onload = function(){
     }
   var LP =new Array(0,75000,75000,75000,75000);
   //LP[0]:0->半荘150000/スキルあり 1->半荘300000/スキルあり 2->ミリオネア 3->無限 4->血戦
+  var LPtextlist=[];//HPテキスト
   var LPtemp=new Array(0,0,0,0,0)
   var chara =new Array(0,0,0,0,0)
   //mpmove
@@ -775,7 +783,6 @@ window.onload = function(){
   var msgstate=0
   var gamestate =-10;
   //-2,-1=>tumoronで使用,クリックさせたくない時 0=>クリックで1に,ゲームをしてない時 1=>game中 2=>クリックで0に,ツモのアニメーション 3=>ゲームオーバー、タイトルに戻るなどする 10=>麻雀をしていない
-  var Cimage;//ツモ画面で対局画面の保存用
   var turn =0
   var turntemp
   var parent=0
@@ -1247,11 +1254,11 @@ function updateParticles() {
       Menu();
     }
     function clickHandler(e) {
-      //少しずつ委託予定
+      //少しずつ外部委託予定
       var rect = e.target.getBoundingClientRect();
       mouseX =  Math.floor(e.clientX - rect.left);
       mouseY =  Math.floor(e.clientY - rect.top);
-      if(debugmode){console.log('click!',cLock,"pagestate",pagestate,"msgstate",msgstate)};  
+      if(debugmode){console.log('click!',cLock,"pagestate",pagestate,"msgstate",msgstate,"gamestate",gamestate)};  
       if(gamestate ==10){
         //メニュー画面
         Menu();
@@ -1263,20 +1270,14 @@ function updateParticles() {
     MEMBER[N].turnflag=2;
     var M=MEMBER.filter(value=>value.turnflag==2)
     var MM=4-M.length
-    cx4.clearRect(0,0,800,600)
-    cx4.font = "bold 16px 'メイリオ'";
-    cx4.fillStyle = "black";
-    cx4.strokeStyle ="rgba(250,250,250,0.9)";
-    cx4.lineWidth=5;
-      cx4.strokeText("OK ("+MM+")",730,520);
-      cx4.fillText("OK ("+MM+")",730,520);
+    //どこかでOKtextをaddする
+    OKtext1.text="OK ("+MM+")";
+    OKtext2.text="OK ("+MM+")";
     }
   });
   if(gamestate ==0){//ほんぺ
     //ニューゲーム
-    cx5.globalAlpha = 1;
     handmap.removeAllChildren();
-    //handmap.alpha=0;
     //と言いたいけどダブロンがあればその処理
     if(Ronturn.length>0){
       gamestate=1;
@@ -1289,13 +1290,8 @@ function updateParticles() {
       MEMBER[0].turnflag=2;
       var M=MEMBER.filter(value=>value.turnflag==2)
       var MM=4-M.length
-      cx4.clearRect(0,0,800,600)
-      cx4.font = "bold 16px 'メイリオ'";
-      cx4.fillStyle = "black";
-      cx4.strokeStyle ="rgba(250,250,250,0.9)";
-      cx4.lineWidth=5;
-      cx4.strokeText("OK ("+MM+")",730,520);
-      cx4.fillText("OK ("+MM+")",730,520);
+      OKtext1.text="OK ("+MM+")";
+      OKtext2.text="OK ("+MM+")";
       for(var i=0;i<MEMBER.length;i++){
         if(MEMBER[i].turnflag!==2){
           console.log(MEMBER);
@@ -1307,15 +1303,8 @@ function updateParticles() {
       //ホスト以外は待機
       gamestate =1;
         socket.emit("game_ready", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[0].id});
-      cx4.globalAlpha=1;
-        cx4.fillStyle = "rgba(20,20,20,0.7)";
-        cx4.fillRect(0,0,800,600)
-        cx4.font = "bold 26px 'メイリオ'";
-        cx4.fillStyle = "black";
-        cx4.strokeStyle ="rgba(250,250,250,0.9)";
-        cx4.lineWidth=5;
-        cx4.strokeText("ホストを待っています…",240,200);
-        cx4.fillText("ホストを待っています…",240,200);
+        OKtext1.text="waiting…"
+        OKtext2.text="waiting…"
         return false;
     };
     //一般ルール
@@ -1419,146 +1408,11 @@ function updateParticles() {
           break;
     }
   }else if(gamestate ==-2){
-    //ツモ画面切り替え
-    if(LP[0]==4){
-      if(raidscore[0]==0 && raidscore[2] ==0){
-        cx2.clearRect(0,0,800,600);
-        //引き継ぎ
-        cx3.clearRect(326,348,148,142);
-        cx2.putImageData(Cimage,0,0);
-        gamestate=1;
-        ctl=new Array(0,0,0,0,0)
-        ctlerror=new Array(0,0,0,0,0)
-        ponsw[0]=1;
-          cx2.font = "16px 'Century Gothic'";
-          cx2.strokeStyle ="white";
-          cx2.fillStyle ="black";
-          var Mary=[0,0,0,0,0];
-          var Vmax=60;
-        window.requestAnimationFrame((ts)=>scoreMove(ts))
-        function scoreMove(ts,n=0){
-          if(alpha>0){
-            //loopanime終わるまで待機
-            window.requestAnimationFrame((ts)=>scoreMove(ts,n))
-            return false;
-          }
-          var Y=170;
-          cx4.globalAlpha=1;
-          cx4.font = "16px 'Century Gothic'";
-          cx4.strokeStyle = 'white';
-            for(var i=1;i<LPtemp.length;i++){
-              if(LPtemp[i]>0){
-                cx4.fillStyle ="red";
-                switch(i){
-                  case 1:
-                    Y=470;
-                    break;
-                  case 2:
-                    Y=170;
-                    break;
-                  case 3:
-                    Y=270;
-                    break;
-                  case 4:
-                    Y=370;
-                    break;
-                }
-                cx4.strokeText("+"+LPtemp[i],165,Y)
-                cx4.fillText("+"+LPtemp[i],165,Y)
-              }else if(LPtemp[i]<0){
-                cx4.fillStyle ="blue";
-                switch(i){
-                  case 1:
-                    Y=470;
-                    break;
-                  case 2:
-                    Y=170;
-                    break;
-                  case 3:
-                    Y=270;
-                    break;
-                  case 4:
-                    Y=370;
-                    break;
-                }
-                cx4.strokeText(LPtemp[i],160,Y)
-                cx4.fillText(LPtemp[i],160,Y)
-              }
-            }
-          n+=1;
-          var M=n/Vmax;
-          if(M>1){M==1};
-          for(var i=1;i<LPtemp.length;i++){
-            if(LPtemp[i]!==0){
-              switch(i){
-                case 1:
-                  Y=470;
-                  break;
-                case 2:
-                  Y=170;
-                  break;
-                case 3:
-                  Y=270;
-                  break;
-                case 4:
-                  Y=370;
-                  break;
-              }
-              Mary[i]=Math.floor(LP[i]-LPtemp[i]+(LPtemp[i]*M));
-              cx2.clearRect(75,Y-20,75,23);
-              cx2.strokeText(Mary[i],80,Y)
-              cx2.fillText(Mary[i],80,Y)
-            }
-          } 
-          if(n>Vmax){
-            cx4.clearRect(0,0,800,600);
-            cx4.globalAlpha=0;
-            for(var i=1;i<LPtemp.length;i++){
-              if(LPtemp[i]!==0){
-                switch(i){
-                  case 1:
-                    Y=470;
-                    break;
-                  case 2:
-                    Y=170;
-                    break;
-                  case 3:
-                    Y=270;
-                    break;
-                  case 4:
-                    Y=370;
-                    break;
-                }
-                cx2.clearRect(75,Y-20,75,23);
-                cx2.strokeText(LP[i],80,Y)
-                cx2.fillText(LP[i],80,Y)
-              }
-            } 
-            turnchecker();
-          }else{
-            window.requestAnimationFrame((ts)=>scoreMove(ts,n))
-          }
-        }
-        return false;
-        //turnchecker();
-      }else{
-        if(raidscore[2]==1){
-          se10.play();
-          var s = new createjs.Shape();
-          s.graphics.beginFill("rgba(20,20,20,0.5)");
-          s.graphics.drawRect(10, 100, 700, 400);
-          field.addChild(s);
-          var t = new createjs.Text("TIME UP", "36px 'Century Gothic'", "white");
-          t.x=320;
-          t.y=300;
-          field.addChild(t);
-          gamestate=2;
-          }
-      }
-    }else{
-      gamestate=-1;
-    }
+    //ツモのアニメーション中
+    //gamestate=-1;
     }else if(gamestate ==2){//次のゲームへ
+    field.addChild(OKtext1);
+    field.addChild(OKtext2);
     if(pvpmode==1 && IsHost(IAM.room)){
       MEMBER[0].turnflag=1;
   for(var i=1;i<MEMBER.length;i++){
@@ -4871,55 +4725,55 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             LP[i]=75000;
           }}
             }}
-        var LPlist=[];//HPテキスト
+        LPtextlist=[];//HPテキスト
         parentY =450;
         var t = new createjs.Text(LP[1], "16px 'Century Gothic'", "#eb5600");
         t.x=80;
         t.y=450;
         t.outline=3;
         field.addChild(t);
-        LPlist.push(t);
+        LPtextlist.push(t);
         var t = new createjs.Text(LP[1], "16px 'Century Gothic'", "white");
         t.x=80;
         t.y=450;
         field.addChild(t);
-        LPlist.push(t);
+        LPtextlist.push(t);
         parentY =150;
         var t = new createjs.Text(LP[2], "16px 'Century Gothic'", "#eb5600");
         t.x=80;
         t.y=parentY;
         t.outline=3;
         field.addChild(t);
-        LPlist.push(t);
+        LPtextlist.push(t);
         var t = new createjs.Text(LP[2], "16px 'Century Gothic'", "white");
         t.x=80;
         t.y=parentY;
         field.addChild(t);
-        LPlist.push(t);
+        LPtextlist.push(t);
         parentY +=100
         var t = new createjs.Text(LP[3], "16px 'Century Gothic'", "#eb5600");
         t.x=80;
         t.y=parentY;
         t.outline=3;
         field.addChild(t);
-        LPlist.push(t);
+        LPtextlist.push(t);
         var t = new createjs.Text(LP[3], "16px 'Century Gothic'", "white");
         t.x=80;
         t.y=parentY;
         field.addChild(t);
-        LPlist.push(t);
+        LPtextlist.push(t);
         parentY +=100
         var t = new createjs.Text(LP[4], "16px 'Century Gothic'", "#eb5600");
         t.x=80;
         t.y=parentY;
         t.outline=3;
         field.addChild(t);
-        LPlist.push(t);
+        LPtextlist.push(t);
         var t = new createjs.Text(LP[4], "16px 'Century Gothic'", "white");
         t.x=80;
         t.y=parentY;
         field.addChild(t);
-        LPlist.push(t);
+        LPtextlist.push(t);
         parentY =185;
         var Ary=["CPU1","CPU2","CPU3",Username]
         for(var i=0;i<4;i++){
@@ -7532,10 +7386,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             field.addChild(rect);
           }
         };
-      if(LP[0]==4){
-        //魔界ルール
-        Cimage = cx2.getImageData(0, 0, 800, 600);
-      };
       se7.play();
       cLock=0
       gamestate=-2;
@@ -7730,7 +7580,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         PB("満貫");}
       cx4.clearRect(0,0,800,600)
       opLock=-1;
-      //gamestate=2;
+      //gamestate =2;
       tweeNsquare.paused=true;
       Csquare.alpha=0;
       //描画 魔界モード以外の時はResultmapで描画
@@ -7762,7 +7612,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         drawcard.y=120;
         drawcard.scaleX=7/12;
         drawcard.scaleY=31/52;
-        drawcardlist[i-1]=drawcard;
         fieldmap.addChild(drawcard);
         }
         var haix
@@ -8067,12 +7916,12 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           cx2.fillText(MEMBER[i].name, x, y);
           x+=200;
           };
-    }else{
+        }else{
         cx2.fillText(Username,30,430)
           cx2.fillText("ＣＰＵ１",230,430)
             cx2.fillText("ＣＰＵ２",430,430)
               cx2.fillText("ＣＰＵ３",630,430)
-    }
+        }
         cx2.fillText(chrlist[chara[1]],30,460)
         cx2.fillText(LPtemp[1],30,490)
         cx2.fillText(chrlist[chara[2]],230,460)
@@ -9306,7 +9155,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           var s = new createjs.Shape();
             s.graphics.beginFill("rgba(20,20,20,0.5)");
             if(ippatu[4]==1){
-              s.graphics.drawRect(riverx[4]-10.5, rivery[4]+10.5, 43.5, 33);
+              s.graphics.drawRect(riverx[4]-10.5, rivery[4]+5.25, 43.5, 33);
             }else{
               s.graphics.drawRect(riverx[4], rivery[4], 33, 43.5);
             }
@@ -9344,7 +9193,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           var s = new createjs.Shape();
           s.graphics.beginFill("rgba(20,20,20,0.5)");
           if(ippatu[1]==1){
-            s.graphics.drawRect(riverx[1]-10.5, rivery[1]+10.5, 43.5, 33);
+            s.graphics.drawRect(riverx[1]-10.5, rivery[1]+5.25, 43.5, 33);
           }else{
             s.graphics.drawRect(riverx[1], rivery[1], 33, 43.5);
           }
@@ -9381,7 +9230,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           var s = new createjs.Shape();
           s.graphics.beginFill("rgba(20,20,20,0.5)");
           if(ippatu[2]==1){
-            s.graphics.drawRect(riverx[2]-10.5, rivery[2]+10.5, 43.5, 33);
+            s.graphics.drawRect(riverx[2]-10.5, rivery[2]+5.25, 43.5, 33);
           }else{
             s.graphics.drawRect(riverx[2], rivery[2], 33, 43.5);
           }
@@ -9417,7 +9266,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           var s = new createjs.Shape();
           s.graphics.beginFill("rgba(20,20,20,0.5)");
           if(ippatu[3]==1){
-            s.graphics.drawRect(riverx[3]-10.5, rivery[3]+10.5, 43.5, 33);
+            s.graphics.drawRect(riverx[3]-10.5, rivery[3]+5.25, 43.5, 33);
           }else{
             s.graphics.drawRect(riverx[3], rivery[3], 33, 43.5);
           }
@@ -10382,7 +10231,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       .call(next);
       function next(){
       opLock=0;
-      if(LP[0]!==4){Resultmap(player,type)
+      if(LP[0]!==4){Resultmap(player,type);
       };
       createjs.Tween.get(Container)
       .to({alpha: 0},500)
@@ -10391,9 +10240,85 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       function end(){
         Container.removeAllChildren();
         stage.removeChild(Container);
+        if(LP[0]==4){Raidscore()};
       }
       };
-  
+      function Raidscore(){
+          if(raidscore[0]==0 && raidscore[2] ==0){
+            gamestate=1;
+            ctl=new Array(0,0,0,0,0)
+            ctlerror=new Array(0,0,0,0,0)
+            ponsw[0]=1;
+              var Mary=[0,0,0,0,0];
+              var Vmax=60;
+              var count = 0
+              createjs.Ticker.addEventListener("tick", handleTick);
+            return false;
+          }else{
+            if(raidscore[2]==1){
+              se10.play();
+              var s = new createjs.Shape();
+              s.graphics.beginFill("rgba(20,20,20,0.5)");
+              s.graphics.drawRect(10, 100, 700, 400);
+              field.addChild(s);
+              var t = new createjs.Text("TIME UP", "36px 'Century Gothic'", "white");
+              t.x=320;
+              t.y=300;
+              field.addChild(t);
+              gamestate =2;
+              }
+          };
+        function handleTick(){
+          var Container = new createjs.Container();
+          field.addChild(Container);
+            var Ary=[0,450,150,250,350]
+            for(var i=1;i<LPtemp.length;i++){
+              if(LPtemp[i]>0){
+                var t = new createjs.Text("+"+LPtemp[i], "16px 'Century Gothic'", "white");
+                t.x=165;
+                t.y=Ary[i];
+                t.outline=3;
+                Container.addChild(t);
+                var t = new createjs.Text("+"+LPtemp[i], "16px 'Century Gothic'", "red");
+                t.x=165;
+                t.y=Ary[i];
+                Container.addChild(t);
+              }else if(LPtemp[i]<0){
+                var t = new createjs.Text("-"+LPtemp[i], "16px 'Century Gothic'", "white");
+                t.x=165;
+                t.y=Ary[i];
+                t.outline=3;
+                Container.addChild(t);
+                var t = new createjs.Text("-"+LPtemp[i], "16px 'Century Gothic'", "blue");
+                t.x=165;
+                t.y=Ary[i];
+                Container.addChild(t);
+              }
+            }
+          count+=1;
+          var M=count/Vmax;
+          if(M>1){M==1};
+          for(var i=1;i<LPtemp.length;i++){
+            if(LPtemp[i]!==0){
+              Mary[i]=Math.floor(LP[i]-LPtemp[i]+(LPtemp[i]*M));
+              LPtextlist[i*2-2].text=Mary[i];
+              LPtextlist[i*2-1].text=Mary[i];
+            }
+          } 
+          if(count>Vmax){
+            for(var i=1;i<LPtemp.length;i++){
+              if(LPtemp[i]!==0){
+                LPtextlist[i*2-2].text=LP[i];
+                LPtextlist[i*2-1].text=LP[i];
+              }
+            };
+            createjs.Ticker.removeEventListener("tick", handleTick);
+            field.removeChild(Container);
+            turnchecker();
+          }
+            stage.update();
+        }
+      }
   function ReachAnimation(p){
     var Container = new createjs.Container();
     Container.alpha=0;
