@@ -1,19 +1,16 @@
-//var1.017　season2 
+//var1.018　season2 
 // npm run dev
 //全職75枚（エピックキャラは1枚ずつ増量）＋オールマイティ2枚＋マスター8枚（ガ、ロ、ベ、デ、ソ、ア、ハ）合計85枚→53枚スタート
 //対戦で魔界モードのリザルトが出ないらしい
-//FEVER→最初に1回だけ、職変チャンス
 //いつか→魔界モードのリザルトのスライド 不足分の画像　対戦部屋の工事、プレイガイド　場の同じパイの色付け
-//クレスト役の判定がおかしい　リーチの前の段階でリーチにかかってしまう
-//クレストオブマスターロード：マスターロード8枚+Any
-//player以外のカンは未実装
-//ロン2回押さないと反応しない カン後にラインで上がれてしまう　カンドローの一番右の表示が違う？ drawcardが消えていない？
+//クレスト
+//対局が止まることがある・・・詳細不明
 window.onload = function(){
   draw();
   };
   
   function draw(){
-  var titletext="v1.017/Click to START";
+  var titletext="v1.018/Click to START";
   var debugmode=true;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にfalseに
   //自分自身の情報を入れる箱
   var IAM = {
@@ -301,7 +298,7 @@ window.onload = function(){
   var LPtemp=new Array(0,0,0,0,0)
   var chara =new Array(0,0,0,0,0)
   //mpmove
-  var Fever =0;
+  var Fever =-1;//fever->未使用
   //ルーム設定
   var LP_PVP={Length:[1,"東風","半荘",],LP:[1,75000,150000,300000],Block:[1,"満貫あり","満貫なし"],Rule:[1,"サバイバル","デスマッチ","魔界血戦"]};//
   var mpmoving=false;
@@ -468,17 +465,18 @@ window.onload = function(){
     {id:"ラビィの友達",chr:[50],han:[1]},
     {id:"悪戯の王",chr:[51],han:[1]},
     {id:"機械工学",chr:[43],han:[1]},
+    {id:"エルの巫女",chr:[67],han:[1]},
     {id:"原初的な動き",chr:[0,12,28],han:[2]},
-    {id:"マナ守護",chr:[5,26,49],han:[2,3]},
-    {id:"殴り合い",chr:[13,32,48],han:[2]},
+    {id:"マナ守護",chr:[5,26,49,61],han:[2,3]},
+    {id:"殴り合い",chr:[13,32,48,60],han:[2]},
     {id:"時空間",chr:[6,34,46],han:[2]},
     {id:"戦場の天使",chr:[18,23,42],han:[2]},
-    {id:"精霊の加護",chr:[8,9,10,11],han:[2]},
-    {id:"魔族",chr:[36,37,38,39],han:[2,3]},
+    {id:"精霊の加護",chr:[8,9,10,11,66],han:[2]},
+    {id:"魔族",chr:[36,37,38,39,62],han:[2,3]},
     {id:"属性鍛錬者",chr:[1,4,20,29],han:[2,3]},
-    {id:"歪曲された視線",chr:[19,47,55,59],han:[2]},
-    {id:"ナソード研究",chr:[16,17,18,33,56],han:[2,4]},
-    {id:"正義を貫徹する者",chr:[0,3,20,24,28,44],han:[2,4]},
+    {id:"歪曲された視線",chr:[19,47,55,59,63],han:[2]},
+    {id:"ナソード研究",chr:[16,17,18,33,56,65],han:[2,4]},
+    {id:"正義を貫徹する者",chr:[0,3,20,24,28,44,64],han:[2,4]},
     {id:"敏捷さ",chr:[2,8,12,21,31,42,52],han:[2,3]},
     {id:"巨人審判者",chr:[2,14,22,40,44,53,55,66],han:[2,3]},
     {id:"探求する者",chr:[4,7,17,22,33,35,43,53],han:[2,3]},
@@ -803,7 +801,6 @@ window.onload = function(){
   var parentY
   var tumo
   var tumo2
-  var Kantumo=-1;//カンで引くための右手
   //捨て牌
   var tumotemp
   //cputumoで使用
@@ -1788,13 +1785,6 @@ function menuMap(p=0){
       }else{
         drawbuttom(690,340,"Play",0,60,40)
       }
-      if(dahaiSE==1){
-      drawbuttom(665,110,"A",1,40,40)
-      drawbuttom(705,110,"B",0,40,40)
-      }else if(dahaiSE==2){
-      drawbuttom(665,110,"A",0,40,40)
-      drawbuttom(705,110,"B",1,40,40)
-      }
       if(mpVelocity==1){
         drawbuttom(80,310,"おそめ",1,80,40)
       }else{
@@ -1810,21 +1800,25 @@ function menuMap(p=0){
       }else{
       drawbuttom(260,310,"はやめ",0,80,40)
       }
+      if(dahaiSE==1){
+        drawbuttom(250,370,"A",1,40,40)
+        drawbuttom(290,370,"B",0,40,40)
+        }else if(dahaiSE==2){
+        drawbuttom(250,370,"A",0,40,40)
+        drawbuttom(290,370,"B",1,40,40)
+        }
       drawbuttom2(600,450,"OK",0,100,40,1)
       drawbuttom2(400,450,"デフォルトに戻す",0,180,40,1)
       cx2.fillStyle = "black";
       cx2.fillRect(360,70,2,400);
-      cx2.fillRect(660,70,2,100);
       cx2.font = "26px 'Century Gothic'";
       cx2.fillText("ユーザー補助",60,100)
       cx2.fillText("対局設定",60,200)
       cx2.fillText("音量設定",390,100)
-      cx2.fillText("打牌音",665,100)
       cx2.fillText("対局BGM設定",390,198)
       cx2.font = "18px 'Century Gothic'";
-      cx2.fillText("（注意：対局設定について）",60,420)
-      cx2.fillText("「たいせん」モードでは",60,440)
-      cx2.fillText("ルーム長の対局設定データが",65,460)
+      cx2.fillText("（注意：対局設定について）",60,440)
+      cx2.fillText("対戦モードではルーム長の設定が",65,460)
       cx2.fillText("全体に反映されます。",65,480)
       cx2.font = "24px 'Century Gothic'";
       if(tumoConfig==0){
@@ -1840,11 +1834,7 @@ function menuMap(p=0){
         cx2.fillText("■",140+i*24,260);
       };
       cx2.fillText("MPチャージ速度",100,300);
-      if(Fever==-1){
-        cx2.fillText("FEVER なし",100,380);
-      }else{
-      cx2.fillText("FEVER あり",100,380);
-      }
+      cx2.fillText("打牌音",100,400)
       //soundbar
                 //音量の設定
                 Barlist=[];
@@ -2740,16 +2730,15 @@ function NameChange(){
             mpVelocity=1;
             dahaiSE=1;
               se3.play();
-              musicset=[3,7,8];
-              if(Ponrate<0){Ponrate=0};
+              musicset=[0,0,0];
           }
-          if(mouseX >665 && mouseX <705 && mouseY >110 && mouseY <150){
+          if(mouseX >250 && mouseX <290 && mouseY >370 && mouseY <410){
             if(dahaiSE!==1){
             dahaiSE=1;
             se4.play();
             }
           }
-          if(mouseX >705 && mouseX <745 && mouseY >110 && mouseY <150){
+          if(mouseX >290 && mouseX <330 && mouseY >370 && mouseY <410){
             if(dahaiSE!==2){
             dahaiSE=2;
             se16.play();
@@ -2779,14 +2768,6 @@ function NameChange(){
               tumoConfig=-1;
               }else{
                 tumoConfig=0
-              }
-          }
-          if(mouseX >80 && mouseX <340 && mouseY >350 && mouseY <410){
-            se3.play();
-            if(Fever!==-1){
-              Fever=-1;
-              }else{
-              Fever=0;
               }
           }
           if(mouseX >110 && mouseX <150 && mouseY >230 && mouseY <270){
@@ -4041,7 +4022,7 @@ if(opLock==0 && gamestate ==1){
       };
       Y+=100;
       };
-      if(shiagytemp==1){yakumapYmax=Y-330}else{yakumapYmax=2840};
+      if(shiagytemp==1){yakumapYmax=Y-330}else{yakumapYmax=2960};
       yakumapMask.addChild(t);
       // マスクを適用する
       yakumapMask.mask = shapeMask;
@@ -4497,7 +4478,6 @@ e7.src=eltear_src[DD]
 e7.onload=function(){
 dorax+=40
 cx1.drawImage(e7,dorax,10,33,43.5)
-    Fever=0;
     handgraph(-1,1);
     decklength(1);  
 }}}}
@@ -4530,6 +4510,8 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         //背景
         if(LP[0]==4){
           backyard.y=-600;
+          fieldmap.removeAllChildren();
+          fieldmap.x=0;
         }else{
           backyard.y=0;
         }
@@ -4552,6 +4534,36 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         field.addChild(t);
         skillusage2[0]+=1;
         auras=0;
+        //
+        if(pvpmode==1){
+          if(LP_PVP.Length[0]==1 && skillusage2[0]==4){
+            cx1.fillText("オーラス"+(skillusage2[5]),10,88);
+            auras=1;
+            Dlvup.alpha=0;
+            Dlvup.x=-60;
+            Dlvup.y=-40;
+            Dlvup.scale=1.2;
+            se12.play();
+            createjs.Tween.get(Dlvup)
+            .to({scale:1,x:0,y:0,alpha:1},150,createjs.Ease.backOut)
+            .wait(1000)
+            .to({scale:1.5,x:-200,y:-150,alpha:0},250,createjs.Ease.backOut);
+          }else if(LP_PVP.Length[0]==2 && skillusage2[0]==8){
+            cx1.fillText("オーラス"+(skillusage2[5]),10,88);
+            auras=1;
+            Dlvup.alpha=0;
+            Dlvup.x=-60;
+            Dlvup.y=-40;
+            Dlvup.scale=1.2;
+            se12.play();
+            createjs.Tween.get(Dlvup)
+            .to({scale:1,x:0,y:0,alpha:1},150,createjs.Ease.backOut)
+            .wait(1000)
+            .to({scale:1.5,x:-200,y:-150,alpha:0},250,createjs.Ease.backOut);
+          }else{cx1.fillText("第"+(skillusage2[0])+"局 "+(skillusage2[5])+"本場",10,88);
+               }
+        }
+        //
         var t = new createjs.Text("第"+(skillusage2[0])+"局 "+(skillusage2[5])+"本場", "24px 'Century Gothic'", "white");
         t.x=10;
         t.y=68;
@@ -4636,6 +4648,22 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           skillswitch[i]=1;
           }
           skillusage=new Array(0,0,0,0,0)
+        if(pvpmode==1){
+          if(LP_PVP.Rule[0]==2){
+            for(var i=1; i<5 ; i++){//復活
+              if(LP[i]<0){
+              skillusage2[i]-=1;
+              if(skillusage2[i] <=-1){
+                LP[i]=75000;
+                for (var I=0;I<4;I++){
+                  if(I!==i){
+                  death[i-1].Bdmg[i-1]+=death[i-1].Bdmg[I];
+                  death[i-1].Bdmg[I]=0;
+                  }
+                }
+              }}
+          }}
+        }else{
         if(LP[0]==2){
         for(var i=1; i<5 ; i++){//復活
           if(LP[i]<0){
@@ -4644,6 +4672,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             LP[i]=75000;
           }}
             }}
+        };
         LPtextlist=[];//HPテキスト
         parentY =450;
         var t = new createjs.Text(LP[1], "16px 'Century Gothic'", "#eb5600");
@@ -4694,7 +4723,11 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         field.addChild(t);
         LPtextlist.push(t);
         parentY =185;
+        if(pvpmode==1){
+        var Ary=[MEMBER[1].name,MEMBER[2].name,MEMBER[3].name,Username]          
+        }else{
         var Ary=["CPU1","CPU2","CPU3",Username]
+        }
         for(var i=0;i<4;i++){
           var t = new createjs.Text(Ary[i], "16px 'Century Gothic'", "black");
           t.x=10;
@@ -4823,6 +4856,58 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         }}}
       }
         Buffdraw();
+        //
+        if(pvpmode==1){
+          if(IsHost(IAM.room)){
+            //ホストで初期化するもの
+            deck=[]
+            hand1=[]
+            hand2=[]
+            hand3=[]
+            hand4=[]
+            for(var i =0; i<70; i++){
+              deck.push(i);
+              }
+              deck.push(0,4,9,13,17,20,24,28,32,37,42,45,49,52,56);
+              if(debugmode){console.log(deck.length);}
+            shuffle();
+            if(debugmode){console.log(parent);}
+            king =deck.splice(0,7)
+            hand1b=deck.splice(0,8-hand1.length)
+            hand1=hand1.concat(hand1b)
+            hand1b=deck.splice(0,8-hand2.length)
+            hand2=hand2.concat(hand1b)
+            hand1b=deck.splice(0,8-hand3.length)
+            hand3=hand3.concat(hand1b)
+            hand1b=deck.splice(0,8-hand4.length)
+            hand4=hand4.concat(hand1b)
+            //手札をソート
+            hand1.sort(compareFunc);
+            hand2.sort(compareFunc);
+            hand3.sort(compareFunc);
+            hand4.sort(compareFunc);
+            //1番目の配列は上がり判定に使用
+            hand1.unshift(-1)
+            hand2.unshift(-1)
+            hand3.unshift(-1)
+            hand4.unshift(-1)
+            //最後9番目の配列はドローカードに使うので適当に100を代入
+            hand1.push(100)
+            hand2.push(100)
+            hand3.push(100)
+            hand4.push(100)
+            if(debugmode){
+            console.log(king);//嶺上牌
+            console.log(hand1);//自分の手札
+            console.log(hand2);
+            console.log(hand3);
+            console.log(hand4);
+            }
+            socket.emit("deck_handler",{room:RoomName[IAM.room],Deck:deck,Hand:{hand1,hand2,hand3,hand4},King:king,MPV:mpVelocity,PON:Ponrate,FEV:Fever} );
+            //非ホスト側は特に何もせず
+          };
+        }else{
+        //PvE
         for(var i =0; i<70; i++){
         deck.push(i);
         }
@@ -4916,6 +5001,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         console.log(hand3);
         console.log(hand4);
         }
+      };
         dora=king.splice(0,1);
         if(debugmode){console.log(dora)}
       dorax=60
@@ -5256,12 +5342,12 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       }
       }
     });
-      function turnchecker(){
-        console.log('turncheckerP'+turn,ponsw[0])
+      function turnchecker(n=-1){
+        console.log('turnchecker'+turn,ponsw[0])
+        if(n>=0){tumotemp=n};
       //pvpmode1の場合、ホストだけでチェックを行い、
       //プレイヤーのロン・ポン判定はそのプレイヤーになすりつける
-      //CPUはロンできる時は必ずロンするため無視
-      //CPUのポンはランダム要素があるためホスト側で決定する
+      //n-> 加カンで回ってきた時に使用
         if(nuki[0]>0){
           var Fr1=Buff[1].findIndex(value=>value==6 || value==11);
           var Fr2=Buff[2].findIndex(value=>value==6 || value==11);
@@ -5412,6 +5498,34 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           //次の人のポンへ
           if(turn==0 && ponsw[0]==0 && Fr2==-1 && LP[2]>=0 && ManaBreak==0){
           //可能な限りポン->ライン揃えに行く場合はポンしない
+          if(Kan(2)){
+            if(pvpmode==1){
+                if(MEMBER[1].pc==1){
+                console.log('player waiting');
+                return false;
+              }else if(IsHost(IAM.room)){
+                var R=Math.random();
+                if(R>poncpu[2]){
+                  Kan(2,tumotemp);
+                    socket.emit("nuki", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[3].id,status:true});
+                return false;
+              }else{
+                  socket.emit("nuki", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[3].id,status:false});
+                //kansw[4]=kan4.length;
+              }}else{
+              return false;
+              }
+            }else{
+              var R=Math.random();
+              if(R>poncpu[2]){
+              Kan(2,tumotemp);
+              return false;
+              }else{
+              //kansw[4]=kan4.length;
+            }
+          }
+          }
+          //
             if(Pon(2)){
               if(pvpmode==1){
                 if(MEMBER[1].pc==1){
@@ -5440,6 +5554,34 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           }}
           };
           if(turn==1 && ponsw[0]==0 && Fr3==-1 && LP[3]>=0 && ManaBreak==0){
+            if(Kan(3)){
+              if(pvpmode==1){
+                  if(MEMBER[2].pc==1){
+                  console.log('player waiting');
+                  return false;
+                }else if(IsHost(IAM.room)){
+                  var R=Math.random();
+                  if(R>poncpu[3]){
+                    Kan(3,tumotemp);
+                      socket.emit("nuki", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[2].id,status:true});
+                  return false;
+                }else{
+                    socket.emit("nuki", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[2].id,status:false});
+                  //kansw[4]=kan4.length;
+                }}else{
+                return false;
+                }
+              }else{
+                var R=Math.random();
+                if(R>poncpu[3]){
+                Kan(3,tumotemp);
+                return false;
+                }else{
+                //kansw[4]=kan4.length;
+              }
+            }
+            }
+            //
             if(Pon(3)){
               if(pvpmode==1){
                 if(MEMBER[2].pc==1){
@@ -5468,6 +5610,33 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             }}
           }
           if(turn==2 && ponsw[0]==0 && Fr4==-1 && LP[4]>=0 && ManaBreak==0){
+            if(Kan(4)){
+              if(pvpmode==1){
+                  if(MEMBER[3].pc==1){
+                  console.log('player waiting');
+                  return false;
+                }else if(IsHost(IAM.room)){
+                  var R=Math.random();
+                  if(R>poncpu[4]){
+                    Kan(4,tumotemp);
+                      socket.emit("nuki", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[3].id,status:true});
+                  return false;
+                }else{
+                    socket.emit("nuki", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[3].id,status:false});
+                  //kansw[4]=kan4.length;
+                }}else{
+                return false;
+                }
+              }else{
+                var R=Math.random();
+                if(R>poncpu[4]){
+                Kan(4,tumotemp);
+                return false;
+                }else{
+                //kansw[4]=kan4.length;
+              }
+            }
+            }
             if(Pon(4)){
               if(pvpmode==1){
                 if(MEMBER[3].pc==1){
@@ -5945,17 +6114,10 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           e1.addEventListener("mouseover", {card:100,handleEvent:handOnCorsor});
           e1.addEventListener("mouseout", {card:-1,handleEvent:handOnCorsor});
         }else{
-          if(Kantumo>=0 && h==hand1.length-2){
-            e1.x=620;
-            e1.y=500;
-            e1.addEventListener("mouseover", {card:99,handleEvent:handOnCorsor});
-            e1.addEventListener("mouseout", {card:-1,handleEvent:handOnCorsor});
-          }else{
           e1.x=100+size*(h-1);
           e1.y=500;
           e1.addEventListener("mouseover", {card:h,handleEvent:handOnCorsor});
           e1.addEventListener("mouseout", {card:-1,handleEvent:handOnCorsor});
-          }
         }
         e1.addEventListener("click", {card:h,handleEvent:paiCut});
         e1.scale=7/12;
@@ -6032,7 +6194,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       }};
     console.log('Setup',pvp);//socketで飛ばすとなんか3回くらい呼び出される
     navisw=0;
-    if(Fever!==-1){Fever=0};
     DP =new Array(0,0,0,0,0);
     skillusage2=new Array(0,-1,-1,-1,-1,0)
     death=[
@@ -6246,7 +6407,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
   if(ippatu[1]==1){ippatu[1]=2}
   if(nuki[0]==5){
     nuki[0]=0;
-    Kantumo=-1;
     //ドラを1枚追加
     dora.push(king.splice(0,1));
     dorax+=40;
@@ -6407,7 +6567,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
     //山から1枚引いてくる nuki>0の場合はデッキ外から2枚ドロー
     if(nuki[0]>0){
       tumo=Math.floor(Math.random()*60);
-      Kantumo=Math.floor(Math.random()*60);
     }else{
     if(deck.length<=0){
         console.log('deckerror');
@@ -6437,24 +6596,11 @@ cx1.drawImage(e7,dorax,10,33,43.5)
     createjs.Tween.get(drawcard)
       .to({alpha: 1,y:500},300)
       .call(drawstep);
-    if(Kantumo>=0){
-      hand1.splice(hand1.length-1,0,Kantumo);
-      var d= new createjs.Bitmap(eltear_src[Kantumo]);
-      d.alpha=0;
-      d.x=620;
-      d.y=470;
-      d.scale=7/12;
-      handmap.addChild(d);
-      createjs.Tween.get(d)
-        .to({alpha: 1,y:500},300)
-        d.addEventListener("mouseover", {card:99,handleEvent:handOnCorsor});
-        d.addEventListener("mouseout", {card:-1,handleEvent:handOnCorsor});
-        d.addEventListener("click", {card:hand1.length-2,handleEvent:paiCut});
-    }
   function drawstep(){
     drawcard.addEventListener("mouseover", {card:100,handleEvent:handOnCorsor});
     drawcard.addEventListener("mouseout", {card:-1,handleEvent:handOnCorsor});
     drawcard.addEventListener("click", {card:hand1.length-1,handleEvent:paiCut});
+    ponkanmap.removeAllChildren();
     if(reach[1] <3){
       if(skillusage[1]>0 && chara[1]==5){
       yoti(skillusage[1]);
@@ -6486,21 +6632,11 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         default:
           break;
       }
-      ponkanmap.removeAllChildren();
       if(chara[1] !==0 && skillswitch[1]==0 && pvpmode==0){
         var btn1 = createButton("スキル", 80, 40);
         btn1.x = 710;
         btn1.y = 440;
         ponkanmap.addChild(btn1);
-      }
-      if(Kan(1,-2)){
-        se5.play()
-        nukiswitch[1]=1;//嶺上開花判定に使用
-        var btn1 = createButton("カン", 80, 40);
-        btn1.x = 710;
-        btn1.y = 400;
-        ponkanmap.addChild(btn1);
-        btn1.addEventListener("click",{card:2,handleEvent:PonKanBt});
       }
       }
     }
@@ -6515,6 +6651,15 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       ponkanmap.addChild(btn1);
       btn1.addEventListener("click",{card:0,handleEvent:ReachBt});
       };
+    if(Kan(1,-2)){
+      se5.play()
+      nukiswitch[1]=1;//嶺上開花判定に使用
+      var btn1 = createButton("カン", 80, 40);
+      btn1.x = 710;
+      btn1.y = 400;
+      ponkanmap.addChild(btn1);
+      btn1.addEventListener("click",{card:2,handleEvent:PonKanBt});
+    }
     if(hand1[0]==-3){
       se6.play();
       var btn1=createCircleButton("ツモ",50);
@@ -6526,6 +6671,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
     setTimeout(()=>{
       cLock=1;
       console.log('操作可',cLock)
+      if(debugmode){console.log(hand1)};
       },100)
     }
     }
@@ -7092,20 +7238,60 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             switch(player){
               case 1:
               handtemp = hand1.concat(pon1);
-              PonN=pon1.length;
+              PonN=pon1.length+kan1.length;
+              if(kan1.length){
+                var A=kan1.concat();
+                if(kan1.length>=8){
+                  A.splice(4,1);
+                }
+                if(kan1.length>=4){
+                  A.splice(0,1);
+                }
+              handtemp = handtemp.concat(A);
+              }
               break;
               case 2:
-                PonN=pon2.length;
+                PonN=pon2.length+kan2.length;
+                if(kan2.length){
+                  var A=kan2.concat();
+                  if(kan2.length>=8){
+                    A.splice(4,1);
+                  }
+                  if(kan2.length>=4){
+                    A.splice(0,1);
+                  }
+                handtemp = handtemp.concat(A);
+                }
                 break;
               case 3:
-                PonN=pon3.length;
+                PonN=pon3.length+kan3.length;
+                if(kan3.length){
+                  var A=kan3.concat();
+                  if(kan3.length>=8){
+                    A.splice(4,1);
+                  }
+                  if(kan3.length>=4){
+                    A.splice(0,1);
+                  }
+                handtemp = handtemp.concat(A);
+                }
                 break;
               case 4:
-                PonN=pon4.length;
+                PonN=pon4.length+kan4.length;
+                if(kan1.length){
+                  var A=kan4.concat();
+                  if(kan4.length>=8){
+                    A.splice(4,1);
+                  }
+                  if(kan4.length>=4){
+                    A.splice(0,1);
+                  }
+                handtemp = handtemp.concat(A);
+                }
               break;
               default:
                 console.log('player error!')
-              handtemp = hand2.concat();
+                handtemp = hand2.concat();
               //自信ないから残しとく
               break;
             }
@@ -7328,15 +7514,55 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       switch(player){
         case 1:
           handtemp = hand1.concat(pon1);
+          if(kan1.length){
+            var A=kan1.concat();
+            if(kan1.length>=8){
+              A.splice(4,1);
+            }
+            if(kan1.length>=4){
+              A.splice(0,1);
+            }
+          handtemp = handtemp.concat(A);
+          }
         break;
         case 2:
           handtemp = hand2.concat(pon2);
+          if(kan2.length){
+            var A=kan2.concat();
+            if(kan2.length>=8){
+              A.splice(4,1);
+            }
+            if(kan2.length>=4){
+              A.splice(0,1);
+            }
+          handtemp = handtemp.concat(A);
+          }
         break;
         case 3:
           handtemp = hand3.concat(pon3);
+          if(kan3.length){
+            var A=kan3.concat();
+            if(kan3.length>=8){
+              A.splice(4,1);
+            }
+            if(kan3.length>=4){
+              A.splice(0,1);
+            }
+          handtemp = handtemp.concat(A);
+          }
         break;
         case 4:
           handtemp = hand4.concat(pon4);
+          if(kan1.length){
+            var A=kan4.concat();
+            if(kan4.length>=8){
+              A.splice(4,1);
+            }
+            if(kan4.length>=4){
+              A.splice(0,1);
+            }
+          handtemp = handtemp.concat(A);
+          }
         break;
       }
   
@@ -7410,7 +7636,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             var rect = new createjs.Shape();
             rect.graphics
             .beginFill("rgba(200,0,0,0.5)")
-            .drawRect(riverx[num]-10.5, rivery[num]+10, 43.5, 33);
+            .drawRect(riverx[num]-10.5, rivery[num]+5.25, 43.5, 33);
             field.addChild(rect);
           }else{
             var rect = new createjs.Shape();
@@ -7645,7 +7871,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       fieldmap.addChild(s);
         for (var i=1;i<vichand.length;i++){
         var drawcard=new createjs.Bitmap(eltear_src[vichand[i]]);
-        drawcard.x=15+size*(i-1);
+        drawcard.x=15+size*(i-1)+raidscore[1]*800;
         if(i==9){drawcard.x+=15}
         drawcard.y=120;
         drawcard.scaleX=7/12;
@@ -7811,11 +8037,11 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       //handmap.alpha=1; 
       var drawcard;
       var drawcardlist=[];
-      for (var i=1;i<10;i++){
+      for (var i=1;i<vichand.length;i++){
       drawcard=new createjs.Bitmap(eltear_src[vichand[i]]);
       drawcard.alpha=0;
       drawcard.x=15+size*(i-1);
-      if(i==9){drawcard.x+=15}
+      if(i==vichand.length-1){drawcard.x+=15}
       drawcard.y=120;
       drawcard.scaleX=7/12;
       drawcard.scaleY=31/52;
@@ -8592,25 +8818,57 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                   YakuDT("渇望"); 
                   YakuDT("歪曲された視線"); 
                   break;
+                case 60://マスター
+                  YakuDT("殴り合い"); 
+                  break;
+                case 61:
+                YakuDT("マナ守護"); 
+                break;
+                case 62:
+                YakuDT("魔族"); 
+                break;
+                case 63:
+                  YakuDT("歪曲された視線"); 
+                  break;
+                case 64:
+                  YakuDT("正義を貫徹する者"); 
+                  break;
+                case 65:
+                  YakuDT("ナソード研究"); 
+                  break;
+                case 66:
+                  YakuDT("精霊の加護"); 
+                  break;
+                case 67:
+                  YakuDT("エルの巫女"); 
+                  break;
                 }
         }
       }
    
     function Reachwait(num){
-      //hand1のnum番目を切った場合に
-      //何待ちなのか3枚くらいパイを表示する
+      //hand1のnum番目を切った場合に何待ちなのか3枚くらいパイを表示する
+      //0に○○待ちの文字、1~3に待ちパイ
       console.log('Reachwait',num)
       var Count={};
       var Line={};
       var Color={};
       var Result=[];
-      //0に○○待ちの文字、1~3に待ちパイ
       Result.push("ノーテン");
-        handtemp = hand1.concat(pon1);
+      handtemp = hand1.concat(pon1);
+      //カンは1つ減らしてポンと同じ裁定にしてみる
+      if(kan1.length){
+        var A=kan1.concat();
+        if(kan1.length>=8){
+          A.splice(4,1);
+        }
+        if(kan1.length>=4){
+          A.splice(0,1);
+        }
+        handtemp = handtemp.concat(A);
+      }
             //下でCがエラー吐いたので
             handtemp.splice(num,1);
-            var HH=handtemp.findIndex(value=>value==100);
-            console.log(handtemp.length,HH)
             handtemp.sort(compareFunc);
             for(var i=1; i<handtemp.length;i++){
               var C=donpai.findIndex(value=>value.id==handtemp[i])
@@ -8664,8 +8922,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             var tumoj=0;//同じキャラ3枚をカウント
             var kanj=0;//同じキャラ4枚をカウント
             var keyj=Object.keys(Count);
-            //console.log(keyj.length);
-            //Count.length->undefined
             for(var j=0;j<keyj.length;j++){
               if(Count[keyj[j]]==2){
                 reachj+=1;
@@ -8677,7 +8933,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                 kanj+=1;
               }
             }
-            //console.log(tumoj,reachj);
             switch(Line["0"]){
               case 2:
                 //リーチとなるのは3,3+1+1 3,2,1+1+1 2,2,2+1+1
@@ -8768,6 +9023,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                 break;
           };
           //クレスト：同じ属性9枚、マスターロードを含む
+          //リーチ後の待ちはラインと同じ
           var Ary=["0","ソーレス","デニフ","ベントス","アドリアン","ガイア","ロッソ","ハルニエ"];
         switch(Color["0"]){
           case 2:
@@ -8783,20 +9039,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                   Result.push(E[i].id);
                 }
                 if(Result.length>5){break;}
-              }
-            }
-            if(keyj3.length==3){
-              if(Color[keyj3[1]]==1 || Color[keyj3[2]]==1){
-                var resultF=Object.keys(Color).find((key)=>Color[key]>2);
-                console.log(resultF);
-                Result[0]="クレストオブ"+Ary[resultF];
-              var E=donpai.filter(value=>value.color==resultF);
-              for(var i=0; i<E.length ; i++){
-                if(Remaincheck(E[i].id)){
-                  Result.push(E[i].id);
-                }
-                if(Result.length>5){break;}
-              }
               }
             }
             break;
@@ -8823,32 +9065,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                     Result.push(E[i].id);
                   }
                 }
-              }
-            }
-            if(keyj3.length==2){
-              var M=handtemp.findIndex(value=>value>=60 && value<=67);
-              if(Color[keyj3[0]]==1 || Color[keyj3[1]]==1){
-                var resultF=Object.keys(Color).find((key)=>Color[key]>2);
-                console.log(resultF);
-                Result[0]="クレストオブ"+Ary[resultF];
-                if(M!==-1){
-                  var E=donpai.filter(value=>value.color==resultF);
-                  for(var i=0; i<E.length ; i++){
-                    if(Remaincheck(E[i].id)){
-                      Result.push(E[i].id);
-                    }
-                    if(Result.length>5){break;}
-                  }
-                  }else{
-                    //マスロパイ待ち
-                    console.log('crest reach')
-                    var E=donpai.filter(value=>value.color==resultF && value.id>=60);
-                    for(var i=0; i<E.length ; i++){
-                      if(Remaincheck(E[i].id)){
-                        Result.push(E[i].id);
-                      }
-                    }
-                  }
               }
             }
           break;
@@ -9038,17 +9254,53 @@ cx1.drawImage(e7,dorax,10,33,43.5)
     }
     }
     function Kan(player,num=-1){
-      //カンすると役が作れないため現在未実装
-      //カン後2ドロー、立直中はカンできない条件でテスト
       console.log('Kan',player,num);
     if(num==-2){
       //自分ターンのカン
+      if(reach[player]==3){
+        //立直中は引いたパイでのみ可能
+        if(tumotemp>=60 && tumotemp<=69){
+          //マスターロード・オールマイティはカンできない
+          return false;
+        }
+        switch(player){
+          case 1:
+            if(pon1.length>=6){
+              //ポンすると手札がなくなるZE
+              return false;
+            }
+            //ponsw[1]=0;
+            handtemp = hand1.concat();
+          break;
+          case 2:
+            if(pon2.length>=6){
+              return false;
+            }
+            handtemp = hand2.concat();
+          break;
+          case 3:
+            if(pon3.length>=6){
+              return false;
+            }
+            handtemp = hand3.concat();
+          break;
+          case 4:
+            if(pon4.length>=6){
+              return false;
+            }
+            handtemp = hand4.concat();
+          break;
+        }
+          var A=Math.floor(hand1[hand1.length-1]/4);
+          var B=handtemp.filter(value=>value>=4*A && value<4*(A+1));
+          if(debugmode){console.log(B)};
+          if(B.length>=3){kansw[player]=1;
+            return true;
+          }
+        return false;
+      }
       var handtest=[];
       handtest=hand1.concat(pon1);
-          if(reach[player]==3){
-          //立直しているなら明カンできない
-          return false;
-          }
           var Count={};
           for(var i=1; i<handtest.length;i++){
           var C=donpai.findIndex(value=>value.id==handtest[i])
@@ -9112,60 +9364,229 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       }else{
         //実際にカンする動き
         //自分ターン 現在playerのみ
+        //自動でカンするパイを選んでいるためリーチ中に想定しないカンが発生する可能性あるかも
         if(num==100){
           //ポンしているパイでカンできる時（加カン）はそっちを優先
-          if(pon1.length>=3){
-            var A=Math.floor(pon1[0]/4);
-            var B=hand1.findIndex(value=>value>=4*A && value<4*(A+1));
-            if(B!==-1){
-              var N=hand1.splice(B,1);
-              kan1.unshift(N,pon1[0],pon1[1],pon1[2]);
-              pon1=pon1.splice(0,3);
-              //かきなおす
-              ponkandraw(1);
-              se8.play();
-              NukiAnimation(player);
-              return true;
-            }
-          };
-          if(pon1.length>=6){
-            var A=Math.floor(pon1[3]/4);
-            var B=hand1.findIndex(value=>value>=4*A && value<4*(A+1));
-            if(B!==-1){
-              var N=hand1.splice(B,1);
-              kan1.unshift(N,pon1[0],pon1[1],pon1[2]);
-              pon1=pon1.splice(0,3);
-              ponkandraw(1);
-              se8.play();
-              NukiAnimation(player);
-              return true;
-            }
-          };
-          //手札のみ4枚 この場合は槍槓できないのでまた挙動が変わる　悲しい
-          var handtest=[];
-          var A;
-          handtest=hand1.concat();
-          var Count={};
-          for(var i=1; i<handtest.length;i++){
-          var C=donpai.findIndex(value=>value.id==handtest[i])
-          var elm=donpai[C].name;
-          Count[elm]=(Count[elm] || 0)+1
-          }
-          var resultF=Object.keys(Count).filter((key)=>Count[key]>=4);
-          if(resultF.length){
-            var E=donpai.findIndex(value=>value.name==resultF[0]);
-            for(var i=0;i<4;i++){
-              var pA=hand1.findIndex(value=>value>=E && value<E+4);
-              var kanA=hand1.splice(pA,1);
-              kan1.unshift(kanA);
+        switch(player){
+          case 1:
+            if(pon1.length>=3){
+              var A=Math.floor(pon1[0]/4);
+              var B=hand1.findIndex(value=>value>=4*A && value<4*(A+1));
+              if(B!==-1){
+                var N=hand1.splice(B,1);
+                kan1.unshift(N,pon1[0],pon1[1],pon1[2]);
+                pon1=pon1.splice(0,3);
+                //かきなおす
+                hand1.push(100);
+                ponkandraw(1);
+                se8.play();
+                NukiAnimation(player,N);
+                return true;
               }
-              ;
-            ponkandraw(1);
-            se8.play();
-            NukiAnimation(player,-1,0);
-          }
+            };
+            if(pon1.length>=6){
+              var A=Math.floor(pon1[3]/4);
+              var B=hand1.findIndex(value=>value>=4*A && value<4*(A+1));
+              if(B!==-1){
+                var N=hand1.splice(B,1);
+                kan1.unshift(N,pon1[0],pon1[1],pon1[2]);
+                pon1=pon1.splice(0,3);
+                hand1.push(100);
+                ponkandraw(1);
+                se8.play();
+                NukiAnimation(player,N);
+                return true;
+              }
+            };
+            //手札のみ4枚 この場合は槍槓できない
+            var handtest=[];
+            var A;
+            handtest=hand1.concat();
+            var Count={};
+            for(var i=1; i<handtest.length;i++){
+            var C=donpai.findIndex(value=>value.id==handtest[i])
+            var elm=donpai[C].name;
+            Count[elm]=(Count[elm] || 0)+1
+            }
+            var resultF=Object.keys(Count).filter((key)=>Count[key]>=4);
+            if(resultF.length){
+              var E=donpai.findIndex(value=>value.name==resultF[0]);
+              for(var i=0;i<4;i++){
+                var pA=hand1.findIndex(value=>value>=E && value<E+4);
+                var kanA=hand1.splice(pA,1);
+                kan1.unshift(kanA);
+                };
+              hand1.push(100);
+              ponkandraw(1);
+              se8.play();
+              NukiAnimation(player,-1);
+            }
+            break;
+          case 2:
+            if(pon2.length>=3){
+              var A=Math.floor(pon2[0]/4);
+              var B=hand2.findIndex(value=>value>=4*A && value<4*(A+1));
+              if(B!==-1){
+                var N=hand2.splice(B,1);
+                kan2.unshift(N,pon2[0],pon2[1],pon2[2]);
+                pon2=pon2.splice(0,3);
+                //かきなおす
+                hand2.push(100);
+                ponkandraw(1);
+                se8.play();
+                NukiAnimation(player,N);
+                return true;
+              }
+            };
+            if(pon2.length>=6){
+              var A=Math.floor(pon2[3]/4);
+              var B=hand2.findIndex(value=>value>=4*A && value<4*(A+1));
+              if(B!==-1){
+                var N=hand2.splice(B,1);
+                kan2.unshift(N,pon2[0],pon2[1],pon2[2]);
+                pon2=pon2.splice(0,3);
+                hand2.push(100);
+                ponkandraw(1);
+                se8.play();
+                NukiAnimation(player,N);
+                return true;
+              }
+            };
+            //手札のみ4枚 この場合は槍槓できない
+            var handtest=[];
+            var A;
+            handtest=hand2.concat();
+            var Count={};
+            for(var i=1; i<handtest.length;i++){
+            var C=donpai.findIndex(value=>value.id==handtest[i])
+            var elm=donpai[C].name;
+            Count[elm]=(Count[elm] || 0)+1
+            }
+            var resultF=Object.keys(Count).filter((key)=>Count[key]>=4);
+            if(resultF.length){
+              var E=donpai.findIndex(value=>value.name==resultF[0]);
+              for(var i=0;i<4;i++){
+                var pA=hand2.findIndex(value=>value>=E && value<E+4);
+                var kanA=hand2.splice(pA,1);
+                kan2.unshift(kanA);
+                };
+              hand2.push(100);
+              ponkandraw(1);
+              se8.play();
+              NukiAnimation(player,-1);
+            }
+            break;
+          case 3:
+            if(pon3.length>=3){
+              var A=Math.floor(pon3[0]/4);
+              var B=hand3.findIndex(value=>value>=4*A && value<4*(A+1));
+              if(B!==-1){
+                var N=hand3.splice(B,1);
+                kan3.unshift(N,pon3[0],pon3[1],pon3[2]);
+                pon3=pon3.splice(0,3);
+                //かきなおす
+                hand3.push(100);
+                ponkandraw(1);
+                se8.play();
+                NukiAnimation(player,N);
+                return true;
+              }
+            };
+            if(pon3.length>=6){
+              var A=Math.floor(pon3[3]/4);
+              var B=hand3.findIndex(value=>value>=4*A && value<4*(A+1));
+              if(B!==-1){
+                var N=hand3.splice(B,1);
+                kan3.unshift(N,pon3[0],pon3[1],pon3[2]);
+                pon3=pon3.splice(0,3);
+                hand3.push(100);
+                ponkandraw(1);
+                se8.play();
+                NukiAnimation(player,N);
+                return true;
+              }
+            };
+            //手札のみ4枚 この場合は槍槓できない
+            var handtest=[];
+            var A;
+            handtest=hand3.concat();
+            var Count={};
+            for(var i=1; i<handtest.length;i++){
+            var C=donpai.findIndex(value=>value.id==handtest[i])
+            var elm=donpai[C].name;
+            Count[elm]=(Count[elm] || 0)+1
+            }
+            var resultF=Object.keys(Count).filter((key)=>Count[key]>=4);
+            if(resultF.length){
+              var E=donpai.findIndex(value=>value.name==resultF[0]);
+              for(var i=0;i<4;i++){
+                var pA=hand3.findIndex(value=>value>=E && value<E+4);
+                var kanA=hand3.splice(pA,1);
+                kan3.unshift(kanA);
+                };
+              hand3.push(100);
+              ponkandraw(1);
+              se8.play();
+              NukiAnimation(player,-1);
+            }
+            break;
+          case 4:
+            if(pon4.length>=3){
+              var A=Math.floor(pon4[0]/4);
+              var B=hand4.findIndex(value=>value>=4*A && value<4*(A+1));
+              if(B!==-1){
+                var N=hand4.splice(B,1);
+                kan4.unshift(N,pon4[0],pon4[1],pon4[2]);
+                pon4=pon4.splice(0,3);
+                //かきなおす
+                hand4.push(100);
+                ponkandraw(1);
+                se8.play();
+                NukiAnimation(player,N);
+                return true;
+              }
+            };
+            if(pon4.length>=6){
+              var A=Math.floor(pon4[3]/4);
+              var B=hand4.findIndex(value=>value>=4*A && value<4*(A+1));
+              if(B!==-1){
+                var N=hand4.splice(B,1);
+                kan4.unshift(N,pon4[0],pon4[1],pon4[2]);
+                pon4=pon4.splice(0,3);
+                hand4.push(100);
+                ponkandraw(1);
+                se8.play();
+                NukiAnimation(player,N);
+                return true;
+              }
+            };
+            //手札のみ4枚 この場合は槍槓できない
+            var handtest=[];
+            var A;
+            handtest=hand4.concat();
+            var Count={};
+            for(var i=1; i<handtest.length;i++){
+            var C=donpai.findIndex(value=>value.id==handtest[i])
+            var elm=donpai[C].name;
+            Count[elm]=(Count[elm] || 0)+1
+            }
+            var resultF=Object.keys(Count).filter((key)=>Count[key]>=4);
+            if(resultF.length){
+              var E=donpai.findIndex(value=>value.name==resultF[0]);
+              for(var i=0;i<4;i++){
+                var pA=hand4.findIndex(value=>value>=E && value<E+4);
+                var kanA=hand4.splice(pA,1);
+                kan4.unshift(kanA);
+                };
+              hand4.push(100);
+              ponkandraw(1);
+              se8.play();
+              NukiAnimation(player,-1);
+            }
+            break;
         }
-        //相手ターン
+        };
+        //相手ターン 制度上は実装
         if(num>=0 && num<70){
         handtemp=[];
         switch(player){
@@ -9187,8 +9608,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           console.log('pon error!',handtemp)
           return false;
         }
-          handtemp[pp]=tumotemp;
-          handtemp.sort(compareFunc);
       switch(player){
         case 1:
           //カンされたパイを塗りつぶす
@@ -9201,7 +9620,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             }
           field.addChild(s);
           cLock=0;
-          hand1.splice(pp,1)
           var A=Math.floor(num/4);
           var pA=hand1.findIndex(value=>value>=4*A && value<4*(A+1));
           var ponA=hand1.splice(pA,1)
@@ -9230,7 +9648,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             s.graphics.drawRect(riverx[1], rivery[1], 33, 43.5);
           }
         field.addChild(s);
-          hand2.splice(pp,1)
             var A=Math.floor(num/4);
           var pA=hand2.findIndex(value=>value>=4*A && value<4*(A+1));
           var ponA=hand2.splice(pA,1)
@@ -9258,7 +9675,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             s.graphics.drawRect(riverx[2], rivery[2], 33, 43.5);
           }
         field.addChild(s);
-          hand3.splice(pp,1)
             var A=Math.floor(num/4);
           var pA=hand3.findIndex(value=>value>=4*A && value<4*(A+1));
           var ponA=hand3.splice(pA,1)
@@ -9286,7 +9702,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             s.graphics.drawRect(riverx[3], rivery[3], 33, 43.5);
           }
         field.addChild(s);
-          hand4.splice(pp,1)
             var A=Math.floor(num/4);
           var pA=hand4.findIndex(value=>value>=4*A && value<4*(A+1));
           var ponA=hand4.splice(pA,1)
@@ -9482,6 +9897,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       console.log('操作禁止',cLock);
       if(raidscore[2]==1){
         //はじめて
+        fieldmap.x=800;
         field.addChild(fieldmap);
         guidemap.alpha=0;
         raidscore[2]=2;
@@ -9499,17 +9915,17 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         switch(msgstate){
           case 0:
             createjs.Tween.get(fieldmap)
-            .to({x:-800},250, createjs.Ease.cubicInOut)
+            .to({x:0},250, createjs.Ease.cubicInOut)
             .call(next);
             break;
           case 1:
             createjs.Tween.get(fieldmap)
-            .to({x:-1600},250, createjs.Ease.cubicInOut)  
+            .to({x:-800},250, createjs.Ease.cubicInOut)  
             .call(next);
             break;
           case 2:
             createjs.Tween.get(fieldmap)
-            .to({x:-2400},250, createjs.Ease.cubicInOut)  
+            .to({x:-1600},250, createjs.Ease.cubicInOut)  
             .call(next);
             break;
           default:
@@ -9640,9 +10056,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
               if(ponsw[1]!==1 && i==hand1.length-1){
                 C.x=690;
               }
-              if(Kantumo>=0 && i==hand1.length-2){
-                C.x=620;
-              }
               ponkanmap.addChild(C);
             }
           }
@@ -9665,6 +10078,14 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             ponkanmap.addChild(btn1);
             btn1.addEventListener("click",{card:2,handleEvent:PonKanBt});
           }
+          if(hand1[0]==-3){
+            se6.play();
+            var btn1=createCircleButton("ツモ",50);
+            btn1.x=320;
+            btn1.y=400;
+            ponkanmap.addChild(btn1)
+            btn1.addEventListener("click", {card:1,handleEvent:TumoronBt});
+          };
           if(chara[1] !==0 && skillswitch[1]==0 && pvpmode==0){
             var btn1 = createButton("スキル", 80, 40);
               btn1.x = 710;
@@ -9866,10 +10287,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             break;
           case 2:
             //オプション
-            if(mouseX >650 && mouseX <750 && mouseY >70 && mouseY <170){
-              Textlist[0].text="パイを切った時に鳴る効果音です。";
-              Textlist[1].text="A：トランプっぽい音　B：麻雀牌っぽい音"
-            }
             if(mouseX >380 && mouseX <750 && mouseY >200 && mouseY <260){
               //通常テキスト
               Textlist[0].text="通常対局時に流れるBGMを変更できます。";
@@ -9895,11 +10312,11 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             }
             if(mouseX >50 && mouseX <350 && mouseY >260 && mouseY <350){
               Textlist[0].text="パイを切った時にMPが溜まる速度です。";
-              Textlist[1].text="なお、MPはスキルやマナブレイクに使用します。"
+              Textlist[1].text="MPはスキルやマナブレイクに使用します。"
             }
             if(mouseX >50 && mouseX <350 && mouseY >350 && mouseY <400){
-              Textlist[0].text="（対戦中のみ有効）ありにすると特定のタイミングで";
-              Textlist[1].text="FEVER!が発生します。 現在のFEVER効果：ドラ3枚追加"
+              Textlist[0].text="パイを切った時に鳴る効果音です。";
+              Textlist[1].text="A：トランプっぽい音　B：麻雀牌っぽい音"
             }
             if(mouseX >600 && mouseX <700 && mouseY >450 && mouseY <490){
               Textlist[0].text="現在の設定を反映して戻ります。";
@@ -10793,14 +11210,14 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       createjs.Tween.get(C)
       .to({x:0},60);
         function next(){
-          //pai-> カンしたパイ -1 暗カン もう一度自分のターン
-          //type 0->自分のターンのカン
+          //pai -1-> もう一度自分のターン 0- ->加カンで使用 
+
           ponkanmap.removeAllChildren();
           Container.removeAllChildren();
           stage.removeChild(Container);
           if(pai==-1){
             nuki[1]+=1;
-            nuki[0]=p;   
+            nuki[0]=p;
             switch(p){
               case 1:
               handgraph(0,1)
@@ -10828,8 +11245,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                 break;
             }         
             return false;
-          }
-          if(type==0){
+          }else{
             //槍槓チェックが入る場合
             nuki[1]+=1;
             nuki[0]=p;
@@ -11300,6 +11716,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
     Configmap.removeAllChildren();
     guidemap.removeAllChildren();
     handmap.removeAllChildren();
+    ponkanmap.removeAllChildren();
     jingle2.seek(1);
     jingle2.play();
     if(musicset[1]<=0){musicset[1]=0};
@@ -11535,11 +11952,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
   cx2.fillStyle = "white";
   switch(num){
     case 0:
-      drawbuttom(635,10,"スキル",1,60,20)
-      ponkanmap.removeAllChildren();
-      var C=canvas2.toDataURL();
-      var Cb = new createjs.Bitmap(C);
-      ponkanmap.addChild(Cb);
     if(p==1){
       cx2.font = "bold 16px Arial";
       cx2.fillText("ストーンスキン", 635, 110);
@@ -11834,7 +12246,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
     tumoConfig=0;
   }
   if (Fever === void 0) {
-    Fever=0;
+    Fever=-1;
   }
   if (Ponrate === void 0) {
     Ponrate=0.4;
@@ -11873,7 +12285,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
   Ponrate=0.4;
   mpVelocity=1;
   dahaiSE=1;
-  Fever =0;
   for(var i=0; i<achieveA.length;i++){
     achieveA[i].id=i;
     achieveA[i].cleared=0;
@@ -11985,7 +12396,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       tumoConfig=0;
     }
     if (Fever === void 0) {
-      Fever=0;
+      Fever=-1;
     }
     if (Ponrate === void 0) {
       Ponrate=0.4;
