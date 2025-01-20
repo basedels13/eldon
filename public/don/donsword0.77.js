@@ -1,16 +1,16 @@
-//var1.018　season2 
+//var1.019　season2 
 // npm run dev
-//全職75枚（エピックキャラは1枚ずつ増量）＋オールマイティ2枚＋マスター8枚（ガ、ロ、ベ、デ、ソ、ア、ハ）合計85枚→53枚スタート
+//全職75枚（エピックキャラは1枚ずつ増量）＋オールマイティ2枚＋マスター8枚×2（ガ、ロ、ベ、デ、ソ、ア、ハ）合計93枚→61枚スタート
 //対戦で魔界モードのリザルトが出ないらしい
-//いつか→魔界モードのリザルトのスライド 不足分の画像　対戦部屋の工事、プレイガイド　場の同じパイの色付け
-//クレスト
-//対局が止まることがある・・・詳細不明
+//いつか→不足分の画像　対戦部屋の工事、プレイガイド　場の同じパイの色付け
+//クレスト役
+//流局画面でクリックできず即進んでしまう
 window.onload = function(){
   draw();
   };
   
   function draw(){
-  var titletext="v1.018/Click to START";
+  var titletext="v1.019/Click to START";
   var debugmode=true;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にfalseに
   //自分自身の情報を入れる箱
   var IAM = {
@@ -566,7 +566,8 @@ window.onload = function(){
     {name:"機械工学",sub:"シナジー役",max:1},
     {name:"ラビィの友達",sub:"シナジー役",max:1},
     {name:"悪戯の王",sub:"シナジー役",max:1},
-    {name:"戦場の天使",sub:"シナジー役",max:2},
+    {name:"エルの巫女",sub:"シナジー役",max:1},
+    {name:"戦場の天使",sub:"シナジー役",max:3},
     {name:"クレストオブガイア",sub:"キャラ役"},
     {name:"クレストオブソーレス",sub:"キャラ役"},
     {name:"クレストオブベントス",sub:"キャラ役"},
@@ -2553,9 +2554,18 @@ function NameChange(){
     setting.scale=0.6;
     field.addChild(setting);
     solo.addEventListener("click", {card:2,handleEvent:Menubutton});
-    multi.addEventListener("click", {card:4,handleEvent:Menubutton});
-    howto.addEventListener("click", {card:1,handleEvent:Menubutton});
+    //multi.addEventListener("click", {card:4,handleEvent:Menubutton});
+    //howto.addEventListener("click", {card:1,handleEvent:Menubutton});
     setting.addEventListener("click", {handleEvent:OptionConfig});
+    var rect = new createjs.Shape();
+    rect.graphics
+    .beginFill("rgba(20,20,20,0.7)")
+    .drawRect(220, 210, 181, 91);
+    field.addChild(rect);
+    rect.graphics
+    .beginFill("rgba(20,20,20,0.7)")
+    .drawRect(40, 300, 181, 91);
+    field.addChild(rect);
     var wT=winrank[0]+winrank[1]+winrank[2]+winrank[3]
     var winrate=0;
     if(wT>0){
@@ -2933,15 +2943,15 @@ function NameChange(){
                   cx2.font = "26px 'Century Gothic'";
                   cx2.fillText("国士無双とはなんですか？", 260, 90);
                   cx2.font = "22px 'Century Gothic'";
-                  cx2.fillText("国士無双は、3つ目の役で、少し特殊な役です。", 90, 340);
-                  cx2.fillText("「エピックライン」という各キャラごとに定められた", 90, 370);
-                  cx2.fillText("パイのみを9枚集めることで成立します。", 90, 400);
-                  cx2.fillText("この時、同じパイが複数含まれてはいけません。", 90, 430);
+                  cx2.fillText("国士無双は、少し特殊な役です。", 90, 340);
+                  cx2.fillText("マスターロードのパイのみを", 90, 370);
+                  cx2.fillText("9枚集めることで成立します。", 90, 400);
+                  cx2.fillText("8種類のパイを1つずつ揃える必要があります。", 90, 430);
                   cx2.fillText("国士無双を揃えるとボーナスとして高得点が貰えます。", 90, 460);
                   msgstate=2;
                   cx2.clearRect(80,530,670,70)
                   cx2.font = "18px Arial";
-                  cx2.fillText("国士無双はエピックラインを9枚揃える特殊な役です。", 80, 550);
+                  cx2.fillText("マスターロードのパイを9枚揃える特殊な役です。", 80, 550);
                   cx2.fillText("オールマイティのパイがあれば狙ってみましょう。", 80, 570);
                 }}
                 if(mouseX >50 && mouseX <250 && mouseY >230 && mouseY <270){
@@ -4150,7 +4160,7 @@ if(opLock==0 && gamestate ==1){
       }
     }
     function deckHandlerP(){
-          //ホスト配牌
+          //ホスト配牌 未使用
           if(IsHost(IAM.room)){
             //ホストで初期化するもの
             deck=[]
@@ -4524,10 +4534,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                         .drawRect(10, 60, 135, 34)
         field.addChild(rect);
         field.addChild(Csquare);
-        if(pvpmode==1){
-          deckHandlerP();
-          return false;
-        }
         var t = new createjs.Text("ドラ", "24px 'Century Gothic'", "white");
         t.x=10;
         t.y=20;
@@ -4563,7 +4569,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           }else{cx1.fillText("第"+(skillusage2[0])+"局 "+(skillusage2[5])+"本場",10,88);
                }
         }
-        //
         var t = new createjs.Text("第"+(skillusage2[0])+"局 "+(skillusage2[5])+"本場", "24px 'Century Gothic'", "white");
         t.x=10;
         t.y=68;
@@ -4856,7 +4861,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         }}}
       }
         Buffdraw();
-        //
         if(pvpmode==1){
           if(IsHost(IAM.room)){
             //ホストで初期化するもの
@@ -4872,7 +4876,10 @@ cx1.drawImage(e7,dorax,10,33,43.5)
               if(debugmode){console.log(deck.length);}
             shuffle();
             if(debugmode){console.log(parent);}
-            king =deck.splice(0,7)
+            king =[];
+            for (var i = 0; i < 10; i++) {
+              king.push(Math.floor(Math.random() * 67));
+            }
             hand1b=deck.splice(0,8-hand1.length)
             hand1=hand1.concat(hand1b)
             hand1b=deck.splice(0,8-hand2.length)
@@ -4912,8 +4919,9 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         deck.push(i);
         }
         deck.push(0,4,9,13,17,20,24,28,32,37,42,45,49,52,56);
+        deck.push(60,61,62,63,64,65,66,67);
         if(debugmode){console.log(deck.length);}
-        //expected84
+        //expected84->93
         //山シャッフル
         shuffle();
         //初手積み込み
@@ -4966,11 +4974,11 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           }
           }
         }
-        //嶺上牌を廃止、代わりにドラをランダムに決定
         king =[];
         for (var i = 0; i < 10; i++) {
           king.push(Math.floor(Math.random() * 67));
         }
+        //deck.splice(0,7)
         hand1b=deck.splice(0,8-hand1.length)
         hand1=hand1.concat(hand1b)
         hand1b=deck.splice(0,8-hand2.length)
@@ -4984,6 +4992,8 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         hand2.sort(compareFunc);
         hand3.sort(compareFunc);
         hand4.sort(compareFunc);
+        //積み込み
+        //if(debugmode){hand1=[60,61,62,63,64,66,67,69]};
         //1番目の配列は上がり判定に使用
         hand1.unshift(-1)
         hand2.unshift(-1)
@@ -5581,7 +5591,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
               }
             }
             }
-            //
             if(Pon(3)){
               if(pvpmode==1){
                 if(MEMBER[2].pc==1){
@@ -5994,6 +6003,17 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       se16.play();
       }
       Tumoname();
+      if(nuki[0]>0){
+        nuki[0]=0;
+        //ドラを1枚追加
+        dora.push(king.splice(0,1));
+        dorax+=40;
+        e7 = new createjs.Bitmap(eltear_src[dora[dora.length-1]]);
+        e7.x=dorax;
+        e7.y=10;
+        e7.scale=33/120;
+        field.addChild(e7);
+      };
       if(player==1){Elname(tumotemp)};
       e5= new createjs.Bitmap(eltear_src[tumotemp]);
       e5.src=eltear_src[tumotemp]
@@ -6405,17 +6425,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
   if(debugmode){console.log(tumotemp,hand1.length-1,hand1[num],hand1[hand1.length-1])};
   if(turn ==0 && ctl[1]==0){
   if(ippatu[1]==1){ippatu[1]=2}
-  if(nuki[0]==5){
-    nuki[0]=0;
-    //ドラを1枚追加
-    dora.push(king.splice(0,1));
-    dorax+=40;
-    e7 = new createjs.Bitmap(eltear_src[dora[dora.length-1]]);
-    e7.x=dorax;
-    e7.y=10;
-    e7.scale=33/120;
-    field.addChild(e7);
-  };
   if(reach[1] ==2){
   cx1.font = "bold 16px 'Century Gothic'";
   cx1.fillStyle = "orange";
@@ -6640,7 +6649,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       }
       }
     }
-    if(nuki[0]==1){nuki[0]=5};
     if(judge(1)){hand1[0]=-3};
     if(deck.length==0 && reach[1]!==3){reach[1]=0};
     if(reach[1] ==1){
@@ -6677,8 +6685,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
     }
   };
     function cpu(chr,timer=0){//expected chr=2,3,4
-      //コピーよりも先にjudgeに行くことでエラーになっている？
-      //r4も空回りしていない？大丈夫？
           console.log('cpu',chr,ctl,timer);
           timer+=1;
           var cturn=chr -1
@@ -7499,6 +7505,39 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             }
           break;
         }
+        var Kokushi=[60,61,62,63,64,65,66,67,68,69]
+        var Kreach=0;
+        var KKreach=0;
+        for(var k=1;k<handtemp.length;k++){
+          var A=Kokushi.findIndex(value=>value==handtemp[k])
+          if(A!==-1){
+            var B=handtemp.filter(value=>value==handtemp[k])
+            KKreach+=B.length-1;
+          }else{
+            Kreach+=1;
+            if(Kreach>2){break;}
+          }
+        }
+        console.log(Kreach,KKreach);//0,4
+        if(Kreach==1){
+          if(KKreach==0 || KKreach==2){
+            //8/9枚がマスロパイの場合　ダブリが1つの時にリーチとする
+            console.log('国士リーチ');
+            if(reach[player]==0 && reachR==0){reach[player]=1};
+          }
+        }
+        if(Kreach==0){
+          if(KKreach==4){
+            //全部マスロパイの場合　ダブリが2つの時にリーチとする
+            console.log('国士リーチ');
+            if(reach[player]==0 && reachR==0){reach[player]=1};
+          }else if(KKreach==0 || KKreach==2){
+            //国士ツモ
+            if(reach[player]==0 && reachR==0){reach[player]=1};
+            //アガリ
+            return true;
+          }
+        }
         console.log('judge',player)
       }//judge
   
@@ -7708,7 +7747,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         fu-=10*ponf;
       }
       if(Astyle=="国士無双"){
-        han[player]+=6;
+        han[player]+=12;
       }
       if(num==0 && ponsw[player] ==0){han[player] +=1}//門前ツモ
       han[player]+=nuki[player];
@@ -7777,7 +7816,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         PB("天和");
         }
         if(Astyle=="国士無双"){
-          Resultary.push('国士無双 6翻')
+          Resultary.push('国士無双 12翻')
           PB("国士無双");
         }
       if(nuki[0]>0){
@@ -8386,7 +8425,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       }}
     }
   
-    function Nodyaku(player,mode=0){//アガリ条件チェック
+    function Nodyaku(){//アガリ条件チェック
       //ラインとペアの確認
       var result=0
       cx2.fillStyle = "white";
@@ -8448,18 +8487,19 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                 kanj+=1;
               }
             }
+            var Pair=tumoj+kanj;//カンしている可能性もあるため
             //ルリエルとアリエルは別名扱いに注意
-            console.log(tumoj,reachj);
+            //console.log(tumoj,reachj);
             switch(Line["0"]){
               case 2:
                 //ツモとなるのは3,3,1 3,2,2
                 if(keyj.length==5){
-                  if(tumoj==2 && reachj==0){
+                  if(Pair==2 && reachj==0){
                     console.log('chara tumo')
                     result="3ペア"
                       return result;
                   }
-                  if(tumoj==1 && reachj==2){
+                  if(Pair==1 && reachj==2){
                     console.log('chara tumo')
                     result="3ペア"
                       return result;
@@ -8468,14 +8508,14 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                 break;
               case 1:
                 //ツモとなるのは3,3,2
-                if(tumoj==2 && reachj==1){
+                if(Pair==2 && reachj==1){
                   console.log('chara tumo')
                   result="3ペア"
                     return result;
                 }
                 break;
               default:
-                if(tumoj==3){
+                if(Pair==3){
                   console.log('chara tumo')
                   result="3ペア"
                     return result;
@@ -8483,7 +8523,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                 break;
           }
             //国士無双:エピックラインのみ、かつ同パイを含まない
-            var Kokushi=[0,3,7,10,13,15,18,21,24,28,31,34,36,41,43,44]
+            var Kokushi=[60,61,62,63,64,65,66,67,68,69]
             var Kreach=0;
             var KKreach=0;
             for(var k=1;k<handtemp.length;k++){
@@ -8494,7 +8534,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           }else{Kreach+=1}
             if(Kreach>2){break;}
             }
-            if(Kreach==0 && KKreach==0){
+            if(Kreach==0 && KKreach==2){
                 //アガリ
                 console.log('kokushi tumo')
                 result="国士無双"
@@ -9069,6 +9109,42 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             }
           break;
         }
+        //国士無双:エピックラインのみ、かつ同パイを含まない
+        var Kokushi=[60,61,62,63,64,65,66,67,68,69]
+        var KokushiM=[60,61,62,63,64,65,66,67]
+        var resultF=KokushiM.concat();
+        var Kreach=0;
+        var KKreach=0;
+        for(var k=1;k<handtemp.length;k++){
+          var A=Kokushi.findIndex(value=>value==handtemp[k])
+          if(A!==-1){
+            var C=resultF.findIndex(value=>value==handtemp[k])
+            if(C!==-1){resultF.splice(C,1)};
+            var B=handtemp.filter(value=>value==handtemp[k])
+          KKreach+=B.length-1;
+        }else{Kreach+=1}
+          if(Kreach>2){break;}
+          }
+        if(Kreach==0){
+            //国士
+            console.log(Kreach,KKreach,resultF);
+            if(KKreach==0){
+            //8面待ちになる
+            Result[0]="国士無双"
+            for(var i=0; i<KokushiM.length ; i++){
+              if(Remaincheck(KokushiM[i])){
+                Result.push(KokushiM[i]);
+              }
+              if(Result.length>5){break;}
+            }
+            }else if(KKreach==2 || KKreach==4){
+            Result[0]="国士無双"
+            for(var i=0; i<resultF.length ; i++){
+              if(Remaincheck(resultF[i])){
+                Result.push(resultF[i]);
+              }
+            }}
+        }
           return Result;
     }  
     function Pon(player,num=-1){//自分の同じキャラ2枚+前の人が切った同じキャラを除外
@@ -9257,56 +9333,47 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       console.log('Kan',player,num);
     if(num==-2){
       //自分ターンのカン
+      var handtest=[];
+      var tumoP;
+      switch(player){
+        case 1:
+          tumoP=hand1[hand1.length-1]
+          handtest=hand1.concat(pon1);
+          break;
+        case 2:
+          tumoP=hand2[hand2.length-1]
+          handtest=hand2.concat(pon2);
+          break;
+        case 3:
+          tumoP=hand3[hand3.length-1]
+          handtest=hand3.concat(pon3);
+          break;
+        case 4:
+          tumoP=hand4[hand4.length-1]
+          handtest=hand4.concat(pon4);
+          break;
+      }
       if(reach[player]==3){
         //立直中は引いたパイでのみ可能
-        if(tumotemp>=60 && tumotemp<=69){
+        if(tumoP>=60 && tumoP<=69){
           //マスターロード・オールマイティはカンできない
           return false;
         }
-        switch(player){
-          case 1:
-            if(pon1.length>=6){
-              //ポンすると手札がなくなるZE
-              return false;
-            }
-            //ponsw[1]=0;
-            handtemp = hand1.concat();
-          break;
-          case 2:
-            if(pon2.length>=6){
-              return false;
-            }
-            handtemp = hand2.concat();
-          break;
-          case 3:
-            if(pon3.length>=6){
-              return false;
-            }
-            handtemp = hand3.concat();
-          break;
-          case 4:
-            if(pon4.length>=6){
-              return false;
-            }
-            handtemp = hand4.concat();
-          break;
-        }
-          var A=Math.floor(hand1[hand1.length-1]/4);
+          var A=Math.floor(tumoP/4);
           var B=handtemp.filter(value=>value>=4*A && value<4*(A+1));
           if(debugmode){console.log(B)};
-          if(B.length>=3){kansw[player]=1;
+          if(B.length>=4){kansw[player]=1;
             return true;
           }
         return false;
       }
-      var handtest=[];
-      handtest=hand1.concat(pon1);
           var Count={};
           for(var i=1; i<handtest.length;i++){
-          var C=donpai.findIndex(value=>value.id==handtest[i])
+          var C=donpai.findIndex(value=>value.id==handtest[i] && value.id<60)
+          if(C!==-1){
           var elm=donpai[C].name;
           Count[elm]=(Count[elm] || 0)+1
-          }
+          }}
           var keyj=Object.keys(Count);
           for(var j=0;j<keyj.length;j++){
           if(Count[keyj[j]]>=4){
@@ -9369,16 +9436,60 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           //ポンしているパイでカンできる時（加カン）はそっちを優先
         switch(player){
           case 1:
+            if(reach[player]==3){
+                var N=Math.floor(hand1[hand1.length-1]/4);
+                if(pon1.length>=3){
+                  var A=Math.floor(pon1[0]/4);
+                  if(A==N){
+                    hand1.splice(hand1.length-1,1);
+                    kan1.unshift(N,pon1[0],pon1[1],pon1[2]);
+                    pon1.splice(0,3);
+                    hand1.push(100);
+                    ponkandraw(player);
+                    se8.play();
+                    NukiAnimation(player,N);
+                    return true;
+                  }
+                }
+                if(pon1.length>=6){
+                  var A=Math.floor(pon1[3]/4);
+                  if(A==N){
+                    hand1.splice(hand1.length-1,1);
+                    kan1.unshift(N,pon1[3],pon1[4],pon1[5]);
+                    pon1.splice(3,3);
+                    hand1.push(100);
+                    ponkandraw(player);
+                    se8.play();
+                    NukiAnimation(player,N);
+                    return true;
+                  }
+                }
+                var handtest=[];
+                handtest=hand1.concat();
+                var A=handtest.filter(value=>value>=N*4 && value<(N+1)*4)
+                if(A.length>=4){
+                  for(var i=0;i<4;i++){
+                    var pA=hand1.findIndex(value=>value>=N*4 && value<(N+1)*4);
+                    var kanA=hand1.splice(pA,1);
+                    kan1.unshift(kanA);
+                    };
+                  hand1.push(100);
+                  ponkandraw(player);
+                  se8.play();
+                  NukiAnimation(player,-1);
+                }
+              return false;
+            }
             if(pon1.length>=3){
               var A=Math.floor(pon1[0]/4);
               var B=hand1.findIndex(value=>value>=4*A && value<4*(A+1));
               if(B!==-1){
                 var N=hand1.splice(B,1);
                 kan1.unshift(N,pon1[0],pon1[1],pon1[2]);
-                pon1=pon1.splice(0,3);
+                pon1.splice(0,3);
                 //かきなおす
                 hand1.push(100);
-                ponkandraw(1);
+                ponkandraw(player);
                 se8.play();
                 NukiAnimation(player,N);
                 return true;
@@ -9389,10 +9500,10 @@ cx1.drawImage(e7,dorax,10,33,43.5)
               var B=hand1.findIndex(value=>value>=4*A && value<4*(A+1));
               if(B!==-1){
                 var N=hand1.splice(B,1);
-                kan1.unshift(N,pon1[0],pon1[1],pon1[2]);
-                pon1=pon1.splice(0,3);
+                kan1.unshift(N,pon1[3],pon1[4],pon1[5]);
+                pon1.splice(3,3);
                 hand1.push(100);
-                ponkandraw(1);
+                ponkandraw(player);
                 se8.play();
                 NukiAnimation(player,N);
                 return true;
@@ -9417,7 +9528,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                 kan1.unshift(kanA);
                 };
               hand1.push(100);
-              ponkandraw(1);
+              ponkandraw(player);
               se8.play();
               NukiAnimation(player,-1);
             }
@@ -9429,10 +9540,10 @@ cx1.drawImage(e7,dorax,10,33,43.5)
               if(B!==-1){
                 var N=hand2.splice(B,1);
                 kan2.unshift(N,pon2[0],pon2[1],pon2[2]);
-                pon2=pon2.splice(0,3);
+                pon2.splice(0,3);
                 //かきなおす
                 hand2.push(100);
-                ponkandraw(1);
+                ponkandraw(player);
                 se8.play();
                 NukiAnimation(player,N);
                 return true;
@@ -9443,10 +9554,10 @@ cx1.drawImage(e7,dorax,10,33,43.5)
               var B=hand2.findIndex(value=>value>=4*A && value<4*(A+1));
               if(B!==-1){
                 var N=hand2.splice(B,1);
-                kan2.unshift(N,pon2[0],pon2[1],pon2[2]);
-                pon2=pon2.splice(0,3);
+                kan2.unshift(N,pon2[3],pon2[4],pon2[5]);
+                pon2.splice(3,3);
                 hand2.push(100);
-                ponkandraw(1);
+                ponkandraw(player);
                 se8.play();
                 NukiAnimation(player,N);
                 return true;
@@ -9471,7 +9582,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                 kan2.unshift(kanA);
                 };
               hand2.push(100);
-              ponkandraw(1);
+              ponkandraw(player);
               se8.play();
               NukiAnimation(player,-1);
             }
@@ -9483,10 +9594,10 @@ cx1.drawImage(e7,dorax,10,33,43.5)
               if(B!==-1){
                 var N=hand3.splice(B,1);
                 kan3.unshift(N,pon3[0],pon3[1],pon3[2]);
-                pon3=pon3.splice(0,3);
+                pon3.splice(0,3);
                 //かきなおす
                 hand3.push(100);
-                ponkandraw(1);
+                ponkandraw(player);
                 se8.play();
                 NukiAnimation(player,N);
                 return true;
@@ -9497,10 +9608,10 @@ cx1.drawImage(e7,dorax,10,33,43.5)
               var B=hand3.findIndex(value=>value>=4*A && value<4*(A+1));
               if(B!==-1){
                 var N=hand3.splice(B,1);
-                kan3.unshift(N,pon3[0],pon3[1],pon3[2]);
-                pon3=pon3.splice(0,3);
+                kan3.unshift(N,pon3[3],pon3[4],pon3[5]);
+                pon3.splice(3,3);
                 hand3.push(100);
-                ponkandraw(1);
+                ponkandraw(player);
                 se8.play();
                 NukiAnimation(player,N);
                 return true;
@@ -9525,7 +9636,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                 kan3.unshift(kanA);
                 };
               hand3.push(100);
-              ponkandraw(1);
+              ponkandraw(player);
               se8.play();
               NukiAnimation(player,-1);
             }
@@ -9537,10 +9648,10 @@ cx1.drawImage(e7,dorax,10,33,43.5)
               if(B!==-1){
                 var N=hand4.splice(B,1);
                 kan4.unshift(N,pon4[0],pon4[1],pon4[2]);
-                pon4=pon4.splice(0,3);
+                pon4.splice(0,3);
                 //かきなおす
                 hand4.push(100);
-                ponkandraw(1);
+                ponkandraw(player);
                 se8.play();
                 NukiAnimation(player,N);
                 return true;
@@ -9551,10 +9662,10 @@ cx1.drawImage(e7,dorax,10,33,43.5)
               var B=hand4.findIndex(value=>value>=4*A && value<4*(A+1));
               if(B!==-1){
                 var N=hand4.splice(B,1);
-                kan4.unshift(N,pon4[0],pon4[1],pon4[2]);
-                pon4=pon4.splice(0,3);
+                kan4.unshift(N,pon4[3],pon4[4],pon4[5]);
+                pon4.splice(3,3);
                 hand4.push(100);
-                ponkandraw(1);
+                ponkandraw(player);
                 se8.play();
                 NukiAnimation(player,N);
                 return true;
@@ -9579,7 +9690,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                 kan4.unshift(kanA);
                 };
               hand4.push(100);
-              ponkandraw(1);
+              ponkandraw(player);
               se8.play();
               NukiAnimation(player,-1);
             }
@@ -9725,6 +9836,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
     }
     };
     function ponkandraw(p){
+      console.log(pon1.length,kan1.length);
       switch(p){
         case 1:
           if(pon1.length){
@@ -11211,13 +11323,12 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       .to({x:0},60);
         function next(){
           //pai -1-> もう一度自分のターン 0- ->加カンで使用 
-
           ponkanmap.removeAllChildren();
           Container.removeAllChildren();
           stage.removeChild(Container);
+          nuki[1]+=1;
+          nuki[0]=p;
           if(pai==-1){
-            nuki[1]+=1;
-            nuki[0]=p;
             switch(p){
               case 1:
               handgraph(0,1)
@@ -11240,6 +11351,7 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                     MEMBER[turn].turnflag=1;
                     turnrole();
                 }else{
+                ctl[p]=0;
                 cpu(p);
                 }
                 break;
@@ -11247,8 +11359,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
             return false;
           }else{
             //槍槓チェックが入る場合
-            nuki[1]+=1;
-            nuki[0]=p;
             turnchecker(pai);
             return false;
           }
