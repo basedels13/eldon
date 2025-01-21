@@ -1,17 +1,17 @@
-//var1.019　season2 
+//var1.02　season2 
 // npm run dev
 //全職75枚（エピックキャラは1枚ずつ増量）＋オールマイティ2枚＋マスター8枚×2（ガ、ロ、ベ、デ、ソ、ア、ハ）合計93枚→61枚スタート
 //対戦で魔界モードのリザルトが出ないらしい
-//いつか→不足分の画像　対戦部屋の工事、プレイガイド　場の同じパイの色付け
-//クレスト役
-//流局画面でクリックできず即進んでしまう
+//いつか→対戦部屋の工事、プレイガイド　場の同じパイの色付け　スマホ対応
+//クレスト役未確認
+//流局画面でクリックできず即進んでしまうことがある
 window.onload = function(){
   draw();
   };
   
   function draw(){
-  var titletext="v1.019/Click to START";
-  var debugmode=true;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にfalseに
+  var titletext="v1.02/Click to START";
+  var debugmode=false;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にfalseに
   //自分自身の情報を入れる箱
   var IAM = {
     token: null,    // 戸別管理用のトークン
@@ -6124,8 +6124,13 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       }
       console.log(reachhand,ponnum)
       //鳴いたパイは書き直さない
+      if(handlist.length){
+        for (var i=0;i<handlist.length;i++){
+          field.removeChild(handlist[i]);
+        }
+      }
       handlist=[];//左から順にパイの画像idが入る
-      handmap.removeAllChildren();
+      //handmap.removeAllChildren();
       for(var h=1;h<hand1.length;h++){
       e1= new createjs.Bitmap(eltear_src[hand1[h]]);
         if(op==1 && h==hand1.length-1){
@@ -6141,22 +6146,27 @@ cx1.drawImage(e7,dorax,10,33,43.5)
         }
         e1.addEventListener("click", {card:h,handleEvent:paiCut});
         e1.scale=7/12;
-        handmap.addChild(e1);
+        field.addChild(e1);
         handlist.push(e1);
       }
       }
       if(num ==-1){//最初だけ
         //e1~e4を使って自分の手札を描画
         console.log(hand1);
+        if(handlist.length){
+          for (var i=0;i<handlist.length;i++){
+            field.removeChild(handlist[i]);
+          }
+        }
         handlist=[];//左から順にパイの画像idが入る
-        handmap.removeAllChildren();
+        //handmap.removeAllChildren();
         for(var h=1;h<10;h++){
         e1= new createjs.Bitmap(eltear_src[hand1[h]]);
         e1.alpha=0;
         e1.x=100+size*(h-1);
         e1.y=500;
         e1.scale=7/12;
-        handmap.addChild(e1);
+        field.addChild(e1);
         handlist.push(e1);
         e1.addEventListener("mouseover", {card:h,handleEvent:handOnCorsor});
         e1.addEventListener("mouseout", {card:-1,handleEvent:handOnCorsor});
@@ -6601,7 +6611,8 @@ cx1.drawImage(e7,dorax,10,33,43.5)
     drawcard.x=690;
     drawcard.y=470;
     drawcard.scale=7/12;
-    handmap.addChild(drawcard);
+    field.addChild(drawcard);
+    handlist.push(drawcard);
     createjs.Tween.get(drawcard)
       .to({alpha: 1,y:500},300)
       .call(drawstep);
