@@ -86,7 +86,7 @@ margin: 0 auto;
 </head>
 <body>
     <div class="main">
-  <p>エルドンオンラインv0.95</p>
+  <p>エルドンオンライン</p>
    </div>
 <div class="canvas-wrapper" WIDTH="800"; HEIGHT="600">
    <canvas id="canvas6" WIDTH="800"; HEIGHT="600"></canvas>
@@ -106,18 +106,18 @@ margin: 0 auto;
         <p style="text-align:center"><b><font size="5">【エルドンオンライン/for this game】</font><br></b></p>
       <b>はじめに</b><br>
       　エルソードに登場するキャラクターがパイになったドンジャラ風のボードゲームです。<br>
-      　自動的にロードを行います。<br>
+      　対戦機能あり。最大4人でおともだちと対戦ができます。<br>
+      　自動的にロードを行います。操作はクリックのみ。<br>
       　BGM,SEが鳴ります。<br>
       　ローカルストレージに自動セーブ機能付き。バックアップ用に出力可。<br>
-      　ルーム対戦機能あり。最大4人でおともだちと対戦ができます。<br><br>
       <b>概要</b><br>
-      　9枚のパイで以下の「役」と呼ばれる組み合わせを揃えるゲームです。<br><br>
+      　9枚のパイを使って「役」と呼ばれる組み合わせを揃えるゲームです。<br><br>
       ①3ペア：同じキャラ（エルス、アイシャなど）を3枚1組として、3組（3キャラ）を揃える。<br>
       ②ライン通貫：職ライン（1,2,3,4）が同じパイを9枚揃える。<br>
-      ③クレストオブマスターロード：同じ属性マークのパイを9種類揃える。<br><br>
+      ③特殊な役：国士無双/クレストシリーズ等の特殊な役もあります。<br><br>
       <b>モード説明</b><br>
-      　「フリーバトル」　1人プレイ／自分とCPU3人でエルドン。スキル使用可。<br>
-      　「たいせん」　1~4人プレイ／対戦ルームで他のプレイヤーとエルドン。スキル使用不可。<br><br>
+      　「ひとりで遊ぶ/SOLO」　自分とCPU3人でエルドン。スキル使用可。<br>
+      　「だれかと遊ぶ/MULTI」　対戦ルームで他のプレイヤーとエルドン。スキル使用不可。<br><br>
       <b>Tips</b><br>
       　あと1枚で揃うと思ったら、リーチしましょう。<br>
       　オールマイティのパイは何にでも代用可能です。<br>
@@ -138,9 +138,9 @@ margin: 0 auto;
     「残パイリスト」　クリックするとまだ場に出ていないパイを表示します。<br>
     「シナジー」　クリックするとシナジー役一覧/所持パイで可能なシナジー役を表示します。<br><br>
     <b>その他の操作</b><br>
-    「プロフィール変更」　プロフィール枠か虫眼鏡をクリックした先の画面で変更可能。ユーザー名は半角12文字以内。<br>
-    「セーブデータ出力」　プレイデータをjson形式でダウンロードします。<br>
-    「ロード」　画面外下部「ファイルを選択」ボタンからセーブデータをアップロード。<br><b>※ロードは必ずメインメニュー画面状態で行ってください。</b><br><br></p>
+    「プロフィール変更」　虫眼鏡をクリックした先の画面で変更可能。ユーザー名は半角12文字以内。<br>
+    「設定→セーブデータ出力」　プレイデータをjson形式でダウンロードします。<br>
+    「ロード」　画面外下部「ファイルを選択」ボタンからセーブデータをアップロード。<br><br></p>
     <div class="square"><p style="text-align:center"><b><font color="red" size="4">【困った時は】</font></b></p>
     <b>ロードが進まない！</b>　しばらく待ってもロードが進まない場合はページをリロードしてみてください。（はじめてのロードはとても時間がかかるみたいです……）<br>
     <b>音がデカすぎんだろ……。</b>　オプションから音量を変更できます。また、画面右上の「SOUND」をクリックするといつでも音をミュート/解除できます。<br>
@@ -149,12 +149,12 @@ margin: 0 auto;
 </div>
 <div class="square">
   <p style="text-align:center"><b><font size="5">【対戦モードマニュアル】</font></b></p>
-  <p>　「たいせん」モードの説明です。</p>
+  <p>　対戦モードの説明です。</p>
 <div onclick="obj=document.getElementById('open').style; obj.display=(obj.display=='none')?'block':'none';">
   <div class="square"><a style="cursor:pointer;"><p style="text-align:center"><b>▼ クリックで展開 ▼</b></p></a>
 <div id="open" style="display:none;clear:both;">
   <p><b>ルーム画面</b><br>
-    　「たいせん」をクリック後、ルーム1～ルーム3をクリックすると、<br>以下のような画面に移ります。（ルーム長の画面）</p>
+    　「だれかと遊ぶ」をクリック後、ルーム1～ルーム3をクリックすると、<br>以下のような画面に移ります。（ルーム長の画面）</p>
   <img class="img-rounded article-img" src="don/ss4.png" width="640"/>
   <p><b>ルーム長</b><br>
     　そのルームのホストです。いちばん最初に部屋を立てた人です。ルーム長が退室した場合、ルーム内の他の誰かがルーム長になります。</p>
@@ -169,7 +169,7 @@ margin: 0 auto;
   <p></p>
 </div></div></div></div>
 <div class="square">
-  <p style="text-align:center"><b><font size="5">【参考：得点表】</font></b></p>
+  <p style="text-align:center"><b><font size="5">【得点表】</font></b></p>
 <div onclick="obj=document.getElementById('open1').style; obj.display=(obj.display=='none')?'block':'none';">
   <div class="square"><a style="cursor:pointer;"><p style="text-align:center"><b>▼ クリックで展開 ▼</b></p></a>
 <div id="open1" style="display:none;clear:both;">
@@ -181,10 +181,7 @@ margin: 0 auto;
    ・原作　ELSWORD<br>
    　　　　※キャラクター「名無しさん」のみ全く関係ありません。<br>
    ・画像　メッセージウインドウは「空想曲線」様の素材をお借りしました。<br>
-   ・音楽　ロードに時間がかかってしまうためビットレートを下げてお送りしています。<br>
-   　●以下のbgmは「フリーBGM DOVA-SYNDROME」からお借りしました。<br>
-   　　「盲目のアストライア」「The Evil Sacrifice Archenemies」「Nine Jack」「ロベリア」「STARDUST_LEMON」<br><br>
-   　●その他のbgmは原作の曲を元にした耳コピ・アレンジ打ち込みです。<br><br>
+   ・音楽　一部の音楽は「フリーBGM DOVA-SYNDROME」からお借りしました。<br>
   ・効果音　「効果音ラボ」「Pocket sound」ほか<br><br>
   ・テストプレイ協力　インターネット老人会のみなさま<br><br>
   </div>

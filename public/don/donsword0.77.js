@@ -1,17 +1,17 @@
-//var1.02　season2 
+//var1.021　season2 
 // npm run dev
 //全職75枚（エピックキャラは1枚ずつ増量）＋オールマイティ2枚＋マスター8枚×2（ガ、ロ、ベ、デ、ソ、ア、ハ）合計93枚→61枚スタート
 //対戦で魔界モードのリザルトが出ないらしい
-//いつか→対戦部屋の工事、プレイガイド　場の同じパイの色付け　スマホ対応
+//いつか→対戦部屋の工事、スキル　場の同じパイの色付け　スマホ対応
 //クレスト役未確認
-//流局画面でクリックできず即進んでしまうことがある
+//流局画面でクリックできず即進んでしまうことがある？
 window.onload = function(){
   draw();
   };
   
   function draw(){
-  var titletext="v1.02/Click to START";
-  var debugmode=false;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にfalseに
+  var titletext="v1.021/Click to START";
+  var debugmode=true;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にfalseに
   //自分自身の情報を入れる箱
   var IAM = {
     token: null,    // 戸別管理用のトークン
@@ -237,7 +237,6 @@ window.onload = function(){
   Csquare.graphics.beginFill("rgba(28, 134, 255, 0.7)").drawRect(0,0,145,100);
   Csquare.x=0;
   Csquare.y=0;
-  //stage.addChild(Csquare);
   var tweeNsquare;
   tweeNsquare=createjs.Tween.get(Csquare, {loop: true})
   .to({alpha:0.5},600)
@@ -670,9 +669,6 @@ window.onload = function(){
   var e15= new Image();
   var e16= new Image();
   var e17= new Image();
-  //ツモロンの時の表示に
-  var e18= new Image();
-  var e19= new Image();
   //属性マーク
   var Aicon=new Image();
   //マナブレアイコン
@@ -680,7 +676,6 @@ window.onload = function(){
   var epic= new Image();
   var zoom=  new createjs.Bitmap("don/zoom650.png");
   zoom.scale=0.4;
-  var donicon= new Image();
   //ツモロンボタン
   var skilltext1
   var skilltext2
@@ -1476,7 +1471,7 @@ function updateParticles() {
     }else if(gamestate ==1){
       if(opLock==3){
         if(mouseX >300 && mouseY > 55 && mouseX <400 && mouseY <100){
-          se2.play();
+          se3.play();
           if(shiagytemp==0){
             shiagytemp=1;
           }else{
@@ -1504,7 +1499,7 @@ function updateParticles() {
         yakumap.removeAllChildren();
         yakumap.alpha=0;
         opLock=0;
-        se2.play();
+        se3.play();
         return false;
       }
       if(opLock==2){
@@ -1861,7 +1856,6 @@ function menuMap(p=0){
                 t.x=410;
                 t.y=140;
                 menu_setting.addChild(t);
-                //
                 var option_arrow = new createjs.Shape();
                 option_arrow.graphics.beginFill("#0080ff")
                         .beginStroke("#68ceed")
@@ -2221,10 +2215,500 @@ function menuMap(p=0){
       var Cb=canvas2.toDataURL();
       Cbb = new createjs.Bitmap(Cb);
       menu_main.addChild(Cbb);
-      break;
+    break;
+    case 3:
+    //プレイガイド
+    menu_guide.removeAllChildren();
+    var e = new createjs.Bitmap(epic_src[0]);
+    e.x=50;
+    e.y=50;
+    e.scale=1.1;
+    menu_guide.addChild(e);
+    var e = new createjs.Bitmap(epic_src[0]);
+    e.x=400;
+    e.y=50;
+    e.scale=1.1;
+    menu_guide.addChild(e);
+    var option_bt5 = new createjs.Bitmap('don/soL_batu.png');
+    option_bt5.x=680;
+    option_bt5.y=60;
+    option_bt5.scale=0.4;
+    menu_guide.addChild(option_bt5)
+    option_bt5.addEventListener("click", {card:-1,handleEvent:HowtoBt});
+    switch(msgstate){
+      case 0:
+        var e = new createjs.Bitmap(epic_src[5]);
+        e.x=270;
+        e.y=100;
+        menu_guide.addChild(e)
+        Textlist[0].text="読んでもよく分からないマニュアル。";
+        Textlist[1].text="エルコレドンジャラのルール説明です。";   
+        var t = new createjs.Text("プレイガイド", "24px 'Century Gothic'", "black");
+        t.x=62;
+        t.y=70;
+        menu_guide.addChild(t);
+        var btn1 = createButton("画面の見方", 130, 40);
+        btn1.x = 60;
+        btn1.y = 100;
+        menu_guide.addChild(btn1);
+        btn1.addEventListener("click", {card:1,handleEvent:HowtoBt});
+        var btn1 = createButton("役/3ペア", 130, 40);
+        btn1.x = 60;
+        btn1.y = 140;
+        menu_guide.addChild(btn1);
+        btn1.addEventListener("click", {card:2,handleEvent:HowtoBt});
+        var btn1 = createButton("役/ライン通貫", 130, 40);
+        btn1.x = 60;
+        btn1.y = 180;
+        menu_guide.addChild(btn1);
+        btn1.addEventListener("click", {card:3,handleEvent:HowtoBt});
+        var btn1 = createButton("役/特殊な役", 130, 40);
+        btn1.x = 60;
+        btn1.y = 220;
+        menu_guide.addChild(btn1);
+        btn1.addEventListener("click", {card:4,handleEvent:HowtoBt});
+        var btn1 = createButton("シナジー", 130, 40);
+        btn1.x = 60;
+        btn1.y = 260;
+        menu_guide.addChild(btn1);
+        btn1.addEventListener("click", {card:5,handleEvent:HowtoBt});
+        var btn1 = createButton("ポン", 130, 40);
+        btn1.x = 60;
+        btn1.y = 300;
+        menu_guide.addChild(btn1);
+        btn1.addEventListener("click", {card:6,handleEvent:HowtoBt});
+        var btn1 = createButton("カン", 130, 40);
+        btn1.x = 60;
+        btn1.y = 340;
+        menu_guide.addChild(btn1);
+        btn1.addEventListener("click", {card:7,handleEvent:HowtoBt});
+        var btn1 = createButton("マナブレイク", 130, 40);
+        btn1.x = 60;
+        btn1.y = 380;
+        menu_guide.addChild(btn1);
+        btn1.addEventListener("click", {card:8,handleEvent:HowtoBt});
+        var btn1 = createButton("パイ一覧", 130, 40);
+        btn1.x = 60;
+        btn1.y = 420;
+        menu_guide.addChild(btn1);
+        btn1.addEventListener("click", {card:9,handleEvent:HowtoBt});
+        break;
+      case 1:
+        //プレイ画面
+        var btn1 = createButton("目次", 80, 40);
+        btn1.x = 5;
+        btn1.y = 80;
+        menu_guide.addChild(btn1);
+        btn1.addEventListener("click", {card:0,handleEvent:HowtoBt});
+        Textlist[0].text="画面の見方です。";
+        Textlist[1].text="（カーソルを当ててみてください）"
+        var e = new createjs.Bitmap(epic_src[1]);
+        e.x=90;
+        e.y=55;
+        menu_guide.addChild(e)
+        break;
+        case 2:
+          //3ペアの説明
+          var btn1 = createButton("目次", 80, 40);
+          btn1.x = 5;
+          btn1.y = 80;
+          menu_guide.addChild(btn1);
+          btn1.addEventListener("click", {card:0,handleEvent:HowtoBt});
+          Textlist[0].text="3ペアは最も基本的な役です。";
+          Textlist[1].text="同じキャラ3枚を1組として、3組を揃える役です。"
+          var e = new createjs.Bitmap(epic_src[2]);
+          e.sourceRect={x:0,y:0,width:600,height:128};
+          e.x=90;
+          e.y=125;
+          menu_guide.addChild(e)
+          var t = new createjs.Text("3ペアとはなんですか？", "26px 'Century Gothic'", "black");
+          t.x=90;
+          t.y=90;
+          menu_guide.addChild(t);
+          var Y=280;
+          var t = new createjs.Text("エルコレドンジャラでは9枚のパイで役を作る必要があります。", "22px 'Century Gothic'", "black");
+          t.x=90;
+          t.y=Y;
+          Y+=30;
+          menu_guide.addChild(t);
+          var t = new createjs.Text("3ペアは、「アイシャ」「ラシェ」「エリシス」のように、", "22px 'Century Gothic'", "black");
+          t.x=90;
+          t.y=Y;
+          Y+=30;
+          menu_guide.addChild(t);
+          var t = new createjs.Text("同じキャラクターを3枚1組として、3組揃えます。", "22px 'Century Gothic'", "black");
+          t.x=90;
+          t.y=Y;
+          Y+=30;
+          menu_guide.addChild(t);
+          var t = new createjs.Text("同じキャラクターであればラインが異なっていても良いですし、", "22px 'Century Gothic'", "black");
+          t.x=90;
+          t.y=Y;
+          Y+=30;
+          menu_guide.addChild(t);
+          var t = new createjs.Text("同じパイが複数あっても構いません。", "22px 'Century Gothic'", "black");
+          t.x=90;
+          t.y=Y;
+          Y+=30;
+          menu_guide.addChild(t);
+          var t = new createjs.Text("「ポン」によって効率的にペアを揃えることができます。", "22px 'Century Gothic'", "black");
+          t.x=90;
+          t.y=Y;
+          Y+=30;
+          menu_guide.addChild(t);
+          break;
+          case 3:
+            //ラインの説明
+            var btn1 = createButton("目次", 80, 40);
+            btn1.x = 5;
+            btn1.y = 80;
+            menu_guide.addChild(btn1);
+            btn1.addEventListener("click", {card:0,handleEvent:HowtoBt});
+            Textlist[0].text="ライン通貫は、同じラインのキャラを9枚揃える役です。";
+            Textlist[1].text="シナジーでの高得点が狙いやすいかもしれません。"
+            var e = new createjs.Bitmap(epic_src[2]);
+            e.sourceRect={x:0,y:0,width:600,height:128};
+            e.x=90;
+            e.y=125;
+            menu_guide.addChild(e)
+            var t = new createjs.Text("ライン通貫とはなんですか？", "26px 'Century Gothic'", "black");
+            t.x=90;
+            t.y=90;
+            menu_guide.addChild(t);
+            var Y=280;
+            var t = new createjs.Text("エルコレドンジャラでは9枚のパイで役を作る必要があります。", "22px 'Century Gothic'", "black");
+            t.x=90;
+            t.y=Y;
+            Y+=30;
+            menu_guide.addChild(t);
+            var t = new createjs.Text("「1」「2」「3」「4」のように、パイに書かれた数字が", "22px 'Century Gothic'", "black");
+            t.x=90;
+            t.y=Y;
+            Y+=30;
+            menu_guide.addChild(t);
+            var t = new createjs.Text("同じパイを9組揃えることで、ライン通貫が成立します。", "22px 'Century Gothic'", "black");
+            t.x=90;
+            t.y=Y;
+            Y+=30;
+            menu_guide.addChild(t);
+            var t = new createjs.Text("同じパイが複数あっても構いません。", "22px 'Century Gothic'", "black");
+            t.x=90;
+            t.y=Y;
+            Y+=30;
+            menu_guide.addChild(t);
+            var t = new createjs.Text("「ポン」や「カン」した場合には満たせなくなります。", "22px 'Century Gothic'", "black");
+            t.x=90;
+            t.y=Y;
+            Y+=30;
+            menu_guide.addChild(t);
+            break;
+            case 4:
+              //特殊な役
+              var btn1 = createButton("目次", 80, 40);
+              btn1.x = 5;
+              btn1.y = 80;
+              menu_guide.addChild(btn1);
+              btn1.addEventListener("click", {card:0,handleEvent:HowtoBt});
+              Textlist[0].text="3ペア・ライン通貫の他に特殊な役として";
+              Textlist[1].text="国士無双とクレストシリーズがあります。"
+              var t = new createjs.Text("特殊な役-国士無双とクレストシリーズ", "26px 'Century Gothic'", "black");
+              t.x=90;
+              t.y=90;
+              menu_guide.addChild(t);
+              var Y=280;
+              var t = new createjs.Text("3ペア・ライン通貫の他にも特殊な役があります。", "22px 'Century Gothic'", "black");
+              t.x=90;
+              t.y=Y;
+              Y+=30;
+              menu_guide.addChild(t);
+              var t = new createjs.Text("「国士無双」は、「マスターロード」のパイを", "22px 'Century Gothic'", "black");
+              t.x=90;
+              t.y=Y;
+              Y+=30;
+              menu_guide.addChild(t);
+              var t = new createjs.Text("8種類かつ9枚揃えることで成立します。", "22px 'Century Gothic'", "black");
+              t.x=90;
+              t.y=Y;
+              Y+=30;
+              menu_guide.addChild(t);
+              var t = new createjs.Text("「クレスト」シリーズは、属性（パイに描かれたマーク）が", "22px 'Century Gothic'", "black");
+              t.x=90;
+              t.y=Y;
+              Y+=30;
+              menu_guide.addChild(t);
+              var t = new createjs.Text("同じパイを9枚揃えることで成立します。", "22px 'Century Gothic'", "black");
+              t.x=90;
+              t.y=Y;
+              Y+=30;
+              menu_guide.addChild(t);
+              break;
+              case 5:
+                //シナジーの説明
+                var btn1 = createButton("目次", 80, 40);
+                btn1.x = 5;
+                btn1.y = 80;
+                menu_guide.addChild(btn1);
+                btn1.addEventListener("click", {card:0,handleEvent:HowtoBt});
+                Textlist[0].text="シナジーは、和了した時に追加で加点される役です。";
+                Textlist[1].text="まずは3ペアやライン通貫を優先しましょう。"
+                var t = new createjs.Text("（枠内クリックで上下にスクロールできます）", "20px 'Century Gothic'", "black");
+                t.x=170;
+                t.y=495;
+                menu_guide.addChild(t);
+                yakumap.x=40;
+                yakumap.alpha=1;
+                break;
+                case 6:
+                  //ポンの説明
+                  var btn1 = createButton("目次", 80, 40);
+                  btn1.x = 5;
+                  btn1.y = 80;
+                  menu_guide.addChild(btn1);
+                  btn1.addEventListener("click", {card:0,handleEvent:HowtoBt});
+                  Textlist[0].text="1つ前のプレイヤーが捨てたパイと同じキャラのパイが";
+                  Textlist[1].text="手元に2枚以上ある時、捨てパイを貰うことができます。"
+                  var e = new createjs.Bitmap(epic_src[3]);
+                  e.sourceRect={x:50,y:0,width:500,height:526};
+                  e.x=365;
+                  e.y=55;
+                  e.scale=38/50;
+                  menu_guide.addChild(e)
+                  var t = new createjs.Text("ポン", "26px 'Century Gothic'", "black");
+                  t.x=90;
+                  t.y=90;
+                  menu_guide.addChild(t);
+                  var Y=130;
+                  var t = new createjs.Text("ポンについて知りたいポン？", "22px 'Century Gothic'", "black");
+                  t.x=60;
+                  t.y=Y;
+                  Y+=40;
+                  menu_guide.addChild(t);
+                  var t = new createjs.Text("前の人が捨てたパイと同じ", "22px 'Century Gothic'", "black");
+                  t.x=60;
+                  t.y=Y;
+                  Y+=30;
+                  menu_guide.addChild(t);
+                  var t = new createjs.Text("キャラのパイを2枚持って", "22px 'Century Gothic'", "black");
+                  t.x=60;
+                  t.y=Y;
+                  Y+=30;
+                  menu_guide.addChild(t);
+                  var t = new createjs.Text("いるなら「ポン！」と叫んで", "22px 'Century Gothic'", "black");
+                  t.x=60;
+                  t.y=Y;
+                  Y+=30;
+                  menu_guide.addChild(t);
+                  var t = new createjs.Text("そのパイを貰えるポン！", "22px 'Century Gothic'", "black");
+                  t.x=60;
+                  t.y=Y;
+                  Y+=40;
+                  menu_guide.addChild(t);
+                  var t = new createjs.Text("ポンした後は山からパイを", "22px 'Century Gothic'", "black");
+                  t.x=60;
+                  t.y=Y;
+                  Y+=30;
+                  menu_guide.addChild(t);
+                  var t = new createjs.Text("引かず、手札を1枚切るポン。", "22px 'Century Gothic'", "black");
+                  t.x=60;
+                  t.y=Y;
+                  Y+=40;
+                  menu_guide.addChild(t);
+                  var t = new createjs.Text("ポンすると3ペアを揃えやすく", "22px 'Century Gothic'", "black");
+                  t.x=60;
+                  t.y=Y;
+                  Y+=30;
+                  menu_guide.addChild(t);
+                  var t = new createjs.Text("なるけど、その代わりに", "22px 'Century Gothic'", "black");
+                  t.x=60;
+                  t.y=Y;
+                  Y+=30;
+                  menu_guide.addChild(t);
+                  var t = new createjs.Text("得点が少し減っちゃうポン…。", "22px 'Century Gothic'", "black");
+                  t.x=60;
+                  t.y=Y;
+                  Y+=30;
+                  menu_guide.addChild(t);
+                  break;
+                  case 7:
+                    //カン
+                    var btn1 = createButton("目次", 80, 40);
+                    btn1.x = 5;
+                    btn1.y = 80;
+                    menu_guide.addChild(btn1);
+                    btn1.addEventListener("click", {card:0,handleEvent:HowtoBt});
+                    Textlist[0].text="同じキャラのパイが4枚あるとき、";
+                    Textlist[1].text="カンによって4枚を1ペアとして扱うことができます。"
+                    var t = new createjs.Text("カン", "26px 'Century Gothic'", "black");
+                    t.x=90;
+                    t.y=90;
+                    menu_guide.addChild(t);
+                    var Y=130;
+                    var t = new createjs.Text("基本的に3ペアでは同キャラ3枚を一組として扱いますが、", "22px 'Century Gothic'", "black");
+                    t.x=90;
+                    t.y=Y;
+                    Y+=30;
+                    menu_guide.addChild(t);
+                    var t = new createjs.Text("同キャラ4枚を一組として扱うことができます。", "22px 'Century Gothic'", "black");
+                    t.x=90;
+                    t.y=Y;
+                    Y+=30;
+                    menu_guide.addChild(t);
+                    var t = new createjs.Text("自分が同じキャラのパイを4枚持っている時、", "22px 'Century Gothic'", "black");
+                    t.x=90;
+                    t.y=Y;
+                    Y+=30;
+                    menu_guide.addChild(t);
+                    var t = new createjs.Text("または自分が同じキャラのパイを3枚持っていて", "22px 'Century Gothic'", "black");
+                    t.x=90;
+                    t.y=Y;
+                    Y+=30;
+                    menu_guide.addChild(t);
+                    var t = new createjs.Text("前の人がそれと同じキャラのパイを捨てた時、", "22px 'Century Gothic'", "black");
+                    t.x=90;
+                    t.y=Y;
+                    Y+=30;
+                    menu_guide.addChild(t);
+                    var t = new createjs.Text("「カン」することができます。", "22px 'Century Gothic'", "black");
+                    t.x=90;
+                    t.y=Y;
+                    Y+=30;
+                    menu_guide.addChild(t);
+                    var t = new createjs.Text("カンをした後は、山とは別の場所からパイを1枚引き、", "22px 'Century Gothic'", "black");
+                    t.x=90;
+                    t.y=Y;
+                    Y+=30;
+                    menu_guide.addChild(t);
+                    var t = new createjs.Text("その後、手札のパイを選んで切ります。", "22px 'Century Gothic'", "black");
+                    t.x=90;
+                    t.y=Y;
+                    Y+=30;
+                    menu_guide.addChild(t);
+                    var t = new createjs.Text("カンをすると、ドラが増えるという特徴があります。", "22px 'Century Gothic'", "black");
+                    t.x=90;
+                    t.y=Y;
+                    Y+=30;
+                    menu_guide.addChild(t);
+                    break;
+                    case 8:
+                      //マナブレイクの説明
+                      var btn1 = createButton("目次", 80, 40);
+                      btn1.x = 5;
+                      btn1.y = 80;
+                      menu_guide.addChild(btn1);
+                      btn1.addEventListener("click", {card:0,handleEvent:HowtoBt});
+                      Textlist[0].text="MPを消費してマナブレイクすることができます。";
+                      Textlist[1].text="ここぞという時に使いましょう。"
+                      var e = new createjs.Bitmap(epic_src[6]);
+                      e.x=350;
+                      e.y=120;
+                      e.scale=0.66;
+                      menu_guide.addChild(e)
+                      var t = new createjs.Text("マナブレイク", "26px 'Century Gothic'", "black");
+                      t.x=90;
+                      t.y=90;
+                      menu_guide.addChild(t);
+                      var Y=130;
+                      var t = new createjs.Text("マウスを長押ししていると", "22px 'Century Gothic'", "black");
+                      t.x=60;
+                      t.y=Y;
+                      Y+=30;
+                      menu_guide.addChild(t);
+                      var t = new createjs.Text("自分のMPゲージが徐々に", "22px 'Century Gothic'", "black");
+                      t.x=60;
+                      t.y=Y;
+                      Y+=30;
+                      menu_guide.addChild(t);
+                      var t = new createjs.Text("緑色に変わっていきます。", "22px 'Century Gothic'", "black");
+                      t.x=60;
+                      t.y=Y;
+                      Y+=40;
+                      menu_guide.addChild(t);
+                      var t = new createjs.Text("MPが1ゲージ以上緑色に", "22px 'Century Gothic'", "black");
+                      t.x=60;
+                      t.y=Y;
+                      Y+=30;
+                      menu_guide.addChild(t);
+                      var t = new createjs.Text("変化した状態でパイを切ると", "22px 'Century Gothic'", "black");
+                      t.x=60;
+                      t.y=Y;
+                      Y+=30;
+                      menu_guide.addChild(t);
+                      var t = new createjs.Text("マナブレイクが発動します！", "22px 'Century Gothic'", "black");
+                      t.x=60;
+                      t.y=Y;
+                      Y+=40;
+                      menu_guide.addChild(t);
+                      var t = new createjs.Text("マナブレイクしたパイは", "22px 'Century Gothic'", "black");
+                      t.x=60;
+                      t.y=Y;
+                      Y+=30;
+                      menu_guide.addChild(t);
+                      var t = new createjs.Text("相手プレイヤーから見えず、", "22px 'Century Gothic'", "black");
+                      t.x=60;
+                      t.y=Y;
+                      Y+=30;
+                      menu_guide.addChild(t);
+                      var t = new createjs.Text("ポンやロンされません。", "22px 'Century Gothic'", "black");
+                      t.x=60;
+                      t.y=Y;
+                      Y+=40;
+                      menu_guide.addChild(t);
+                      var t = new createjs.Text("リーチする時や、リーチ中でも使用できますが、", "22px 'Century Gothic'", "black");
+                      t.x=60;
+                      t.y=Y;
+                      Y+=30;
+                      menu_guide.addChild(t);
+                      var t = new createjs.Text("緑色になっていた分だけMPを消費します。", "22px 'Century Gothic'", "black");
+                      t.x=60;
+                      t.y=Y;
+                      Y+=30;
+                      menu_guide.addChild(t);
+                      break;
+                      case 9:
+                        //一覧
+                        var btn1 = createButton("目次", 80, 40);
+                        btn1.x = 5;
+                        btn1.y = 80;
+                        menu_guide.addChild(btn1);
+                        btn1.addEventListener("click", {card:0,handleEvent:HowtoBt});
+                        Textlist[0].text="エルス～リティアはそれぞれ5枚（エピックライン2枚）";
+                        Textlist[1].text="マスターロードはそれぞれ2枚、合計93枚のパイを使用します。"
+                        var t = new createjs.Text("パイの一覧表です。", "20px 'Century Gothic'", "black");
+                        t.x=170;
+                        t.y=495;
+                        menu_guide.addChild(t);
+                        paiviewer.x=60;
+                        paiviewer.alpha=1;
+                        break;
+        
+    }
+    //
+    break;
   }
 };
-
+function HowtoBt(){
+  if(msgstate==5){
+    yakumap.x=0;
+    yakumap.alpha=0;}
+  if(msgstate==9){
+    paiviewer.x=0;
+    paiviewer.alpha=0;
+  }
+  switch(this.card){
+    case -1:
+      pagestate=0;
+      msgstate=0;
+      se2.play();
+      Menu();
+      //トップに戻る
+    break;
+    default:
+      msgstate=this.card;
+      se3.play();
+      menuMap(3);
+    break;
+  }
+}
 function NameChange(){
   se3.play();
   user = window.prompt("プレイヤー名を入力", Username);
@@ -2342,9 +2826,10 @@ function NameChange(){
       case 1:
         //プレイガイド
           pagestate=4;
-          msgstate=-1;
+          msgstate=0;
           se5.play();
-          Menu();
+          menuMap(3);
+          field.addChild(menu_guide);
         break;
       case 2:
         //フリーバトル
@@ -2354,6 +2839,7 @@ function NameChange(){
         break;
       case 3:
         //設定->optionconfig
+
         break;
       case 4:
         //たいせん
@@ -2555,16 +3041,12 @@ function NameChange(){
     field.addChild(setting);
     solo.addEventListener("click", {card:2,handleEvent:Menubutton});
     //multi.addEventListener("click", {card:4,handleEvent:Menubutton});
-    //howto.addEventListener("click", {card:1,handleEvent:Menubutton});
+    howto.addEventListener("click", {card:1,handleEvent:Menubutton});
     setting.addEventListener("click", {handleEvent:OptionConfig});
     var rect = new createjs.Shape();
     rect.graphics
     .beginFill("rgba(20,20,20,0.7)")
     .drawRect(220, 210, 181, 91);
-    field.addChild(rect);
-    rect.graphics
-    .beginFill("rgba(20,20,20,0.7)")
-    .drawRect(40, 300, 181, 91);
     field.addChild(rect);
     var wT=winrank[0]+winrank[1]+winrank[2]+winrank[3]
     var winrate=0;
@@ -2590,12 +3072,12 @@ function NameChange(){
     zoom.x=710;
     zoom.y=400;
     field.addChild(zoom);
-    //実績とか名前変更する画面へ
+    //実績・名前変更する画面へ
     btn1.addEventListener("click", {card:5,handleEvent:Menubutton});
     menuMap();
     break;
       case 1:
-        //旧ボタン　自由・オプションは移行済み
+        //旧ボタン　いろいろ移行済み
         if(mouseX <0){
           if(mouseY >250 && mouseY <295){//pvpたいせん
             cx2.clearRect(675,390,80,50)
@@ -2853,250 +3335,9 @@ function NameChange(){
           corsor();
           break;
           case 4:
-            //ガイド
-            if(mouseX >700 && mouseX <750 && mouseY >50 && mouseY <90){
-              if(msgstate==3){
-                yakumap.x-=40;
-                yakumap.alpha=0;}
-              pagestate=0;
-              msgstate=0;
-              se2.play();
-              Menu();
-              return false;
-            }
+            //ガイド　シナジーのスクロールのみこちらで対応
             switch(msgstate){
-              case 0:
-                if(mouseX >50 && mouseX <250 && mouseY >70 && mouseY <110){
-                  epic.src=epic_src[1]
-                  epic.onload=function(){
-                  se4.play();
-                  drawbuttom(5,80,"目次")
-                  cx2.clearRect(50,50,660,460);
-                  cx3.clearRect(50,50,700,460)
-                  cx2.fillStyle = "black";
-                  cx2.drawImage(epic,90,55,600,450);
-                  msgstate=1;
-                  cx2.clearRect(80,530,670,70)
-                  cx2.font = "18px Arial";
-                  cx2.fillText("プレイ方法を知りたいですか？", 80, 550);
-                  cx2.fillText("カーソルを当ててみてください！", 80, 570);
-                }}
-                if(mouseX >50 && mouseX <250 && mouseY >110 && mouseY <150){
-                  epic.src=epic_src[2]
-                  epic.onload=function(){
-                  se4.play();
-                  drawbuttom(5,80,"目次")
-                  cx2.clearRect(50,50,660,460);
-                  cx3.clearRect(50,50,700,460)
-                  cx2.fillStyle = "black";
-                  cx2.font = "26px 'Century Gothic'";
-                  cx2.fillText("3ペアとはなんですか？", 280, 90);
-                  cx2.font = "22px 'Century Gothic'";
-                  cx2.fillText("エルコレドンジャラでは9枚のパイで役を作る必要があります。", 90, 280);
-                  cx2.fillText("3ペアは、3種類ある役のうち、最も基本的な役です。", 90, 310);
-                  cx2.fillText("「アイシャ」「ラシェ」「エリシス」のように、", 90, 340);
-                  cx2.fillText("同じキャラクターを3枚1組として、3組揃えます。", 90, 370);
-                  cx2.fillText("同じキャラクターであればラインが異なっていても良いですし、", 90, 400);
-                  cx2.fillText("同じパイが複数あっても構いません。", 90, 430);
-                  cx2.fillText("ただし、同じキャラクターを6枚集めても、3ペアにはなりません。", 90, 460);
-                  cx2.fillText("「ポン」によって効率的にペアを揃えることができます。", 90, 490);
-                  cx2.drawImage(epic,0,0,600,128,90,95,600,128);
-                  msgstate=2;
-                  cx2.clearRect(80,530,670,70)
-                  cx2.font = "18px Arial";
-                  cx2.fillText("3ペアは最も基本的な役です。", 80, 550);
-                  cx2.fillText("同じキャラ3枚を1組として、3組を揃える必要があります。", 80, 570);
-                }}
-                if(mouseX >50 && mouseX <250 && mouseY >150 && mouseY <190){
-                  epic.src=epic_src[2]
-                  epic.onload=function(){
-                  se4.play();
-                  drawbuttom(5,80,"目次")
-                  cx2.clearRect(50,50,660,460);
-                  cx3.clearRect(50,50,700,460)
-                  cx2.fillStyle = "black";
-                  cx2.font = "26px 'Century Gothic'";
-                  cx2.fillText("ライン通貫とはなんですか？", 260, 90);
-                  cx2.font = "22px 'Century Gothic'";
-                  cx2.fillText("エルコレドンジャラでは9枚のパイで役を作る必要があります。", 90, 280);
-                  cx2.fillText("ライン通貫は、3ペアの次に揃えやすい役です。", 90, 310);
-                  cx2.fillText("「1」「2」「3」のように、パイに書かれた数字がラインです。", 90, 340);
-                  cx2.fillText("ラインが同じパイを9組揃えることでライン通貫が成立します。", 90, 370);
-                  cx2.fillText("このとき、同じパイが複数あっても構いません。", 90, 400);
-                  cx2.fillText("ポンの性質上、「ポン」した場合には満たせなくなります。", 90, 430);
-                  cx2.drawImage(epic,0,128,600,128,90,95,600,128);
-                  msgstate=2;
-                  cx2.clearRect(80,530,670,70)
-                  cx2.font = "18px Arial";
-                  cx2.fillText("ライン通貫は、同じラインのキャラを9枚揃える役です。", 80, 550);
-                  cx2.fillText("手札によっては、3ペアよりも揃えやすいかもしれません。", 80, 570);
-                }}
-                if(mouseX >50 && mouseX <250 && mouseY >190 && mouseY <230){
-                  epic.src=epic_src[4]
-                  epic.onload=function(){
-                  se4.play();
-                  drawbuttom(5,80,"目次")
-                  cx2.clearRect(50,50,660,460);
-                  cx3.clearRect(50,50,700,460)
-                  cx2.drawImage(epic,90,95,600,223);
-                  cx2.fillStyle = "black";
-                  cx2.font = "26px 'Century Gothic'";
-                  cx2.fillText("国士無双とはなんですか？", 260, 90);
-                  cx2.font = "22px 'Century Gothic'";
-                  cx2.fillText("国士無双は、少し特殊な役です。", 90, 340);
-                  cx2.fillText("マスターロードのパイのみを", 90, 370);
-                  cx2.fillText("9枚集めることで成立します。", 90, 400);
-                  cx2.fillText("8種類のパイを1つずつ揃える必要があります。", 90, 430);
-                  cx2.fillText("国士無双を揃えるとボーナスとして高得点が貰えます。", 90, 460);
-                  msgstate=2;
-                  cx2.clearRect(80,530,670,70)
-                  cx2.font = "18px Arial";
-                  cx2.fillText("マスターロードのパイを9枚揃える特殊な役です。", 80, 550);
-                  cx2.fillText("オールマイティのパイがあれば狙ってみましょう。", 80, 570);
-                }}
-                if(mouseX >50 && mouseX <250 && mouseY >230 && mouseY <270){
-                  epic.src=epic_src[3]
-                  epic.onload=function(){
-                  se4.play();
-                  drawbuttom(5,80,"目次")
-                  cx2.clearRect(50,50,660,460);
-                  cx3.clearRect(50,50,700,460)
-                  cx2.drawImage(epic,50,0,500,526,360,55,380,400);
-                  cx2.clearRect(680,50,60,40);
-                  cx2.font = "32px 'Century Gothic'";
-                  cx2.fillText("　×",680,80)
-                  cx2.fillStyle = "black";
-                  cx2.font = "26px 'Century Gothic'";
-                  cx2.fillText("ポン", 90, 90);
-                  cx2.font = "22px 'Century Gothic'";
-                  cx2.fillText("ポンについて知りたいポン？", 60, 150);
-                  cx2.fillText("隣のプレイヤーの捨てパイと", 60, 180);
-                  cx2.fillText("同じキャラのパイが2枚以上", 60, 210);
-                  cx2.fillText("あれば、捨てパイを貰う", 60, 240);
-                  cx2.fillText("ことができるポン！", 60, 270);
-                  cx2.fillText("ポンした後は山からパイを", 60, 300);
-                  cx2.fillText("引かずに、手札のパイを1枚", 60, 330);
-                  cx2.fillText("選んで捨てるポン！", 60, 360);
-                  cx2.fillText("ポンすると3ペアを揃えやすく", 60, 390);
-                  cx2.fillText("なるけど、その代わりに", 60, 420);
-                  cx2.fillText("得点が少し減っちゃうポン…", 60, 450);
-                  msgstate=2;
-                  cx2.clearRect(80,530,670,70)
-                  cx2.font = "18px Arial";
-                  cx2.fillText("1つ前のプレイヤーが捨てたパイと同じキャラのパイが。", 80, 550);
-                  cx2.fillText("手元に2枚以上ある時、捨てパイを貰うことができます。", 80, 570);
-                }}
-                if(mouseX >50 && mouseX <250 && mouseY >270 && mouseY <310){
-                  yakumap.x+=40;
-                  yakumap.alpha=1;
-                  //Yakucheck();
-                  se4.play();
-                  drawbuttom(5,80,"目次")
-                  cx2.clearRect(50,50,660,460);
-                  cx3.clearRect(50,50,700,460);
-                  cx2.fillStyle = "black";
-                  cx2.font = "26px 'Century Gothic'";
-                  cx2.fillText("シナジー", 90, 90);
-                  cx2.font = "20px 'Century Gothic'";
-                  cx2.fillText("（枠内クリックで上下にスクロールできます）", 210, 90);
-                  msgstate=3;
-                  cx2.clearRect(80,530,670,70)
-                  cx2.font = "18px Arial";
-                  cx2.fillText("和了した時に、それぞれの組み合わせの中から2枚以上所持していると", 80, 540);
-                  cx2.fillText("シナジー役がつきます（ただし1枚役は1翻）。", 80, 560);
-                  cx2.fillText("まずは基本役である3ペアやライン通貫を優先し、余裕があれば狙ってみましょう。", 80, 580)
-                }
-                if(mouseX >50 && mouseX <250 && mouseY >310 && mouseY <350){
-                  epic.src=epic_src[7]
-                  epic.onload=function(){
-                  se4.play();
-                  var X=240;
-                  var Y=55;
-                  Aicon.src="don/Duel_gaia.png"
-                  Aicon.onload=function(){
-                    cx2.drawImage(Aicon,X,Y,40,40);
-                    X+=40;
-                      Aicon.src="don/Duel_heat.png"
-                      Aicon.onload=function(){
-                        cx2.drawImage(Aicon,X,Y,40,40);
-                        X+=40;
-                          Aicon.src="don/Duel_aqua.png"
-                          Aicon.onload=function(){
-                            cx2.drawImage(Aicon,X,Y,40,40);
-                            X+=40;
-                            Aicon.src="don/Duel_wind.png"
-                            Aicon.onload=function(){
-                              cx2.drawImage(Aicon,X,Y,40,40);
-                              X+=40;
-                              Aicon.src="don/Duel_sun.png"
-                              Aicon.onload=function(){
-                                cx2.drawImage(Aicon,X,Y,40,40);
-                                X+=40;
-                                Aicon.src="don/Duel_moon.png"
-                                Aicon.onload=function(){
-                                  cx2.drawImage(Aicon,X,Y,40,40);
-                                  X+=40;
-                              Aicon.src="don/Don_HA.png"
-                              Aicon.onload=function(){
-                                cx2.drawImage(Aicon,X,Y,40,40);
-                  }}}}}}};
-                  drawbuttom(5,80,"目次")
-                  cx2.clearRect(50,50,660,460);
-                  cx3.clearRect(50,50,700,460)
-                  cx2.drawImage(epic,60,100,630,270);
-                  cx2.clearRect(680,50,60,40);
-                  cx2.font = "32px 'Century Gothic'";
-                  cx2.fillText("　×",680,80)
-                  cx2.fillStyle = "black";
-                  cx2.font = "26px 'Century Gothic'";
-                  cx2.fillText("クレスト", 90, 90);
-                  cx2.font = "22px 'Century Gothic'";
-                  msgstate=2;
-                  cx2.clearRect(80,530,670,70)
-                  cx2.font = "18px Arial";
-                  cx2.fillText("パイに描かれたマークは、それぞれの属性を示しています。", 80, 540);
-                  cx2.fillText("3ペアで和了した時に、属性が同じパイを2組（6枚）所持していれば、", 80, 560);
-                  cx2.fillText("クレスト役がつきます。", 80, 580);
-
-                }}
-                if(mouseX >50 && mouseX <250 && mouseY >350 && mouseY <390){
-                  epic.src=epic_src[6]
-                  epic.onload=function(){
-                  se4.play();
-                  drawbuttom(5,80,"目次")
-                  cx2.clearRect(50,50,660,460);
-                  cx3.clearRect(50,50,700,460)
-                  cx2.drawImage(epic,340,100,400,240);
-                  cx2.clearRect(680,50,60,40);
-                  cx2.font = "32px 'Century Gothic'";
-                  cx2.fillText("　×",680,80)
-                  cx2.fillStyle = "black";
-                  cx2.font = "26px 'Century Gothic'";
-                  cx2.fillText("マナブレイク", 90, 90);
-                  cx2.font = "22px 'Century Gothic'";
-                  cx2.fillText("対局中、マウス長押しで", 60, 150);
-                  cx2.fillText("自分のMPゲージが徐々に", 60, 180);
-                  cx2.fillText("緑色に変わっていきます。", 60, 210);
-                  cx2.fillText("MPゲージが1目盛り以上", 60, 240);
-                  cx2.fillText("緑色の状態でパイを選ぶと", 60, 270);
-                  cx2.fillText("マナブレイクが発動します。", 60, 300);
-                  cx2.fillText("マナブレイクしたパイは", 60, 330);
-                  cx2.fillText("相手プレイヤーから見えず、", 60, 360);
-                  cx2.fillText("ポンやロンされません。", 60, 390);
-                  cx2.fillText("リーチする時や、リーチ中でも使用できますが、", 60, 420);
-                  cx2.fillText("MPを消費するので使いどころに注意しましょう。", 60, 450);
-                  msgstate=2;
-                  cx2.clearRect(80,530,670,70)
-                  cx2.font = "18px Arial";
-                  cx2.fillText("MPを消費してマナブレイクすることができます。", 80, 550);
-                  cx2.fillText("ここぞという時に使いましょう。", 80, 570);
-                }}
-                break;
-                case 3:
-                  if(mouseX >0 && mouseX <60 && mouseY >80 && mouseY <120){
-                    yakumap.x-=40;
-                    yakumap.alpha=0;
-                  }
+                case 5:
                   if(mouseX >80 && mouseY > 100 && mouseX <640 && mouseY <200){
                     Yakucheck(180);
                     return false;
@@ -3110,47 +3351,10 @@ function NameChange(){
                     return false;
                     }
                     if(mouseX >80 && mouseY > 400 && mouseX <640 && mouseY <480){
-                      Yakucheck(-180);
-                      return false;
-                      }
-              case 1:
-              case 2:
-                if(mouseX >0 && mouseX <60 && mouseY >80 && mouseY <120){
-                  se4.play();
-                  msgstate=-1;
-                  Menu();
-                }
+                    Yakucheck(-180);
+                    return false;
+                    }
                 break;
-                default:
-                epic.src=epic_src[0]
-                epic.onload=function(){
-                  cx1.fillStyle = "rgba(20,20,20,0.7)";
-                  cx2.clearRect(0,0,800,510)
-                  cx1.fillRect(0,0,800,510)
-                  cx1.drawImage(epic,50,50,350,460)
-                  cx1.drawImage(epic,400,50,350,460)
-                    epic.src=epic_src[5]
-                    epic.onload=function(){
-                      cx2.drawImage(epic,300,70,400,300)
-                cx2.fillStyle = "black";
-                cx2.font = "26px 'Century Gothic'";
-                cx2.fillText("画面の見方",60,100)
-                cx2.fillText("役/3ペア",60,140)
-                cx2.fillText("役/ライン通貫",60,180)
-                cx2.fillText("役/国士無双",60,220)
-                cx2.fillText("ポン",60,260)
-                cx2.fillText("シナジー",60,300)
-                cx2.fillText("クレスト",60,340)
-                cx2.fillText("マナブレイク",60,380)
-                cx2.font = "32px 'Century Gothic'";
-                cx2.fillText("　×",680,80)
-                cx2.clearRect(80,520,670,70)
-                cx2.font = "18px Arial";
-                cx2.fillText("プレイガイド　9枚のパイで役を揃えるゲーム、", 80, 550);
-                cx2.fillText("エルコレドンジャラのルール説明です。", 80, 570)
-                msgstate=0;
-                      }}
-                  break;
             }
             break;
           case 5:
@@ -10348,30 +10552,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
           if(mouseX >470 && mouseX <640 && mouseY >410 && mouseY <470){
             Textlist[0].text="現在の設定で対局を開始します！";
             Textlist[1].text="　";  
-          }
-          if(mouseX >510 && mouseX <560 && mouseY >130 && mouseY <160){
-            cx3.fillText("◀ ",520,150)//pc
-          }
-          if(mouseX >670 && mouseX <705 && mouseY >130 && mouseY <160){
-            cx3.fillText(" ▶",670,150)
-          }
-          if(mouseX >670 && mouseX <705 && mouseY >230 && mouseY <260){
-            cx3.fillText(" ▶",670,250)//chara2
-          }
-          if(mouseX >510 && mouseX <560 && mouseY >230 && mouseY <260){
-            cx3.fillText("◀ ",520,250)
-          }
-          if(mouseX >670 && mouseX <705 && mouseY >270 && mouseY <300){
-            cx3.fillText(" ▶",670,250)
-          }
-          if(mouseX >510 && mouseX <560 && mouseY >270 && mouseY <300){
-            cx3.fillText("◀ ",520,290)
-          }
-          if(mouseX >670 && mouseX <705 && mouseY >310 && mouseY <340){
-            cx3.fillText(" ▶",670,330)
-          }
-          if(mouseX >510 && mouseX <560 && mouseY >310 && mouseY <340){
-            cx3.fillText("◀ ",520,330)
           }
         if(mouseX >510 && mouseX <705 && mouseY >80 && mouseY <110){
           //通常テキスト
