@@ -5,6 +5,7 @@
 //いつか→対戦部屋の工事、スキル　場の同じパイの色付け　スマホ対応
 //クレスト役未確認
 //流局画面でクリックできず即進んでしまうことがある？
+//2771 duel 画面
 window.onload = function(){
   draw();
   };
@@ -2680,10 +2681,105 @@ function menuMap(p=0){
                         paiviewer.x=60;
                         paiviewer.alpha=1;
                         break;
-        
     }
-    //
     break;
+    case 4:
+//たいせん
+menu_duel.removeAllChildren();
+switch(msgstate){
+  case 0:
+//ルーム入口
+var e = new createjs.Bitmap(epic_src[0]);
+e.x=50;
+e.y=50;
+e.scale=1.1;
+menu_duel.addChild(e);
+var e = new createjs.Bitmap(epic_src[0]);
+e.x=400;
+e.y=50;
+e.scale=1.1;
+menu_duel.addChild(e);
+var option_bt5 = new createjs.Bitmap('don/soL_batu.png');
+option_bt5.x=700;
+option_bt5.y=60;
+option_bt5.scale=0.4;
+menu_duel.addChild(option_bt5)
+option_bt5.addEventListener("click", {card:-1,handleEvent:HowtoBt});
+var rect = new createjs.Shape();
+      rect.graphics
+        .beginFill("rgba(16, 7, 79, 0.7)")
+        .drawRect(60, 80, 200, 200)
+        .drawRect(280, 80, 200, 200)
+        .drawRect(500, 80, 200, 200);
+      menu_duel.addChild(rect);
+  Textlist[0].text="ルーム選択";
+  Textlist[1].text="現在の接続人数："+Usercount; 
+  for(var i=0;i<3;i++){
+  var btn1 = createButton("ルーム"+(i+1), 130, 45);
+        btn1.x = 90+220*i;
+        btn1.y = 80;
+        menu_duel.addChild(btn1);
+  var t = new createjs.Text("人数："+RoomNum[i]+"/4", "bold 22px Arial", "white");
+        t.x=80+220*i;
+        t.y=150;
+        menu_duel.addChild(t);
+  var t = new createjs.Text("状態："+RoomState[i], "bold 22px Arial", "white");
+        t.x=80+220*i;
+        t.y=190;
+        menu_duel.addChild(t);
+        btn1.addEventListener("click", {card:i+1,handleEvent:Nyusitu});
+  }    
+    break;
+  case 2:
+    //ルーム内-> 3871
+    var rect = new createjs.Shape();
+      rect.graphics
+        .beginFill("#001c0d")
+        .drawRect(0, 0, 800, 600);
+      menu_duel.addChild(rect);
+      rect.graphics
+      .beginFill("#126e60")
+      .drawRect(11, 100, 148, 300)
+      .drawRect(161, 100, 148, 300)
+      .drawRect(311, 100, 148, 300)
+      .drawRect(461, 100, 148, 300);
+    menu_duel.addChild(rect);
+    for(var i=0;i<4;i++){
+    var t = new createjs.Text('CPU', "bold 30px Arial", "white");
+    t.x=50+150*i;
+    t.y=250;
+    t.rotation=-7;
+    menu_duel.addChild(t);
+    }
+    var t = new createjs.Text(LP_PVP.Rule[LP_PVP.Rule[0]]+"　"+LP_PVP.Length[LP_PVP.Length[0]]+"戦", "bold 30px Arial", "white");
+    t.x=200;
+    t.y=40;
+    menu_duel.addChild(t);
+    var t = new createjs.Text("持ち点 "+LP_PVP.LP[LP_PVP.LP[0]]+"　"+LP_PVP.Block[LP_PVP.Block[0]], "bold 30px Arial", "white");
+    t.x=170;
+    t.y=75;
+    menu_duel.addChild(t);
+    var rect = new createjs.Shape();
+      rect.graphics
+        .beginFill("rgba(16, 7, 79, 0.7)")
+        .drawRect(1, 1, 30, 44)
+      menu_duel.addChild(rect);
+      var t = new createjs.Text("ルーム"+IAM.room, "14px Arial", "white");
+      t.x=10;
+      t.y=10;
+      menu_duel.addChild(t);
+      if(IsHost(IAM.room)){
+        var X=700;
+        var Y=130;
+        var t = new createjs.Text("ルール", "bold 22px Arial", "white");
+        t.x=X;
+        t.y=Y;
+        t.textAlign="center";
+        menu_duel.addChild(t);
+      }
+    break;
+  }
+  break;//end of menumap switch
   }
 };
 function HowtoBt(){
@@ -2709,6 +2805,29 @@ function HowtoBt(){
     break;
   }
 }
+function Nyusitu(){
+  var rn=this.card;
+  console.log('nyusitu',rn);
+  if(msgstate==0){msgstate=1};
+  var clientId=Username;
+  var clientCrest=Usercrest;
+  var clientChr=chara[1];
+  var roomId=RoomName[rn];
+  socket.emit('join_to_room',{token: IAM.token,name:clientId,crest:clientCrest,chr:clientChr,room:roomId});
+  cx4.globalAlpha=1;
+  se3.play();
+  cx4.fillStyle = "rgba(20,20,20,0.7)";
+  cx4.fillRect(0,0,800,600)
+  cx4.font = "bold 26px 'メイリオ'";
+  cx4.fillStyle = "black";
+  cx4.strokeStyle ="rgba(250,250,250,0.9)";
+  cx4.lineWidth=5;
+  cx4.strokeText("入室しています",240,200);
+  cx4.fillText("入室しています",240,200);   
+  var C=canvas4.toDataURL();
+  var Cb = new createjs.Bitmap(C);
+  yakumap.addChild(Cb);
+  }
 function NameChange(){
   se3.play();
   user = window.prompt("プレイヤー名を入力", Username);
@@ -2838,11 +2957,17 @@ function NameChange(){
           field.addChild(menu_solo);
         break;
       case 3:
-        //設定->optionconfig
-
+        //設定->optionconfigへ
         break;
       case 4:
-        //たいせん
+        //たいせん ->3709
+        pagestate=6;
+        msgstate=0;
+        se5.play();
+        socket.emit('lobby_update');
+        socket.emit("join", {name:Username});
+        menuMap(4);
+        field.addChild(menu_duel);
         break;
       case 5:
         //実績等
@@ -3040,14 +3165,9 @@ function NameChange(){
     setting.scale=0.6;
     field.addChild(setting);
     solo.addEventListener("click", {card:2,handleEvent:Menubutton});
-    //multi.addEventListener("click", {card:4,handleEvent:Menubutton});
+    multi.addEventListener("click", {card:4,handleEvent:Menubutton});
     howto.addEventListener("click", {card:1,handleEvent:Menubutton});
     setting.addEventListener("click", {handleEvent:OptionConfig});
-    var rect = new createjs.Shape();
-    rect.graphics
-    .beginFill("rgba(20,20,20,0.7)")
-    .drawRect(220, 210, 181, 91);
-    field.addChild(rect);
     var wT=winrank[0]+winrank[1]+winrank[2]+winrank[3]
     var winrate=0;
     if(wT>0){
@@ -3076,23 +3196,8 @@ function NameChange(){
     btn1.addEventListener("click", {card:5,handleEvent:Menubutton});
     menuMap();
     break;
-      case 1:
-        //旧ボタン　いろいろ移行済み
-        if(mouseX <0){
-          if(mouseY >250 && mouseY <295){//pvpたいせん
-            cx2.clearRect(675,390,80,50)
-            cx3.clearRect(675,385,80,60)
-            pagestate=6;
-            msgstate=-1;
-            se5.play();
-            socket.emit('lobby_update');
-            socket.emit("join", {name:Username});
-            Menu();
-          }
-        }
-        break;
         case 3:
-          //フリバへ
+          //フリバからのキャンセルボタン
           console.log('2439!')
           if(mouseX >80 && mouseX <380 && mouseY >80 && mouseY <480){
             se2.play();
@@ -3648,78 +3753,6 @@ function NameChange(){
                 }
               };
                 break;
-              case 0:
-                //入場
-                if(mouseX >60 && mouseX <260 && mouseY >80 && mouseY <280){
-                msgstate=1;
-                Nyusitu(1);  
-                };
-                if(mouseX >280 && mouseX <480 && mouseY >80 && mouseY <280){
-                  msgstate=1;
-                  Nyusitu(2);
-                }
-                if(mouseX >500 && mouseX <700 && mouseY >80 && mouseY <280){
-                  msgstate=1;
-                  Nyusitu(3);
-                }
-                function Nyusitu(rn=1){
-                  console.log('nyusitu',rn);
-                  var clientId=Username;
-                  var clientCrest=Usercrest;
-                  var clientChr=chara[1];
-                  var roomId=RoomName[rn];
-                  socket.emit('join_to_room',{token: IAM.token,name:clientId,crest:clientCrest,chr:clientChr,room:roomId});
-                  cx4.globalAlpha=1;
-                  se3.play();
-                  cx4.fillStyle = "rgba(20,20,20,0.7)";
-                  cx4.fillRect(0,0,800,600)
-                  cx4.font = "bold 26px 'メイリオ'";
-                  cx4.fillStyle = "black";
-                  cx4.strokeStyle ="rgba(250,250,250,0.9)";
-                  cx4.lineWidth=5;
-                  cx4.strokeText("入室しています",240,200);
-                  cx4.fillText("入室しています",240,200);   
-                  }
-                break;
-                case -1:
-                  epic.src=epic_src[0]
-                  epic.onload=function(){
-                    cx1.fillStyle = "rgba(20,20,20,0.7)";
-                    cx.clearRect(0,520,800,70)
-                    cx1.clearRect(0,0,800,600)
-                    cx2.clearRect(0,0,800,600)
-                    cx4.clearRect(0,0,800,600)
-                    cx1.fillRect(0,0,800,510)
-                    cx1.drawImage(epic,50,50,350,460)
-                    cx1.drawImage(epic,400,50,350,460)
-                  cx2.fillStyle = "rgba(20,20,20,0.7)";
-                  cx2.fillRect(60,80,200,200)
-                  cx2.fillRect(280,80,200,200)
-                  cx2.fillRect(500,80,200,200)
-                  drawbuttom(90,80,"ルーム1",0,130,44);
-                  drawbuttom(310,80,"ルーム2",0,130,44);
-                  drawbuttom(530,80,"ルーム3",0,130,44);
-                cx2.font = "32px 'Century Gothic'";
-                cx2.fillStyle = "black";
-                cx2.fillText("　×",680,80)
-                cx2.clearRect(80,530,670,70)
-                cx2.font = "18px Arial";
-                cx2.fillText("ルーム選択", 80, 550);
-                cx2.clearRect(580,530,170,20)
-                cx2.fillText("現在の接続人数："+Usercount, 580, 550);
-                  cx3.fillStyle = "white";
-                  cx3.font = "bold 22px Arial";
-                  var X=80;
-                  var Y=130;
-                  for(var i=0;i<3;i++){
-                    cx3.clearRect(X-10,Y-20,150,100);
-                    cx3.fillText("人数："+RoomNum[i]+"/4", X, Y+20);
-                    cx3.fillText("状態："+RoomState[i], X, Y+50);
-                    X+=220;
-                  }
-                msgstate=0;
-                  }; 
-            break;
             }
     //ルーム関連のソケット
   //ゲームスタート
@@ -3794,13 +3827,12 @@ function NameChange(){
       if(msgstate!==2){
         msgstate=2;
         socket.emit('lobby_update');
-      cx4.clearRect(0,0,800,600)
+        menuMap(4);
       };
     }else{
       console.log('入室失敗');
-      cx4.clearRect(0,0,800,600);
-      msgstate=-1;
-      Menu();
+      msgstate=0;
+      menuMap(4);
       return false;
     }
     });
@@ -3816,6 +3848,7 @@ function NameChange(){
     //Host
     if(msgstate!==2){
       msgstate=2;
+      menuMap(4);
       cx2.clearRect(610,80,180,300);
       cx2.fillStyle = "white";
       cx2.font = "16px 'Century Gothic'";
@@ -3881,6 +3914,7 @@ function NameChange(){
       Roomlist3=data.list.concat();
       break;
       }
+      menuMap(4);//必要な部分だけこちらで描画する
       if(data.focus !==1){
       cx.clearRect(0,520,800,70)
       cx1.fillStyle = "#001c0d";
