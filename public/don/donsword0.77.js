@@ -6,6 +6,8 @@
 //クレスト役未確認
 //流局画面でクリックできず即進んでしまうことがある？
 //duel 局やデッキが初期化されていない？
+//魔界モードのカン時の描画・CPUがカン後にラインで上がる
+//マージに失敗したのでもしかしたら同じ文言が連続してるかも
 window.onload = function(){
   draw();
   };
@@ -1455,6 +1457,7 @@ function updateParticles() {
             field.removeAllChildren();
             menuMap(4);
             field.addChild(menu_duel);
+            textmap.alpha=1;
             se2.play();
             if(!IsHost(IAM.room)){
               if(IAM.is_ready==1){IAM.is_ready=0};
@@ -2838,29 +2841,6 @@ function Nyusitu(){
   var C=canvas4.toDataURL();
   var Cb = new createjs.Bitmap(C);
   yakumap.addChild(Cb);
-}
-function Nyusitu(){
-  var rn=this.card;
-  console.log('nyusitu',rn);
-  if(msgstate==0){msgstate=1};
-  var clientId=Username;
-  var clientCrest=Usercrest;
-  var clientChr=chara[1];
-  var roomId=RoomName[rn];
-  socket.emit('join_to_room',{token: IAM.token,name:clientId,crest:clientCrest,chr:clientChr,room:roomId});
-  cx4.globalAlpha=1;
-  se3.play();
-  cx4.fillStyle = "rgba(20,20,20,0.7)";
-  cx4.fillRect(0,0,800,600)
-  cx4.font = "bold 26px 'メイリオ'";
-  cx4.fillStyle = "black";
-  cx4.strokeStyle ="rgba(250,250,250,0.9)";
-  cx4.lineWidth=5;
-  cx4.strokeText("入室しています",240,200);
-  cx4.fillText("入室しています",240,200);   
-  var C=canvas4.toDataURL();
-  var Cb = new createjs.Bitmap(C);
-  yakumap.addChild(Cb);
   }
 function NameChange(){
   se3.play();
@@ -3880,12 +3860,9 @@ function NameChange(){
         msgstate=2;
         socket.emit('lobby_update');
         menuMap(4);
-        menuMap(4);
       };
     }else{
       console.log('入室失敗');
-      msgstate=0;
-      menuMap(4);
       msgstate=0;
       menuMap(4);
       return false;
@@ -3945,7 +3922,6 @@ function NameChange(){
       }
       updateRoomGraph()
       console.log('room updated')
-      //
       function updateRoomGraph(){
         menuMap(4);
         if(data.focus==2){
@@ -3959,7 +3935,6 @@ function NameChange(){
           menu_duel.addChild(t);
         }
         if(IsHost(IAM.room)){
-          console.log('button ここ')
           var btn1 = createButton("対局開始", 170, 60,"#ffbb4d","#ff7b00","#372d23","#5e5e5e");
           btn1.x = 420;
           btn1.y = 420;
