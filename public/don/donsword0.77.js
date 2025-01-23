@@ -1963,7 +1963,6 @@ function menuMap(p=0){
               break;
           }
         }
-      //
       cx2.fillText("通常",430,230)
       cx2.fillText("リーチ",430,300)
       cx2.fillText("オーラス",430,370)
@@ -2839,7 +2838,6 @@ function Nyusitu(){
   var C=canvas4.toDataURL();
   var Cb = new createjs.Bitmap(C);
   yakumap.addChild(Cb);
-  }
 }
 function Nyusitu(){
   var rn=this.card;
@@ -3234,9 +3232,7 @@ function NameChange(){
     btn1.addEventListener("click", {card:5,handleEvent:Menubutton});
     menuMap();
     break;
-    break;
         case 3:
-          //フリバからのキャンセルボタン
           //フリバからのキャンセルボタン
           console.log('2439!')
           if(mouseX >80 && mouseX <380 && mouseY >80 && mouseY <480){
@@ -3802,8 +3798,14 @@ function NameChange(){
               };
                 break;
               };
-                break;
-            }
+            break;
+            default:
+              //pagesateが負の場合には正負を入れ替えて終了
+              if(debugmode){console.log(pagestate)};
+              if(pagestate<0){pagestate=-pagestate};
+            break;
+      }
+  };
     //ルーム関連のソケット
   //ゲームスタート
   socket.on("start-result", (data)=>{
@@ -4065,14 +4067,6 @@ function NameChange(){
       }
   }
   });
-   break;
-   default:
-    //pagesateが負の場合には正負を入れ替えて終了
-    if(debugmode){console.log(pagestate)};
-    if(pagestate<0){pagestate=-pagestate};
-    break;
-    }
-  }
   window.addEventListener("keyup", keyupHandler, false);
     function keyupHandler(e) {
     if(e.keyCode==27){
@@ -4364,358 +4358,6 @@ if(opLock==0 && gamestate ==1){
         }
       }
     }
-    function deckHandlerP(){
-          //ホスト配牌 未使用
-          if(IsHost(IAM.room)){
-            //ホストで初期化するもの
-            deck=[]
-            hand1=[]
-            hand2=[]
-            hand3=[]
-            hand4=[]
-            for(var i =0; i<43; i++){
-            deck.push(i);
-            deck.push(i);
-            }
-            deck.push(43);
-            deck.push(44);
-            if(debugmode){console.log(deck.length);}
-            //expected88
-            //山シャッフル
-            shuffle();
-            //初手積み込み
-            if(debugmode){console.log(parent);}
-            king =deck.splice(0,7)
-            hand1b=deck.splice(0,8-hand1.length)
-            hand1=hand1.concat(hand1b)
-            hand1b=deck.splice(0,8-hand2.length)
-            hand2=hand2.concat(hand1b)
-            hand1b=deck.splice(0,8-hand3.length)
-            hand3=hand3.concat(hand1b)
-            hand1b=deck.splice(0,8-hand4.length)
-            hand4=hand4.concat(hand1b)
-            //手札をソート
-            hand1.sort(compareFunc);
-            hand2.sort(compareFunc);
-            hand3.sort(compareFunc);
-            hand4.sort(compareFunc);
-            //1番目の配列は上がり判定に使用
-            hand1.unshift(-1)
-            hand2.unshift(-1)
-            hand3.unshift(-1)
-            hand4.unshift(-1)
-            //最後9番目の配列はドローカードに使うので適当に100を代入
-            hand1.push(100)
-            hand2.push(100)
-            hand3.push(100)
-            hand4.push(100)
-            if(debugmode){
-            console.log(king);//嶺上牌
-            console.log(hand1);//自分の手札
-            console.log(hand2);
-            console.log(hand3);
-            console.log(hand4);
-            }
-            socket.emit("deck_handler",{room:RoomName[IAM.room],Deck:deck,Hand:{hand1,hand2,hand3,hand4},King:king,MPV:mpVelocity,PON:Ponrate,FEV:Fever} );
-          };
-      //ゲームスタート時の配牌と画面
-      cx1.font = "24px 'Century Gothic'";
-      cx1.fillStyle ="white";
-      cx1.fillText("ドラ",10,40)
-      skillusage2[0]+=1
-      auras=0;
-      if(LP_PVP.Length[0]==1 && skillusage2[0]==4){
-        cx1.fillText("オーラス"+(skillusage2[5]),10,88);
-        auras=1;
-        Dlvup.alpha=0;
-        Dlvup.x=-60;
-        Dlvup.y=-40;
-        Dlvup.scale=1.2;
-        se12.play();
-        createjs.Tween.get(Dlvup)
-        .to({scale:1,x:0,y:0,alpha:1},150,createjs.Ease.backOut)
-        .wait(1000)
-        .to({scale:1.5,x:-200,y:-150,alpha:0},250,createjs.Ease.backOut);
-      }else if(LP_PVP.Length[0]==2 && skillusage2[0]==8){
-        cx1.fillText("オーラス"+(skillusage2[5]),10,88);
-        auras=1;
-        Dlvup.alpha=0;
-        Dlvup.x=-60;
-        Dlvup.y=-40;
-        Dlvup.scale=1.2;
-        se12.play();
-        createjs.Tween.get(Dlvup)
-        .to({scale:1,x:0,y:0,alpha:1},150,createjs.Ease.backOut)
-        .wait(1000)
-        .to({scale:1.5,x:-200,y:-150,alpha:0},250,createjs.Ease.backOut);
-      }else{cx1.fillText("第"+(skillusage2[0])+"局 "+(skillusage2[5])+"本場",10,88);
-           }
-           if(Fever>=0){
-           cx1.font = "18px 'Century Gothic'";
-           cx1.fillText("FEVER",160,84);
-            var x=220;
-            var y=68;
-            cx1.fillStyle="#3d3d3d";
-            cx1.clearRect(x,y,90,15);
-            cx1.fillRect(x,y,90,15);
-            cx1.fillStyle="#00ff66";
-            cx1.fillRect(x,y,30*Fever,15);
-            cx1.fillStyle="#99ed68";
-            cx1.fillRect(x,y,30*Fever,5);;
-            cx1.strokeStyle="#e3e3e3"
-            cx1.strokeRect(x,y,30,15);
-            cx1.strokeRect(x+30,y,30,15);
-            cx1.strokeRect(x+60,y,30,15);;
-            cx1.fillStyle ="white";
-           }
-        //music
-        if(auras==0 && musicset[0]!==musicnum){
-          if(musicset[0]==0){
-            musicnum=musicrandom[0][Math.floor(Math.random()*musicrandom[0].length)];
-          }else{
-            musicnum=musicset[0]
-          }
-          musicStart(musicnum);
-        }else if(auras==1 && musicset[2]!==musicnum){
-          if(musicset[2]==0){
-            musicnum=musicrandom[2][Math.floor(Math.random()*musicrandom[2].length)];
-          }else{
-            musicnum=musicset[2]
-          }
-        musicStart(musicnum);
-      };
-      cx1.font = "16px 'Century Gothic'";
-      cx1.fillText("ポン",640,425)
-      cx1.fillText("リーチ",640,465)
-      cx1.fillText("スキル",720,425)
-      cx1.fillText("抜き",720,465)
-      handsort=0;
-      drawbuttom(10,550,"SORT");
-      parentY =400
-      e11.src=chrimg_src[chara[1]]
-      e11.onload=function(){
-      cx1.drawImage(e11,500,0,300,600,0,parentY,100,200)
-      parentY=100
-      e12.src=chrimg_src[chara[2]]
-      e12.onload=function(){
-      cx1.drawImage(e12,500,0,300,300,0,parentY,100,100)
-      parentY+=100
-      e13.src=chrimg_src[chara[3]]
-      e13.onload=function(){
-      cx1.drawImage(e13,500,0,300,300,0,parentY,100,100)
-      parentY+=100
-      e14.src=chrimg_src[chara[4]]
-      e14.onload=function(){
-      cx1.drawImage(e14,500,0,300,300,0,parentY,100,100)
-      cx2.font = "16px 'Century Gothic'";
-      if(LP[0]>=6 && LP[0]<10){
-      cx2.fillStyle ="white";
-      cx2.strokeStyle = '#eb5600';
-      }else{
-      cx2.fillStyle ="black";
-      cx2.strokeStyle = 'white';
-      }
-      for(var i=1; i<skillswitch.length;i++){
-        skillswitch[i]=1;
-        }
-        skillusage=new Array(0,0,0,0,0)
-      if(LP_PVP.Rule[0]==2){
-      for(var i=1; i<5 ; i++){//復活
-        if(LP[i]<0){
-        skillusage2[i]-=1;
-        if(skillusage2[i] <=-1){
-          LP[i]=75000;
-          for (var I=0;I<4;I++){
-            if(I!==i){
-            death[i-1].Bdmg[i-1]+=death[i-1].Bdmg[I];
-            death[i-1].Bdmg[I]=0;
-            }
-          }
-        }}
-          }}
-      cx1.lineWidth = 3;
-      cx1.lineJoin = 'round';
-      cx2.lineWidth = 3;
-      cx2.lineJoin = 'round';
-      parentY =170
-      cx2.strokeText(LP[2],80,parentY)
-      cx2.fillText(LP[2],80,parentY)
-      parentY +=100
-      cx2.strokeText(LP[3],80,parentY)
-      cx2.fillText(LP[3],80,parentY)
-      parentY +=100
-      cx2.strokeText(LP[4],80,parentY)
-      cx2.fillText(LP[4],80,parentY)
-      parentY +=100
-      cx2.strokeText(LP[1],80,parentY)
-      cx2.fillText(LP[1],80,parentY)
-      parentY +=100
-      cx1.font = "bold 16px 'Century Gothic'";
-      cx1.fillStyle ="black";
-      cx1.strokeStyle = 'white';
-      cx1.lineWidth = 3;
-      cx1.lineJoin = 'round';
-        var y=125
-        if(MEMBER[1].pc==0){cx1.fillStyle = 'black';}else{cx1.fillStyle = 'darkred';}
-        cx1.strokeText(MEMBER[1].name,40, y);
-        cx1.fillText(MEMBER[1].name,40, y);
-        y+=100;
-        if(MEMBER[2].pc==0){cx1.fillStyle = 'black';}else{cx1.fillStyle = 'darkred';}
-        cx1.strokeText(MEMBER[2].name,40, y);
-        cx1.fillText(MEMBER[2].name,40, y);
-        y+=100;
-        if(MEMBER[3].pc==0){cx1.fillStyle = 'black';}else{cx1.fillStyle = 'darkred';}
-        cx1.strokeText(MEMBER[3].name,40, y);
-        cx1.fillText(MEMBER[3].name,40, y);
-        y+=100;
-        if(MEMBER[0].pc==0){cx1.fillStyle = 'black';}else{cx1.fillStyle = 'darkred';}
-        cx1.strokeText(MEMBER[0].name,40, y);
-        cx1.fillText(MEMBER[0].name,40, y);
-      cx1.font = "18px 'Century Gothic'";
-      cx1.fillStyle ="white";
-      cx1.strokeStyle ="#d92100"
-      parentY =25+100*parent
-      if(parent==0){parentY=425};
-      cx1.strokeText("親",10,parentY)
-      cx1.fillText("親",10,parentY)
-      parentY -=8
-      cx1.beginPath () ;
-      cx1.arc( 20, parentY, 16, 0 * Math.PI / 180, 360 * Math.PI / 180, false ) ;
-      cx1.strokeStyle = "red" ;
-      cx1.lineWidth = 2 ;
-      cx1.stroke();
-      cx2.fillStyle = "rgba(20,20,20,0.5)";
-      cx2.fillRect(630,400,160,80)
-      //初期化
-      dora=[];
-      handtemp=[]
-      tumotemp=0;
-      cpuwant =0
-      Ronturn=[];
-      trash1=[]
-      trash2=[]
-      trash3=[]
-      trash4=[]
-      Extrash=[];
-      c1=0
-      opLock=0;
-      raidscore=[0,0,0,0,0];
-      //ポンポポン
-      ponsw=[0,0,0,0,0]
-      poncpu=[0,Ponrate,Ponrate,Ponrate,Ponrate]
-      pon1=[];
-      pon2=[];
-      pon3=[];
-      pon4=[];
-      kansw=[0,0,0,0,0]
-      kan1=[];
-      kan2=[];
-      kan3=[];
-      kan4=[];
-      ctl=new Array(0,0,2,2,2)
-      ctlerror=new Array(0,0,0,0,0)
-      cLock = 0;
-      //clock0->反応させない　1以上->操作を許可 2->リーチからのパイ切り？ 3->スキルキーからのパイ切り
-      han =new Array(0,0,0,0,0)
-      reach =new Array(0,0,0,0,0)
-      nuki =new Array(0,0,0,0,0);
-      nukiswitch =new Array(0,0,0,0,0);
-      ippatu =new Array(0,0,0,0,0)
-      rorder =new Array(0,0,0,0,0)
-      for(var i=1; i<5;i++){
-      if(LP[i]<=0){rorder[i]=2}else{rorder[i]=0}
-      }
-      counter=new Array(0,0,0,0,0)
-      riverx=new Array(0,120,120,120,120)
-      rivery=new Array(0,400,100,200,300)
-      DPlist=new Array(0,0,0,0,0);
-      drawDP();
-      Buff =new Array(0,[],[],[],[])
-      Bufflist =new Array(0,[],[],[],[])
-      if(LP[0]==4){
-        var K=5-skillusage2[0];
-        if(K>0){;
-      for (var i=1;i<Buff.length;i++){
-        for(var j=0;j<K;j++){
-      Buff[i].push(7);
-      }}}
-    }
-      Buffdraw();
-    //playmaker
-    dora.push(king[0])
-    if(debugmode){console.log(dora)}
-    dorax=60
-    if(Fever>=3){
-      console.log('fever!',Fever);
-      Clvup.alpha=0;
-      Clvup.x=-400;
-      Clvup.y=0;
-      se12.play();
-      createjs.Tween.get(Clvup)
-      .to({x:40,alpha:1},200)
-      .to({alpha:0},300)
-      .to({alpha:1},300)
-      .to({alpha:0},100)
-      .to({alpha:1},100)
-      .to({alpha:0},100)
-      .to({alpha:1},100)
-      .to({alpha:0},100)
-      .to({alpha:1},100)
-      .to({alpha:0},100)
-      .to({alpha:1},100)
-      .to({scaleX:1.5,scaleY:1.5,x:-120,y:-10},300,createjs.Ease.backOut)
-      .to({scaleX:1,scaleY:1,x:800,y:0,alpha:0},200,createjs.Ease.cubicIn)
-      .call(feverTime);
-function feverTime (){
-  var DD=dora[dora.length-1]+1
-  if(DD>=45){DD=0;}
-  e7.src=eltear_src[DD]
-e7.onload=function(){
-cx1.drawImage(e7,dorax,10,33,43.5)
-      dora.push(king[1]);
-    var DD=dora[dora.length-1]+1
-    if(DD>=45){DD=0;}
-    e7.src=eltear_src[DD]
-  e7.onload=function(){
-  dorax+=40
-  cx1.drawImage(e7,dorax,10,33,43.5)
-  dora.push(king[2]);
-  var DD=dora[dora.length-1]+1
-  if(DD>=45){DD=0;}
-  e7.src=eltear_src[DD]
-e7.onload=function(){
-dorax+=40
-cx1.drawImage(e7,dorax,10,33,43.5)
-dora.push(king[3]);
-var DD=dora[dora.length-1]+1
-if(DD>=45){DD=0;}
-e7.src=eltear_src[DD]
-e7.onload=function(){
-dorax+=40
-cx1.drawImage(e7,dorax,10,33,43.5)
-    handgraph(-1,1);
-    decklength(1);  
-}}}}
-};
-    }else{
-      handgraph(-1,1);
-      decklength(1);
-    }
-      //player1();
-      turn =parent
-      for(var i=0;i<MEMBER.length;i++){
-        MEMBER[i].turnflag=0;
-      };
-      MEMBER[parent].turnflag=1;
-      if(LP[turn+1]<=0){turn+=1;if(turn==4){turn=0}}
-      if(LP[turn+1]<=0){turn+=1;if(turn==4){turn=0}}
-      if(LP[turn+1]<=0){turn+=1;if(turn==4){turn=0}}
-      parent +=1
-      if(parent ==4){parent =0}
-      ctl[turn+1]=0
-      }}}}
-      };
-  
       function deckHandler(){
         //ゲームスタート時の配牌と画面
         cx2.clearRect(0,0,800,600);
@@ -11042,7 +10684,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
 
       return button;      
     }
-    //
     function createCircleButton(text, width, keyColorA="rgb(255,155,135)", keyColorB="rgb(221,84,72)", keyColorC="rgb(255,255,150)", keyColorD="rgb(223,163,0)"){
       // ツモ・ロンのぼたん width=>径
       var button = new createjs.Container();
@@ -11098,7 +10739,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
 
       return button;      
     }
-    //
       function drawbuttom(x,y,word,type=0,w=80,z=40,R=0,context=cx2){
         //type->活性化時1に
         context.lineWidth = 2;
@@ -11185,18 +10825,6 @@ cx1.drawImage(e7,dorax,10,33,43.5)
               break;
           }
           }  
-      function drawstar(x,y){
-        cx4.lineWidth = 1;
-        cx4.beginPath();
-        cx4.moveTo(x,y);
-        cx4.lineTo(x+40, y);
-        cx4.lineTo(x+7, y+22);
-        cx4.lineTo(x+20,y-14);
-        cx4.lineTo(x+33, y+22);
-        cx4.lineTo(x,y);
-        cx4.fill();
-        }
-
     function LoopAnimation(player,type=0){
       //type->0 ツモ 1 ロン
       var Container = new createjs.Container();
