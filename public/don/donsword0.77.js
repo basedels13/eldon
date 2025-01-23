@@ -1,10 +1,11 @@
-//var1.021　season2 
+//var1.022　season2 
 // npm run dev
 //全職75枚（エピックキャラは1枚ずつ増量）＋オールマイティ2枚＋マスター8枚×2（ガ、ロ、ベ、デ、ソ、ア、ハ）合計93枚→61枚スタート
 //対戦で魔界モードのリザルトが出ないらしい
-//いつか→対戦部屋の工事、スキル　場の同じパイの色付け　スマホ対応
+//いつか→対戦部屋の工事、通信対戦でのカン処理　pvEでのスキル　場の同じパイの色付け　スマホ対応
 //クレスト役未確認
 //流局画面でクリックできず即進んでしまうことがある？
+//duel 局やデッキが初期化されていない？
 window.onload = function(){
   draw();
   };
@@ -85,33 +86,28 @@ window.onload = function(){
     // トークンを保存
     IAM.token = data.token;
   });
-  
+  //
+  var RoomAry=[];//ルーム人数表示テキスト
+  var RoomConfigAry=[];//ルーム内の設定ボタン等テキスト
   //接続人数を受け取る 変化していれば反映する
   socket.on('lobby-update',(data)=>{
     //room:Room,state:State
     RoomNum=data.room.concat();
     RoomState=data.state.concat();
     if(pagestate==6 && msgstate==0){
-      cx3.fillStyle = "white";
-      cx3.font = "bold 22px Arial";
-      var X=80;
-      var Y=130;
+      var k=0;
       for(var i=0;i<3;i++){
-        cx3.clearRect(X-10,Y-20,150,100);
-        cx3.fillText("人数："+RoomNum[i]+"/4", X, Y+20);
-        cx3.fillText("状態："+RoomState[i], X, Y+50);
-        X+=220;
-      }
+        RoomAry[k].text="人数："+RoomNum[i]+"/4";
+        RoomAry[k+1].text="状態："+RoomState[i];
+        k+=2;
+       }
     }
   });
   socket.on('xxx', (data)=>{
     if(Usercount !== data.message){
     Usercount=data.message;
     if(pagestate==6 && msgstate==0){
-      cx2.fillStyle = "black";
-      cx2.font = "18px Arial";
-      cx2.clearRect(580,530,170,20)
-      cx2.fillText("現在の接続人数："+Usercount, 580, 550);
+      Textlist[1].text="現在の接続人数："+Usercount;
     }}
     });
   var Usercount=0;
@@ -1456,6 +1452,9 @@ function updateParticles() {
             gamestate=10;
             pagestate=6;
             msgstate=2;
+            field.removeAllChildren();
+            menuMap(4);
+            field.addChild(menu_duel);
             se2.play();
             if(!IsHost(IAM.room)){
               if(IAM.is_ready==1){IAM.is_ready=0};
@@ -2680,10 +2679,119 @@ function menuMap(p=0){
                         paiviewer.x=60;
                         paiviewer.alpha=1;
                         break;
-        
     }
-    //
     break;
+    case 4:
+//たいせん
+menu_duel.removeAllChildren();
+switch(msgstate){
+  case 0:
+//ルーム入口
+var e = new createjs.Bitmap(epic_src[0]);
+e.x=50;
+e.y=50;
+e.scale=1.1;
+menu_duel.addChild(e);
+var e = new createjs.Bitmap(epic_src[0]);
+e.x=400;
+e.y=50;
+e.scale=1.1;
+menu_duel.addChild(e);
+var option_bt5 = new createjs.Bitmap('don/soL_batu.png');
+option_bt5.x=700;
+option_bt5.y=60;
+option_bt5.scale=0.4;
+menu_duel.addChild(option_bt5)
+option_bt5.addEventListener("click", {card:-1,handleEvent:HowtoBt});
+var rect = new createjs.Shape();
+      rect.graphics
+        .beginFill("rgba(16, 7, 79, 0.7)")
+        .drawRect(60, 80, 200, 200)
+        .drawRect(280, 80, 200, 200)
+        .drawRect(500, 80, 200, 200);
+      menu_duel.addChild(rect);
+  RoomAry=[];
+  RoomConfigAry=[];
+  Textlist[0].text="ルーム選択";
+  Textlist[1].text="現在の接続人数："+Usercount; 
+  for(var i=0;i<3;i++){
+  var btn1 = createButton("ルーム"+(i+1), 130, 45);
+        btn1.x = 90+220*i;
+        btn1.y = 80;
+        menu_duel.addChild(btn1);
+  var t = new createjs.Text("人数："+RoomNum[i]+"/4", "bold 22px Arial", "white");
+        t.x=80+220*i;
+        t.y=150;
+        menu_duel.addChild(t);
+        RoomAry.push(t);
+  var t = new createjs.Text("状態："+RoomState[i], "bold 22px Arial", "white");
+        t.x=80+220*i;
+        t.y=190;
+        menu_duel.addChild(t);
+        RoomAry.push(t);
+        btn1.addEventListener("click", {card:i+1,handleEvent:Nyusitu});
+  }    
+    break;
+  case 2:
+    RoomConfigAry=[];
+    var rect = new createjs.Shape();
+      rect.graphics
+        .beginFill("#001c0d")
+        .drawRect(0, 0, 800, 600);
+      menu_duel.addChild(rect);
+      rect.graphics
+      .beginFill("#126e60")
+      .drawRect(11, 100, 148, 300)
+      .drawRect(161, 100, 148, 300)
+      .drawRect(311, 100, 148, 300)
+      .drawRect(461, 100, 148, 300);
+    menu_duel.addChild(rect);
+    for(var i=0;i<4;i++){
+    var t = new createjs.Text('CPU', "bold 30px Arial", "white");
+    t.x=50+150*i;
+    t.y=250;
+    t.rotation=-7;
+    menu_duel.addChild(t);
+    }
+    var t = new createjs.Text(LP_PVP.Rule[LP_PVP.Rule[0]]+"　"+LP_PVP.Length[LP_PVP.Length[0]]+"戦", "bold 30px Arial", "white");
+    t.x=200;
+    t.y=30;
+    menu_duel.addChild(t);
+    var t = new createjs.Text("持ち点 "+LP_PVP.LP[LP_PVP.LP[0]]+"　"+LP_PVP.Block[LP_PVP.Block[0]], "bold 30px Arial", "white");
+    t.x=170;
+    t.y=65;
+    menu_duel.addChild(t);
+    var rect = new createjs.Shape();
+      rect.graphics
+        .beginFill("rgba(16, 7, 79, 0.7)")
+        .drawRect(1, 1, 80, 40)
+      menu_duel.addChild(rect);
+      var t = new createjs.Text("ルーム"+IAM.room, "14px Arial", "white");
+      t.x=10;
+      t.y=10;
+      menu_duel.addChild(t);
+      if(IsHost(IAM.room)){
+        var Ary=["ルール","◀"+LP_PVP.Rule[LP_PVP.Rule[0]]+"▶",'持ち点',"◀"+LP_PVP.LP[LP_PVP.LP[0]]+"▶",'東風/半荘',"◀"+LP_PVP.Length[LP_PVP.Length[0]]+"▶",'満貫打ち止め',"◀"+LP_PVP.Block[LP_PVP.Block[0]]+"▶"]
+      }else{
+        var Ary=["ルール",LP_PVP.Rule[LP_PVP.Rule[0]],'持ち点',LP_PVP.LP[LP_PVP.LP[0]],'東風/半荘',LP_PVP.Length[LP_PVP.Length[0]],'満貫打ち止め',LP_PVP.Block[LP_PVP.Block[0]]]
+      }
+        var X=700;
+        var Y=130;
+        for(var i=0;i<Ary.length;i++){
+        var t = new createjs.Text(Ary[i], "bold 22px Arial", "white");
+        t.x=X;
+        t.y=Y;
+        t.textAlign="center";
+        menu_duel.addChild(t);
+        Y+=30;
+        if(i%2==1){
+          Y+=10;
+          RoomConfigAry.push(t);
+        };
+        }
+    break;
+  }
+  break;//end of menumap switch
   }
 };
 function HowtoBt(){
@@ -2709,6 +2817,29 @@ function HowtoBt(){
     break;
   }
 }
+function Nyusitu(){
+  var rn=this.card;
+  console.log('nyusitu',rn);
+  if(msgstate==0){msgstate=1};
+  var clientId=Username;
+  var clientCrest=Usercrest;
+  var clientChr=chara[1];
+  var roomId=RoomName[rn];
+  socket.emit('join_to_room',{token: IAM.token,name:clientId,crest:clientCrest,chr:clientChr,room:roomId});
+  cx4.globalAlpha=1;
+  se3.play();
+  cx4.fillStyle = "rgba(20,20,20,0.7)";
+  cx4.fillRect(0,0,800,600)
+  cx4.font = "bold 26px 'メイリオ'";
+  cx4.fillStyle = "black";
+  cx4.strokeStyle ="rgba(250,250,250,0.9)";
+  cx4.lineWidth=5;
+  cx4.strokeText("入室しています",240,200);
+  cx4.fillText("入室しています",240,200);   
+  var C=canvas4.toDataURL();
+  var Cb = new createjs.Bitmap(C);
+  yakumap.addChild(Cb);
+  }
 function NameChange(){
   se3.play();
   user = window.prompt("プレイヤー名を入力", Username);
@@ -2838,11 +2969,17 @@ function NameChange(){
           field.addChild(menu_solo);
         break;
       case 3:
-        //設定->optionconfig
-
+        //設定->optionconfigへ
         break;
       case 4:
         //たいせん
+        pagestate=6;
+        msgstate=0;
+        se5.play();
+        socket.emit('lobby_update');
+        socket.emit("join", {name:Username});
+        menuMap(4);
+        field.addChild(menu_duel);
         break;
       case 5:
         //実績等
@@ -3040,14 +3177,9 @@ function NameChange(){
     setting.scale=0.6;
     field.addChild(setting);
     solo.addEventListener("click", {card:2,handleEvent:Menubutton});
-    //multi.addEventListener("click", {card:4,handleEvent:Menubutton});
+    multi.addEventListener("click", {card:4,handleEvent:Menubutton});
     howto.addEventListener("click", {card:1,handleEvent:Menubutton});
     setting.addEventListener("click", {handleEvent:OptionConfig});
-    var rect = new createjs.Shape();
-    rect.graphics
-    .beginFill("rgba(20,20,20,0.7)")
-    .drawRect(220, 210, 181, 91);
-    field.addChild(rect);
     var wT=winrank[0]+winrank[1]+winrank[2]+winrank[3]
     var winrate=0;
     if(wT>0){
@@ -3076,23 +3208,8 @@ function NameChange(){
     btn1.addEventListener("click", {card:5,handleEvent:Menubutton});
     menuMap();
     break;
-      case 1:
-        //旧ボタン　いろいろ移行済み
-        if(mouseX <0){
-          if(mouseY >250 && mouseY <295){//pvpたいせん
-            cx2.clearRect(675,390,80,50)
-            cx3.clearRect(675,385,80,60)
-            pagestate=6;
-            msgstate=-1;
-            se5.play();
-            socket.emit('lobby_update');
-            socket.emit("join", {name:Username});
-            Menu();
-          }
-        }
-        break;
         case 3:
-          //フリバへ
+          //フリバからのキャンセルボタン
           console.log('2439!')
           if(mouseX >80 && mouseX <380 && mouseY >80 && mouseY <480){
             se2.play();
@@ -3596,130 +3713,66 @@ function NameChange(){
                 //room_config
                 //LP_PVP={Length:[1,"東風","半荘",],LP:[1,75000,150000,300000],Block:[1,"満貫あり","満貫なし"],Rule:[1,"サドンデス","デスマッチ"]};
                 if(IsHost(IAM.room)){
-                if(mouseX >610 && mouseX <660 && mouseY >130 && mouseY <170){
+                if(mouseX >610 && mouseX <680 && mouseY >130 && mouseY <180){
                   LP_PVP.Rule[0]-=1;
                   if(LP_PVP.Rule[0]<=0){LP_PVP.Rule[0]=LP_PVP.Rule.length-1;}
+                  se3.play();
                   corsor();
                   msgstate=1;
                   socket.emit('room_config',{token: IAM.token,room:RoomName[IAM.room],config:LP_PVP});
                 }
-                if(mouseX >740 && mouseX <790 && mouseY >130 && mouseY <170){
+                if(mouseX >720 && mouseX <790 && mouseY >130 && mouseY <180){
                   LP_PVP.Rule[0]+=1;
                   if(LP_PVP.Rule[0]>=LP_PVP.Rule.length){LP_PVP.Rule[0]=1;}
+                  se3.play();
                   corsor();
                   msgstate=1;
                   socket.emit('room_config',{token: IAM.token,room:RoomName[IAM.room],config:LP_PVP});
                 }
-                if(mouseX >610 && mouseX <660 && mouseY >200 && mouseY <240){
+                if(mouseX >610 && mouseX <680 && mouseY >200 && mouseY <250){
                   msgstate=1;
                   LP_PVP.LP[0]-=1;
                   if(LP_PVP.LP[0]<=0){LP_PVP.LP[0]=LP_PVP.LP.length-1;}
+                  se3.play();
                   socket.emit('room_config',{token: IAM.token,room:RoomName[IAM.room],config:LP_PVP});
                 }
-                if(mouseX >740 && mouseX <790 && mouseY >200 && mouseY <240){
+                if(mouseX >720 && mouseX <790 && mouseY >200 && mouseY <250){
                   msgstate=1;
                   LP_PVP.LP[0]+=1;
                   if(LP_PVP.LP[0]>=LP_PVP.LP.length){LP_PVP.LP[0]=1;}
+                  se3.play();
                   socket.emit('room_config',{token: IAM.token,room:RoomName[IAM.room],config:LP_PVP});
                 }
-                if(mouseX >610 && mouseX <660 && mouseY >270 && mouseY <310){
+                if(mouseX >610 && mouseX <680 && mouseY >270 && mouseY <320){
                   msgstate=1;
                   LP_PVP.Length[0]-=1;
                   if(LP_PVP.Length[0]<=0){LP_PVP.Length[0]=LP_PVP.Length.length-1;}
+                  se3.play();
                   socket.emit('room_config',{token: IAM.token,room:RoomName[IAM.room],config:LP_PVP});
                 }
-                if(mouseX >740 && mouseX <790 && mouseY >270 && mouseY <310){
+                if(mouseX >720 && mouseX <790 && mouseY >270 && mouseY <320){
                   msgstate=1;
                   LP_PVP.Length[0]+=1;
                   if(LP_PVP.Length[0]>=LP_PVP.Length.length){LP_PVP.Length[0]=1;}
+                  se3.play();
                   socket.emit('room_config',{token: IAM.token,room:RoomName[IAM.room],config:LP_PVP});
                 }
-                if(mouseX >610 && mouseX <660 && mouseY >340 && mouseY <380){
+                if(mouseX >610 && mouseX <680 && mouseY >340 && mouseY <390){
                   msgstate=1;
                   LP_PVP.Block[0]-=1;
                   if(LP_PVP.Block[0]<=0){LP_PVP.Block[0]=LP_PVP.Block.length-1;}
+                  se3.play();
                   socket.emit('room_config',{token: IAM.token,room:RoomName[IAM.room],config:LP_PVP});
                 }
-                if(mouseX >740 && mouseX <790 && mouseY >340 && mouseY <380){
+                if(mouseX >720 && mouseX <790 && mouseY >340 && mouseY <390){
                   msgstate=1;
                   LP_PVP.Block[0]+=1;
                   if(LP_PVP.Block[0]>=LP_PVP.Block.length){LP_PVP.Block[0]=1;}
+                  se3.play();
                   socket.emit('room_config',{token: IAM.token,room:RoomName[IAM.room],config:LP_PVP});
                 }
               };
                 break;
-              case 0:
-                //入場
-                if(mouseX >60 && mouseX <260 && mouseY >80 && mouseY <280){
-                msgstate=1;
-                Nyusitu(1);  
-                };
-                if(mouseX >280 && mouseX <480 && mouseY >80 && mouseY <280){
-                  msgstate=1;
-                  Nyusitu(2);
-                }
-                if(mouseX >500 && mouseX <700 && mouseY >80 && mouseY <280){
-                  msgstate=1;
-                  Nyusitu(3);
-                }
-                function Nyusitu(rn=1){
-                  console.log('nyusitu',rn);
-                  var clientId=Username;
-                  var clientCrest=Usercrest;
-                  var clientChr=chara[1];
-                  var roomId=RoomName[rn];
-                  socket.emit('join_to_room',{token: IAM.token,name:clientId,crest:clientCrest,chr:clientChr,room:roomId});
-                  cx4.globalAlpha=1;
-                  se3.play();
-                  cx4.fillStyle = "rgba(20,20,20,0.7)";
-                  cx4.fillRect(0,0,800,600)
-                  cx4.font = "bold 26px 'メイリオ'";
-                  cx4.fillStyle = "black";
-                  cx4.strokeStyle ="rgba(250,250,250,0.9)";
-                  cx4.lineWidth=5;
-                  cx4.strokeText("入室しています",240,200);
-                  cx4.fillText("入室しています",240,200);   
-                  }
-                break;
-                case -1:
-                  epic.src=epic_src[0]
-                  epic.onload=function(){
-                    cx1.fillStyle = "rgba(20,20,20,0.7)";
-                    cx.clearRect(0,520,800,70)
-                    cx1.clearRect(0,0,800,600)
-                    cx2.clearRect(0,0,800,600)
-                    cx4.clearRect(0,0,800,600)
-                    cx1.fillRect(0,0,800,510)
-                    cx1.drawImage(epic,50,50,350,460)
-                    cx1.drawImage(epic,400,50,350,460)
-                  cx2.fillStyle = "rgba(20,20,20,0.7)";
-                  cx2.fillRect(60,80,200,200)
-                  cx2.fillRect(280,80,200,200)
-                  cx2.fillRect(500,80,200,200)
-                  drawbuttom(90,80,"ルーム1",0,130,44);
-                  drawbuttom(310,80,"ルーム2",0,130,44);
-                  drawbuttom(530,80,"ルーム3",0,130,44);
-                cx2.font = "32px 'Century Gothic'";
-                cx2.fillStyle = "black";
-                cx2.fillText("　×",680,80)
-                cx2.clearRect(80,530,670,70)
-                cx2.font = "18px Arial";
-                cx2.fillText("ルーム選択", 80, 550);
-                cx2.clearRect(580,530,170,20)
-                cx2.fillText("現在の接続人数："+Usercount, 580, 550);
-                  cx3.fillStyle = "white";
-                  cx3.font = "bold 22px Arial";
-                  var X=80;
-                  var Y=130;
-                  for(var i=0;i<3;i++){
-                    cx3.clearRect(X-10,Y-20,150,100);
-                    cx3.fillText("人数："+RoomNum[i]+"/4", X, Y+20);
-                    cx3.fillText("状態："+RoomState[i], X, Y+50);
-                    X+=220;
-                  }
-                msgstate=0;
-                  }; 
-            break;
             }
     //ルーム関連のソケット
   //ゲームスタート
@@ -3794,13 +3847,12 @@ function NameChange(){
       if(msgstate!==2){
         msgstate=2;
         socket.emit('lobby_update');
-      cx4.clearRect(0,0,800,600)
+        menuMap(4);
       };
     }else{
       console.log('入室失敗');
-      cx4.clearRect(0,0,800,600);
-      msgstate=-1;
-      Menu();
+      msgstate=0;
+      menuMap(4);
       return false;
     }
     });
@@ -3814,44 +3866,19 @@ function NameChange(){
       LP_PVP.Rule[0]=data.Rule[0];
       }else{
     //Host
-    if(msgstate!==2){
-      msgstate=2;
-      cx2.clearRect(610,80,180,300);
-      cx2.fillStyle = "white";
-      cx2.font = "16px 'Century Gothic'";
-      cx2.textAlign = "center";
-      cx2.fillText('ルーム設定',700,100);
-      cx2.font = "bold 22px Arial";
-      var X=700;
-      var Y=130;
-      cx2.fillText('ルール',X,Y);
-      Y+=30;
-      cx2.fillText("◀　　　　　▶",X,Y);
-      cx2.fillText(LP_PVP.Rule[LP_PVP.Rule[0]],X,Y);
-      Y+=40;
-      cx2.fillText('持ち点',X,Y);
-      Y+=30;
-      cx2.fillText("◀　　　　　▶",X,Y);
-      cx2.fillText(LP_PVP.LP[LP_PVP.LP[0]],X,Y);
-      Y+=40;
-      cx2.fillText('東風/半荘',X,Y);
-      Y+=30;
-      cx2.fillText("◀　　　　　▶",X,Y);
-      cx2.fillText(LP_PVP.Length[LP_PVP.Length[0]],X,Y);
-      Y+=40;
-      cx2.fillText('満貫打ち止め',X,Y);
-      Y+=30;
-      cx2.fillText("◀　　　　　▶",X,Y);
-      cx2.fillText(LP_PVP.Block[LP_PVP.Block[0]],X,Y);
-      cx2.textAlign = "start";
+      if(msgstate!==2){
+        msgstate=2;
+        }
       }
-  }
-  cx2.fillStyle = "white";
-  cx2.font = "bold 30px Arial";
-  cx2.clearRect(160,5,365,75);
-  cx2.fillText(LP_PVP.Rule[LP_PVP.Rule[0]]+"　"+LP_PVP.Length[LP_PVP.Length[0]]+"戦",200,40);
-  cx2.fillText("持ち点 "+LP_PVP.LP[LP_PVP.LP[0]]+"　"+LP_PVP.Block[LP_PVP.Block[0]],170,75);
-  });
+      if(IsHost(IAM.room)){
+        var Ary=["◀"+LP_PVP.Rule[LP_PVP.Rule[0]]+"▶","◀"+LP_PVP.LP[LP_PVP.LP[0]]+"▶","◀"+LP_PVP.Length[LP_PVP.Length[0]]+"▶","◀"+LP_PVP.Block[LP_PVP.Block[0]]+"▶"]
+      }else{
+        var Ary=[LP_PVP.Rule[LP_PVP.Rule[0]],LP_PVP.LP[LP_PVP.LP[0]],LP_PVP.Length[LP_PVP.Length[0]],LP_PVP.Block[LP_PVP.Block[0]]]
+      }
+      for(var i=0;i<RoomConfigAry.length;i++){
+        RoomConfigAry[i].text=Ary[i];
+      }
+});
   //入室状態更新
   socket.on("room-update", (data)=>{
     if(gamestate>=0 && gamestate<=2){
@@ -3881,187 +3908,128 @@ function NameChange(){
       Roomlist3=data.list.concat();
       break;
       }
-      if(data.focus !==1){
-      cx.clearRect(0,520,800,70)
-      cx1.fillStyle = "#001c0d";
-      cx1.fillRect(0,0,800,600)
-      cx2.clearRect(0,0,800,600)
-      cx3.clearRect(0,0,800,600)
-      cx4.clearRect(0,0,800,600)
-      cx2.fillStyle = "#126e60"
-      cx2.fillRect(11,100,148,300);
-      cx2.fillRect(161,100,148,300);
-      cx2.fillRect(311,100,148,300);
-      cx2.fillRect(461,100,148,300);
-      cx2.fillStyle = "white";
-      cx2.font = "bold 30px Arial";
-      cx2.fillText('CPU',50,270);
-      cx2.fillText('CPU',200,270);
-      cx2.fillText('CPU',350,270);
-      cx2.fillText('CPU',500,270);
-      cx2.fillText(LP_PVP.Rule[LP_PVP.Rule[0]]+"　"+LP_PVP.Length[LP_PVP.Length[0]]+"戦",200,40);
-      cx2.fillText("持ち点 "+LP_PVP.LP[LP_PVP.LP[0]]+"　"+LP_PVP.Block[LP_PVP.Block[0]],170,75);
-      drawbuttom(10,10,"ルーム"+IAM.room,1,30,44);
-      if(data.focus==2){
-        cx2.fillText('♪「STARDUST LEMON」',530,55);
-        cx2.fillText('/yuhei komatsu',560,75);
-      }
-      if(IsHost(IAM.room)){
-      cx2.textAlign = "center";
-      cx2.fillText('ルーム設定',700,100);
-      cx2.font = "bold 22px Arial";
-      var X=700;
-      var Y=130;
-      cx2.fillText('ルール',X,Y);
-      Y+=30;
-      cx2.fillText("◀　　　　　▶",X,Y);
-      cx2.fillText(LP_PVP.Rule[LP_PVP.Rule[0]],X,Y);
-      Y+=40;
-      cx2.fillText('持ち点',X,Y);
-      Y+=30;
-      cx2.fillText("◀　　　　　▶",X,Y);
-      cx2.fillText(LP_PVP.LP[LP_PVP.LP[0]],X,Y);
-      Y+=40;
-      cx2.fillText('東風/半荘',X,Y);
-      Y+=30;
-      cx2.fillText("◀　　　　　▶",X,Y);
-      cx2.fillText(LP_PVP.Length[LP_PVP.Length[0]],X,Y);
-      Y+=40;
-      cx2.fillText('満貫打ち止め',X,Y);
-      Y+=30;
-      cx2.fillText("◀　　　　　▶",X,Y);
-      cx2.fillText(LP_PVP.Block[LP_PVP.Block[0]],X,Y);
-      cx2.textAlign = "start";
-      };
-    }
-    if(IsHost(IAM.room)){
-      //LP_PVP={Length:[1,"東風","半荘",],LP:[1,75000,150000,300000],Block:[1,"満貫あり","満貫なし"],Rule:[1,"サドンデス","デスマッチ"]};
-      drawbuttom2(420,520,"対局開始",0); 
-      drawbuttom2(600,520,"退出する",0);                       
-      }else{
-        var A=data.list.findIndex(value=>value.token==IAM.token);
-        if(A==-1){
-          console.log('token error',A);
-          A=0;
+      updateRoomGraph()
+      console.log('room updated')
+      //
+      function updateRoomGraph(){
+        menuMap(4);
+        if(data.focus==2){
+          var t = new createjs.Text('♪「STARDUST LEMON」', "14px Arial", "white");
+          t.x=530
+          t.y=55;
+          menu_duel.addChild(t);
+          var t = new createjs.Text('/yuhei komatsu', "14px Arial", "white");
+          t.x=560
+          t.y=75;
+          menu_duel.addChild(t);
         }
-        if(A>0 && data.list[A].ready){
-      drawbuttom2(420,520,"Quit",0);
-      drawbuttom2(600,520,"退出する",1);
-        }else if(A>0){
-      drawbuttom2(420,520,"Ready",0);
-      drawbuttom2(600,520,"退出する",0);
-        }
-      }
-      cx4.fillStyle='orange';
-      drawstar(20,125);
-      cx2.fillStyle = "white";
-      switch(data.list.length){
-        case 1:
-        cx2.clearRect(10,100,150,400)
-          cx2.font = "14px Arial";
-          cx2.fillText(data.list[0].crest, 10, 425);
-          cx2.font = "bold 24px Arial";
-          cx2.fillText(data.list[0].name, 10, 450);
-          cx2.fillStyle = "orange";
-          cx2.font = "bold 26px Arial";
-          cx2.fillText("ルーム長", 40, 480);
-        e10.src=chrimg_src[data.list[0].chr]
-        e10.onload=function(){
-      cx2.drawImage(e10,400,0,300,600,10,100,150,300)
-        }
-          break;
-        case 2:
-          cx2.clearRect(10,100,300,400);
-          cx2.font = "14px Arial";
-          cx2.fillText(data.list[0].crest, 10, 425);
-          cx2.fillText(data.list[1].crest, 160, 425);
-          cx2.font = "bold 24px Arial";
-          cx2.fillText(data.list[0].name, 10, 450);
-          cx2.fillText(data.list[1].name, 160, 450);
-          cx2.fillStyle = "orange";
-          cx2.font = "bold 26px Arial";
-          cx2.fillText("ルーム長", 40, 480);
-          if(data.list[1].ready){
-            cx2.fillText("READY", 190, 480);
-          }
-        e10.src=chrimg_src[data.list[0].chr]
-        e10.onload=function(){
-        cx2.drawImage(e10,400,0,300,600,10,100,150,300)
-          e10.src=chrimg_src[data.list[1].chr]
-          e10.onload=function(){
-          cx2.drawImage(e10,400,0,300,600,160,100,150,300)
-        }}
-          break;
-        case 3:
-          cx2.clearRect(10,100,450,400);
-          cx2.font = "14px Arial";
-          cx2.fillText(data.list[0].crest, 10, 425);
-          cx2.fillText(data.list[1].crest, 160, 425);
-          cx2.fillText(data.list[2].crest, 310, 425);
-          cx2.font = "bold 24px Arial";
-          cx2.fillText(data.list[0].name, 10, 450);
-          cx2.fillText(data.list[1].name, 160, 450);
-          cx2.fillText(data.list[2].name, 310, 450);
-          cx2.fillStyle = "orange";
-          cx2.font = "bold 26px Arial";
-          cx2.fillText("ルーム長", 40, 480);
-          if(data.list[1].ready){
-            cx2.fillText("READY", 190, 480);
+        if(IsHost(IAM.room)){
+          console.log('button ここ')
+          var btn1 = createButton("対局開始", 170, 60,"#ffbb4d","#ff7b00","#372d23","#5e5e5e");
+          btn1.x = 420;
+          btn1.y = 420;
+          menu_duel.addChild(btn1);   
+          var btn2 = createButton("退出する", 170, 60,"#ffbb4d","#ff7b00","#372d23","#5e5e5e");
+          btn2.x = 600;
+          btn2.y = 420;
+          menu_duel.addChild(btn2);   
+          btn1.addEventListener("click", {card:1,handleEvent:getReady}); 
+          btn2.addEventListener("click", {card:0,handleEvent:getReady}); 
+          }else{
+            var A=data.list.findIndex(value=>value.token==IAM.token);
+            if(A==-1){
+              console.log('token error',A);
+              A=0;
+            }
+            if(A>0 && data.list[A].ready){
+          var btn1 = createButton("Quit", 170, 60,"#ffbb4d","#ff7b00","#372d23","#5e5e5e");
+          btn1.x = 420;
+          btn1.y = 420;
+          menu_duel.addChild(btn1);   
+          var btn2 = createButton("退出する", 170, 60,"#ffbb4d","#ff7b00","#372d23","#5e5e5e");
+          btn2.x = 600;
+          btn2.y = 420;
+          menu_duel.addChild(btn2);  
+          btn1.addEventListener("click", {card:1,handleEvent:getReady}); 
+          btn2.addEventListener("click", {card:-1,handleEvent:getReady}); 
+            }else if(A>0){
+          var btn1 = createButton("Ready", 170, 60,"#ffbb4d","#ff7b00","#372d23","#5e5e5e");
+          btn1.x = 420;
+          btn1.y = 420;
+          menu_duel.addChild(btn1);   
+          var btn2 = createButton("退出する", 170, 60,"#ffbb4d","#ff7b00","#372d23","#5e5e5e");
+          btn2.x = 600;
+          btn2.y = 420;
+          menu_duel.addChild(btn2);  
+          btn1.addEventListener("click", {card:1,handleEvent:getReady}); 
+          btn2.addEventListener("click", {card:0,handleEvent:getReady}); 
+            }
           };
-          if(data.list[2].ready){
-            cx2.fillText("READY", 340, 480);
+          function getReady(){
+          switch(this.card){
+            case -1:
+              se3.play();
+              alert("Ready状態を解除してください。");
+            break;
+            case 0:
+                msgstate=0;
+                se3.play();
+                var clientId=Username;
+                var clientChr=chara[1];
+                var roomId=RoomName[IAM.room];
+                //個人のルーム設定を初期化
+                LP_PVP={Length:[1,"東風","半荘",],LP:[1,75000,150000,300000],Block:[1,"満貫あり","満貫なし"],Rule:[1,"サバイバル","デスマッチ","魔界血戦"]};//
+                socket.emit('leave_to_room',{token: IAM.token,name:clientId,chr:clientChr,room:roomId});
+                menuMap(4);
+            break;
+            case 1:
+              msgstate=1;
+              var roomId=RoomName[IAM.room];
+              if(IsHost(IAM.room)){
+                //他のプレイヤーが全員レディならスタート
+                socket.emit('ready_to_start',{token: IAM.token,ready:-1,room:roomId});
+              }else{
+                socket.emit('ready_to_start',{token: IAM.token,ready: IAM.is_ready,room:roomId});
+                if(IAM.is_ready==1){IAM.is_ready=0}else{IAM.is_ready=1};
+              }
+            break;
           }
-        e10.src=chrimg_src[data.list[0].chr]
-        e10.onload=function(){
-        cx2.drawImage(e10,400,0,300,600,10,100,150,300)
-          e10.src=chrimg_src[data.list[1].chr]
-          e10.onload=function(){
-          cx2.drawImage(e10,400,0,300,600,160,100,150,300)
-          e10.src=chrimg_src[data.list[2].chr]
-          e10.onload=function(){
-          cx2.drawImage(e10,400,0,300,600,310,100,150,300)
-        }}}
-          break;
-        case 4:
-          cx2.clearRect(10,100,600,400);
-          cx2.font = "14px Arial";
-          cx2.fillText(data.list[0].crest, 10, 425);
-          cx2.fillText(data.list[1].crest, 160, 425);
-          cx2.fillText(data.list[2].crest, 310, 425);
-          cx2.fillText(data.list[3].crest, 460, 425);
-          cx2.font = "bold 24px Arial";
-          cx2.fillText(data.list[0].name, 10, 450);
-          cx2.fillText(data.list[1].name, 160, 450);
-          cx2.fillText(data.list[2].name, 310, 450);
-          cx2.fillText(data.list[3].name, 460, 450);
-          cx2.fillStyle = "orange";
-          cx2.font = "bold 26px Arial";
-          cx2.fillText("ルーム長", 40, 480);
-          if(data.list[1].ready){
-            cx2.fillText("READY", 190, 480);
           };
-          if(data.list[2].ready){
-            cx2.fillText("READY", 340, 480);
-          }
-          if(data.list[3].ready){
-            cx2.fillText("READY", 490, 480);
-          }
-        e10.src=chrimg_src[data.list[0].chr]
-        e10.onload=function(){
-        cx2.drawImage(e10,400,0,300,600,10,100,150,300)
-          e10.src=chrimg_src[data.list[1].chr]
-          e10.onload=function(){
-          cx2.drawImage(e10,400,0,300,600,160,100,150,300)
-          e10.src=chrimg_src[data.list[2].chr]
-          e10.onload=function(){
-          cx2.drawImage(e10,400,0,300,600,310,100,150,300)
-          e10.src=chrimg_src[data.list[3].chr]
-          e10.onload=function(){
-          cx2.drawImage(e10,400,0,300,600,460,100,150,300)
-        }}}}
-          break;
+          var Cstar = new createjs.Shape(graphics);
+            Cstar.x=30;
+            Cstar.y=120;
+            Cstar.rotation=-15;
+            Cstar.scale=0.6;
+            menu_duel.addChild(Cstar)
+          for(var i=0;i<data.list.length;i++){
+            var t = new createjs.Text(data.list[i].crest, "14px Arial", "white");
+            t.x=10+150*i
+            t.y=425;
+            menu_duel.addChild(t);
+            var t = new createjs.Text(data.list[i].name, "bold 24px Arial", "white");
+            t.x=10+150*i
+            t.y=450;
+            menu_duel.addChild(t);
+            if(i==0){
+            var t = new createjs.Text("ルーム長", "bold 26px Arial", "orange");
+            t.x=40+150*i
+            t.y=480;
+            menu_duel.addChild(t);
+            }else{
+            if(data.list[i].ready){
+              var t = new createjs.Text("READY", "bold 26px Arial", "orange");
+              t.x=40+150*i
+              t.y=480;
+              menu_duel.addChild(t);
+            }}
+            var e = new createjs.Bitmap(chrimg_src[data.list[i].chr]);
+            e.sourceRect={x:400,y:0,width:300,height:600};
+            e.scale=1/2;
+            e.x=9+150*i
+            e.y=100;
+            menu_duel.addChild(e);
+            }
       }
-    console.log('room updated')
   }
   });
    break;
@@ -6422,9 +6390,12 @@ cx1.drawImage(e7,dorax,10,33,43.5)
       pvpmode=0;
       se1.play();
     }else{
-        if(pvpmode!==1){
-          pvpmode=1;
-          se1.play();
+      field.removeAllChildren();
+      textmap.alpha=0;
+      musicnum=-1;
+      if(pvpmode!==1){
+        pvpmode=1;
+        se1.play();
       }};
     console.log('Setup',pvp);//socketで飛ばすとなんか3回くらい呼び出される
     navisw=0;
@@ -10725,75 +10696,62 @@ cx1.drawImage(e7,dorax,10,33,43.5)
                 cx2.fillStyle = "white";
                 cx2.font = "18px Arial";
                 var elskunn=[
-                  {name:"サバイバル　一般的な麻雀のようなルールです。",sub:"誰かが飛ぶかオーラス終了までドンジャラを",suburb:"します。持ち点が多いほど高順位です。"},
-                  {name:"デスマッチ　和了しても自分の持ち点は増えず、",sub:"誰かが飛んでも試合が続きます。",suburb:"（飛んだプレイヤーは2局後に75000点で復活）"},
-                  {name:"魔界血戦　4人中3人が和了するまで対局が続き、",sub:"後の局ほど点数が高くなります。",suburb:"裏ドラなし、連荘なし"},
+                  {name:"サバイバル　一般的な麻雀のようなルールです。",sub:"誰かが飛ぶかオーラス終了までドンジャラをします。"},
+                  {name:"デスマッチ　和了しても自分の持ち点は増えず、誰かが飛んでも",sub:"試合が続きます。（飛んだプレイヤーは2局後に75000点で復活）"},
+                  {name:"魔界血戦　4人中3人が和了するまで対局が続きます。",sub:"後の局ほど点数が高くなります。"},
                   {name:"持ち点　ゲーム開始時の持ち点です。",sub:"※得点基準参考：親が満貫の場合、75000点"},
                   {name:"対局数の設定　東風では最大4局まで、",sub:"半荘では最大8局までドンジャラが続きます。"},
                   {name:"満貫打ち止め　満貫ブロックの有無の設定です。",sub:"「なし」にすると高得点が出やすくなります。"},
                 ];
                 if(mouseX >160 && mouseX <330 && mouseY >0 && mouseY <45){
-                  cx2.clearRect(10,521,400,70)
                   if(LP_PVP.Rule[0]==1){
-                  cx2.fillText(elskunn[0].name, 20, 540);
-                  cx2.fillText(elskunn[0].sub, 20, 560); 
-                  cx2.fillText(elskunn[0].suburb, 20, 580); 
+                  Textlist[0].text=elskunn[0].name
+                  Textlist[1].text=elskunn[0].sub
                   }else if(LP_PVP.Rule[0]==2){
-                  cx2.fillText(elskunn[1].name, 20, 540);
-                  cx2.fillText(elskunn[1].sub, 20, 560); 
-                  cx2.fillText(elskunn[1].suburb, 20, 580);  
+                    Textlist[0].text=elskunn[1].name
+                    Textlist[1].text=elskunn[1].sub
                 }else if(LP_PVP.Rule[0]==3){
-                  cx2.fillText(elskunn[2].name, 20, 540);
-                  cx2.fillText(elskunn[2].sub, 20, 560); 
-                  cx2.fillText(elskunn[2].suburb, 20, 580);  
+                  Textlist[0].text=elskunn[2].name
+                  Textlist[1].text=elskunn[2].sub
                   }                  
                 }
                 if(mouseX >340 && mouseX <460 && mouseY >0 && mouseY <45){
-                  cx2.clearRect(10,521,400,70);
-                  cx2.fillText(elskunn[3].name, 20, 550);
-                  cx2.fillText(elskunn[3].sub, 20, 570); 
+                  Textlist[0].text=elskunn[4].name
+                  Textlist[1].text=elskunn[4].sub
                 }
                 if(mouseX >160 && mouseX <360 && mouseY >45 && mouseY <80){
-                  cx2.clearRect(10,521,400,70);
-                  cx2.fillText(elskunn[2].name, 20, 550);
-                  cx2.fillText(elskunn[2].sub, 20, 570); 
+                  Textlist[0].text=elskunn[3].name
+                  Textlist[1].text=elskunn[3].sub
                 }
                 if(mouseX >360 && mouseX <530 && mouseY >45 && mouseY <80){
-                  cx2.clearRect(10,521,400,70);
-                  cx2.fillText(elskunn[4].name, 20, 550);
-                  cx2.fillText(elskunn[4].sub, 20, 570); 
+                  Textlist[0].text=elskunn[5].name
+                  Textlist[1].text=elskunn[5].sub
                 }
                 if(IsHost(IAM.room)){
                   if(mouseX >610 && mouseX <790 && mouseY >100 && mouseY <170){
                     cx2.clearRect(10,521,400,70)
                     if(LP_PVP.Rule[0]==1){
-                    cx2.fillText(elskunn[0].name, 20, 540);
-                    cx2.fillText(elskunn[0].sub, 20, 560); 
-                    cx2.fillText(elskunn[0].suburb, 20, 580); 
+                      Textlist[0].text=elskunn[0].name
+                      Textlist[1].text=elskunn[0].sub
                     }else if(LP_PVP.Rule[0]==2){
-                    cx2.fillText(elskunn[1].name, 20, 540);
-                    cx2.fillText(elskunn[1].sub, 20, 560); 
-                    cx2.fillText(elskunn[1].suburb, 20, 580);  
+                      Textlist[0].text=elskunn[1].name
+                      Textlist[1].text=elskunn[1].sub
                     }else if(LP_PVP.Rule[0]==3){
-                    cx2.fillText(elskunn[2].name, 20, 540);
-                    cx2.fillText(elskunn[2].sub, 20, 560); 
-                    cx2.fillText(elskunn[2].suburb, 20, 580);  
+                      Textlist[0].text=elskunn[2].name
+                      Textlist[1].text=elskunn[2].sub
                     }
                   }
                   if(mouseX >610 && mouseX <790 && mouseY >180 && mouseY <240){
-                    cx2.clearRect(10,521,400,70);
-                    cx2.fillText(elskunn[3].name, 20, 550);
-                    cx2.fillText(elskunn[3].sub, 20, 570); 
+                    Textlist[0].text=elskunn[3].name
+                    Textlist[1].text=elskunn[3].sub
                   }
                   if(mouseX >610 && mouseX <790 && mouseY >250 && mouseY <310){
-                    cx2.clearRect(10,521,400,70);
-                    cx2.fillText(elskunn[4].name, 20, 550);
-                    cx2.fillText(elskunn[4].sub, 20, 570); 
+                    Textlist[0].text=elskunn[4].name
+                    Textlist[1].text=elskunn[4].sub
                   }
                   if(mouseX >610 && mouseX <790 && mouseY >310 && mouseY <390){
-                    cx2.clearRect(10,521,400,70);
-                    cx2.fillText(elskunn[5].name, 20, 550);
-                    cx2.fillText(elskunn[5].sub, 20, 570); 
+                    Textlist[0].text=elskunn[5].name
+                    Textlist[1].text=elskunn[5].sub
                   }
                 } 
               break;      
