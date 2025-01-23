@@ -2840,6 +2840,30 @@ function Nyusitu(){
   var Cb = new createjs.Bitmap(C);
   yakumap.addChild(Cb);
   }
+}
+function Nyusitu(){
+  var rn=this.card;
+  console.log('nyusitu',rn);
+  if(msgstate==0){msgstate=1};
+  var clientId=Username;
+  var clientCrest=Usercrest;
+  var clientChr=chara[1];
+  var roomId=RoomName[rn];
+  socket.emit('join_to_room',{token: IAM.token,name:clientId,crest:clientCrest,chr:clientChr,room:roomId});
+  cx4.globalAlpha=1;
+  se3.play();
+  cx4.fillStyle = "rgba(20,20,20,0.7)";
+  cx4.fillRect(0,0,800,600)
+  cx4.font = "bold 26px 'メイリオ'";
+  cx4.fillStyle = "black";
+  cx4.strokeStyle ="rgba(250,250,250,0.9)";
+  cx4.lineWidth=5;
+  cx4.strokeText("入室しています",240,200);
+  cx4.fillText("入室しています",240,200);   
+  var C=canvas4.toDataURL();
+  var Cb = new createjs.Bitmap(C);
+  yakumap.addChild(Cb);
+  }
 function NameChange(){
   se3.play();
   user = window.prompt("プレイヤー名を入力", Username);
@@ -2969,6 +2993,7 @@ function NameChange(){
           field.addChild(menu_solo);
         break;
       case 3:
+        //設定->optionconfigへ
         //設定->optionconfigへ
         break;
       case 4:
@@ -3178,6 +3203,7 @@ function NameChange(){
     field.addChild(setting);
     solo.addEventListener("click", {card:2,handleEvent:Menubutton});
     multi.addEventListener("click", {card:4,handleEvent:Menubutton});
+    multi.addEventListener("click", {card:4,handleEvent:Menubutton});
     howto.addEventListener("click", {card:1,handleEvent:Menubutton});
     setting.addEventListener("click", {handleEvent:OptionConfig});
     var wT=winrank[0]+winrank[1]+winrank[2]+winrank[3]
@@ -3208,7 +3234,9 @@ function NameChange(){
     btn1.addEventListener("click", {card:5,handleEvent:Menubutton});
     menuMap();
     break;
+    break;
         case 3:
+          //フリバからのキャンセルボタン
           //フリバからのキャンセルボタン
           console.log('2439!')
           if(mouseX >80 && mouseX <380 && mouseY >80 && mouseY <480){
@@ -3773,6 +3801,8 @@ function NameChange(){
                 }
               };
                 break;
+              };
+                break;
             }
     //ルーム関連のソケット
   //ゲームスタート
@@ -3848,9 +3878,12 @@ function NameChange(){
         msgstate=2;
         socket.emit('lobby_update');
         menuMap(4);
+        menuMap(4);
       };
     }else{
       console.log('入室失敗');
+      msgstate=0;
+      menuMap(4);
       msgstate=0;
       menuMap(4);
       return false;
