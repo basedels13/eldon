@@ -5,14 +5,13 @@
 //いつか→対戦部屋の工事、通信対戦でのカン処理　pvEでのスキル　場の同じパイの色付け　スマホ対応
 //クレスト役未確認 シナジーの翻数調整
 //流局画面でクリックできず即進んでしまうことがある？
-//duel 局やデッキが初期化されていない？
-//魔界モードのカン時の描画・CPUがカン後にラインで上がる
+//魔界モードのカン時の描画
 window.onload = function(){
   draw();
   };
   
   function draw(){
-  var titletext="v1.021/Click to START";
+  var titletext="v1.022/Click to START";
   var debugmode=true;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にfalseに
   //自分自身の情報を入れる箱
   var IAM = {
@@ -185,12 +184,14 @@ window.onload = function(){
     textmap.addChild(underText);
     Textlist.push(underText);
     var OKtext1 = new createjs.Text("OK (1)", "bold 16px 'メイリオ'", "white");
-    OKtext1.x=730;
-    OKtext1.y=520;
+    OKtext1.x=760;
+    OKtext1.y=500;
+    OKtext1.textAlign="right"
     OKtext1.outline=5;
     var OKtext2 = new createjs.Text("OK (1)", "bold 16px 'メイリオ'", "black");
-    OKtext2.x=730;
-    OKtext2.y=520;
+    OKtext2.x=760;
+    OKtext2.y=500;
+    OKtext2.textAlign="right"
     //残パイ枚数テキスト
     var deckText = new createjs.Text("残:", "24px 'Century Gothic'", "white");
     var tumonameA = new createjs.Text("　", "14px Arial", "white");
@@ -1035,7 +1036,7 @@ function handleComplete() {
 canvas5.onmousedown = mouseDownListener;
 function mouseDownListener(e) {
   createjs.Ticker.addEventListener("tick", MouseCircle);
-  if(gamestate==1 && cLock==1 && opLock>=0 && opLock !==2){
+  if(gamestate ==1 && cLock==1 && opLock>=0 && opLock !==2){
     mpC=-2;
     mpmoving=true;
   }
@@ -9814,6 +9815,8 @@ if(opLock==0 && gamestate ==1){
       //emit
       tweeNsquare.paused=true;
       Csquare.alpha=0;
+      field.addChild(OKtext1);
+      field.addChild(OKtext2);
       if(pvpmode==1){
       if(IsHost(IAM.room)){
         MEMBER[0].turnflag=1;
@@ -9824,6 +9827,10 @@ if(opLock==0 && gamestate ==1){
         MEMBER[i].turnflag=2;
       }
     }}
+      var M=MEMBER.filter(value=>value.turnflag==2)
+      var MM=4-M.length
+      OKtext1.text="OK ("+MM+")";
+      OKtext2.text="OK ("+MM+")";
     }
     yakumap.alpha=0;
     cx4.clearRect(0,0,800,600)
@@ -10160,7 +10167,7 @@ if(opLock==0 && gamestate ==1){
       }
     };
     function corsor(){
-      if(gamestate==10){
+      if(gamestate ==10){
         switch(pagestate){
           case 1:
             //usercrest
