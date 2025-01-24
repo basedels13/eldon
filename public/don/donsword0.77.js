@@ -3,17 +3,15 @@
 //全職75枚（エピックキャラは1枚ずつ増量）＋オールマイティ2枚＋マスター8枚×2（ガ、ロ、ベ、デ、ソ、ア、ハ）合計93枚→61枚スタート
 //対戦で魔界モードのリザルトが出ないらしい
 //いつか→対戦部屋の工事、通信対戦でのカン処理　pvEでのスキル　場の同じパイの色付け　スマホ対応
-//クレスト役未確認
+//クレスト役未確認 シナジーの翻数調整
 //流局画面でクリックできず即進んでしまうことがある？
-//duel 局やデッキが初期化されていない？
-//魔界モードのカン時の描画・CPUがカン後にラインで上がる
-//マージに失敗したのでもしかしたら同じ文言が連続してるかも
+//魔界モードのカン時の描画
 window.onload = function(){
   draw();
   };
   
   function draw(){
-  var titletext="v1.021/Click to START";
+  var titletext="v1.022/Click to START";
   var debugmode=true;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にfalseに
   //自分自身の情報を入れる箱
   var IAM = {
@@ -186,12 +184,14 @@ window.onload = function(){
     textmap.addChild(underText);
     Textlist.push(underText);
     var OKtext1 = new createjs.Text("OK (1)", "bold 16px 'メイリオ'", "white");
-    OKtext1.x=730;
-    OKtext1.y=520;
+    OKtext1.x=760;
+    OKtext1.y=500;
+    OKtext1.textAlign="right"
     OKtext1.outline=5;
     var OKtext2 = new createjs.Text("OK (1)", "bold 16px 'メイリオ'", "black");
-    OKtext2.x=730;
-    OKtext2.y=520;
+    OKtext2.x=760;
+    OKtext2.y=500;
+    OKtext2.textAlign="right"
     //残パイ枚数テキスト
     var deckText = new createjs.Text("残:", "24px 'Century Gothic'", "white");
     var tumonameA = new createjs.Text("　", "14px Arial", "white");
@@ -702,7 +702,7 @@ window.onload = function(){
   var pon2=[];
   var pon3=[];
   var pon4=[];
-  //カンカカン 未実装
+  //カンカカン
   var kansw=[0,0,0,0,0]
   var kan1=[];
   var kan2=[];
@@ -1036,7 +1036,7 @@ function handleComplete() {
 canvas5.onmousedown = mouseDownListener;
 function mouseDownListener(e) {
   createjs.Ticker.addEventListener("tick", MouseCircle);
-  if(gamestate==1 && cLock==1 && opLock>=0 && opLock !==2){
+  if(gamestate ==1 && cLock==1 && opLock>=0 && opLock !==2){
     mpC=-2;
     mpmoving=true;
   }
@@ -4335,6 +4335,7 @@ if(opLock==0 && gamestate ==1){
     }
       function deckHandler(){
         //ゲームスタート時の配牌と画面
+        console.log('deckhandler')
         cx2.clearRect(0,0,800,600);
         field.removeAllChildren();
         guidemap.removeAllChildren();
@@ -4364,6 +4365,7 @@ if(opLock==0 && gamestate ==1){
         auras=0;
         //
         if(pvpmode==1){
+          console.log(skillusage2[0])
           if(LP_PVP.Length[0]==1 && skillusage2[0]==4){
             cx1.fillText("オーラス"+(skillusage2[5]),10,88);
             auras=1;
@@ -4623,16 +4625,11 @@ if(opLock==0 && gamestate ==1){
         field.addChild(tumonameA);
         field.addChild(tumonameB);
         //初期化
-        deck=[]
         dora=[]
         handtemp=[]
         tumotemp=0;
         //Tumotemp=[]
         cpuwant =0
-        hand1=[]
-        hand2=[]
-        hand3=[]
-        hand4=[]
         Ronturn=[];
         trash1=[]
         trash2=[]
@@ -4694,6 +4691,7 @@ if(opLock==0 && gamestate ==1){
             for(var i =0; i<70; i++){
               deck.push(i);
               }
+              deck.push(60,61,62,63,64,65,66,67);
               deck.push(0,4,9,13,17,20,24,28,32,37,42,45,49,52,56);
               if(debugmode){console.log(deck.length);}
             shuffle();
@@ -4737,6 +4735,11 @@ if(opLock==0 && gamestate ==1){
           };
         }else{
         //PvE
+        deck=[]
+        hand1=[]
+        hand2=[]
+        hand3=[]
+        hand4=[]
         for(var i =0; i<70; i++){
         deck.push(i);
         }
@@ -5246,6 +5249,7 @@ if(opLock==0 && gamestate ==1){
               return false;
             }
             //ターンを回す
+            console.log(turn,nuki[0])
           turn =nuki[0]-1;
           if(pvpmode==1){
             if(nuki[0]==0){
@@ -6810,7 +6814,20 @@ if(opLock==0 && gamestate ==1){
         kanj+=1;
       }
     }
+    var ponN=0;
+    switch(player){
+      case 2:
+        ponN=pon2.length+kan2.length;
+      break;
+      case 3:
+        ponN=pon3.length+kan3.length;
+      break;
+      case 4:
+        ponN=pon4.length+kan4.length;
+      break;
+    }
           //ラインチェック
+        if(ponN==0){
           switch(Line["0"]){
             case 2:
             case 1:
@@ -6889,6 +6906,7 @@ if(opLock==0 && gamestate ==1){
           console.log(thinkTime)
           return cputumo;
           }
+        }
           //ペアチェック
           switch(Line["0"]){
             case 2:
@@ -7120,7 +7138,7 @@ if(opLock==0 && gamestate ==1){
                 break;
               case 4:
                 PonN=pon4.length+kan4.length;
-                if(kan1.length){
+                if(kan4.length){
                   var A=kan4.concat();
                   if(kan4.length>=8){
                     A.splice(4,1);
@@ -7747,7 +7765,7 @@ if(opLock==0 && gamestate ==1){
         for (var i=1;i<vichand.length;i++){
         var drawcard=new createjs.Bitmap(eltear_src[vichand[i]]);
         drawcard.x=15+size*(i-1)+raidscore[1]*800;
-        if(i==9){drawcard.x+=15}
+        if(i==vichand.length-1){drawcard.x+=15}
         drawcard.y=120;
         drawcard.scaleX=7/12;
         drawcard.scaleY=31/52;
@@ -9533,7 +9551,7 @@ if(opLock==0 && gamestate ==1){
             break;
         }
         };
-        //相手ターン 制度上は実装
+        //相手ターン
         if(num>=0 && num<70){
         handtemp=[];
         switch(player){
@@ -9797,6 +9815,8 @@ if(opLock==0 && gamestate ==1){
       //emit
       tweeNsquare.paused=true;
       Csquare.alpha=0;
+      field.addChild(OKtext1);
+      field.addChild(OKtext2);
       if(pvpmode==1){
       if(IsHost(IAM.room)){
         MEMBER[0].turnflag=1;
@@ -9807,6 +9827,10 @@ if(opLock==0 && gamestate ==1){
         MEMBER[i].turnflag=2;
       }
     }}
+      var M=MEMBER.filter(value=>value.turnflag==2)
+      var MM=4-M.length
+      OKtext1.text="OK ("+MM+")";
+      OKtext2.text="OK ("+MM+")";
     }
     yakumap.alpha=0;
     cx4.clearRect(0,0,800,600)
@@ -10143,7 +10167,7 @@ if(opLock==0 && gamestate ==1){
       }
     };
     function corsor(){
-      if(gamestate==10){
+      if(gamestate ==10){
         switch(pagestate){
           case 1:
             //usercrest
