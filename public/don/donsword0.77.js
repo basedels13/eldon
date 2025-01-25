@@ -1,17 +1,16 @@
-//var1.022　season2 
+//var1.023　season2 
 // npm run dev
 //全職75枚（エピックキャラは1枚ずつ増量）＋オールマイティ2枚＋マスター8枚×2（ガ、ロ、ベ、デ、ソ、ア、ハ）合計93枚→61枚スタート
-//対戦で魔界モードのリザルトが出ないらしい
-//いつか→対戦部屋の工事、通信対戦でのカン処理　pvEでのスキル　場の同じパイの色付け　スマホ対応
+//いつか→pvEでのスキル　場の同じパイの色付け　スマホ対応
 //クレスト役未確認 シナジーの翻数調整
 //流局画面でクリックできず即進んでしまうことがある？
-//魔界モードのカン時の描画
+//魔界モードの 手札からのカンが同期されない　魔界モードで非ホストがリザルトに辿り着けない
 window.onload = function(){
   draw();
   };
   
   function draw(){
-  var titletext="v1.022/Click to START";
+  var titletext="v1.023/Click to START";
   var debugmode=true;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にfalseに
   //自分自身の情報を入れる箱
   var IAM = {
@@ -302,7 +301,7 @@ window.onload = function(){
   var mpC=0;
   var ManaBreak=0;
   var pvpmode=0;
-  var raidscore=new Array(0,0,0,0,0);//魔界ルールで使用 0->終了時 1-4 和了した人
+  var raidscore=new Array(0,0,0,0,0);//魔界ルールで使用 0->終了時1に 1->和了回数 2->1けっかはっぴょう 2
   var drawcard;
   var Cskillprepare=[0,0,0,0,0];
   //chara0 0->cpuランダム 1->cpu決める
@@ -1306,6 +1305,7 @@ function updateParticles() {
     }
     if(pvpmode==1 && IsHost(IAM.room)){
       //他のプレイヤーが準備できたら次に進む
+      if(LP[0]!==4 || (LP[0]==4 && raidscore[0]==1)){
       MEMBER[0].turnflag=2;
       var M=MEMBER.filter(value=>value.turnflag==2)
       var MM=4-M.length
@@ -1315,94 +1315,114 @@ function updateParticles() {
         if(MEMBER[i].turnflag!==2){
           console.log(MEMBER);
           return false;
+          }
         }
       }
     }
     if(pvpmode==1 && !IsHost(IAM.room)){
       //ホスト以外は待機
-      gamestate =1;
+      if(LP[0]!==4 || (LP[0]==4 && raidscore[0]==1)){
+        gamestate =1;
         socket.emit("game_ready", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[0].id});
         OKtext1.text="waiting…"
         OKtext2.text="waiting…"
         return false;
+      }
     };
-    //一般ルール
-    if(pvpmode==1){
-    switch(LP_PVP.Length[0]){
-      case 1:
-        if(skillusage2[0]>=4){
-          gameover();
-          return false;
-        }
-        break;
-      case 2:
-        if(skillusage2[0]>=8){
-          gameover();
-          return false;
-        }
-        break;
-    } 
-    if(LP_PVP.Rule[0]==1 || LP_PVP.Rule[0]==3){
-    if(LP[1] >=0 && LP[2]>=0 && LP[3] >=0 && LP[4]>=0){
-      gamestate =1
-      deckHandler();
-      return false;
-      }else{
-        gameover();
-        return false;
-      }}else if(LP_PVP.Rule[0]==2){
-        gamestate =1
-        deckHandler();
-        return false;
-      };
-      return false;
-    }
+    //pvpでは東風も考慮
     switch(LP[0]){
       case 0:
+        //一般ルール
+        if(pvpmode==1){
+          if(LP_PVP.Length[0]==1){
+              if(skillusage2[0]>=4){
+                gameover();
+                return false;
+              }
+          }else if(LP_PVP.Length[0]==2){
+              if(skillusage2[0]>=8){
+                gameover();
+                return false;
+              }
+            } 
+        }else{
           if(skillusage2[0]>=8){
           gameover();
           return false;
+          }
         }
         if(LP[1] >=0 && LP[2]>=0 && LP[3] >=0 && LP[4]>=0){
           gamestate =1
           deckHandler();
           return false;
-          }else{
-            gameover();
-            return false;
-          }
+        }else{
+          gameover();
+          return false;
+        }
         break;
         case 1:
-          if(skillusage2[0]>=8){
+          if(pvpmode==1){
+            if(LP_PVP.Length[0]==1){
+                if(skillusage2[0]>=4){
+                  gameover();
+                  return false;
+                }
+            }else if(LP_PVP.Length[0]==2){
+                if(skillusage2[0]>=8){
+                  gameover();
+                  return false;
+                }
+              }
+              gamestate =1;
+              deckHandler();
+            return false;
+          }else{
+            if(skillusage2[0]>=8){
             gameover();
             return false;
-          }
-          if(LP[1] >0){
-            gamestate =1
-            deckHandler();
-            return false;
+            }
+            if(LP[1] >0){
+              gamestate =1
+              deckHandler();
+              return false;
             }else{
               gameover();
-              return false;}
+              return false;
+            }
+          }
           break;
           case 2:
     //ミリオネア
       if(LP[1] >=1000000 || LP[2] >=1000000 || LP[3] >=1000000 || LP[4]>=1000000){
-      gameover();
-      return false;
-    }else{
-      gamestate =1
-      deckHandler();
-      return false;
-    }
+            gameover();
+            return false;
+            }else{
+              gamestate =1
+              deckHandler();
+              return false;
+            }
             break;
             case 4:
     //魔界ルール
     console.log(raidscore);
     if(raidscore[0]==1){
-      if(skillusage2[0]>=8){
+      if(pvpmode==1){
+        if(LP_PVP.Length[0]==1){
+            if(skillusage2[0]>=4){
+              gameover();
+              return false;
+            }
+        }else if(LP_PVP.Length[0]==2){
+            if(skillusage2[0]>=8){
+              gameover();
+              return false;
+            }
+          } 
+      }else{
+        if(skillusage2[0]>=8){
         gameover();
         return false;
+        }
       }
     if(LP[1] >=0 && LP[2]>=0 && LP[3] >=0 && LP[4]>=0){
       gamestate =1;
@@ -1454,8 +1474,9 @@ function updateParticles() {
             gamestate=10;
             pagestate=6;
             msgstate=2;
+            cx2.clearRect(0,0,800,600);
             field.removeAllChildren();
-            menuMap(4);
+            //menuMap(4);
             field.addChild(menu_duel);
             textmap.alpha=1;
             se2.play();
@@ -2411,7 +2432,12 @@ function menuMap(p=0){
               menu_guide.addChild(btn1);
               btn1.addEventListener("click", {card:0,handleEvent:HowtoBt});
               Textlist[0].text="3ペア・ライン通貫の他に特殊な役として";
-              Textlist[1].text="国士無双とクレストシリーズがあります。"
+              Textlist[1].text="国士無双とクレストシリーズがあります。";
+              var e = new createjs.Bitmap(epic_src[2]);
+              e.sourceRect={x:0,y:270,width:600,height:128};
+              e.x=90;
+              e.y=125;
+              menu_guide.addChild(e)
               var t = new createjs.Text("特殊な役-国士無双とクレストシリーズ", "26px 'Century Gothic'", "black");
               t.x=90;
               t.y=90;
@@ -2759,10 +2785,12 @@ var rect = new createjs.Shape();
     t.x=200;
     t.y=30;
     menu_duel.addChild(t);
+    RoomConfigAry.push(t);
     var t = new createjs.Text("持ち点 "+LP_PVP.LP[LP_PVP.LP[0]]+"　"+LP_PVP.Block[LP_PVP.Block[0]], "bold 30px Arial", "white");
     t.x=170;
     t.y=65;
     menu_duel.addChild(t);
+    RoomConfigAry.push(t);
     var rect = new createjs.Shape();
       rect.graphics
         .beginFill("rgba(16, 7, 79, 0.7)")
@@ -2971,7 +2999,6 @@ function NameChange(){
           field.addChild(menu_solo);
         break;
       case 3:
-        //設定->optionconfigへ
         //設定->optionconfigへ
         break;
       case 4:
@@ -3863,6 +3890,7 @@ function NameChange(){
       };
     }else{
       console.log('入室失敗');
+      alert("ルーム入室に失敗しました。");
       msgstate=0;
       menuMap(4);
       return false;
@@ -3883,9 +3911,9 @@ function NameChange(){
         }
       }
       if(IsHost(IAM.room)){
-        var Ary=["◀"+LP_PVP.Rule[LP_PVP.Rule[0]]+"▶","◀"+LP_PVP.LP[LP_PVP.LP[0]]+"▶","◀"+LP_PVP.Length[LP_PVP.Length[0]]+"▶","◀"+LP_PVP.Block[LP_PVP.Block[0]]+"▶"]
+        var Ary=[LP_PVP.Rule[LP_PVP.Rule[0]]+"　"+LP_PVP.Length[LP_PVP.Length[0]]+"戦","持ち点 "+LP_PVP.LP[LP_PVP.LP[0]]+"　"+LP_PVP.Block[LP_PVP.Block[0]],"◀"+LP_PVP.Rule[LP_PVP.Rule[0]]+"▶","◀"+LP_PVP.LP[LP_PVP.LP[0]]+"▶","◀"+LP_PVP.Length[LP_PVP.Length[0]]+"▶","◀"+LP_PVP.Block[LP_PVP.Block[0]]+"▶"]
       }else{
-        var Ary=[LP_PVP.Rule[LP_PVP.Rule[0]],LP_PVP.LP[LP_PVP.LP[0]],LP_PVP.Length[LP_PVP.Length[0]],LP_PVP.Block[LP_PVP.Block[0]]]
+        var Ary=[LP_PVP.Rule[LP_PVP.Rule[0]]+"　"+LP_PVP.Length[LP_PVP.Length[0]]+"戦","持ち点 "+LP_PVP.LP[LP_PVP.LP[0]]+"　"+LP_PVP.Block[LP_PVP.Block[0]],LP_PVP.Rule[LP_PVP.Rule[0]],LP_PVP.LP[LP_PVP.LP[0]],LP_PVP.Length[LP_PVP.Length[0]],LP_PVP.Block[LP_PVP.Block[0]]]
       }
       for(var i=0;i<RoomConfigAry.length;i++){
         RoomConfigAry[i].text=Ary[i];
@@ -3894,11 +3922,6 @@ function NameChange(){
   //入室状態更新
   socket.on("room-update", (data)=>{
     if(gamestate>=0 && gamestate<=2){
-      cx4.globalAlpha = 1;
-      cx4.clearRect(0,0,800,600);
-      cx4.font = "bold 26px 'メイリオ'";
-      cx4.fillStyle = "white";
-      cx4.fillText('ルーム人数が変化したため、ゲームが終了しました',50,590);
       se3.play();
       scoretemp[0]=-1;
       opLock=0;
@@ -4363,9 +4386,15 @@ if(opLock==0 && gamestate ==1){
         field.addChild(t);
         skillusage2[0]+=1;
         auras=0;
-        //
         if(pvpmode==1){
-          console.log(skillusage2[0])
+          if(debugmode){console.log(skillusage2[0],MEMBER)};
+          for(var i=0;i<MEMBER.length;i++){
+            MEMBER[i].turnflag=0;
+          }
+          MEMBER[parent].turnflag=1;
+          for(var i=0;i<MEMBER.length;i++){
+            console.log(MEMBER[i].turnflag)
+          };
           if(LP_PVP.Length[0]==1 && skillusage2[0]==4){
             cx1.fillText("オーラス"+(skillusage2[5]),10,88);
             auras=1;
@@ -4837,8 +4866,8 @@ if(opLock==0 && gamestate ==1){
         console.log(hand4);
         }
       };
-        dora=king.splice(0,1);
-        if(debugmode){console.log(dora)}
+      dora=king.splice(0,1);
+      if(debugmode){console.log(dora)}
       dorax=60
       handgraph(-1,1);
       decklength(1);
@@ -5177,6 +5206,34 @@ if(opLock==0 && gamestate ==1){
       }
       }
     });
+    socket.on("nuki-pai", (data)=>{
+      //非送信者ならカンのアニメーションを表示する
+      if(IAM.token!== data.Token){
+        var N=1+MEMBER.findIndex(value=>value.id==data.who);
+        if(debugmode){console.log('kan-pai',N,data.status);}
+      if(data.status){
+        nuki[0]=N;
+        if(data.pai==100){
+          console.log(data.handtest);
+        switch(N){
+          case 2:
+            hand2=data.handtest.concat();
+            break;
+          case 3:
+            hand3=data.handtest.concat();
+            break;
+          case 4:
+            hand4=data.handtest.concat();
+            break;
+          default:
+            console.log('pon-pai N error?',N);
+            kansw[N]=kan1.length;
+            break;
+        }};
+        Kan(N,data.pai);
+      }
+      };
+    });
       function turnchecker(n=-1){
         console.log('turnchecker'+turn,ponsw[0])
         if(n>=0){tumotemp=n};
@@ -5343,10 +5400,10 @@ if(opLock==0 && gamestate ==1){
                 var R=Math.random();
                 if(R>poncpu[2]){
                   Kan(2,tumotemp);
-                    socket.emit("nuki", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[3].id,status:true});
+                    socket.emit("nuki", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[1].id,pai:tumotemp,status:true});
                 return false;
               }else{
-                  socket.emit("nuki", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[3].id,status:false});
+                  socket.emit("nuki", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[1].id,pai:tumotemp,status:false});
                 //kansw[4]=kan4.length;
               }}else{
               return false;
@@ -5370,11 +5427,11 @@ if(opLock==0 && gamestate ==1){
               }else if(IsHost(IAM.room)){
                 var R=Math.random();
                 if(R>poncpu[2]){
-                    socket.emit("pon", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[1].id,status:true});
+                    socket.emit("pon", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[1].id,pai:tumotemp,status:true});
                     Pon(2,tumotemp);
                 return false;
               }else{
-                  socket.emit("pon", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[1].id,status:false});
+                  socket.emit("pon", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[1].id,pai:tumotemp,status:false});
                 ponsw[2]=pon2.length;
               }}else{
                 return false;
@@ -5399,11 +5456,10 @@ if(opLock==0 && gamestate ==1){
                   var R=Math.random();
                   if(R>poncpu[3]){
                     Kan(3,tumotemp);
-                      socket.emit("nuki", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[2].id,status:true});
+                      socket.emit("nuki", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[2].id,pai:tumotemp,status:true});
                   return false;
                 }else{
-                    socket.emit("nuki", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[2].id,status:false});
-                  //kansw[4]=kan4.length;
+                    socket.emit("nuki", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[2].id,pai:tumotemp,status:false});
                 }}else{
                 return false;
                 }
@@ -5426,10 +5482,10 @@ if(opLock==0 && gamestate ==1){
                 var R=Math.random();
                 if(R>poncpu[3]){
                   Pon(3,tumotemp);
-                    socket.emit("pon", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[2].id,status:true});
+                    socket.emit("pon", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[2].id,pai:tumotemp,status:true});
                 return false;
               }else{
-                  socket.emit("pon", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[2].id,status:false});
+                  socket.emit("pon", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[2].id,pai:tumotemp,status:false});
                 ponsw[3]=pon3.length;
               }}else{
               return false;
@@ -5454,10 +5510,10 @@ if(opLock==0 && gamestate ==1){
                   var R=Math.random();
                   if(R>poncpu[4]){
                     Kan(4,tumotemp);
-                      socket.emit("nuki", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[3].id,status:true});
+                      socket.emit("nuki", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[3].id,pai:tumotemp,status:true});
                   return false;
                 }else{
-                    socket.emit("nuki", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[3].id,status:false});
+                    socket.emit("nuki", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[3].id,pai:tumotemp,status:false});
                   //kansw[4]=kan4.length;
                 }}else{
                 return false;
@@ -5707,6 +5763,8 @@ if(opLock==0 && gamestate ==1){
               hand3=data.Hand.hand4.concat();
               hand4=data.Hand.hand1.concat();
               for(var i=1;i<4;i++){
+                //reach 0 2 3 4 1
+                //Reach 0 1 2 3 4
                 reach[i]=data.Reach[i+1];
                 DP[i]=data.Dp[i+1];
                 ippatu[i]=data.Ippatu[i+1];
@@ -5723,6 +5781,8 @@ if(opLock==0 && gamestate ==1){
               hand3=data.Hand.hand1.concat();
               hand4=data.Hand.hand2.concat();
               for(var i=1;i<3;i++){
+                //reach   3 4 1 2
+                //Reach 0 1 2 3 4
                 reach[i]=data.Reach[i+2];
                 reach[i+2]=data.Reach[i];
                 DP[i]=data.Dp[i+2];
@@ -5739,6 +5799,8 @@ if(opLock==0 && gamestate ==1){
               hand3=data.Hand.hand2.concat();
               hand4=data.Hand.hand3.concat();
               for(var i=2;i<5;i++){
+                //reach   4 1 2 3
+                //Reach 0 1 2 3 4
                 reach[i]=data.Reach[i-1];
                 DP[i]=data.Dp[i-1];
                 ippatu[i]=data.Ippatu[i-1];
@@ -7342,7 +7404,7 @@ if(opLock==0 && gamestate ==1){
             if(keyj3.length==1){
               var M=handtemp.findIndex(value=>value>=60 && value<=67)
               if(M!==-1){
-              console.log('crest tumo'+donpai[M].name)
+              console.log('crest tumo'+donpai[handtemp[M]].name)
               if(reach[player]==0 && reachR==0){reach[player]=1};
                 return true;
               }else{
@@ -7607,7 +7669,7 @@ if(opLock==0 && gamestate ==1){
       han[player]+=nuki[player];
       if(nuki[0]>0){han[player]+=1}//嶺上
       if(ippatu[player]==1){han[player] +=1}
-      if(counter[player] ==0 && num==0){han[player] +=4}//天和 4翻
+      if(counter[player] ==0 && num==0){han[player] +=12}//天和 12翻
       if(deck.length ==0){han[player] +=1};//海底
       if(ponsw[player] >0){han[player] -=2};//鳴き
       var doracheck =Doracheck(player);
@@ -7666,7 +7728,7 @@ if(opLock==0 && gamestate ==1){
       console.log(Astyle);
       Resultary.push(Astyle)
       if(counter[player] ==0){
-        if(num==0){Resultary.push('天和 4翻');}
+        if(num==0){Resultary.push('天和 12翻');}
         PB("天和");
         }
         if(Astyle=="国士無双"){
@@ -8287,6 +8349,7 @@ if(opLock==0 && gamestate ==1){
         //console.log(handtemp[9],handtemp)
             var Count={};
             var Line={};
+            var Color={};
             for(var i=1; i<handtemp.length;i++){
               var C=donpai.findIndex(value=>value.id==handtemp[i]);
               if(C==-1){
@@ -8295,8 +8358,10 @@ if(opLock==0 && gamestate ==1){
               }
               var elm=donpai[C].name;
               var elm2=donpai[C].line
+              var elm3=donpai[C].color;
               Count[elm]=(Count[elm] || 0)+1
               Line[elm2]=(Line[elm2] || 0)+1
+              Color[elm3]=(Color[elm3] || 0)+1
             }
             console.log(Count);
             console.log(Line);
@@ -8341,9 +8406,8 @@ if(opLock==0 && gamestate ==1){
                 kanj+=1;
               }
             }
-            var Pair=tumoj+kanj;//カンしている可能性もあるため
-            //ルリエルとアリエルは別名扱いに注意
-            //console.log(tumoj,reachj);
+            var Pair=tumoj+kanj;
+            //カンしている可能性もあるため
             switch(Line["0"]){
               case 2:
                 //ツモとなるのは3,3,1 3,2,2
@@ -8375,6 +8439,31 @@ if(opLock==0 && gamestate ==1){
                     return result;
                 }
                 break;
+          };
+          //クレストシリーズ
+          var keyj3=Object.keys(Color);
+          var Ary=["0","ソーレス","デニフ","ベントス","アドリアン","ガイア","ロッソ","ハルニエ"];
+          switch(Color["0"]){
+            case 2:
+            case 1:
+              if(keyj3.length==2){
+                console.log('crest tumo',keyj3[1]);
+                var resultF=Object.keys(Color).find((key)=>Color[key]>2);
+                result="クレストオブ"+Ary[resultF];
+                  return result;
+              }
+              break;
+            default:
+              if(keyj3.length==1){
+                var M=handtemp.findIndex(value=>value>=60 && value<=67);
+                var resultF=Object.keys(Color).find((key)=>Color[key]>2);
+                if(M!==-1){
+                console.log('crest tumo',keyj3[0]);
+                result="クレストオブ"+Ary[resultF];
+                return result;
+                }
+              }
+            break;
           }
             //国士無双:エピックラインのみ、かつ同パイを含まない
             var Kokushi=[60,61,62,63,64,65,66,67,68,69]
@@ -9370,8 +9459,10 @@ if(opLock==0 && gamestate ==1){
             var Count={};
             for(var i=1; i<handtest.length;i++){
             var C=donpai.findIndex(value=>value.id==handtest[i])
-            var elm=donpai[C].name;
-            Count[elm]=(Count[elm] || 0)+1
+            if(C!==-1){
+              var elm=donpai[C].name;
+              Count[elm]=(Count[elm] || 0)+1
+              }
             }
             var resultF=Object.keys(Count).filter((key)=>Count[key]>=4);
             if(resultF.length){
@@ -9424,8 +9515,10 @@ if(opLock==0 && gamestate ==1){
             var Count={};
             for(var i=1; i<handtest.length;i++){
             var C=donpai.findIndex(value=>value.id==handtest[i])
-            var elm=donpai[C].name;
-            Count[elm]=(Count[elm] || 0)+1
+            if(C!==-1){
+              var elm=donpai[C].name;
+              Count[elm]=(Count[elm] || 0)+1
+              }
             }
             var resultF=Object.keys(Count).filter((key)=>Count[key]>=4);
             if(resultF.length){
@@ -9478,8 +9571,10 @@ if(opLock==0 && gamestate ==1){
             var Count={};
             for(var i=1; i<handtest.length;i++){
             var C=donpai.findIndex(value=>value.id==handtest[i])
+            if(C!==-1){
             var elm=donpai[C].name;
             Count[elm]=(Count[elm] || 0)+1
+            }
             }
             var resultF=Object.keys(Count).filter((key)=>Count[key]>=4);
             if(resultF.length){
@@ -9527,13 +9622,14 @@ if(opLock==0 && gamestate ==1){
             };
             //手札のみ4枚 この場合は槍槓できない
             var handtest=[];
-            var A;
             handtest=hand4.concat();
             var Count={};
             for(var i=1; i<handtest.length;i++){
             var C=donpai.findIndex(value=>value.id==handtest[i])
-            var elm=donpai[C].name;
-            Count[elm]=(Count[elm] || 0)+1
+            if(C!==-1){
+              var elm=donpai[C].name;
+              Count[elm]=(Count[elm] || 0)+1
+              }
             }
             var resultF=Object.keys(Count).filter((key)=>Count[key]>=4);
             if(resultF.length){
@@ -10100,7 +10196,7 @@ if(opLock==0 && gamestate ==1){
             if(debugmode){console.log(nukiswitch)};
               if(pvpmode==1){
                 //emitの文字を変えると面倒なかもしれない
-              socket.emit("nuki", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[0].id});
+              socket.emit("nuki", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[0].id,pai:100,handtest:[hand1],status:true});
               }
               cLock=0;
               console.log('操作禁止',cLock);
@@ -10110,7 +10206,7 @@ if(opLock==0 && gamestate ==1){
             if(debugmode){console.log(nukiswitch)};
               if(pvpmode==1){
                 //emitの文字を変えると面倒なかもしれない
-              socket.emit("nuki", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[0].id});
+                socket.emit("nuki", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[0].id,pai:tumotemp,status:true});
               }
               cLock=0;
               console.log('操作禁止',cLock);
@@ -11616,17 +11712,14 @@ if(opLock==0 && gamestate ==1){
     if(IAM.token!==data.Token){
       if(data.scoretemp==-1){
         scoretemp[0]=-1;
+        gameover('ルーム人数が変化したため、ゲームが終了しました');
       }
       if(data.scoretemp==-2){
         scoretemp[0]=-1;
-        cx4.globalAlpha=1;
-        cx4.font = "bold 26px 'メイリオ'";
-        cx4.fillStyle = "white";
         var RsString=['ルーム長がトイレに行きました','ルーム長権限が発動しました','ルーム長がゲームを終了させました'];
         var A=Math.floor(Math.random()*RsString.length);
-        cx4.fillText(RsString[A],50,590);
+        gameover(RsString[A]);
       }
-      gameover();
     }
   });
   function gameover(word="クリックで進む"){//けっかはっぴょぉうする
