@@ -867,6 +867,10 @@ window.onload = function(){
     src:"don/suzu.mp3",
     volume: 0.3,
     });
+  var se18 = new Howl({
+    src:"don/Tambourine04-03.mp3",
+    volume: 0.3,
+    });
   const jingle =new Howl({
       src: "don/Don_jingle.mp3",
       volume: 0.3,
@@ -1305,12 +1309,28 @@ function updateParticles() {
     }
     if(pvpmode==1 && IsHost(IAM.room)){
       //他のプレイヤーが準備できたら次に進む
+      //ゲームオーバー画面へは非同期で進む
       if(LP[0]!==4 || (LP[0]==4 && raidscore[0]==1)){
       MEMBER[0].turnflag=2;
       var M=MEMBER.filter(value=>value.turnflag==2)
       var MM=4-M.length
       OKtext1.text="OK ("+MM+")";
       OKtext2.text="OK ("+MM+")";
+      if(LP_PVP.Length[0]==1){
+          if(skillusage2[0]>=4){
+            gameover();
+            return false;
+          }
+      }else if(LP_PVP.Length[0]==2){
+          if(skillusage2[0]>=8){
+            gameover();
+            return false;
+          }
+        }
+      if(LP[0]!==1 && (LP[1] <0 || LP[2]<0 || LP[3] <0 || LP[4]<0)){
+        gameover();
+        return false;
+      }
       for(var i=0;i<MEMBER.length;i++){
         if(MEMBER[i].turnflag!==2){
           console.log(MEMBER);
@@ -1326,6 +1346,21 @@ function updateParticles() {
         socket.emit("game_ready", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[0].id});
         OKtext1.text="waiting…"
         OKtext2.text="waiting…"
+        if(LP_PVP.Length[0]==1){
+            if(skillusage2[0]>=4){
+              gameover();
+              return false;
+            }
+          }else if(LP_PVP.Length[0]==2){
+              if(skillusage2[0]>=8){
+                gameover();
+                return false;
+              }
+            }
+          if(LP[0]!==1 && (LP[1] <0 || LP[2]<0 || LP[3] <0 || LP[4]<0)){
+            gameover();
+            return false;
+        }
         return false;
       }
     };
@@ -1361,22 +1396,7 @@ function updateParticles() {
         }
         break;
         case 1:
-          if(pvpmode==1){
-            if(LP_PVP.Length[0]==1){
-                if(skillusage2[0]>=4){
-                  gameover();
-                  return false;
-                }
-            }else if(LP_PVP.Length[0]==2){
-                if(skillusage2[0]>=8){
-                  gameover();
-                  return false;
-                }
-              }
-              gamestate =1;
-              deckHandler();
-            return false;
-          }else{
+        //デスマッチ
             if(skillusage2[0]>=8){
             gameover();
             return false;
@@ -1388,11 +1408,10 @@ function updateParticles() {
             }else{
               gameover();
               return false;
-            }
           }
           break;
           case 2:
-    //ミリオネア
+      //ミリオネア
       if(LP[1] >=1000000 || LP[2] >=1000000 || LP[3] >=1000000 || LP[4]>=1000000){
             gameover();
             return false;
@@ -9188,7 +9207,6 @@ if(opLock==0 && gamestate ==1){
               ippatu[i]=2;
             }
           }
-            se8.play();
             PonAnimation(player);
           break;
         case 2:
@@ -9214,7 +9232,6 @@ if(opLock==0 && gamestate ==1){
               ippatu[i]=2;
             }
           }
-        se8.play();
         PonAnimation(player);
           break;
         case 3:
@@ -9240,7 +9257,6 @@ if(opLock==0 && gamestate ==1){
             ippatu[i]=2;
           }
         }
-        se8.play();
         PonAnimation(player);
           break;
         case 4:
@@ -9266,7 +9282,6 @@ if(opLock==0 && gamestate ==1){
               ippatu[i]=2;
             }
           }
-        se8.play();
         PonAnimation(player);
       break;
       }
@@ -9389,7 +9404,7 @@ if(opLock==0 && gamestate ==1){
                     pon1.splice(0,3);
                     hand1.push(100);
                     ponkandraw(player);
-                    se8.play();
+                    se18.play();
                     NukiAnimation(player,N);
                     return true;
                   }
@@ -9402,7 +9417,7 @@ if(opLock==0 && gamestate ==1){
                     pon1.splice(3,3);
                     hand1.push(100);
                     ponkandraw(player);
-                    se8.play();
+                    se18.play();
                     NukiAnimation(player,N);
                     return true;
                   }
@@ -9418,7 +9433,7 @@ if(opLock==0 && gamestate ==1){
                     };
                   hand1.push(100);
                   ponkandraw(player);
-                  se8.play();
+                  se18.play();
                   NukiAnimation(player,-1);
                 }
               return false;
@@ -9433,7 +9448,7 @@ if(opLock==0 && gamestate ==1){
                 //かきなおす
                 hand1.push(100);
                 ponkandraw(player);
-                se8.play();
+                se18.play();
                 NukiAnimation(player,N);
                 return true;
               }
@@ -9447,7 +9462,7 @@ if(opLock==0 && gamestate ==1){
                 pon1.splice(3,3);
                 hand1.push(100);
                 ponkandraw(player);
-                se8.play();
+                se18.play();
                 NukiAnimation(player,N);
                 return true;
               }
@@ -9474,7 +9489,7 @@ if(opLock==0 && gamestate ==1){
                 };
               hand1.push(100);
               ponkandraw(player);
-              se8.play();
+              se18.play();
               NukiAnimation(player,-1);
             }
             break;
@@ -9489,7 +9504,7 @@ if(opLock==0 && gamestate ==1){
                 //かきなおす
                 hand2.push(100);
                 ponkandraw(player);
-                se8.play();
+                se18.play();
                 NukiAnimation(player,N);
                 return true;
               }
@@ -9503,7 +9518,7 @@ if(opLock==0 && gamestate ==1){
                 pon2.splice(3,3);
                 hand2.push(100);
                 ponkandraw(player);
-                se8.play();
+                se18.play();
                 NukiAnimation(player,N);
                 return true;
               }
@@ -9530,7 +9545,7 @@ if(opLock==0 && gamestate ==1){
                 };
               hand2.push(100);
               ponkandraw(player);
-              se8.play();
+              se18.play();
               NukiAnimation(player,-1);
             }
             break;
@@ -9545,7 +9560,6 @@ if(opLock==0 && gamestate ==1){
                 //かきなおす
                 hand3.push(100);
                 ponkandraw(player);
-                se8.play();
                 NukiAnimation(player,N);
                 return true;
               }
@@ -9559,7 +9573,6 @@ if(opLock==0 && gamestate ==1){
                 pon3.splice(3,3);
                 hand3.push(100);
                 ponkandraw(player);
-                se8.play();
                 NukiAnimation(player,N);
                 return true;
               }
@@ -9586,7 +9599,6 @@ if(opLock==0 && gamestate ==1){
                 };
               hand3.push(100);
               ponkandraw(player);
-              se8.play();
               NukiAnimation(player,-1);
             }
             break;
@@ -9601,7 +9613,6 @@ if(opLock==0 && gamestate ==1){
                 //かきなおす
                 hand4.push(100);
                 ponkandraw(player);
-                se8.play();
                 NukiAnimation(player,N);
                 return true;
               }
@@ -9615,7 +9626,6 @@ if(opLock==0 && gamestate ==1){
                 pon4.splice(3,3);
                 hand4.push(100);
                 ponkandraw(player);
-                se8.play();
                 NukiAnimation(player,N);
                 return true;
               }
@@ -9641,7 +9651,6 @@ if(opLock==0 && gamestate ==1){
                 };
               hand4.push(100);
               ponkandraw(player);
-              se8.play();
               NukiAnimation(player,-1);
             }
             break;
@@ -9697,7 +9706,6 @@ if(opLock==0 && gamestate ==1){
               ippatu[i]=2;
             }
           }
-            se8.play();
             NukiAnimation(player);
           break;
         case 2:
@@ -9724,7 +9732,6 @@ if(opLock==0 && gamestate ==1){
               ippatu[i]=2;
             }
           }
-        se8.play();
         NukiAnimation(player);
           break;
         case 3:
@@ -9751,7 +9758,6 @@ if(opLock==0 && gamestate ==1){
             ippatu[i]=2;
           }
         }
-        se8.play();
         NukiAnimation(player);
           break;
         case 4:
@@ -9778,7 +9784,6 @@ if(opLock==0 && gamestate ==1){
               ippatu[i]=2;
             }
           }
-        se8.play();
         NukiAnimation(player);
       break;
       }
@@ -10196,7 +10201,7 @@ if(opLock==0 && gamestate ==1){
             if(debugmode){console.log(nukiswitch)};
               if(pvpmode==1){
                 //emitの文字を変えると面倒なかもしれない
-              socket.emit("nuki", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[0].id,pai:100,handtest:[hand1],status:true});
+              socket.emit("nuki", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[0].id,pai:100,handtest:hand1,status:true});
               }
               cLock=0;
               console.log('操作禁止',cLock);
@@ -11110,6 +11115,7 @@ if(opLock==0 && gamestate ==1){
     };
   
   function PonAnimation(p=0){
+    se8.play();
     ponkanmap.removeAllChildren();
     var Container = new createjs.Container();
     Container.alpha=0;
@@ -11186,6 +11192,7 @@ if(opLock==0 && gamestate ==1){
     };
   function NukiAnimation(p=0,pai=-1,type=0){
       console.log('Kan!',p,pai,type)
+      se18.play();
       var Container = new createjs.Container();
       Container.alpha=0;
       stage.addChild(Container);
@@ -12461,6 +12468,7 @@ if(opLock==0 && gamestate ==1){
         se15.volume(0);
         se16.volume(0);
         se17.volume(0);
+        se18.volume(0);
         jingle.volume(0);
         jingle2.volume(0);
       }else{
@@ -12481,6 +12489,7 @@ if(opLock==0 && gamestate ==1){
       se15.volume(0.3*sBar);
       se16.volume(0.3*sBar);
       se17.volume(0.3*sBar);
+      se18.volume(0.3*sBar);
       jingle.volume(0.3*sBar);
       jingle2.volume(0.3*sBar);
       }
