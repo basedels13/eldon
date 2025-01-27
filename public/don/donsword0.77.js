@@ -1,16 +1,17 @@
-//var1.023　season2 
+//var1.024　season2 
 // npm run dev
 //全職75枚（エピックキャラは1枚ずつ増量）＋オールマイティ2枚＋マスター8枚×2（ガ、ロ、ベ、デ、ソ、ア、ハ）合計93枚→61枚スタート
-//いつか→pvEでのスキル　場の同じパイの色付け　スマホ対応
+//いつか→pvEでのスキル　デスマでキルアシに準じて順位をつける　タイトル画面でミュートの設定
+//deathを参照してください
 //クレスト役未確認 シナジーの翻数調整
-//流局画面でクリックできず即進んでしまうことがある？
-//魔界モードの 手札からのカンが同期されない　魔界モードで非ホストがリザルトに辿り着けない
+//自分のターンで流局になる時、流局画面でクリックできず即進んでしまうことがある？
+//カン後、3ペアリーチした時にロンできない場合がある？
 window.onload = function(){
   draw();
   };
   
   function draw(){
-  var titletext="v1.023/Click to START";
+  var titletext="v1.024/Click to START";
   var debugmode=true;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にfalseに
   //自分自身の情報を入れる箱
   var IAM = {
@@ -160,6 +161,8 @@ window.onload = function(){
     var ponkanmap = new createjs.Container();//プレイ中のボタン系
     stage.addChild(ponkanmap);
     var fieldmap = new createjs.Container();//魔界血戦時のツモ画面の描画に使用
+    var fieldpai = new createjs.Container();//同じ色のパイとか
+    stage.addChild(fieldpai);
     var soundmap = new createjs.Container();
     stage.addChild(soundmap); //sound ミュートボタン
     //Configmap
@@ -649,10 +652,7 @@ window.onload = function(){
   var e4= new Image();
   var e5= new Image();
   //handgraphで使用
-  var e6= new Image();
   var e7= new Image();
-  //ドラ
-  var e8= new Image();
   //アガリ牌描画
   var e9= new Image();
   //リーチの待ちパイ、cpuのpon
@@ -721,12 +721,9 @@ window.onload = function(){
   var dahaiSE=1;
   //初手の積み込み用
   var hand1b =new Array
-  var trash1=[]
-  var trash2=[]
-  var trash3=[]
-  var trash4=[]
   //捨て牌
-  var Extrash=[]
+  var trash=[[],[],[],[]];
+  var Extrash=[];//マナブレ等残パイで嘘つくため
   //除外
   //playerで使われている=>ctl[1]
   //cpuのインターバルをクリアするスイッチ
@@ -755,7 +752,8 @@ window.onload = function(){
   //捨て牌の座標
   var riverx=new Array(0,120,120,120,120)
   var rivery=new Array(0,400,100,200,300)
-  var counter=new Array(0,0,0,0,0)
+  var counter=new Array(0,0,0,0,0);//捨てたパイの数
+  var counterR=new Array(0,0,0,0,0);//何巡目にリーチしたか
   //スペシャルスキル関連
   var skillswitch=new Array(-1,1,1,1,1)
   //1->初期　0->使用可 2->不可
@@ -772,7 +770,7 @@ window.onload = function(){
   //デスマッチ用
   //kill とどめを刺した数
   //assist　最も多くのダメージを与えた人
-  //Admg:0-4プレイヤーに与えたダメージ
+  //Admg:0-4プレイヤーに与えたダメージ　該当プレイヤーが死んだらリセット
   //Bdmg:0-4プレイヤーから受けたダメージ　死んだらリセット
   var startTime=0
   var clearTime=0
@@ -868,8 +866,8 @@ window.onload = function(){
     volume: 0.3,
     });
   var se18 = new Howl({
-    src:"don/Tambourine04-03.mp3",
-    volume: 0.3,
+    src:"don/Onoma-Impact09-1.mp3",
+    volume: 0.7,
     });
   const jingle =new Howl({
       src: "don/Don_jingle.mp3",
@@ -1173,7 +1171,7 @@ function updateParticles() {
   Yakucheck();
   paiView();
   for(var i=0;i<6;i++){
-    var A=Math.floor(Math.random()*45);
+    var A=Math.floor(Math.random()*70);
     s = new createjs.Bitmap(eltear_src[A]);
     s.x=-120;
     s.y=5;
@@ -1654,19 +1652,8 @@ function updateParticles() {
     }
     }else if(cLock==1){
     //クリックしてから捨て牌を描写してturnroleに繋げるところまで
-    //徐々に移行予定
-    //アガリ・ポン・カン・リーチはボタン自体にクリック判定している ->PaiCut,TumoronBt, PonKanBt,reachbt
+    //各種ボタン移行済み
     ctl[1]=0
-    if(turn ==0){
-    if(reach[1] !==3){
-    //自分のツモ
-    if(mouseY >440 && mouseY< 480){
-      if(mouseX >710 && mouseX<790){
-          //スキル
-          if(pvpmode==0){SpecialSkill(1,0)};
-    }}
-    }
-    }//turn
     }
     }//gamestate
       }
@@ -2594,7 +2581,7 @@ function menuMap(p=0){
                     t.y=Y;
                     Y+=30;
                     menu_guide.addChild(t);
-                    var t = new createjs.Text("同キャラ4枚を一組として扱うことができます。", "22px 'Century Gothic'", "black");
+                    var t = new createjs.Text("カンにより同キャラ4枚を一組として扱うことができます。", "22px 'Century Gothic'", "black");
                     t.x=90;
                     t.y=Y;
                     Y+=30;
@@ -2629,7 +2616,12 @@ function menuMap(p=0){
                     t.y=Y;
                     Y+=30;
                     menu_guide.addChild(t);
-                    var t = new createjs.Text("カンをすると、ドラが増えるという特徴があります。", "22px 'Century Gothic'", "black");
+                    var t = new createjs.Text("カンをすると、ドラが1枚増えます。", "22px 'Century Gothic'", "black");
+                    t.x=90;
+                    t.y=Y;
+                    Y+=30;
+                    menu_guide.addChild(t);
+                    var t = new createjs.Text("運がよければ、得点アップを期待できるかもしれません。", "22px 'Century Gothic'", "black");
                     t.x=90;
                     t.y=Y;
                     Y+=30;
@@ -3945,7 +3937,7 @@ function NameChange(){
       scoretemp[0]=-1;
       opLock=0;
       gameover('ルーム人数が変化したため、ゲームが終了しました');
-    }else if(gamestate==10){
+    }else if(gamestate ==10){
     //data.focus 0->誰かが入室してきた 1->ready 2->ゲームオーバーのあと
     if(IsHost(IAM.room) && data.focus==0){
       //ルーム設定を同期
@@ -4334,11 +4326,6 @@ if(opLock==0 && gamestate ==1){
       return true;
     }
     var DD=dora[dora.length-1]
-    var rect = new createjs.Shape();
-    rect.graphics.beginFill("rgba(10,10,10,0.6)")
-                  .drawRect(dorax, 10, 40, 44)
-                  .drawRect(530, 10, 90, 44)
-    field.addChild(rect);
     e7 = new createjs.Bitmap(eltear_src[DD]);
     e7.x=dorax;
     e7.y=10;
@@ -4382,6 +4369,7 @@ if(opLock==0 && gamestate ==1){
         field.removeAllChildren();
         guidemap.removeAllChildren();
         guidemap.alpha=1;
+        fieldpai.removeAllChildren();
         //背景
         if(LP[0]==4){
           backyard.y=-600;
@@ -4395,8 +4383,9 @@ if(opLock==0 && gamestate ==1){
                         .drawRect(630, 400, 160, 80)
                         .drawRect(630, 10, 160, 350)
                         .drawRect(10, 100, 135, 400)
-                        .drawRect(10, 10, 120, 44)
+                        .drawRect(10, 10, 220, 44)
                         .drawRect(10, 60, 135, 34)
+                        .drawRect(530, 10, 90, 44);
         field.addChild(rect);
         field.addChild(Csquare);
         var t = new createjs.Text("ドラ", "24px 'Century Gothic'", "white");
@@ -4491,10 +4480,12 @@ if(opLock==0 && gamestate ==1){
       t.x=720;
       t.y=410;
       field.addChild(t);
+      if(pvpmode==0){
       var t = new createjs.Text("スキル", "16px 'Century Gothic'", "white");
       t.x=720;
       t.y=450;
       field.addChild(t);
+      };
         parentY =400
         e11 = new createjs.Bitmap(chrimg_src[chara[1]]);
         e11.sourceRect={x:500,y:0,width:300,height:600}
@@ -4679,10 +4670,7 @@ if(opLock==0 && gamestate ==1){
         //Tumotemp=[]
         cpuwant =0
         Ronturn=[];
-        trash1=[]
-        trash2=[]
-        trash3=[]
-        trash4=[]
+        trash=[[],[],[],[]];
         Extrash=[];
         c1=0
         opLock=0;
@@ -4713,6 +4701,7 @@ if(opLock==0 && gamestate ==1){
         if(LP[i]<=0){rorder[i]=2}else{rorder[i]=0}
         }
         counter=new Array(0,0,0,0,0)
+        counterR=new Array(0,0,0,0,0)
         riverx=new Array(0,120,120,120,120)
         rivery=new Array(0,400,100,200,300)
         DPlist=new Array(0,0,0,0,0);
@@ -5012,7 +5001,7 @@ if(opLock==0 && gamestate ==1){
     Bgm.volume(N*vBar);
   }
       function Buffdraw(){
-        if(debugmode){console.log('Buffdraw')}
+      //if(debugmode){console.log('Buffdraw')}
      //バフアイコンを描画する
      var x=[0,120,120,120,120];
      var y=[0,400,100,200,300];
@@ -5254,7 +5243,7 @@ if(opLock==0 && gamestate ==1){
       };
     });
       function turnchecker(n=-1){
-        console.log('turnchecker'+turn,ponsw[0])
+        console.log('turnchecker'+turn,ponsw[0],nuki[0],ManaBreak)
         if(n>=0){tumotemp=n};
       //pvpmode1の場合、ホストだけでチェックを行い、
       //プレイヤーのロン・ポン判定はそのプレイヤーになすりつける
@@ -5868,16 +5857,16 @@ if(opLock==0 && gamestate ==1){
     var shapeMask = new createjs.Shape();
     shapeMask.graphics
     .beginFill("gold")
-    .drawRect(140, 0, 660, 100);
+    .drawRect(0, 0, 630, 100);
     shapeMask.scaleY=0.1;
     shapeMask.y=B;
     Container.mask = shapeMask;
     var C = new createjs.Bitmap(chrimg_src[chara[p]]);
-    C.x=-300;
-    C.y=B-250;
+    C.x=-400;
+    C.y=B-200;
     Container.addChild(C);
     createjs.Tween.get(C)
-    .to({x:0},60);
+    .to({x:-460},60);
     MBicon.x=160;
     MBicon.y=B-50;
     Container.addChild(MBicon);
@@ -5921,6 +5910,12 @@ if(opLock==0 && gamestate ==1){
         e7.scale=33/120;
         field.addChild(e7);
       };
+      if(ManaBreak==0 || player==1){
+      trash[player-1].push(tumotemp);
+      }else{
+      //KEが0なので-tumotempは使えない・・
+      trash[player-1].push(-1);
+      }
       if(player==1){Elname(tumotemp)};
       e5= new createjs.Bitmap(eltear_src[tumotemp]);
       e5.src=eltear_src[tumotemp]
@@ -5951,6 +5946,7 @@ if(opLock==0 && gamestate ==1){
         };
         }
       if(ippatu[player]==1){//守備表示
+      counterR[player]=counter[player];
       riverx[player] +=43.5
       e5.rotation=90;
       e5.x=riverx[player]+33;
@@ -5972,7 +5968,7 @@ if(opLock==0 && gamestate ==1){
         field.addChild(s);
         var t = new createjs.Text("X", "bold 26px 'Century Gothic'", "darkred");
         t.rotation=90;
-        t.x=riverx[player]+38;
+        t.x=riverx[player]+28;
         t.y=rivery[player]+10;
         field.addChild(t);
       }
@@ -5989,7 +5985,7 @@ if(opLock==0 && gamestate ==1){
         ReachAnimation(player);
         //イヴ様
         for(var i=1;i<5;i++){
-          if(i!==player && chara[i]==5){
+          if(i!==player && chara[i]==5 && skillusage[i]==0){
             skillusage[i]=player;
           }
       }}else{//通常
@@ -6360,7 +6356,6 @@ if(opLock==0 && gamestate ==1){
     hand1.sort(compareFunc3) 
     hand1=hand1.concat(Hlast)
   }
-  trash1.push(tumotemp);
   ctl[2]=0
   handgraph(0,1)  
   //ボタンとカーソルを消す
@@ -6486,6 +6481,7 @@ if(opLock==0 && gamestate ==1){
           btn1.x = 710;
           btn1.y = 440;
           ponkanmap.addChild(btn1);
+          btn1.addEventListener("click",{card:0,handleEvent:SkillBt});
       }
       setTimeout(()=>{
         cLock=1;
@@ -6835,17 +6831,14 @@ if(opLock==0 && gamestate ==1){
           Cpuhandtemp[r4]=100;
           Cpuhandtemp.sort(compareFunc);
         if(chr==2){
-          trash2.push(tumotemp)
           hand2=Cpuhandtemp.concat();
         if(ponsw[chr]==1){ponsw[chr]=pon2.length;}
         ctl[3]=0;
         }else if(chr==3){
-          trash3.push(tumotemp)
           hand3=Cpuhandtemp.concat();
         if(ponsw[chr]==1){ponsw[chr]=pon3.length;}
         ctl[4]=0;
         }else if(chr==4){
-          trash4.push(tumotemp)
           hand4=Cpuhandtemp.concat();
           if(ponsw[chr]==1){ponsw[chr]=pon4.length;}
         }
@@ -7284,7 +7277,7 @@ if(opLock==0 && gamestate ==1){
               kanj+=1;
             }
           }
-          console.log(keyj3[0],Color[keyj3[0]])
+          //console.log(keyj3[0],Color[keyj3[0]])
           if(PonN==0){
           switch(Line["0"]){
             case 2:
@@ -7453,7 +7446,7 @@ if(opLock==0 && gamestate ==1){
             if(Kreach>2){break;}
           }
         }
-        console.log(Kreach,KKreach);//0,4
+        //console.log(Kreach,KKreach);//0,4
         if(Kreach==1){
           if(KKreach==0 || KKreach==2){
             //8/9枚がマスロパイの場合　ダブリが1つの時にリーチとする
@@ -7563,7 +7556,6 @@ if(opLock==0 && gamestate ==1){
         if(reach[player]!==3){
           return false;
         }
-        cx3.clearRect(50,468,700,26)
         for(var I=1;I<hand1.length-1;I++){
         handtemp=[];
       switch(player){
@@ -7590,14 +7582,15 @@ if(opLock==0 && gamestate ==1){
       handtemp.sort(compareFunc);
       //チェック
       if(judge(player,1)){
-        console.log(I,'危')
-        cx3.font = "20px 'Century Gothic'";
-        cx3.strokeStyle ="#ff4c38";
-        cx3.lineWidth = 5;
-        cx3.lineJoin = 'round';
-        cx3.fillStyle ="white";
-        cx3.strokeText("危",60+size*I,485)
-        cx3.fillText("危",60+size*I,485)
+        var t = new createjs.Text("危", "20px 'Century Gothic'", "#ff4c38");
+        t.x=60+size*I;
+        t.y=470;
+        t.outline=4;
+        fieldpai.addChild(t);
+        var t = new createjs.Text("危", "20px 'Century Gothic'", "white");
+        t.x=60+size*I;
+        t.y=470;
+        fieldpai.addChild(t);
       };
     }};
     function TumoRon(player,num,dub=1){
@@ -7685,7 +7678,6 @@ if(opLock==0 && gamestate ==1){
         han[player]+=12;
       }
       if(num==0 && ponsw[player] ==0){han[player] +=1}//門前ツモ
-      han[player]+=nuki[player];
       if(nuki[0]>0){han[player]+=1}//嶺上
       if(ippatu[player]==1){han[player] +=1}
       if(counter[player] ==0 && num==0){han[player] +=12}//天和 12翻
@@ -7776,9 +7768,6 @@ if(opLock==0 && gamestate ==1){
       if(doracheck>0){
         Resultary.push('ドラ '+doracheck+'翻')
         }
-      if(nuki[player]>0){
-        Resultary.push('抜き '+nuki[player]+'翻')
-      };
       if(ponsw[player] >0){
           Resultary.push('鳴き -2翻')
       }
@@ -9152,7 +9141,6 @@ if(opLock==0 && gamestate ==1){
         }
           var A=Math.floor(tumotemp/4);
           var B=handtemp.filter(value=>value>=4*A && value<4*(A+1));
-          if(debugmode){console.log(B)};
           if(B.length>=2){ponsw[player]=1;
             return true;
           }
@@ -9319,7 +9307,6 @@ if(opLock==0 && gamestate ==1){
         }
           var A=Math.floor(tumoP/4);
           var B=handtemp.filter(value=>value>=4*A && value<4*(A+1));
-          if(debugmode){console.log(B)};
           if(B.length>=4){kansw[player]=1;
             return true;
           }
@@ -9342,7 +9329,6 @@ if(opLock==0 && gamestate ==1){
     }else if(num==-1){
         //相手ターンのカン　未調整
         //return false;
-        console.log('pon'+player,reach[player]);
         if(reach[player]==3){
           //立直しているなら明カンできない
           return false;
@@ -9382,7 +9368,6 @@ if(opLock==0 && gamestate ==1){
         }
           var A=Math.floor(tumotemp/4);
           var B=handtemp.filter(value=>value>=4*A && value<4*(A+1));
-          if(debugmode){console.log(B)};
           if(B.length>=3){kansw[player]=1;
             return true;
           }
@@ -9404,7 +9389,6 @@ if(opLock==0 && gamestate ==1){
                     pon1.splice(0,3);
                     hand1.push(100);
                     ponkandraw(player);
-                    se18.play();
                     NukiAnimation(player,N);
                     return true;
                   }
@@ -9417,7 +9401,6 @@ if(opLock==0 && gamestate ==1){
                     pon1.splice(3,3);
                     hand1.push(100);
                     ponkandraw(player);
-                    se18.play();
                     NukiAnimation(player,N);
                     return true;
                   }
@@ -9433,7 +9416,6 @@ if(opLock==0 && gamestate ==1){
                     };
                   hand1.push(100);
                   ponkandraw(player);
-                  se18.play();
                   NukiAnimation(player,-1);
                 }
               return false;
@@ -9448,7 +9430,6 @@ if(opLock==0 && gamestate ==1){
                 //かきなおす
                 hand1.push(100);
                 ponkandraw(player);
-                se18.play();
                 NukiAnimation(player,N);
                 return true;
               }
@@ -9462,7 +9443,6 @@ if(opLock==0 && gamestate ==1){
                 pon1.splice(3,3);
                 hand1.push(100);
                 ponkandraw(player);
-                se18.play();
                 NukiAnimation(player,N);
                 return true;
               }
@@ -9489,7 +9469,6 @@ if(opLock==0 && gamestate ==1){
                 };
               hand1.push(100);
               ponkandraw(player);
-              se18.play();
               NukiAnimation(player,-1);
             }
             break;
@@ -9504,7 +9483,6 @@ if(opLock==0 && gamestate ==1){
                 //かきなおす
                 hand2.push(100);
                 ponkandraw(player);
-                se18.play();
                 NukiAnimation(player,N);
                 return true;
               }
@@ -9518,7 +9496,6 @@ if(opLock==0 && gamestate ==1){
                 pon2.splice(3,3);
                 hand2.push(100);
                 ponkandraw(player);
-                se18.play();
                 NukiAnimation(player,N);
                 return true;
               }
@@ -9545,7 +9522,6 @@ if(opLock==0 && gamestate ==1){
                 };
               hand2.push(100);
               ponkandraw(player);
-              se18.play();
               NukiAnimation(player,-1);
             }
             break;
@@ -10023,6 +9999,7 @@ if(opLock==0 && gamestate ==1){
           //eltear.src=eltear_src[hand1[hand1.length-1]]
           se4.play();
           if(skillusage[1]>0 && chara[1]==5){
+            fieldHint(-1);
             yoti(skillusage[1]);
           }
             }else if(handsort==0){
@@ -10034,6 +10011,7 @@ if(opLock==0 && gamestate ==1){
           handgraph(0,1,1)
           se4.play();
           if(skillusage[1]>0 && chara[1]==5){
+            fieldHint(-1);
             yoti(skillusage[1]);
           }
         }
@@ -10060,12 +10038,15 @@ if(opLock==0 && gamestate ==1){
     }
     function handOnCorsor(){
       //手札のカーソル
-      //if(debugmode){console.log('handOnCorsor',this.card)}
-      if(opLock==2){return false};//カーソル表示しない時　現在：esc中のみ非表示
+      if(opLock==2 || gamestate !==1){return false};//カーソル表示しない時　現在：esc中のみ非表示
       switch(this.card){
         case -1:
           tweeNcor.paused=true;
           CorsorKey.alpha=0;
+          fieldHint(-1);
+          if(skillusage[1]>0 && chara[1]==5){
+            yoti(skillusage[1]);
+            }
           break;
         case 101:
           //ソートぼたん
@@ -10085,16 +10066,10 @@ if(opLock==0 && gamestate ==1){
           CorsorKey.alpha=1;
           tweeNcor.paused=false;
           Elname(hand1[hand1.length-1],hand1.length-1)
-          break;
-        case 99:
-          //ツモパイの2
-          CorsorKey.scaleX=0.7;
-          CorsorKey.scaleY=0.91;
-          CorsorKey.x=620
-          CorsorKey.y=500;
-          CorsorKey.alpha=1;
-          tweeNcor.paused=false;
-          Elname(hand1[hand1.length-2],hand1.length-1)
+          fieldHint(0,hand1[hand1.length-1])
+          if(skillusage[1]>0 && chara[1]==5){
+            yoti(skillusage[1]);
+            }
           break;
         default:
           CorsorKey.scaleX=0.7;
@@ -10104,8 +10079,84 @@ if(opLock==0 && gamestate ==1){
           CorsorKey.alpha=1;
           tweeNcor.paused=false;    
           Elname(hand1[this.card],this.card)  
+          fieldHint(0,hand1[this.card])
+          if(skillusage[1]>0 && chara[1]==5){
+            yoti(skillusage[1]);
+            }
           break;
       }
+    }
+    function fieldHint(p=0,pai=-1){
+    //handsort時は場の同じキャラのパイ、handsort1時は同じラインに色付けを行う
+    if(debugmode){console.log('fieldHint',p,pai)}
+    if(p==-1){
+      //カーソルが離れた時
+      fieldpai.removeAllChildren();
+      return true;
+    }
+    if(p==0){
+      fieldpai.removeAllChildren();
+      //同じキャラに色付け
+      var X=[0,153,153,153,153];
+      var Y=[0,400,100,200,300];
+      var Ary=[];
+      for(var i=1;i<5;i++){
+        Ary=trash[i-1].concat();
+        for(var j=0;j<counter[i];j++){
+        if(j==14){
+          Y[i] +=50
+          X[i] =143
+          }
+        if(j==28){
+          Y[i] +=50
+          X[i] =143
+          }
+          if(counterR[i]>0 && counterR[i]==j){
+            if(chrlinecheck(pai,Ary[j])){
+            var rect = new createjs.Shape();
+            rect.graphics.beginFill("rgba(0, 200, 173, 0.5)").drawRoundRect(X[i]-10.5, Y[i]+5.25, 43.5, 33,5,5)
+            rect.compositeOperation = "lighter";
+            fieldpai.addChild(rect);
+            }
+            X[i]+=43.5;
+          }else{
+            if(chrlinecheck(pai,Ary[j])){
+            var rect = new createjs.Shape();
+            rect.graphics
+            .beginFill("rgba(0, 200, 173, 0.5)").drawRoundRect(X[i], Y[i], 33, 43.5,5,5)
+            rect.compositeOperation = "lighter";
+            fieldpai.addChild(rect);
+            }
+            X[i] +=33;
+          }
+        }
+      }
+    };
+    function chrlinecheck(a,b){
+      if(handsort==0){
+        if(a>=0 && a<=67){
+          //エルス-リティア
+          if(a<60 && b<60){
+            if(Math.floor(a/4)==Math.floor(b/4)){
+              return true;
+            }
+          }
+          if(a>=60 && b>=60){
+            //マスロ
+            if(a==b){
+              return true;
+            }
+          }
+        }
+      }else if(handsort==1){
+        if(a>=0 && a<=67 && b>=0 && b<=67){
+          //ライン
+            if(Math.floor(a%4)==Math.floor(b%4)){
+              return true;
+            }
+        }
+      }
+    }
     }
     function ReachBt(){
       switch(this.card){
@@ -10267,6 +10318,57 @@ if(opLock==0 && gamestate ==1){
           break;
       }
     };
+    function SkillBt(){
+      switch(this.card){
+        case 0:
+          //スキルボタン
+          se5.play();
+          var btn1 = createButton("キャンセル", 80, 40);
+          btn1.x = 630;
+          btn1.y = 440;
+          ponkanmap.addChild(btn1)
+          btn1.addEventListener("click",{card:1,handleEvent:SkillBt});
+          //リーチのパイを色付けたりリーチボタンを隠すなど
+          SpecialSkill(1,0);
+          Skillname(1);
+          break;
+        case 1:
+          se3.play()
+          guidemap.removeAllChildren();
+          ponkanmap.removeAllChildren();
+          if(reach[1] ==1){
+          var btn1 = createButton("リーチ", 80, 40);
+          btn1.x = 630;
+          btn1.y = 440;
+          ponkanmap.addChild(btn1);
+          btn1.addEventListener("click",{card:0,handleEvent:ReachBt});
+          }
+          if(Kan(1,-2)){
+            nukiswitch[1]=1;//嶺上開花判定に使用
+            var btn1 = createButton("カン", 80, 40);
+            btn1.x = 710;
+            btn1.y = 400;
+            ponkanmap.addChild(btn1);
+            btn1.addEventListener("click",{card:2,handleEvent:PonKanBt});
+          }
+          if(hand1[0]==-3){
+            se6.play();
+            var btn1=createCircleButton("ツモ",50);
+            btn1.x=320;
+            btn1.y=400;
+            ponkanmap.addChild(btn1)
+            btn1.addEventListener("click", {card:1,handleEvent:TumoronBt});
+          };
+          if(chara[1] !==0 && skillswitch[1]==0 && pvpmode==0){
+            var btn1 = createButton("スキル", 80, 40);
+              btn1.x = 710;
+              btn1.y = 440;
+              ponkanmap.addChild(btn1);
+          }
+          reach[1]=1;
+        break;
+      }
+    }
     function corsor(){
       if(gamestate ==10){
         switch(pagestate){
@@ -10410,7 +10512,7 @@ if(opLock==0 && gamestate ==1){
                 break;
               case 1:
                 if(mouseX >90 && mouseX <200 && mouseY >60 && mouseY <100){
-              Textlist[0].text="ここにはドラパイが1枚表示されます。";
+              Textlist[0].text="ここにはドラパイが表示されます。";
               Textlist[1].text="ドラと同じパイを持っていると、いいことが……？"
                 }
                 if(mouseX >85 && mouseX <200 && mouseY >120 && mouseY <420){
@@ -10568,12 +10670,6 @@ if(opLock==0 && gamestate ==1){
       }
       if(gamestate ==1){
       //スキルは右下に移動
-        if(mouseY >400 && mouseY< 440){
-          if(mouseX >710 && mouseX<790){
-            if(pvpmode==1){
-      Skillname(1);
-            };
-    }}
         if(mouseX >0 && mouseX< 100){
           if(pvpmode==1){
             if(mouseY >100 && mouseY<200){Skillname(2,1);}
@@ -10586,9 +10682,8 @@ if(opLock==0 && gamestate ==1){
           if(mouseY >300 && mouseY<400){Skillname(4,navisw);}
           if(mouseY >400 && mouseY<480){Skillname(1,navisw);}
           }
-      }
-      //河,riverx,120=>110,33,43.5
         }
+      }
       };
     function Elname(num,numb=0){
             //num->id の説明文を右枠に　numb->リーチ時の待ち　hand1の何番目
@@ -11276,59 +11371,77 @@ if(opLock==0 && gamestate ==1){
           }
         };
       };    
-  function SkillAnimation(ts){
-    cx4.globalAlpha = alpha;
-    cx4.clearRect(0,0,800,600)
-    cx4.fillStyle = "#001c0d";
-    cx4.beginPath();
-    cx4.moveTo(150,200);
-    cx4.lineTo(683,0);
-    cx4.lineTo(800,0);
-    cx4.lineTo(800,400);
-    cx4.lineTo(1600/3,500)
-    cx4.lineTo(150,500)
-    cx4.fill();
-  loopX+=3
-  loopX2+=80
-  var loopxx=300/loopX
-  var x=loopX*4
-  var y=300
-  y -=loopX*1.5
-  if(x>=800){loopX=0}
-  if(loopX2>=600){loopX2=600}
-  cx4.font = "32px 'Century Gothic'";
-  cx4.strokeStyle ="#05ff9b";
-    cx4.lineWidth = 5;
-    cx4.lineJoin = 'round';
-  cx4.fillStyle ="white";
-  cx4.strokeText(skilltext1,200+(loopxx),240)
-  cx4.fillText(skilltext1,200+(loopxx),240)
-  cx4.font = "24px 'Century Gothic'";
-  cx4.fillStyle ="#001c0d";
-  cx4.strokeText(skilltext2,300+(loopxx/10),280)
-  cx4.fillText(skilltext2,300+(loopxx/10),280)
-  cx4.drawImage(e17,loopX2-600,0,800,600)
-  cx4.strokeStyle = "white";
-  cx4.lineWidth = 6;
-  cx4.beginPath();
-  cx4.moveTo(x*3,y*3-200);
-  cx4.lineTo(x*3+240,y*3-290);
-  cx4.stroke();
-  cx4.beginPath();
-  cx4.moveTo(x*3,y*3-700);
-  cx4.lineTo(x*3+240,y*3-790);
-  cx4.stroke();
-  if(alpha>0){
-  alpha -=0.05
-  window.requestAnimationFrame((ts)=>SkillAnimation(ts));
-  }else if(alpha <= 0){
-  cx4.clearRect(0,0,800,600);
-  cx4.globalAlpha = 1;
+  function SkillAnimation(p=0,target=0){
+    se12.play();
+    var Container = new createjs.Container();
+    Container.alpha=0;
+    stage.addChild(Container);
+    var C= new createjs.Shape();
+    C.graphics.beginFill("#001c0d")
+    C.graphics.moveTo(0,200);
+    C.graphics.lineTo(1600/3,0);
+    C.graphics.lineTo(800, 0);
+    C.graphics.lineTo(800,400);
+    C.graphics.lineTo(800/3,600)
+    C.graphics.lineTo(0,600)
+    C.graphics.lineTo(0,200)
+    Container.addChild(C);
+    var C = new createjs.Bitmap(win_src[7]);
+      C.regX=400
+      C.regY=300;
+      C.x=400;
+      C.y=300;
+      C.scale=1.5;
+      Container.addChild(C);
+      createjs.Tween.get(C)
+      .to({scale:1},200, createjs.Ease.cubicInOut);
+    var C = new createjs.Bitmap(chrimg_src[chara[p]]);
+    C.x=-600
+    C.y=0;
+    C.scaleX=14/8;
+    C.scaleY=2;
+    Container.addChild(C);
+    createjs.Tween.get(C)
+    .to({x:0, scaleX:1, scaleY:1},200, createjs.Ease.cubicInOut)
+    .wait(800)
+    .to({x:-400, scaleX:1.1, scaleY:1.1,alpha:0.5},150)
+    .call(next);
+    var t = new createjs.Text(skilltext1, "32px 'Century Gothic'", "#05ff9b");
+    t.x=200;
+    t.y=240;
+    t.outline=5;
+    Container.addChild(t);
+    createjs.Tween.get(t)
+    .to({x:300},400, createjs.Ease.cubicOut)
+    var t = new createjs.Text(skilltext1, "32px 'Century Gothic'", "white");
+    t.x=200;
+    t.y=240;
+    Container.addChild(t);
+    createjs.Tween.get(t)
+    .to({x:300},400, createjs.Ease.cubicOut)
+    var t = new createjs.Text(skilltext2, "24px 'Century Gothic'", "#05ff9b");
+    t.x=300;
+    t.y=280;
+    t.outline=5;
+    Container.addChild(t);
+    createjs.Tween.get(t)
+    .to({x:360},400, createjs.Ease.cubicOut)
+    var t = new createjs.Text(skilltext2, "24px 'Century Gothic'", "white");
+    t.x=300;
+    t.y=280;
+    Container.addChild(t);
+    createjs.Tween.get(t)
+    .to({x:360},400, createjs.Ease.cubicOut)
+    //
+  function next(){
+  Container.removeAllChildren();
+  field.removeChild(Container);
   if(ctlswitch>1){
     ctl[ctlswitch]=4
     cpuplay(ctlswitch);
   };
   ctlswitch=5
+  SpecialSkill(p,target)
   if(debugmode){console.log('4789'+ctl)};
   }
   };
@@ -11356,53 +11469,27 @@ if(opLock==0 && gamestate ==1){
             drawDP(player);
           }
           break;
-        default:
-          //スキル演出中
-          if(ctlswitch==5){
-          cLock=1;
-          //handgraph(0,1);
-          console.log('操作可能')
-          }else{
-            setTimeout(function(){
-              SpecialSkill(player,target)
-              }, 550);
-          }
-          return false;
-          break;
         }
-        e17.src=chrimg_src[p]
-        e17.onload=function(){
-        alpha=2;
-        cx4.globalAlpha=1
-        loopX=0;
-        loopX2=0;
         ctlswitch=player
         skilltext1=skilltext[p].fir
         skilltext2=skilltext[p].sec
         skilltext3=skilltext[p].thr
-        window.requestAnimationFrame((ts)=>SkillAnimation(ts));
-        se12.play();
-        //cx2.fillStyle = "rgba(20,20,20,0.5)";
-        drawbuttom(710,400,"スキル",1);
+        SkillAnimation(p,target);
         ponkanmap.removeAllChildren();
-        var C=canvas2.toDataURL();
-        var Cb = new createjs.Bitmap(C);
-        ponkanmap.addChild(Cb);
-        cx3.clearRect(0,0,800,600)
         skillusage[player]+=1
         skillswitch[player]=2
-        SpecialSkill(player,100);
         //player1();
-        }}else if(target==0){
+        }else if(target==0){
+        //対象選択画面
         se5.play()
         cx3.fillStyle = "rgba(20,20,20,0.3)";
         cx3.fillRect(0,0,800,100)
         cx3.fillRect(150,100,650,300)
         cx3.fillRect(0,400,800,200)
-        cLock=2
+        cLock=2;
         }}else{//cpu
             console.log('cpu skill')
-              if(player!==target && target!==100){
+              if(player!==target){
               var Skin=Buff[target].findIndex(value=>value==1);
               if(Skin ==-1){
                 Buff[target].push(5,5,5,5,5)
@@ -11411,32 +11498,14 @@ if(opLock==0 && gamestate ==1){
                 DP[player]-=20;
                 drawDP(player);
               }
-            }else if(target==100){
-              //スキル演出中
-              if(ctlswitch!==5){
-                setTimeout(function(){
-                  SpecialSkill(player,target)
-                  }, 550);
-              }
-              return false;
             }
-            e17.src=chrimg_src[p]
-            e17.onload=function(){
-            alpha=2;
-            cx4.globalAlpha=1
-            loopX=0;
-            loopX2=0;
             ctlswitch=player
             skilltext1=skilltext[p].fir
             skilltext2=skilltext[p].sec
             skilltext3=skilltext[p].thr
-            window.requestAnimationFrame((ts)=>SkillAnimation(ts));
-            se12.play();
+            SkillAnimation(p,target);
             skillusage[player]+=1
             skillswitch[player]=2
-            SpecialSkill(player,100);
-            //player1();
-            }
         }
     }
     if(p==2){//アイ
@@ -11444,8 +11513,6 @@ if(opLock==0 && gamestate ==1){
       if(target>0){
       cLock=0;
       console.log('操作禁止')
-      e17.src=chrimg_src[p]
-      e17.onload=function(){
       if(skillusage2[player]>-1){
         //メモライズしたパイに変える
         if(target>=100){ 
@@ -11454,18 +11521,8 @@ if(opLock==0 && gamestate ==1){
           skillusage2[player]=-1;
           handgraph(0,1);
           judge(1);
-                //9枚目だけここで書く
-        if(ponsw[1]!==1){
-          eltear.src=eltear_src[hand1[hand1.length-1]]
-          eltear.onload=function(){
-          cx2.clearRect(690,500,size,sizey)
-          cx2.drawImage(eltear,690,500,size,sizey)
-          }}
-        }else{
-          setTimeout(function(){
-            SpecialSkill(player,target)
-            }, 550);
-          }
+          //必要なら9枚目だけここで書いて
+        }
           return false;
         }else{
           Cskillprepare[3]=hand1[target];
@@ -11481,53 +11538,33 @@ if(opLock==0 && gamestate ==1){
         DP[player]-=10;
         drawDP(player);
         PlayertoCpu(SX);
-      }else{
-        setTimeout(function(){
-          SpecialSkill(player,target)
-          }, 550);
-        }
+      }
         return false;
       }
       }
-      alpha=2;
-      cx4.globalAlpha=1
-      loopX=0;
-      loopX2=0;
       ctlswitch=player
       skilltext1=skilltext[p].fir
       skilltext2=skilltext[p].sec
       skilltext3=skilltext[p].thr
-      window.requestAnimationFrame((ts)=>SkillAnimation(ts));
-      se12.play();
-      drawbuttom(710,400,"スキル",1);
+      target+=100;
+      SkillAnimation(p,target);
       ponkanmap.removeAllChildren();
-      var C=canvas2.toDataURL();
-      var Cb = new createjs.Bitmap(C);
-      ponkanmap.addChild(Cb);
       skillswitch[player]=1
       skillusage[player]+=1;
       if(skillusage[player]>=4){skillswitch[player]=2}
-      target+=100;
-      SpecialSkill(player,target);
-      }}else if(target==0){
+      }else if(target==0){
       se5.play()
       cx3.fillStyle = "rgba(20,20,20,0.3)";
       cx3.fillRect(0,0,800,600)
       cx3.clearRect(4,490,762,110)
       cLock=3;
       }}else{//cpu
-      e17.src=chrimg_src[p]
-      e17.onload=function(){
       if(skillusage2[player]>-1){
         //メモライズしたパイに変える
         if(target>=100){ 
           if(ctlswitch==5){ 
         skillusage2[player]=-1;
-      }else{
-        setTimeout(function(){
-          SpecialSkill(player,target)
-          }, 550);
-        }
+      }
         return false;
       }else{
         Cskillprepare[3]=Cpuhandtemp[target];
@@ -11543,33 +11580,23 @@ if(opLock==0 && gamestate ==1){
         var SX=Cpuhandtemp[target]
         DP[player]-=10;
         drawDP(player);
-      }else{
-        setTimeout(function(){
-          SpecialSkill(player,target)
-          }, 550);
-        }
+      }
         return false;
       }
       }
-      alpha=2;
-      cx4.globalAlpha=1
-      loopX=0;
-      loopX2=0;
       ctlswitch=player
       skilltext1=skilltext[p].fir
       skilltext2=skilltext[p].sec
       skilltext3=skilltext[p].thr
-      window.requestAnimationFrame((ts)=>SkillAnimation(ts));
-      se12.play();
+      target+=100;
+      SkillAnimation(p,target);
       cx2.fillStyle = "rgba(20,20,20,0.5)";
       cx2.fillRect(710,400,80,40)
       skillswitch[player]=1
       if(skillusage[player]>=2){skillswitch[player]=2}
-      target+=100;
-      SpecialSkill(player,target);
-      }}
       }
-    if(p==3){//レナ
+      }
+    if(p==3){//レナ→エルス出来たらコピペしてください
       if(player==1){
       if(target>1){
       cLock=0;
@@ -11939,7 +11966,7 @@ if(opLock==0 && gamestate ==1){
   function Skillname(player,num=0){
     //num 0->キャラ情報　1->バフ情報
   cx2.font = "bold 18px Arial";
-  if(LP[player]>0){
+  if(LP[player]>=0){
   cx2.fillStyle = "white";
   }else{
   cx2.fillStyle = "#ff4c38";
@@ -11971,6 +11998,7 @@ if(opLock==0 && gamestate ==1){
   cx2.fillStyle = "white";
   switch(num){
     case 0:
+    drawbuttom(635,10,"スキル",1,50,20)
     if(p==1){
       cx2.font = "bold 16px Arial";
       cx2.fillText("ストーンスキン", 635, 110);
@@ -12050,10 +12078,9 @@ if(opLock==0 && gamestate ==1){
       cx2.fillText("・リーチが発生した時", 635, 130);
       cx2.fillText("危険パイを察知する.", 635, 150);
       cx2.fillText("・引いたばかりのパイは", 635, 170);
-      cx2.fillText("察知できない.", 635, 190);
-      cx2.fillText("・新たにリーチが", 635, 210);
-      cx2.fillText("発生した場合,効果は.", 635, 230);
-      cx2.fillText("上書きされる.", 635, 250);
+      cx2.fillText("察知できず, 新たに.", 635, 190);
+      cx2.fillText("リーチが発生しても", 635, 210);
+      cx2.fillText("再発動はしない.", 635, 230);
       if(skillusage[player]>0){
       switch(skillusage[player]){
         case 1:
@@ -12084,7 +12111,7 @@ if(opLock==0 && gamestate ==1){
     break;
    default:
     //Buff
-    drawbuttom(635,10,"バフ",1,50,20)
+    drawbuttom(635,10,"バフ",1,60,20)
     var y=110;
     if(LP[player]<0){
       cx2.font = "bold 20px Arial";
@@ -12489,7 +12516,7 @@ if(opLock==0 && gamestate ==1){
       se15.volume(0.3*sBar);
       se16.volume(0.3*sBar);
       se17.volume(0.3*sBar);
-      se18.volume(0.3*sBar);
+      se18.volume(0.7*sBar);
       jingle.volume(0.3*sBar);
       jingle2.volume(0.3*sBar);
       }
