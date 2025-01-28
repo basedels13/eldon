@@ -3,7 +3,7 @@
 //全職75枚（エピックキャラは1枚ずつ増量）＋オールマイティ2枚＋マスター8枚×2（ガ、ロ、ベ、デ、ソ、ア、ハ）合計93枚→61枚スタート
 //いつか→デスマでキルアシに準じて順位をつける　タイトル画面でミュートの設定
 //deathを参照してください
-//クレスト役未確認 シナジーの翻数調整
+//シナジーの翻数調整
 //自分のターンで流局になる時、流局画面でクリックできず即進んでしまうことがある？
 //カン後、3ペアリーチした時にロンできない場合がある？
 window.onload = function(){
@@ -12,7 +12,7 @@ window.onload = function(){
   
   function draw(){
   var titletext="v1.025/Click to START";
-  var debugmode=true;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にfalseに
+  var debugmode=false;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にfalseに
   //自分自身の情報を入れる箱
   var IAM = {
     token: null,    // 戸別管理用のトークン
@@ -339,7 +339,6 @@ window.onload = function(){
   var epic_src =new Array("don/elstudio_bg1.png","don/Don_epic1.png","don/Don_epic2.png","don/Don_epic3.png","don/Don_epicline.png","don/Don_ss11.png","don/Don_epic4.png","don/Don_epic5.png");
   //パイの裏
   var eltearB_src =new Array("don/Don_img0.png","don/Don_winbg.png");
-  var eltear= new Image();
   //donpaiのidは0から始める　ロゼimg40-43は位置が変わる
   var eltear_src = new Array("don/Don_img1.png","don/Don_img2.png","don/Don_img3.png","don/Don_img4_1.png","don/Don_img4.png","don/Don_img5.png","don/Don_img6.png","don/Don_img4_2.png","don/Don_img7.png","don/Don_img8.png","don/Don_img9.png","don/Don_img4_3.png","don/Don_img10.png",);
   eltear_src.push("don/Don_img11.png","don/Don_img12.png","don/Don_img4_4.png","don/Don_img13.png","don/Don_img14.png","don/Don_img15.png","don/Don_img4_5.png","don/Don_img16.png","don/Don_img17.png","don/Don_img18.png","don/Don_img4_6.png","don/Don_img19.png","don/Don_img20.png",);
@@ -990,18 +989,21 @@ var queue = new createjs.LoadQueue(),
 //ロード画像適宜追加
       manifest = [];
     for(var i=0;i<eltear_src.length;i++){
-      manifest.push({src:eltear_src[i]})
+      manifest.push(eltear_src[i])
     };
     for(var i=0;i<eltearB_src.length;i++){
-      manifest.push({src:eltearB_src[i]})
+      manifest.push(eltearB_src[i])
     };
     for(var i=0;i<chrimg_src.length;i++){
-      manifest.push({src:chrimg_src[i]})
+      manifest.push(chrimg_src[i])
     };
     for(var i=0;i<win_src.length;i++){
-      manifest.push({src:win_src[i]})
+      manifest.push(win_src[i])
     };
-    manifest.push({src: 'don/circle88.png'})
+    for(var i=0;i<epic_src.length;i++){
+      manifest.push(epic_src[i])
+    };
+    manifest.push('don/circle88.png')
     console.log(manifest.length);
 // 同時接続数を設定
 queue.setMaxConnections(6);
@@ -1179,14 +1181,14 @@ function updateParticles() {
   paiView();
   for(var i=0;i<6;i++){
     var A=Math.floor(Math.random()*70);
-    s = new createjs.Bitmap(eltear_src[A]);
+    s = new createjs.Bitmap(queue.getResult(eltear_src[A]));
     s.x=-120;
     s.y=5;
     ary.push(s);
   };
   for(var j=0;j<6;j++){
     var A=Math.floor(Math.random()*70);
-    s = new createjs.Bitmap(eltear_src[A]);
+    s = new createjs.Bitmap(queue.getResult(eltear_src[A]));
     s.x=920;
     s.y=425;
     ary.push(s);
@@ -1684,12 +1686,12 @@ function menuMap(p=0){
         .beginFill("rgba(20,20,20,0.7)")
         .drawRect(0, 0, 800, 510);
       menu_solo.addChild(rect);
-      var solo = new createjs.Bitmap("don/Don_menu1.png");
+      var solo = new createjs.Bitmap(queue.getResult(win_src[0]));
       solo.x=0;
       solo.y=0;
       solo.scale=0.5;
       menu_solo.addChild(solo);
-      e4 = new createjs.Bitmap(eltearB_src[0]);
+      e4 = new createjs.Bitmap(queue.getResult(eltearB_src[0]));
       e4.x=360;
       e4.y=10;
       e4.scale=1.4;
@@ -1777,24 +1779,34 @@ function menuMap(p=0){
       t.y=350;
       menu_solo.addChild(t);
       menu_solo_list.push(t);
-      e10 = new createjs.Bitmap(chrimg_src[chara[1]]);
+      e10 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[1]]));
       e10.sourceRect={x:400,y:0,width:350,height:510}
       e10.x=10;
       e10.y=0;
       e10.scale=1;
       menu_solo.addChild(e10);
-      menu_solo_list.push(e10);    
+      menu_solo_list.push(e10);
+      var btn1 = createButton("もどる", 148, 40);
+      btn1.x = 2;
+      btn1.y = 80;
+      menu_solo.addChild(btn1);
+      btn1.addEventListener("click", {handleEvent:Totop}); 
+      function Totop(){
+        se2.play();
+        pagestate=0;
+        Menu();
+      };
       break;
     case 1:
       //setting
       menu_setting.removeAllChildren();
       cx2.clearRect(0,0,800,600);
-      var e = new createjs.Bitmap(epic_src[0]);
+      var e = new createjs.Bitmap(queue.getResult(epic_src[0]));
       e.x=50;
       e.y=30;
       e.scale=1.1;
       menu_setting.addChild(e);
-      var e = new createjs.Bitmap(epic_src[0]);
+      var e = new createjs.Bitmap(queue.getResult(epic_src[0]));
       e.x=400;
       e.y=30;
       e.scale=1.1;
@@ -2019,12 +2031,12 @@ function menuMap(p=0){
     case 2:
       menu_main.removeAllChildren();
           cx2.clearRect(0,0,800,600);
-          var e = new createjs.Bitmap(epic_src[0]);
+          var e = new createjs.Bitmap(queue.getResult(epic_src[0]));
           e.x=50;
           e.y=50;
           e.scale=1.1;
           menu_main.addChild(e);
-          var e = new createjs.Bitmap(epic_src[0]);
+          var e = new createjs.Bitmap(queue.getResult(epic_src[0]));
           e.x=400;
           e.y=50;
           e.scale=1.1;
@@ -2052,7 +2064,7 @@ function menuMap(p=0){
           for(var i=0;i<chrimg_src.length;i++){
             var j=i%4;
             var k=Math.floor(i/4);
-            e11 = new createjs.Bitmap(chrimg_src[i]);
+            e11 = new createjs.Bitmap(queue.getResult(chrimg_src[i]));
             e11.sourceRect={x:AryX[i],y:AryY[i],width:200,height:200}
             e11.x=530+50*j;
             e11.y=400+50*k;
@@ -2067,7 +2079,7 @@ function menuMap(p=0){
           rect.y=400+50*Math.floor(chara[1]/4)
           menu_main.addChild(rect);
           menu_main_list.push(rect);
-          e10 = new createjs.Bitmap(chrimg_src[chara[1]]);
+          e10 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[1]]));
           e10.sourceRect={x:400,y:0,width:350,height:490}
           e10.x=530;
           e10.y=120;
@@ -2264,12 +2276,12 @@ function menuMap(p=0){
     case 3:
     //プレイガイド
     menu_guide.removeAllChildren();
-    var e = new createjs.Bitmap(epic_src[0]);
+    var e = new createjs.Bitmap(queue.getResult(epic_src[0]));
     e.x=50;
     e.y=50;
     e.scale=1.1;
     menu_guide.addChild(e);
-    var e = new createjs.Bitmap(epic_src[0]);
+    var e = new createjs.Bitmap(queue.getResult(epic_src[0]));
     e.x=400;
     e.y=50;
     e.scale=1.1;
@@ -2282,7 +2294,7 @@ function menuMap(p=0){
     option_bt5.addEventListener("click", {card:-1,handleEvent:HowtoBt});
     switch(msgstate){
       case 0:
-        var e = new createjs.Bitmap(epic_src[5]);
+        var e = new createjs.Bitmap(queue.getResult(epic_src[5]));
         e.x=270;
         e.y=100;
         menu_guide.addChild(e)
@@ -2347,7 +2359,7 @@ function menuMap(p=0){
         btn1.addEventListener("click", {card:0,handleEvent:HowtoBt});
         Textlist[0].text="画面の見方です。";
         Textlist[1].text="（カーソルを当ててみてください）"
-        var e = new createjs.Bitmap(epic_src[1]);
+        var e = new createjs.Bitmap(queue.getResult(epic_src[1]));
         e.x=90;
         e.y=55;
         menu_guide.addChild(e)
@@ -2361,7 +2373,7 @@ function menuMap(p=0){
           btn1.addEventListener("click", {card:0,handleEvent:HowtoBt});
           Textlist[0].text="3ペアは最も基本的な役です。";
           Textlist[1].text="同じキャラ3枚を1組として、3組を揃える役です。"
-          var e = new createjs.Bitmap(epic_src[2]);
+          var e = new createjs.Bitmap(queue.getResult(epic_src[2]));
           e.sourceRect={x:0,y:0,width:600,height:128};
           e.x=90;
           e.y=125;
@@ -2411,7 +2423,7 @@ function menuMap(p=0){
             btn1.addEventListener("click", {card:0,handleEvent:HowtoBt});
             Textlist[0].text="ライン通貫は、同じラインのキャラを9枚揃える役です。";
             Textlist[1].text="シナジーでの高得点が狙いやすいかもしれません。"
-            var e = new createjs.Bitmap(epic_src[2]);
+            var e = new createjs.Bitmap(queue.getResult(epic_src[2]));
             e.sourceRect={x:0,y:0,width:600,height:128};
             e.x=90;
             e.y=125;
@@ -2456,7 +2468,7 @@ function menuMap(p=0){
               btn1.addEventListener("click", {card:0,handleEvent:HowtoBt});
               Textlist[0].text="3ペア・ライン通貫の他に特殊な役として";
               Textlist[1].text="国士無双とクレストシリーズがあります。";
-              var e = new createjs.Bitmap(epic_src[2]);
+              var e = new createjs.Bitmap(queue.getResult(epic_src[2]));
               e.sourceRect={x:0,y:270,width:600,height:128};
               e.x=90;
               e.y=125;
@@ -2517,7 +2529,7 @@ function menuMap(p=0){
                   btn1.addEventListener("click", {card:0,handleEvent:HowtoBt});
                   Textlist[0].text="1つ前のプレイヤーが捨てたパイと同じキャラのパイが";
                   Textlist[1].text="手元に2枚以上ある時、捨てパイを貰うことができます。"
-                  var e = new createjs.Bitmap(epic_src[3]);
+                  var e = new createjs.Bitmap(queue.getResult(epic_src[3]));
                   e.sourceRect={x:50,y:0,width:500,height:526};
                   e.x=365;
                   e.y=55;
@@ -2653,7 +2665,7 @@ function menuMap(p=0){
                       btn1.addEventListener("click", {card:0,handleEvent:HowtoBt});
                       Textlist[0].text="MPを消費してマナブレイクすることができます。";
                       Textlist[1].text="ここぞという時に使いましょう。"
-                      var e = new createjs.Bitmap(epic_src[6]);
+                      var e = new createjs.Bitmap(queue.getResult(epic_src[6]));
                       e.x=350;
                       e.y=120;
                       e.scale=0.66;
@@ -2743,12 +2755,12 @@ menu_duel.removeAllChildren();
 switch(msgstate){
   case 0:
 //ルーム入口
-var e = new createjs.Bitmap(epic_src[0]);
+var e = new createjs.Bitmap(queue.getResult(epic_src[0]));
 e.x=50;
 e.y=50;
 e.scale=1.1;
 menu_duel.addChild(e);
-var e = new createjs.Bitmap(epic_src[0]);
+var e = new createjs.Bitmap(queue.getResult(epic_src[0]));
 e.x=400;
 e.y=50;
 e.scale=1.1;
@@ -3176,8 +3188,8 @@ function NameChange(){
       AK("ドカーン！")
     }
     //画像ID
-    e4 = new createjs.Bitmap(eltearB_src[0]);
-    e10 = new createjs.Bitmap(chrimg_src[chara[1]]);
+    e4 = new createjs.Bitmap(queue.getResult(eltearB_src[0]));
+    e10 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[1]]));
     //bitmap
     textmap.alpha=1;
     field.removeAllChildren();
@@ -3214,22 +3226,22 @@ function NameChange(){
     t.y=215;
     t.textAlign = "center";
     field.addChild(t);
-    var solo = new createjs.Bitmap("don/Don_menu1.png");
+    var solo = new createjs.Bitmap(queue.getResult(win_src[0]));
     solo.x=40;
     solo.y=210;
     solo.scale=0.6;
     field.addChild(solo);
-    var multi = new createjs.Bitmap("don/Don_menu2.png");
+    var multi = new createjs.Bitmap(queue.getResult(win_src[1]));
     multi.x=220;
     multi.y=210;
     multi.scale=0.6;
     field.addChild(multi);
-    var howto = new createjs.Bitmap("don/Don_menu3.png");
+    var howto = new createjs.Bitmap(queue.getResult(win_src[2]));
     howto.x=40;
     howto.y=300;
     howto.scale=0.6;
     field.addChild(howto);
-    var setting = new createjs.Bitmap("don/Don_menu4.png");
+    var setting = new createjs.Bitmap(queue.getResult(win_src[3]));
     setting.x=220;
     setting.y=300;
     setting.scale=0.6;
@@ -3270,11 +3282,7 @@ function NameChange(){
         case 3:
           //フリバからのキャンセルボタン
           console.log('2439!')
-          if(mouseX >80 && mouseX <380 && mouseY >80 && mouseY <480){
-            se2.play();
-            pagestate=0;
-            Menu();
-          }
+
           if(mouseX >510 && mouseX <560 && mouseY >80 && mouseY <110){
           se3.play();
           if(LP[0]==0){LP[0]=LPlist.length-1}else{LP[0]-=1}
@@ -3291,7 +3299,7 @@ function NameChange(){
             menu_solo_list[2].text="◀ "+chrlist[chara[1]]
             menu_solo.removeChild(menu_solo_list[menu_solo_list.length-1]);
             menu_solo_list.pop();
-            e10 = new createjs.Bitmap(chrimg_src[chara[1]]);
+            e10 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[1]]));
             e10.sourceRect={x:400,y:0,width:350,height:510}
             e10.x=10;
             e10.y=0;
@@ -3305,7 +3313,7 @@ function NameChange(){
             menu_solo_list[2].text="◀ "+chrlist[chara[1]]
             menu_solo.removeChild(menu_solo_list[menu_solo_list.length-1]);
             menu_solo_list.pop();
-            e10 = new createjs.Bitmap(chrimg_src[chara[1]]);
+            e10 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[1]]));
             e10.sourceRect={x:400,y:0,width:350,height:510}
             e10.x=10;
             e10.y=0;
@@ -3926,7 +3934,7 @@ function NameChange(){
               t.y=480;
               menu_duel.addChild(t);
             }}
-            var e = new createjs.Bitmap(chrimg_src[data.list[i].chr]);
+            var e = new createjs.Bitmap(queue.getResult(chrimg_src[data.list[i].chr]));
             e.sourceRect={x:400,y:0,width:300,height:600};
             e.scale=1/2;
             e.x=9+150*i
@@ -4347,22 +4355,22 @@ if(opLock==0 && gamestate ==1){
       field.addChild(t);
       };
         parentY =400
-        e11 = new createjs.Bitmap(chrimg_src[chara[1]]);
+        e11 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[1]]));
         e11.sourceRect={x:500,y:0,width:300,height:600}
         e11.x=0;
         e11.y=400;
         e11.scale=1/3;
-        e12 = new createjs.Bitmap(chrimg_src[chara[2]]);
+        e12 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[2]]));
         e12.sourceRect={x:500,y:0,width:300,height:300}
         e12.x=0;
         e12.y=100;
         e12.scale=1/3;
-        e13 = new createjs.Bitmap(chrimg_src[chara[3]]);
+        e13 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[3]]));
         e13.sourceRect={x:500,y:0,width:300,height:300}
         e13.x=0;
         e13.y=200;
         e13.scale=1/3;
-        e14 = new createjs.Bitmap(chrimg_src[chara[4]]);
+        e14 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[4]]));
         e14.sourceRect={x:500,y:0,width:300,height:300}
         e14.x=0;
         e14.y=300;
@@ -5721,7 +5729,7 @@ if(opLock==0 && gamestate ==1){
     shapeMask.scaleY=0.1;
     shapeMask.y=B;
     Container.mask = shapeMask;
-    var C = new createjs.Bitmap(chrimg_src[chara[p]]);
+    var C = new createjs.Bitmap(queue.getResult(chrimg_src[chara[p]]));
     C.x=-400;
     C.y=B-200;
     Container.addChild(C);
@@ -7672,7 +7680,7 @@ if(opLock==0 && gamestate ==1){
       //描画 魔界モード以外の時はResultmapで描画
       if(LP[0]==4){
         //従来通りツモ画面の描画のみ
-        e15 = new createjs.Bitmap(chrimg_src[chara[player]]);
+        e15 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[player]]));
         e15.sourceRect={x:10,y:10,width:780,height:400};
         e15.x=10+raidscore[1]*800;
         e15.y=100;
@@ -7683,9 +7691,9 @@ if(opLock==0 && gamestate ==1){
       e.y=230;
       fieldmap.addChild(e);
       if(num==0){
-        e16 = new createjs.Bitmap(win_src[4]);
+        e16 = new createjs.Bitmap(queue.getResult(win_src[4]));
       }else{
-        e16 = new createjs.Bitmap(win_src[5]);
+        e16 = new createjs.Bitmap(queue.getResult(win_src[5]));
       }
       e16.scale=0.7;
       e16.x=raidscore[1]*800;
@@ -7836,7 +7844,7 @@ if(opLock==0 && gamestate ==1){
       guidemap.alpha=0;
       cx2.clearRect(0,0,800,600);
       handmap.removeAllChildren();
-      e15 = new createjs.Bitmap(chrimg_src[chara[player]]);
+      e15 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[player]]));
       e15.sourceRect={x:10,y:10,width:780,height:400};
       e15.x=10+raidscore[1]*800;
       e15.y=100;
@@ -7848,9 +7856,9 @@ if(opLock==0 && gamestate ==1){
      e.y=180;
      field.addChild(e);
      if(num==0){
-       e16 = new createjs.Bitmap(win_src[4]);
+       e16 = new createjs.Bitmap(queue.getResult(win_src[4]));
      }else{
-       e16 = new createjs.Bitmap(win_src[5]);
+       e16 = new createjs.Bitmap(queue.getResult(win_src[5]));
      }
      e16.scale=0.7;
      e16.x=0;
@@ -8036,7 +8044,7 @@ if(opLock==0 && gamestate ==1){
     function Score(player){
       //符　tumoronで一部出してる
       //オールマイティ1枚につき-10
-      var All=handtemp.filter(value=>value==43 || value==44)
+      var All=handtemp.filter(value=>value==69 || value==70)
       //console.log(All.length);
       fu-=10*(All.length)
       var Wind=Buff[player].filter(value=>value==3);
@@ -10929,7 +10937,7 @@ if(opLock==0 && gamestate ==1){
       var Container = new createjs.Container();
       Container.alpha=0;
       stage.addChild(Container);
-      var C = new createjs.Bitmap(win_src[7]);
+      var C = new createjs.Bitmap(queue.getResult(win_src[7]));
       C.regX=400
       C.regY=300;
       C.x=400;
@@ -10938,7 +10946,7 @@ if(opLock==0 && gamestate ==1){
       Container.addChild(C);
       createjs.Tween.get(C)
       .to({scale:1},200, createjs.Ease.cubicInOut);
-      var C = new createjs.Bitmap(chrimg_src[chara[player]]);
+      var C = new createjs.Bitmap(queue.getResult(chrimg_src[chara[player]]));
       C.x=-600
       C.y=0;
       C.scaleX=14/8;
@@ -10947,9 +10955,9 @@ if(opLock==0 && gamestate ==1){
       createjs.Tween.get(C)
       .to({x:0, scaleX:1, scaleY:1},200, createjs.Ease.cubicInOut)
       if(type==0){
-      var C = new createjs.Bitmap(win_src[4]);
+      var C = new createjs.Bitmap(queue.getResult(win_src[4]));
       }else{
-      var C = new createjs.Bitmap(win_src[5]);
+      var C = new createjs.Bitmap(queue.getResult(win_src[5]));
       }
       C.x=-20
       C.y=260;
@@ -11085,7 +11093,7 @@ if(opLock==0 && gamestate ==1){
       createjs.Tween.get(D, {loop: true})
       .to({x:D.x-800/3,y:D.y+100},1100);
       }
-      var C = new createjs.Bitmap(chrimg_src[chara[p]]);
+      var C = new createjs.Bitmap(queue.getResult(chrimg_src[chara[p]]));
       C.x=-600
       C.y=0;
       C.scaleX=14/8;
@@ -11095,7 +11103,7 @@ if(opLock==0 && gamestate ==1){
       .to({x:0, scaleX:1, scaleY:1},200, createjs.Ease.cubicInOut)
       .wait(800)
       .to({x:-400, scaleX:1.1, scaleY:1.1,alpha:0.5},150);
-      var C = new createjs.Bitmap(win_src[6]);
+      var C = new createjs.Bitmap(queue.getResult(win_src[6]));
       C.x=110
       C.y=260;
       C.scale=0.7
@@ -11132,7 +11140,7 @@ if(opLock==0 && gamestate ==1){
       shapeMask.scaleY=0.1;
       shapeMask.y=200;
       Container.mask = shapeMask;
-    var C = new createjs.Bitmap(chrimg_src[chara[p]]);
+    var C = new createjs.Bitmap(queue.getResult(chrimg_src[chara[p]]));
       C.x=-300;
       C.y=0;
       Container.addChild(C);
@@ -11208,7 +11216,7 @@ if(opLock==0 && gamestate ==1){
         shapeMask.scaleY=0.1;
         shapeMask.y=200;
         Container.mask = shapeMask;
-      var C = new createjs.Bitmap(chrimg_src[chara[p]]);
+      var C = new createjs.Bitmap(queue.getResult(chrimg_src[chara[p]]));
         C.x=-300;
         C.y=0;
         Container.addChild(C);
@@ -11295,7 +11303,7 @@ if(opLock==0 && gamestate ==1){
     C.graphics.lineTo(0,600)
     C.graphics.lineTo(0,200)
     Container.addChild(C);
-    var C = new createjs.Bitmap(win_src[7]);
+    var C = new createjs.Bitmap(queue.getResult(win_src[7]));
       C.regX=400
       C.regY=300;
       C.x=400;
@@ -11304,7 +11312,7 @@ if(opLock==0 && gamestate ==1){
       Container.addChild(C);
       createjs.Tween.get(C)
       .to({scale:1},200, createjs.Ease.cubicInOut);
-    var C = new createjs.Bitmap(chrimg_src[chara[p]]);
+    var C = new createjs.Bitmap(queue.getResult(chrimg_src[chara[p]]));
     C.x=-600
     C.y=0;
     C.scaleX=14/8;
@@ -11651,7 +11659,7 @@ if(opLock==0 && gamestate ==1){
     s.graphics.beginFill("#001c0d");
     s.graphics.drawRect(0, 0, 800, 600);
     field.addChild(s);
-    var e10 = new createjs.Bitmap(chrimg_src[LPresult[3].chara]);
+    var e10 = new createjs.Bitmap(queue.getResult(chrimg_src[LPresult[3].chara]));
       e10.x=-100;
       e10.y=50;
       e10.scale=1.2;
@@ -11663,7 +11671,7 @@ if(opLock==0 && gamestate ==1){
       .call(next);
     field.addChild(e10);
     for(var i=0;i<3;i++){
-    var e10 = new createjs.Bitmap(chrimg_src[LPresult[2-i].chara]);
+    var e10 = new createjs.Bitmap(queue.getResult(chrimg_src[LPresult[2-i].chara]));
     if(LPresult[2-i].chara==1){
       e10.sourceRect={x:500,y:120,width:215,height:215}
       e10.scale=60/215;
