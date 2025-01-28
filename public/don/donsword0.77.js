@@ -1,7 +1,7 @@
-//var1.024　season2 
+//var1.025　season2 
 // npm run dev
 //全職75枚（エピックキャラは1枚ずつ増量）＋オールマイティ2枚＋マスター8枚×2（ガ、ロ、ベ、デ、ソ、ア、ハ）合計93枚→61枚スタート
-//いつか→pvEでのスキル　デスマでキルアシに準じて順位をつける　タイトル画面でミュートの設定
+//いつか→デスマでキルアシに準じて順位をつける　タイトル画面でミュートの設定
 //deathを参照してください
 //クレスト役未確認 シナジーの翻数調整
 //リザルト画面でクリックすると何度もセーブ完了ポップが出る
@@ -12,8 +12,8 @@ window.onload = function(){
   };
   
   function draw(){
-  var titletext="v1.024/Click to START";
-  var debugmode=true;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にfalseに
+  var titletext="v1.025/Click to START";
+  var debugmode=false;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にfalseに
   //自分自身の情報を入れる箱
   var IAM = {
     token: null,    // 戸別管理用のトークン
@@ -1610,8 +1610,7 @@ function updateParticles() {
         }
     }}
     if(cLock==3){
-      //**スキルで自分のパイ選択画面
-      //オールマイティは対象にできないようにする
+      //スキルで自分のパイ選択画面 手札
     if(mouseY >490 && mouseY < 590 && mouseX >100 && mouseX <760){
         var SX=Math.floor((mouseX+size-100)/size);
           if(mouseX >100 && mouseX <660){
@@ -1638,15 +1637,18 @@ function updateParticles() {
               PlayertoCpu(hand1.length-1);
             }
           }
-    }else{cLock=1}
-  }else if(cLock==2){//スキル対象選択画面
+    }
+  }else if(cLock==2){//スキル対象選択画面 キャラ
     if(mouseX >0 && mouseX <150 && mouseY >100){
     if(mouseY >100 && mouseY <200){SkillAnimation(1,2);
     }else if(mouseY >200 && mouseY <300){SkillAnimation(1,3);
     }else if(mouseY >300 && mouseY <400){SkillAnimation(1,4);
     }
     }
-    }else if(cLock==1){
+  }else if(cLock==4){//スキル対象選択画面 場
+    if(mouseX >150 && mouseX <630 && mouseY >100 && mouseY <490){SkillAnimation(1,1);
+  }
+  }else if(cLock==1){
     //クリックしてから捨て牌を描写してturnroleに繋げるところまで
     //各種ボタン移行済み
     ctl[1]=0
@@ -6529,7 +6531,9 @@ if(opLock==0 && gamestate ==1){
       yoti(skillusage[1]);
       }
       //スキル
-      if(skillswitch[1]==1 & cLock !==3){
+      //cLock !==3
+      if(debugmode){console.log(skillswitch[1]);};
+      if(skillswitch[1]==1){
         switch(chara[1]){
           case 1:
         if(DP[1]>=20){
@@ -6555,14 +6559,14 @@ if(opLock==0 && gamestate ==1){
         default:
           break;
       }
-      if(chara[1] !==0 && skillswitch[1]==0 && pvpmode==0){
-        var btn1 = createButton("スキル", 80, 40);
-        btn1.x = 710;
-        btn1.y = 440;
-        ponkanmap.addChild(btn1);
-        btn1.addEventListener("click",{card:0,handleEvent:SkillBt});
       }
-      }
+    if(chara[1] !==0 && skillswitch[1]==0 && pvpmode==0){
+      var btn1 = createButton("スキル", 80, 40);
+      btn1.x = 710;
+      btn1.y = 440;
+      ponkanmap.addChild(btn1);
+      btn1.addEventListener("click",{card:0,handleEvent:SkillBt});
+    }
     }
     if(judge(1)){hand1[0]=-3};
     if(deck.length==0 && reach[1]!==3){reach[1]=0};
@@ -6750,9 +6754,9 @@ if(opLock==0 && gamestate ==1){
                         }
                         LPrank.sort(compareFunc2);
             if(LPrank[3].chara ==chr){
-              SpecialSkill(chr,LPrank[2].chara);
+              SkillAnimation(chr,LPrank[2].chara);
               }else{
-              SpecialSkill(chr,LPrank[3].chara);
+              SkillAnimation(chr,LPrank[3].chara);
               }
               return true;
             break;
@@ -6760,10 +6764,10 @@ if(opLock==0 && gamestate ==1){
             //ア//メモライズ
             console.log(skillusage2[chr],r4);
         if(skillusage2[chr]>-1){
-          SpecialSkill(chr,r4);
+          SkillAnimation(chr,r4);
           return true;
       }else if((Cpuhandtemp[r4]>=3 && Cpuhandtemp[r4]<=5)||(Cpuhandtemp[r4]>=15 && Cpuhandtemp[r4]<=17)){
-        SpecialSkill(chr,r4);
+        SkillAnimation(chr,r4);
         return true;
       }else{
         return false;
@@ -6782,9 +6786,9 @@ if(opLock==0 && gamestate ==1){
                 }
               LPrank.sort(compareFunc2);
               if(LPrank[3].chara ==chr){
-              SpecialSkill(chr,1);
+              SkillAnimation(chr,1);
               }else{
-            SpecialSkill(chr,LPrank[3].chara);
+              SkillAnimation(chr,LPrank[3].chara);
               }
             return true;
             break;
@@ -10036,7 +10040,7 @@ if(opLock==0 && gamestate ==1){
     }
     function handOnCorsor(){
       //手札のカーソル
-      if(opLock==2 || gamestate !==1){return false};//カーソル表示しない時　現在：esc中のみ非表示
+      if(cLock==1 && (opLock==2 || gamestate !==1)){return false};//カーソル表示しない時　現在：esc中のみ非表示
       switch(this.card){
         case -1:
           tweeNcor.paused=true;
@@ -10427,7 +10431,7 @@ if(opLock==0 && gamestate ==1){
         }
         if(mouseX >520 && mouseX <650 && mouseY >345 && mouseY <375){
           Textlist[0].text="CPUのアクティブスキルの設定です。";
-          Textlist[1].text="禁止するとCPUはスキルを使用しません（パッシブスキルは適用される）";  
+          Textlist[1].text="禁止するとCPUはスキルを使用しません（パッシブスキルは適用）";  
         }
             break;
           case 2:
@@ -11369,9 +11373,9 @@ if(opLock==0 && gamestate ==1){
     cLock=0;
     console.log('操作禁止')
     se12.play();
-    skilltext1=skilltext[p].fir
-    skilltext2=skilltext[p].sec
-    skilltext3=skilltext[p].thr
+    skilltext1=skilltext[chara[p]].fir
+    skilltext2=skilltext[chara[p]].sec
+    skilltext3=skilltext[chara[p]].thr
     var Container = new createjs.Container();
     Container.alpha=0;
     stage.addChild(Container);
@@ -11410,40 +11414,34 @@ if(opLock==0 && gamestate ==1){
     .to({alpha: 0},100)
     .call(next);
     var t = new createjs.Text(skilltext1, "32px 'Century Gothic'", "#05ff9b");
-    t.x=200;
+    t.x=100;
     t.y=280;
     t.outline=5;
     Container.addChild(t);
     createjs.Tween.get(t)
-    .to({x:300},400, createjs.Ease.cubicOut)
+    .to({x:170},400, createjs.Ease.cubicOut)
     var t = new createjs.Text(skilltext1, "32px 'Century Gothic'", "white");
-    t.x=200;
+    t.x=100;
     t.y=280;
     Container.addChild(t);
     createjs.Tween.get(t)
-    .to({x:300},400, createjs.Ease.cubicOut)
+    .to({x:170},400, createjs.Ease.cubicOut)
     var t = new createjs.Text(skilltext2, "24px 'Century Gothic'", "#05ff9b");
-    t.x=300;
+    t.x=200;
     t.y=320;
     t.outline=5;
     Container.addChild(t);
     createjs.Tween.get(t)
-    .to({x:360},400, createjs.Ease.cubicOut)
+    .to({x:250},400, createjs.Ease.cubicOut)
     var t = new createjs.Text(skilltext2, "24px 'Century Gothic'", "white");
-    t.x=300;
+    t.x=200;
     t.y=320;
     Container.addChild(t);
     createjs.Tween.get(t)
-    .to({x:360},400, createjs.Ease.cubicOut)
-    //
+    .to({x:250},400, createjs.Ease.cubicOut);
   function next(){
   Container.removeAllChildren();
   field.removeChild(Container);
-  if(ctlswitch>1){
-    ctl[ctlswitch]=4
-    cpuplay(ctlswitch);
-  };
-  ctlswitch=5
   SpecialSkill(p,target)
   if(debugmode){console.log('4789'+ctl)};
   }
@@ -11452,7 +11450,6 @@ if(opLock==0 && gamestate ==1){
     var p=chara[player]
     console.log("skill",player,target)
     if(skillswitch[player]==0){
-      //target 100->演出中の待ち
     //skillswitch 0使用可能 1次の自分のターンにリセット 2この局では使用不可
     if(p==1){//エル
       if(player==1){
@@ -11504,7 +11501,6 @@ if(opLock==0 && gamestate ==1){
         cLock=2;
         }}else{//cpu
             console.log('cpu skill')
-              if(player!==target){
               var Skin=Buff[target].findIndex(value=>value==1);
               if(Skin ==-1){
                 Buff[target].push(5,5,5,5,5)
@@ -11513,11 +11509,10 @@ if(opLock==0 && gamestate ==1){
                 DP[player]-=20;
                 drawDP(player);
               }
-            }
-            ctlswitch=player
-            SkillAnimation(p,target);
             skillusage[player]+=1
             skillswitch[player]=2
+            ctl[player]=4
+            cpuplay(player);
         }
     }
     if(p==2){//アイ
@@ -11555,7 +11550,7 @@ if(opLock==0 && gamestate ==1){
       se5.play()
       var s = new createjs.Shape();
         s.graphics.beginFill("rgba(20,20,20,0.3)");
-        s.graphics.drawRect(0, 0, 800, 490)
+        s.graphics.drawRect(0, 0, 630, 490)
         ponkanmap.addChild(s);
         var btn1 = createButton("キャンセル", 80, 40);
           btn1.x = 710;
@@ -11566,185 +11561,121 @@ if(opLock==0 && gamestate ==1){
       }}else{//cpu
       if(skillusage2[player]>-1){
         //メモライズしたパイに変える
-        if(target>=100){ 
-          if(ctlswitch==5){ 
         skillusage2[player]=-1;
-      }
-        return false;
-      }else{
         Cskillprepare[3]=Cpuhandtemp[target];
         Cskillprepare[4]=skillusage2[player];
         Cpuhandtemp[target]=skillusage2[player];
         skillusage[player]+=1;
-      }
       }else{
         //メモライズしてから切る
-        if(target>=100){ 
-          if(ctlswitch==5){ 
         skillusage2[player]=Cpuhandtemp[target-100];
         var SX=Cpuhandtemp[target]
         DP[player]-=10;
         drawDP(player);
       }
-        return false;
-      }
-      }
-      ctlswitch=player
-      skilltext1=skilltext[p].fir
-      skilltext2=skilltext[p].sec
-      skilltext3=skilltext[p].thr
-      target+=100;
-      SkillAnimation(p,target);
-      cx2.fillStyle = "rgba(20,20,20,0.5)";
-      cx2.fillRect(710,400,80,40)
       skillswitch[player]=1
       if(skillusage[player]>=2){skillswitch[player]=2}
+        ctl[player]=4
+        cpuplay(player);
       }
       }
-    if(p==3){//レナ→エルス出来たらコピペしてください
+    if(p==3){
+      //レナ
       if(player==1){
-      if(target>1){
-      cLock=0;
-      console.log('操作禁止')
-      switch(target){
-        case 2:
-        case 3:
-        case 4:
-        var Skin=Buff[target].findIndex(value=>value==1);
-        if(Skin ==-1){
-          Buff[target].push(6,6,6)
-          Buffdraw(target);
-          console.log(Buff[target]);
-          DP[player]-=20;
-          drawDP(player);
+        if(target>1){
+        switch(target){
+          case 2:
+          case 3:
+          case 4:
+          var Skin=Buff[target].findIndex(value=>value==1);
+          if(Skin ==-1){
+            Buff[target].push(6,6,6)
+            Buffdraw(target);
+            console.log(Buff[target]);
+            DP[player]-=20;
+            drawDP(player);
+          }
+          break;
         }
-        break;
-      default:
-        //スキル演出中
-        if(ctlswitch==5){
+        //ctlswitch=player
+        ponkanmap.removeAllChildren();
+        skillusage[player]+=1
+        skillswitch[player]=2
         cLock=1;
-        //handgraph(0,1);
-        console.log('操作可能')
-        }else{
-          setTimeout(function(){
-            SpecialSkill(player,target)
-            }, 550);
+        //player1();
+        }else if(target==0){
+        //対象選択画面
+        se5.play()
+        var s = new createjs.Shape();
+        s.graphics.beginFill("rgba(20,20,20,0.3)");
+        s.graphics.drawRect(0, 0, 630, 100)
+        s.graphics.drawRect(150, 100, 480, 300)
+        s.graphics.drawRect(0, 400, 630, 200);
+        ponkanmap.addChild(s);
+        var btn1 = createButton("キャンセル", 80, 40);
+          btn1.x = 710;
+          btn1.y = 440;
+          ponkanmap.addChild(btn1)
+          btn1.addEventListener("click",{card:1,handleEvent:SkillBt});
+        for(var i=0;i<3;i++){
+        var CKey = new createjs.Shape();
+        CKey.graphics.beginStroke("#0088f0").setStrokeStyle(5).drawRoundRect(0,100+100*i,150,100,10,10)
+        ponkanmap.addChild(CKey);
+        var tweeNcor;
+        tweeNcor=createjs.Tween.get(CKey, {loop: true})
+        .to({alpha:1},200)
+        .to({alpha:0.2},400)
+        .to({alpha:1},200);
         }
-        return false;
-        break;
-      }
-      e17.src=chrimg_src[p]
-      e17.onload=function(){
-      alpha=2;
-      cx4.globalAlpha=1
-      loopX=0;
-      loopX2=0;
-      ctlswitch=player
-      skilltext1=skilltext[p].fir
-      skilltext2=skilltext[p].sec
-      skilltext3=skilltext[p].thr
-      window.requestAnimationFrame((ts)=>SkillAnimation(ts));
-      se12.play();
-      //cx2.fillStyle = "rgba(20,20,20,0.5)";
-      drawbuttom(710,400,"スキル",1);
-      ponkanmap.removeAllChildren();
-      var C=canvas2.toDataURL();
-      var Cb = new createjs.Bitmap(C);
-      ponkanmap.addChild(Cb);
-      cx3.clearRect(0,0,800,600)
-      skillusage[player]+=1
-      skillswitch[player]=2
-      SpecialSkill(player,100);
-      //player1();
-      }}else if(target==0){
-      se5.play()
-      cx3.fillStyle = "rgba(20,20,20,0.3)";
-      cx3.fillRect(0,0,800,100)
-      cx3.fillRect(150,100,650,300)
-      cx3.fillRect(0,400,800,200)
-      cLock=2
-      }}else{//cpu
-          console.log('cpu skill')
-            if(player!==target && target!==100){
-            var Skin=Buff[target].findIndex(value=>value==1);
-            if(Skin ==-1){
-              Buff[target].push(6,6,6)
-              Buffdraw(target);
-              console.log(Buff[target]);
-              DP[player]-=20;
-              drawDP(player);
-            }
-          }else if(target==100){
-            //スキル演出中
-            if(ctlswitch!==5){
-              setTimeout(function(){
-                SpecialSkill(player,target)
-                }, 550);
-            }
-            return false;
-          }
-          e17.src=chrimg_src[p]
-          e17.onload=function(){
-          alpha=2;
-          cx4.globalAlpha=1
-          loopX=0;
-          loopX2=0;
-          ctlswitch=player
-          skilltext1=skilltext[p].fir
-          skilltext2=skilltext[p].sec
-          skilltext3=skilltext[p].thr
-          window.requestAnimationFrame((ts)=>SkillAnimation(ts));
-          se12.play();
-          skillusage[player]+=1
-          skillswitch[player]=2
-          SpecialSkill(player,100);
-          //player1();
-          }
-      }
-      }
+        cLock=2;
+        }}else{//cpu
+            console.log('cpu skill')
+              var Skin=Buff[target].findIndex(value=>value==1);
+              if(Skin ==-1){
+                Buff[target].push(6,6,6)
+                Buffdraw(target);
+                console.log(Buff[target]);
+                DP[player]-=20;
+                drawDP(player);
+              }
+            skillusage[player]+=1
+            skillswitch[player]=2
+            ctl[player]=4
+            cpuplay(player);
+        }
+      };
       if(p==4){//ヴン
-        console.log('操作禁止')
-      if(target==100){
-        //スキル演出中
-        if(ctlswitch!==5){
-          setTimeout(function(){
-            SpecialSkill(player,target)
-            }, 550);
-        }
-        return false;
-      }else{
+      if(target==1){
           //スキル演出中
           DP[player]-=30;
           drawDP(player);
+          ponkanmap.removeAllChildren();
           ryukyoku();
           cLock=1;
           //handgraph(0,1);
           console.log('操作可能')
-          }
-        e17.src=chrimg_src[p]
-        e17.onload=function(){
-        alpha=2;
-        cx4.globalAlpha=1
-        loopX=0;
-        loopX2=0;
-        ctlswitch=player
-        skilltext1=skilltext[p].fir
-        skilltext2=skilltext[p].sec
-        skilltext3=skilltext[p].thr
-        window.requestAnimationFrame((ts)=>SkillAnimation(ts));
-        se12.play();
-        //cx2.fillStyle = "rgba(20,20,20,0.5)";
-        drawbuttom(710,400,"スキル",1);
-        ponkanmap.removeAllChildren();
-        var C=canvas2.toDataURL();
-        var Cb = new createjs.Bitmap(C);
-        ponkanmap.addChild(Cb);
-        cx3.clearRect(0,0,800,600)
-        skillusage[player]+=1
-        skillswitch[player]=2
-        SpecialSkill(player,100);
+        }else{
+        se5.play()
+        var s = new createjs.Shape();
+          s.graphics.beginFill("rgba(20,20,20,0.3)");
+          s.graphics.drawRect(0, 0, 630, 600)
+          ponkanmap.addChild(s);
+          var CKey = new createjs.Shape();
+          CKey.graphics.beginStroke("#0088f0").setStrokeStyle(5).drawRoundRect(150,100,480,390,10,10)
+          ponkanmap.addChild(CKey);
+          var tweeNcor;
+          tweeNcor=createjs.Tween.get(CKey, {loop: true})
+          .to({alpha:1},200)
+          .to({alpha:0.2},400)
+          .to({alpha:1},200);
+          var btn1 = createButton("キャンセル", 80, 40);
+            btn1.x = 710;
+            btn1.y = 440;
+            ponkanmap.addChild(btn1)
+            btn1.addEventListener("click",{card:1,handleEvent:SkillBt});
+          cLock=4;
         }
-        }
+      }
     }
     }//specialskill
   socket.on("game-over", (data)=>{
@@ -12039,10 +11970,11 @@ if(opLock==0 && gamestate ==1){
         cx2.fillText("いつでも思い出せる.", 635, 310);
       }else{
       cx2.fillText("効果：②対象のパイを", 635, 230);
-      cx2.fillText("メモしたパイに変える.", 635, 250);
-      cx2.font = "bold 14px Arial";
-      cx2.fillText(donpai[skillusage2[player]].name, 640, 270);
-      cx2.fillText(donpai[skillusage2[player]].sub, 640, 290);
+      cx2.fillStyle="orange"
+      cx2.fillText(donpai[skillusage2[player]].name, 635, 250);
+      cx2.fillText("("+donpai[skillusage2[player]].sub+")", 635, 270);
+      cx2.fillStyle="white";
+      cx2.fillText("に変える.", 640, 290);
 
       }
       }else if(p==3){
