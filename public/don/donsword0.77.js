@@ -1,9 +1,10 @@
-//var1.024　season2 
+//var1.025　season2 
 // npm run dev
 //全職75枚（エピックキャラは1枚ずつ増量）＋オールマイティ2枚＋マスター8枚×2（ガ、ロ、ベ、デ、ソ、ア、ハ）合計93枚→61枚スタート
-//いつか→pvEでのスキル　デスマでキルアシに準じて順位をつける　タイトル画面でミュートの設定
+//いつか→デスマでキルアシに準じて順位をつける　タイトル画面でミュートの設定
 //deathを参照してください
 //クレスト役未確認 シナジーの翻数調整
+//リザルト画面でクリックすると何度もセーブ完了ポップが出る
 //自分のターンで流局になる時、流局画面でクリックできず即進んでしまうことがある？
 //カン後、3ペアリーチした時にロンできない場合がある？
 window.onload = function(){
@@ -11,7 +12,7 @@ window.onload = function(){
   };
   
   function draw(){
-  var titletext="v1.024/Click to START";
+  var titletext="v1.025/Click to START";
   var debugmode=true;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にfalseに
   //自分自身の情報を入れる箱
   var IAM = {
@@ -309,7 +310,7 @@ window.onload = function(){
   var Cskillprepare=[0,0,0,0,0];
   //chara0 0->cpuランダム 1->cpu決める
   //MPゲージ0-30 DPlist->create用 0->マナブレゲージ
-  var DP =new Array(0,0,0,0,0)
+  var DP=new Array(0,0,0,0,0)
   var DPlist=new Array(0,0,0,0,0)
   //バフ 1スキン 2マナシールド 3ネイチャ 4ナソコア 5やけど 6凍結 7適応力
   //11~修羅の戦で和了済みの人
@@ -333,7 +334,7 @@ window.onload = function(){
   var LPlist=new Array("一般","ヘル","ミリオネア","∞","魔界血戦")
   var musiclist=new Array("ランダム","盲目のアストライア","Nine Jack","The Evil Sacrifice Archenemies","ロベリア","夜の迷宮の入口","決闘のテーマ","エルの樹の麓","リーチっぽい音楽","ベスマ-竜の道","ウォーリーの城","歎きの塔Phase3","狂乱のコンサート","リーチっぽい音楽R")
   var chrlist=new Array("名無しさん","エルス","アイシャ","レナ","レイヴン","イヴ")//"ラシェ","アラ","エド","ラビィ")
-  var chrimg_src= new Array("don/Don_chara0.png","don/Don_chara1.png","don/Don_chara2.png","don/Don_chara3.png","don/Don_chara4.png","don/Don_chara5_2.png");
+  var chrimg_src= new Array("don/Don_chara0.png","don/Don_chara1.png","don/Don_chara2.png","don/Don_chara3.png","don/Don_chara4.png","don/Don_chara5.png");
   var atrbute_src= new Array("don/Don_DP.png","don/Duel_mana.png","don/Duel_sun.png","don/Duel_aqua.png","don/Duel_wind.png","don/Duel_moon.png","don/Duel_gaia.png","don/Duel_heat.png","don/Don_HA.png");
   //説明用
   var epic_src =new Array("don/elstudio_bg1.png","don/Don_epic1.png","don/Don_epic2.png","don/Don_epic3.png","don/Don_epicline.png","don/Don_ss11.png","don/Don_epic4.png","don/Don_epic5.png");
@@ -523,7 +524,7 @@ window.onload = function(){
   {name:"変化無双",sub:"国士無双を和了する"},
   {name:"幸運の証票",sub:"天和を和了する"},
   {name:"海千山千",sub:"海底を和了する"},
-  {name:"クレストコンプリート",sub:"全てのキャラ役を1回以上成立させる"},
+  {name:"クレストコンプリート",sub:"全ての属性ペア役を1回以上成立させる"},
   {name:"シナジーコンプリート",sub:"全てのシナジー役を1回以上成立させる"},
   {name:"柔軟な実績コレクター",sub:"実績を10個以上開放する"},
   {name:"強靭な実績コレクター",sub:"実績を30個以上開放する"},
@@ -540,6 +541,13 @@ window.onload = function(){
     {name:"3ライン通貫",sub:"アガリ形"},
     {name:"4ライン通貫",sub:"アガリ形"},
     {name:"国士無双",sub:"アガリ形"},
+    {name:"クレストオブガイア",sub:"アガリ形"},
+    {name:"クレストオブソーレス",sub:"アガリ形"},
+    {name:"クレストオブベントス",sub:"アガリ形"},
+    {name:"クレストオブロッソ",sub:"アガリ形"},
+    {name:"クレストオブデニフ",sub:"アガリ形"},
+    {name:"クレストオブハルニエ",sub:"アガリ形"},
+    {name:"クレストオブアドリアン",sub:"アガリ形"},
     {name:"鋭さ",sub:"シナジー役",max:7},
     {name:"ナソード研究",sub:"シナジー役",max:5},
     {name:"精霊の加護",sub:"シナジー役",max:3},
@@ -567,13 +575,13 @@ window.onload = function(){
     {name:"悪戯の王",sub:"シナジー役",max:1},
     {name:"エルの巫女",sub:"シナジー役",max:1},
     {name:"戦場の天使",sub:"シナジー役",max:3},
-    {name:"クレストオブガイア",sub:"キャラ役"},
-    {name:"クレストオブソーレス",sub:"キャラ役"},
-    {name:"クレストオブベントス",sub:"キャラ役"},
-    {name:"クレストオブロッソ",sub:"キャラ役"},
-    {name:"クレストオブデニフ",sub:"キャラ役"},
-    {name:"クレストオブハルニエ",sub:"キャラ役"},
-    {name:"クレストオブアドリアン",sub:"キャラ役"},
+    {name:"大地のエル",sub:"キャラ役"},
+    {name:"太陽のエル",sub:"キャラ役"},
+    {name:"風のエル",sub:"キャラ役"},
+    {name:"火のエル",sub:"キャラ役"},
+    {name:"水のエル",sub:"キャラ役"},
+    {name:"原初のエル",sub:"キャラ役"},
+    {name:"闇のエル",sub:"キャラ役"},
     {name:"門前ツモ",sub:"アガリ形"},
     {name:"一発",sub:"アガリ形"},
     {name:"天和",sub:"アガリ形"},
@@ -1609,21 +1617,19 @@ function updateParticles() {
         }
     }}
     if(cLock==3){
-      //**スキルで自分のパイ選択画面
-      //オールマイティは対象にできないようにする
-    cx3.clearRect(0,0,800,600)
+      //スキルで自分のパイ選択画面 手札
     if(mouseY >490 && mouseY < 590 && mouseX >100 && mouseX <760){
         var SX=Math.floor((mouseX+size-100)/size);
           if(mouseX >100 && mouseX <660){
             if(hand1.length>SX+1){
-              if(hand1[SX] ==43 || hand1[SX] ==44){
+              if(hand1[SX] ==69 || hand1[SX] ==70){
                 cLock=1;
                 return false;
               }
               PlayertoCpu(SX);
             }
             if(ponsw[1]==1 && hand1.length==SX+1){
-              if(hand1[SX] ==43 || hand1[SX] ==44){
+              if(hand1[SX] ==69 || hand1[SX] ==70){
                 cLock=1;
                 return false;
               }
@@ -1638,19 +1644,18 @@ function updateParticles() {
               PlayertoCpu(hand1.length-1);
             }
           }
-    }else{cLock=1}
-  }else if(cLock==2){//スキル対象選択画面
+    }
+  }else if(cLock==2){//スキル対象選択画面 キャラ
     if(mouseX >0 && mouseX <150 && mouseY >100){
-    if(mouseY >100 && mouseY <200){SpecialSkill(1,2)
-    }else if(mouseY >200 && mouseY <300){SpecialSkill(1,3);
-    }else if(mouseY >300 && mouseY <400){SpecialSkill(1,4)
-    }else if(mouseY >400 && mouseY <600){SpecialSkill(1,1)
+    if(mouseY >100 && mouseY <200){SkillAnimation(1,2);
+    }else if(mouseY >200 && mouseY <300){SkillAnimation(1,3);
+    }else if(mouseY >300 && mouseY <400){SkillAnimation(1,4);
     }
-    }else{
-    cx3.clearRect(0,0,800,600)
-    cLock=1
     }
-    }else if(cLock==1){
+  }else if(cLock==4){//スキル対象選択画面 場
+    if(mouseX >150 && mouseX <630 && mouseY >100 && mouseY <490){SkillAnimation(1,1);
+  }
+  }else if(cLock==1){
     //クリックしてから捨て牌を描写してturnroleに繋げるところまで
     //各種ボタン移行済み
     ctl[1]=0
@@ -2072,7 +2077,8 @@ function menuMap(p=0){
           menu_main_list.push(e10);
           drawbuttom(60,80,"戦績",1,130,44);
           drawbuttom(60,125,"実績リスト",0,130,44);
-          drawbuttom(60,170,"達成役一覧",0,130,44);
+          drawbuttom(60,170,"達成役1",0,130,44);
+          drawbuttom(60,215,"達成役2",0,130,44);
           cx2.font = "32px 'Century Gothic'";
           cx2.fillStyle = "rgba(0,0,0,0.8)";
           cx2.fillRect(530,90,200,40)
@@ -2132,7 +2138,8 @@ function menuMap(p=0){
           }
             drawbuttom(60,80,"戦績",0,130,44);
             drawbuttom(60,125,"実績リスト",1,130,44);
-            drawbuttom(60,170,"達成役一覧",0,130,44);
+            drawbuttom(60,170,"達成役1",0,130,44);
+            drawbuttom(60,215,"達成役2",0,130,44);
             var A=achieveA.filter(value=>value.cleared>0);
             cx2.font = "bold 20px 'Century Gothic'";
             cx2.fillStyle = "black";
@@ -2162,64 +2169,15 @@ function menuMap(p=0){
           Textlist[1].text="かっこ内は達成した回数です。"
             drawbuttom(60,80,"戦績",0,130,44);
             drawbuttom(60,125,"実績リスト",0,130,44);
-            drawbuttom(60,170,"達成役一覧",1,130,44);
-            var achieveC=achieveB.filter(value=>value.sub=="シナジー役");
-            var A=achieveC.filter(value=>value.cleared>0);
-            cx2.font = "bold 20px 'Century Gothic'";
-            cx2.fillStyle = "black";
-            cx2.fillText("シナジー "+A.length+"/"+achieveC.length,200,85) 
-            var X=200;
-            var Y=110
-            for(var i=0;i<achieveC.length; i++){
-              if(achieveC[i].cleared==0){
-                cx2.fillStyle = "#8c8c8c";
-                cx2.font = "18px 'Century Gothic'";
-                cx2.fillText(achieveC[i].name,X,Y);
-                cx2.fillText(achieveC[i].count+"/"+achieveC[i].max,X+150,Y);
-              }else{
-                cx2.fillStyle = "black"; 
-                cx2.font = "bold 18px 'Century Gothic'";
-                cx2.fillText(achieveC[i].name,X,Y);
-                cx2.font = "18px 'Century Gothic'";
-                cx2.fillText(achieveC[i].count+"/"+achieveC[i].max+" ("+achieveC[i].cleared+")",X+150,Y);
-              }
-              Y+=20;
-              if(Y>=500){
-                X+=280;
-                Y=110;
-              }
-            }
-            var achieveD=achieveB.filter(value=>value.sub=="キャラ役");
-            var B=achieveD.filter(value=>value.cleared>0);
-            cx2.font = "bold 20px 'Century Gothic'";
-            cx2.fillStyle = "black";
-            cx2.fillText("クレスト "+B.length+"/"+achieveD.length,380,85) 
-            Y+=10;
-            for(var i=0;i<achieveD.length; i++){
-              if(achieveD[i].cleared==0){
-                cx2.fillStyle = "#8c8c8c";
-                cx2.font = "18px 'Century Gothic'";
-                cx2.fillText(achieveD[i].name,X,Y);
-                cx2.fillText(" ("+achieveD[i].cleared+")",X+200,Y);
-              }else{
-                cx2.fillStyle = "black"; 
-                cx2.font = "bold 18px 'Century Gothic'";
-                cx2.fillText(achieveD[i].name,X,Y);
-                cx2.font = "18px 'Century Gothic'";
-                cx2.fillText(" ("+achieveD[i].cleared+")",X+200,Y);
-              }
-              Y+=20;
-              if(Y>=500){
-                X+=280;
-                Y=110;
-              }
-            }
+            drawbuttom(60,170,"達成役1",1,130,44);
+            drawbuttom(60,215,"達成役2",0,130,44);
             var achieveC=achieveB.filter(value=>value.sub=="アガリ形");
             var A=achieveC.filter(value=>value.cleared>0);
             cx2.font = "bold 20px 'Century Gothic'";
             cx2.fillStyle = "black";
-            cx2.fillText("一般 "+A.length+"/"+achieveC.length,560,85) 
-            Y+=10
+            cx2.fillText("一般 "+A.length+"/"+achieveC.length,200,85) 
+            var X=200;
+            var Y=110
             for(var i=0;i<achieveC.length; i++){
               if(achieveC[i].cleared==0){
                 cx2.fillStyle = "#8c8c8c";
@@ -2239,6 +2197,66 @@ function menuMap(p=0){
               }
             }
           break;
+          case 3:
+            //達成役一覧
+            Textlist[0].text="達成役一覧です。";
+            Textlist[1].text="かっこ内は達成した回数です。"
+              drawbuttom(60,80,"戦績",0,130,44);
+              drawbuttom(60,125,"実績リスト",0,130,44);
+              drawbuttom(60,170,"達成役1",0,130,44);
+              drawbuttom(60,215,"達成役2",1,130,44);
+              var achieveC=achieveB.filter(value=>value.sub=="シナジー役");
+              var A=achieveC.filter(value=>value.cleared>0);
+              cx2.font = "bold 20px 'Century Gothic'";
+              cx2.fillStyle = "black";
+              cx2.fillText("シナジー "+A.length+"/"+achieveC.length,200,85) 
+              var X=200;
+              var Y=110
+              for(var i=0;i<achieveC.length; i++){
+                if(achieveC[i].cleared==0){
+                  cx2.fillStyle = "#8c8c8c";
+                  cx2.font = "18px 'Century Gothic'";
+                  cx2.fillText(achieveC[i].name,X,Y);
+                  cx2.fillText(achieveC[i].count+"/"+achieveC[i].max,X+150,Y);
+                }else{
+                  cx2.fillStyle = "black"; 
+                  cx2.font = "bold 18px 'Century Gothic'";
+                  cx2.fillText(achieveC[i].name,X,Y);
+                  cx2.font = "18px 'Century Gothic'";
+                  cx2.fillText(achieveC[i].count+"/"+achieveC[i].max+" ("+achieveC[i].cleared+")",X+150,Y);
+                }
+                Y+=20;
+                if(Y>=500){
+                  X+=280;
+                  Y=110;
+                }
+              }
+              var achieveD=achieveB.filter(value=>value.sub=="キャラ役");
+              var B=achieveD.filter(value=>value.cleared>0);
+              cx2.font = "bold 20px 'Century Gothic'";
+              cx2.fillStyle = "black";
+              cx2.fillText("属性ペア "+B.length+"/"+achieveD.length,380,85) 
+              Y+=10;
+              for(var i=0;i<achieveD.length; i++){
+                if(achieveD[i].cleared==0){
+                  cx2.fillStyle = "#8c8c8c";
+                  cx2.font = "18px 'Century Gothic'";
+                  cx2.fillText(achieveD[i].name,X,Y);
+                  cx2.fillText(" ("+achieveD[i].cleared+")",X+200,Y);
+                }else{
+                  cx2.fillStyle = "black"; 
+                  cx2.font = "bold 18px 'Century Gothic'";
+                  cx2.fillText(achieveD[i].name,X,Y);
+                  cx2.font = "18px 'Century Gothic'";
+                  cx2.fillText(" ("+achieveD[i].cleared+")",X+200,Y);
+                }
+                Y+=20;
+                if(Y>=500){
+                  X+=280;
+                  Y=110;
+                }
+              }
+            break;
       }
       var Cb=canvas2.toDataURL();
       Cbb = new createjs.Bitmap(Cb);
@@ -3176,20 +3194,20 @@ function NameChange(){
     .drawRect(410, 210, 350, 240);
     field.addChild(rect);
       if(chara[1]==1){
-        e10.sourceRect={x:500,y:120,width:215,height:215}
+        e10.sourceRect={x:500,y:120,width:300,height:215}
       }else{
-        e10.sourceRect={x:500,y:50,width:215,height:215}
+        e10.sourceRect={x:500,y:50,width:300,height:215}
       }
     e10.x=40;
     e10.y=95;
     e10.scale=0.6;
     field.addChild(e10);
     var t = new createjs.Text(Username, "24px 'Century Gothic'", "white");
-    t.x=192;
+    t.x=232;
     t.y=175;
     field.addChild(t);
     var t = new createjs.Text(Usercrest, "14px 'Century Gothic'", "white");
-    t.x=182;
+    t.x=222;
     t.y=155;
     field.addChild(t);
     var t = new createjs.Text("戦 ★ 績", "28px 'Century Gothic'", "#ffffff");
@@ -3546,168 +3564,11 @@ function NameChange(){
               se4.play();
               }
             }
-            switch(msgstate){
-              case 0:
-                  if(mouseX >530 && mouseX <730 && mouseY >400 && mouseY <450){
-                    se3.play();
-                    chara[1]=Math.floor((mouseX-530)/50);
-                    menu_main.removeChild(menu_main_list[menu_main_list.length-1])
-                    menu_main_list.pop();
-                    e10 = new createjs.Bitmap(chrimg_src[chara[1]]);
-                    e10.sourceRect={x:400,y:0,width:350,height:525}
-                    e10.x=530;
-                    e10.y=120;
-                    e10.scale=1/2;
-                    menu_main.addChild(e10);
-                    menu_main_list.push(e10);
-                    menu_main_list[0].x=530+50*(chara[1]%4)
-                    menu_main_list[0].y=400+50*Math.floor(chara[1]/4)
-                  }
-                  if(mouseX >530 && mouseX <630 && mouseY >450 && mouseY <500){
-                    se3.play();
-                    chara[1]=4+Math.floor((mouseX-530)/50);
-                    menu_main.removeChild(menu_main_list[menu_main_list.length-1])
-                    menu_main_list.pop();
-                    e10 = new createjs.Bitmap(chrimg_src[chara[1]]);
-                    e10.sourceRect={x:400,y:0,width:350,height:525}
-                    e10.x=530;
-                    e10.y=120;
-                    e10.scale=1/2;
-                    menu_main.addChild(e10);
-                    menu_main_list.push(e10);
-                    menu_main_list[0].x=530+50*(chara[1]%4)
-                    menu_main_list[0].y=400+50*Math.floor(chara[1]/4)
-                  };
-                break;
-              case 1:
-                if(mouseX >195 && mouseX <380 && mouseY >95 && mouseY <495){
-                  var I=Math.floor((mouseY-95)/20);
-                  cx3.strokeRect(190,92+I*20,240,20);
-                  if(achieveA[I].cleared>0 && Usercrest!==achieveA[I].name){
-                    se3.play();
-                    Usercrest=achieveA[I].name;
-                  }else{
-                    Usercrest="称号なし";
-                  };
-                }
-                if(mouseX >475 && mouseX <660 && mouseY >95 && mouseY <495){
-                  var I=Math.floor((mouseY-95)/20)+20;
-                  if(I>=achieveA.length){
-                    return false;
-                  }
-                  if(achieveA[I].cleared>0 && Usercrest!==achieveA[I].name){
-                    se3.play();
-                      Usercrest=achieveA[I].name;
-                    }else{
-                      Usercrest="称号なし";
-                    };
-                  }
-                break;
-              case 2:
-                cx2.clearRect(190,60,550,440)
-                  drawbuttom(60,80,"戦績",0,130,44);
-                  drawbuttom(60,125,"実績リスト",0,130,44);
-                  drawbuttom(60,170,"達成役一覧",1,130,44);
-                  cx2.font = "32px 'Century Gothic'";
-                  cx2.fillStyle = "black";
-                  cx2.fillText("　×",680,80)
-                  var achieveC=achieveB.filter(value=>value.sub=="シナジー役");
-                  var A=achieveC.filter(value=>value.cleared>0);
-                  cx2.font = "bold 20px 'Century Gothic'";
-                  cx2.fillStyle = "black";
-                  cx2.fillText("シナジー "+A.length+"/"+achieveC.length,200,85) 
-                  var X=200;
-                  var Y=110
-                  for(var i=0;i<achieveC.length; i++){
-                    if(achieveC[i].cleared==0){
-                      cx2.fillStyle = "#8c8c8c";
-                      cx2.font = "18px 'Century Gothic'";
-                      cx2.fillText(achieveC[i].name,X,Y);
-                      cx2.fillText(achieveC[i].count+"/"+achieveC[i].max,X+150,Y);
-                    }else{
-                      cx2.fillStyle = "black"; 
-                      cx2.font = "bold 18px 'Century Gothic'";
-                      cx2.fillText(achieveC[i].name,X,Y);
-                      cx2.font = "18px 'Century Gothic'";
-                      cx2.fillText(achieveC[i].count+"/"+achieveC[i].max+" ("+achieveC[i].cleared+")",X+150,Y);
-                    }
-                    Y+=20;
-                    if(Y>=500){
-                      X+=280;
-                      Y=110;
-                    }
-                  }
-                  var achieveD=achieveB.filter(value=>value.sub=="キャラ役");
-                  var B=achieveD.filter(value=>value.cleared>0);
-                  cx2.font = "bold 20px 'Century Gothic'";
-                  cx2.fillStyle = "black";
-                  cx2.fillText("クレスト "+B.length+"/"+achieveD.length,380,85) 
-                  Y+=10;
-                  for(var i=0;i<achieveD.length; i++){
-                    if(achieveD[i].cleared==0){
-                      cx2.fillStyle = "#8c8c8c";
-                      cx2.font = "18px 'Century Gothic'";
-                      cx2.fillText(achieveD[i].name,X,Y);
-                      cx2.fillText(" ("+achieveD[i].cleared+")",X+200,Y);
-                    }else{
-                      cx2.fillStyle = "black"; 
-                      cx2.font = "bold 18px 'Century Gothic'";
-                      cx2.fillText(achieveD[i].name,X,Y);
-                      cx2.font = "18px 'Century Gothic'";
-                      cx2.fillText(" ("+achieveD[i].cleared+")",X+200,Y);
-                    }
-                    Y+=20;
-                    if(Y>=500){
-                      X+=280;
-                      Y=110;
-                    }
-                  }
-                  var achieveC=achieveB.filter(value=>value.sub=="アガリ形");
-                  var A=achieveC.filter(value=>value.cleared>0);
-                  cx2.font = "bold 20px 'Century Gothic'";
-                  cx2.fillStyle = "black";
-                  cx2.fillText("一般 "+A.length+"/"+achieveC.length,560,85) 
-                  Y+=10
-                  for(var i=0;i<achieveC.length; i++){
-                    if(achieveC[i].cleared==0){
-                      cx2.fillStyle = "#8c8c8c";
-                      cx2.font = "18px 'Century Gothic'";
-                      cx2.fillText(achieveC[i].name,X,Y);
-                      cx2.fillText(" ("+achieveC[i].cleared+")",X+200,Y);
-                    }else{
-                      cx2.fillStyle = "black"; 
-                      cx2.font = "bold 18px 'Century Gothic'";
-                      cx2.fillText(achieveC[i].name,X,Y);
-                      cx2.font = "18px 'Century Gothic'";
-                      cx2.fillText(" ("+achieveC[i].cleared+")",X+200,Y);
-                    }
-                    Y+=20;
-                    if(Y>=500){
-                      break;
-                    }
-                  }
-                break;
-                default:
-                epic.src=epic_src[0]
-                epic.onload=function(){
-                  cx1.fillStyle = "rgba(20,20,20,0.7)";
-                  cx2.clearRect(0,0,800,510)
-                  cx1.fillRect(0,0,800,510)
-                  cx1.drawImage(epic,50,50,350,460)
-                  cx1.drawImage(epic,400,50,350,460)
-                  drawbuttom(60,80,"戦績",0,130,44);
-                  drawbuttom(60,125,"実績リスト",0,130,44);
-                  drawbuttom(60,170,"達成役一覧",0,130,44);
-                cx2.font = "32px 'Century Gothic'";
-                cx2.fillStyle = "black";
-                cx2.fillText("　×",680,80)
-                cx2.clearRect(80,530,670,70)
-                cx2.font = "18px Arial";
-                cx2.fillText("今までの対局の記録です。", 80, 550);
-                msgstate=0;
-                Menu();
-                      }
-                  break;
+            if(mouseX >60 && mouseX <190 && mouseY >215 && mouseY <260){
+              if(msgstate!==3 && msgstate !==-1){
+              msgstate=3;
+              se4.play();
+              }
             }
             menuMap(2);
             break;
@@ -6130,7 +5991,8 @@ if(opLock==0 && gamestate ==1){
       }};
     console.log('Setup',pvp);//socketで飛ばすとなんか3回くらい呼び出される
     navisw=0;
-    DP =new Array(0,0,0,0,0);
+    DP=new Array(0,0,0,0,0);
+    if(debugmode){DP[1]=20};
     skillusage2=new Array(0,-1,-1,-1,-1,0)
     death=[
       {kill:0,assist:0,death:0,Admg:[0,0,0,0],Bdmg:[0,0,0,0]},
@@ -6320,7 +6182,7 @@ if(opLock==0 && gamestate ==1){
     return false;
   }
   if(cLock==3){
-    SpecialSkill(1,num);
+    SkillAnimation(1,num);
   return false;
   };
   if(mpC>=10){
@@ -6532,7 +6394,9 @@ if(opLock==0 && gamestate ==1){
       yoti(skillusage[1]);
       }
       //スキル
-      if(skillswitch[1]==1 & cLock !==3){
+      //cLock !==3
+      if(debugmode){console.log(skillswitch[1]);};
+      if(skillswitch[1]==1){
         switch(chara[1]){
           case 1:
         if(DP[1]>=20){
@@ -6558,13 +6422,14 @@ if(opLock==0 && gamestate ==1){
         default:
           break;
       }
-      if(chara[1] !==0 && skillswitch[1]==0 && pvpmode==0){
-        var btn1 = createButton("スキル", 80, 40);
-        btn1.x = 710;
-        btn1.y = 440;
-        ponkanmap.addChild(btn1);
       }
-      }
+    if(chara[1] !==0 && skillswitch[1]==0 && pvpmode==0){
+      var btn1 = createButton("スキル", 80, 40);
+      btn1.x = 710;
+      btn1.y = 440;
+      ponkanmap.addChild(btn1);
+      btn1.addEventListener("click",{card:0,handleEvent:SkillBt});
+    }
     }
     if(judge(1)){hand1[0]=-3};
     if(deck.length==0 && reach[1]!==3){reach[1]=0};
@@ -6752,9 +6617,9 @@ if(opLock==0 && gamestate ==1){
                         }
                         LPrank.sort(compareFunc2);
             if(LPrank[3].chara ==chr){
-              SpecialSkill(chr,LPrank[2].chara);
+              SkillAnimation(chr,LPrank[2].chara);
               }else{
-              SpecialSkill(chr,LPrank[3].chara);
+              SkillAnimation(chr,LPrank[3].chara);
               }
               return true;
             break;
@@ -6762,10 +6627,10 @@ if(opLock==0 && gamestate ==1){
             //ア//メモライズ
             console.log(skillusage2[chr],r4);
         if(skillusage2[chr]>-1){
-          SpecialSkill(chr,r4);
+          SkillAnimation(chr,r4);
           return true;
       }else if((Cpuhandtemp[r4]>=3 && Cpuhandtemp[r4]<=5)||(Cpuhandtemp[r4]>=15 && Cpuhandtemp[r4]<=17)){
-        SpecialSkill(chr,r4);
+        SkillAnimation(chr,r4);
         return true;
       }else{
         return false;
@@ -6784,9 +6649,9 @@ if(opLock==0 && gamestate ==1){
                 }
               LPrank.sort(compareFunc2);
               if(LPrank[3].chara ==chr){
-              SpecialSkill(chr,1);
+              SkillAnimation(chr,1);
               }else{
-            SpecialSkill(chr,LPrank[3].chara);
+              SkillAnimation(chr,LPrank[3].chara);
               }
             return true;
             break;
@@ -8535,7 +8400,51 @@ if(opLock==0 && gamestate ==1){
                 resultA[0]+=B
                 PA(Sinagy[k].id,nodpair2.length);  
                 resultA.push(Sinagy[k].id+nodpair2.length+"/"+nodpair1.length+" "+B+"翻")}
-          }
+          };
+           //属性枠
+           nodpair1=handtemp.filter(value=>value>=0 && value<=3);
+           nodpair2=handtemp.filter(value=>value>=12 && value<=15);
+           if(nodpair1.length>=3 && nodpair2.length>=3){
+             resultA[0]+=1
+           PA("太陽のエル",1); 
+             resultA.push("太陽のエル 1翻")}
+           nodpair1=handtemp.filter(value=>value>=4 && value<=7);
+           nodpair2=handtemp.filter(value=>value>=20 && value<=23);
+           if(nodpair1.length>=3 && nodpair2.length>=3){
+             resultA[0]+=1
+             PA("水のエル",1); 
+             resultA.push("水のエル 1翻")}
+           nodpair1=handtemp.filter(value=>value>=8 && value<=11);
+           nodpair2=handtemp.filter(value=>value>=40 && value<=43);
+           if(nodpair1.length>=3 && nodpair2.length>=3){
+             resultA[0]+=1
+             PA("風のエル",1); 
+             resultA.push("風のエル 1翻")}
+           nodpair1=handtemp.filter(value=>value>=16 && value<=19);
+           nodpair2=handtemp.filter(value=>value>=32 && value<=35);
+           if(nodpair1.length>=3 && nodpair2.length>=3){
+             resultA[0]+=1
+             PA("闇のエル",1); 
+             resultA.push("闇のエル 1翻")}
+           nodpair1=handtemp.filter(value=>value>=28 && value<=31);
+           nodpair2=handtemp.filter(value=>value>=36 && value<=39);
+           if(nodpair1.length>=3 && nodpair2.length>=3){
+             resultA[0]+=1
+             PA("火のエル",1); 
+             resultA.push("火のエル 1翻")}
+           nodpair1=handtemp.filter(value=>value>=24 && value<=27);
+           nodpair2=handtemp.filter(value=>value>=48 && value<=51);
+           var nodpair3=handtemp.filter(value=>value>=56 && value<=59);
+           if(nodpair1.length + nodpair2.length + nodpair3.length>=6){
+             resultA[0]+=1
+             PA("大地のエル",1); 
+             resultA.push("大地のエル 1翻")}
+           nodpair1=handtemp.filter(value=>value>=44 && value<=47);
+           nodpair2=handtemp.filter(value=>value>=52 && value<=55);
+           if(nodpair1.length==3 && nodpair2.length==3){
+             resultA[0]+=1
+             PA("原初のエル",1); 
+             resultA.push("原初のエル 1翻")}
           console.log(resultA)
           return resultA
         }
@@ -10038,7 +9947,7 @@ if(opLock==0 && gamestate ==1){
     }
     function handOnCorsor(){
       //手札のカーソル
-      if(opLock==2 || gamestate !==1){return false};//カーソル表示しない時　現在：esc中のみ非表示
+      if(cLock==1 && (opLock==2 || gamestate !==1)){return false};//カーソル表示しない時　現在：esc中のみ非表示
       switch(this.card){
         case -1:
           tweeNcor.paused=true;
@@ -10215,6 +10124,7 @@ if(opLock==0 && gamestate ==1){
               btn1.x = 710;
               btn1.y = 440;
               ponkanmap.addChild(btn1);
+              btn1.addEventListener("click",{card:0,handleEvent:SkillBt});
           }
           reach[1]=1;
         break;
@@ -10323,17 +10233,12 @@ if(opLock==0 && gamestate ==1){
         case 0:
           //スキルボタン
           se5.play();
-          var btn1 = createButton("キャンセル", 80, 40);
-          btn1.x = 630;
-          btn1.y = 440;
-          ponkanmap.addChild(btn1)
-          btn1.addEventListener("click",{card:1,handleEvent:SkillBt});
           //リーチのパイを色付けたりリーチボタンを隠すなど
           SpecialSkill(1,0);
           Skillname(1);
           break;
         case 1:
-          se3.play()
+          se3.play();
           guidemap.removeAllChildren();
           ponkanmap.removeAllChildren();
           if(reach[1] ==1){
@@ -10364,8 +10269,8 @@ if(opLock==0 && gamestate ==1){
               btn1.x = 710;
               btn1.y = 440;
               ponkanmap.addChild(btn1);
+              btn1.addEventListener("click",{card:0,handleEvent:SkillBt});
           }
-          reach[1]=1;
         break;
       }
     }
@@ -10433,7 +10338,7 @@ if(opLock==0 && gamestate ==1){
         }
         if(mouseX >520 && mouseX <650 && mouseY >345 && mouseY <375){
           Textlist[0].text="CPUのアクティブスキルの設定です。";
-          Textlist[1].text="禁止するとCPUはスキルを使用しません（パッシブスキルは適用される）";  
+          Textlist[1].text="禁止するとCPUはスキルを使用しません（パッシブスキルは適用）";  
         }
             break;
           case 2:
@@ -10791,7 +10696,7 @@ if(opLock==0 && gamestate ==1){
       }
       //
     }
-    function SoundConfig(event,p=0){
+    function SoundConfig(){
       SEbuffer(-1)
       if(!cLock && debugmode){
         //for debug
@@ -11372,7 +11277,12 @@ if(opLock==0 && gamestate ==1){
         };
       };    
   function SkillAnimation(p=0,target=0){
+    cLock=0;
+    console.log('操作禁止')
     se12.play();
+    skilltext1=skilltext[chara[p]].fir
+    skilltext2=skilltext[chara[p]].sec
+    skilltext3=skilltext[chara[p]].thr
     var Container = new createjs.Container();
     Container.alpha=0;
     stage.addChild(Container);
@@ -11404,43 +11314,41 @@ if(opLock==0 && gamestate ==1){
     createjs.Tween.get(C)
     .to({x:0, scaleX:1, scaleY:1},200, createjs.Ease.cubicInOut)
     .wait(800)
-    .to({x:-400, scaleX:1.1, scaleY:1.1,alpha:0.5},150)
+    .to({x:-400, scaleX:1.1, scaleY:1.1,alpha:0.5},150);
+    createjs.Tween.get(Container)
+    .to({alpha: 1},60)
+    .wait(800)
+    .to({alpha: 0},100)
     .call(next);
     var t = new createjs.Text(skilltext1, "32px 'Century Gothic'", "#05ff9b");
-    t.x=200;
-    t.y=240;
+    t.x=100;
+    t.y=280;
     t.outline=5;
     Container.addChild(t);
     createjs.Tween.get(t)
-    .to({x:300},400, createjs.Ease.cubicOut)
+    .to({x:170},400, createjs.Ease.cubicOut)
     var t = new createjs.Text(skilltext1, "32px 'Century Gothic'", "white");
-    t.x=200;
-    t.y=240;
+    t.x=100;
+    t.y=280;
     Container.addChild(t);
     createjs.Tween.get(t)
-    .to({x:300},400, createjs.Ease.cubicOut)
+    .to({x:170},400, createjs.Ease.cubicOut)
     var t = new createjs.Text(skilltext2, "24px 'Century Gothic'", "#05ff9b");
-    t.x=300;
-    t.y=280;
+    t.x=200;
+    t.y=320;
     t.outline=5;
     Container.addChild(t);
     createjs.Tween.get(t)
-    .to({x:360},400, createjs.Ease.cubicOut)
+    .to({x:250},400, createjs.Ease.cubicOut)
     var t = new createjs.Text(skilltext2, "24px 'Century Gothic'", "white");
-    t.x=300;
-    t.y=280;
+    t.x=200;
+    t.y=320;
     Container.addChild(t);
     createjs.Tween.get(t)
-    .to({x:360},400, createjs.Ease.cubicOut)
-    //
+    .to({x:250},400, createjs.Ease.cubicOut);
   function next(){
   Container.removeAllChildren();
   field.removeChild(Container);
-  if(ctlswitch>1){
-    ctl[ctlswitch]=4
-    cpuplay(ctlswitch);
-  };
-  ctlswitch=5
   SpecialSkill(p,target)
   if(debugmode){console.log('4789'+ctl)};
   }
@@ -11448,14 +11356,11 @@ if(opLock==0 && gamestate ==1){
   function SpecialSkill(player,target=0){
     var p=chara[player]
     console.log("skill",player,target)
-    if(target>=100 || skillswitch[player]==0){
-      //target 100->演出中の待ち
+    if(skillswitch[player]==0){
     //skillswitch 0使用可能 1次の自分のターンにリセット 2この局では使用不可
     if(p==1){//エル
       if(player==1){
         if(target>1){
-        cLock=0;
-        console.log('操作禁止')
         switch(target){
           case 2:
           case 3:
@@ -11470,26 +11375,39 @@ if(opLock==0 && gamestate ==1){
           }
           break;
         }
-        ctlswitch=player
-        skilltext1=skilltext[p].fir
-        skilltext2=skilltext[p].sec
-        skilltext3=skilltext[p].thr
-        SkillAnimation(p,target);
+        //ctlswitch=player
         ponkanmap.removeAllChildren();
         skillusage[player]+=1
         skillswitch[player]=2
+        cLock=1;
         //player1();
         }else if(target==0){
         //対象選択画面
         se5.play()
-        cx3.fillStyle = "rgba(20,20,20,0.3)";
-        cx3.fillRect(0,0,800,100)
-        cx3.fillRect(150,100,650,300)
-        cx3.fillRect(0,400,800,200)
+        var s = new createjs.Shape();
+        s.graphics.beginFill("rgba(20,20,20,0.3)");
+        s.graphics.drawRect(0, 0, 800, 100)
+        s.graphics.drawRect(150, 100, 650, 300)
+        s.graphics.drawRect(0, 400, 800, 200);
+        ponkanmap.addChild(s);
+        var btn1 = createButton("キャンセル", 80, 40);
+          btn1.x = 710;
+          btn1.y = 440;
+          ponkanmap.addChild(btn1)
+          btn1.addEventListener("click",{card:1,handleEvent:SkillBt});
+        for(var i=0;i<3;i++){
+        var CKey = new createjs.Shape();
+        CKey.graphics.beginStroke("#0088f0").setStrokeStyle(5).drawRoundRect(0,100+100*i,150,100,10,10)
+        ponkanmap.addChild(CKey);
+        var tweeNcor;
+        tweeNcor=createjs.Tween.get(CKey, {loop: true})
+        .to({alpha:1},200)
+        .to({alpha:0.2},400)
+        .to({alpha:1},200);
+        }
         cLock=2;
         }}else{//cpu
             console.log('cpu skill')
-              if(player!==target){
               var Skin=Buff[target].findIndex(value=>value==1);
               if(Skin ==-1){
                 Buff[target].push(5,5,5,5,5)
@@ -11498,14 +11416,10 @@ if(opLock==0 && gamestate ==1){
                 DP[player]-=20;
                 drawDP(player);
               }
-            }
-            ctlswitch=player
-            skilltext1=skilltext[p].fir
-            skilltext2=skilltext[p].sec
-            skilltext3=skilltext[p].thr
-            SkillAnimation(p,target);
             skillusage[player]+=1
             skillswitch[player]=2
+            ctl[player]=4
+            cpuplay(player);
         }
     }
     if(p==2){//アイ
@@ -11515,231 +11429,160 @@ if(opLock==0 && gamestate ==1){
       console.log('操作禁止')
       if(skillusage2[player]>-1){
         //メモライズしたパイに変える
-        if(target>=100){ 
-          if(ctlswitch==5){ 
-          cLock=1;
-          skillusage2[player]=-1;
-          handgraph(0,1);
-          judge(1);
-          //必要なら9枚目だけここで書いて
-        }
-          return false;
-        }else{
-          Cskillprepare[3]=hand1[target];
-          Cskillprepare[4]=skillusage2[player];
-          hand1[target]=skillusage2[player]}
+        Cskillprepare[3]=hand1[target];
+        Cskillprepare[4]=skillusage2[player];
+        hand1[target]=skillusage2[player]
+        cLock=1;
+        skillusage2[player]=-1;
+        handgraph(0,1);
+        judge(1);
+        //必要なら9枚目だけここで書いて
+        return false;
       }else{
         //メモライズしてから切る
-      if(target>=100){ 
-        if(ctlswitch==5){ 
         cLock=1;
-        skillusage2[player]=hand1[target-100];
+        ponkanmap.removeAllChildren();
+        skillswitch[player]=1
+        skillusage[player]+=1;
+        if(skillusage[player]>=4){skillswitch[player]=2}
+        skillusage2[player]=hand1[target];
         var SX=hand1.findIndex(value=>value==skillusage2[player])
         DP[player]-=10;
         drawDP(player);
         PlayertoCpu(SX);
-      }
         return false;
       }
-      }
-      ctlswitch=player
-      skilltext1=skilltext[p].fir
-      skilltext2=skilltext[p].sec
-      skilltext3=skilltext[p].thr
-      target+=100;
-      SkillAnimation(p,target);
-      ponkanmap.removeAllChildren();
-      skillswitch[player]=1
-      skillusage[player]+=1;
-      if(skillusage[player]>=4){skillswitch[player]=2}
+      //ctlswitch=player
       }else if(target==0){
       se5.play()
-      cx3.fillStyle = "rgba(20,20,20,0.3)";
-      cx3.fillRect(0,0,800,600)
-      cx3.clearRect(4,490,762,110)
+      var s = new createjs.Shape();
+        s.graphics.beginFill("rgba(20,20,20,0.3)");
+        s.graphics.drawRect(0, 0, 630, 490)
+        ponkanmap.addChild(s);
+        var btn1 = createButton("キャンセル", 80, 40);
+          btn1.x = 710;
+          btn1.y = 440;
+          ponkanmap.addChild(btn1)
+          btn1.addEventListener("click",{card:1,handleEvent:SkillBt});
       cLock=3;
       }}else{//cpu
       if(skillusage2[player]>-1){
         //メモライズしたパイに変える
-        if(target>=100){ 
-          if(ctlswitch==5){ 
         skillusage2[player]=-1;
-      }
-        return false;
-      }else{
         Cskillprepare[3]=Cpuhandtemp[target];
         Cskillprepare[4]=skillusage2[player];
         Cpuhandtemp[target]=skillusage2[player];
         skillusage[player]+=1;
-      }
       }else{
         //メモライズしてから切る
-        if(target>=100){ 
-          if(ctlswitch==5){ 
         skillusage2[player]=Cpuhandtemp[target-100];
         var SX=Cpuhandtemp[target]
         DP[player]-=10;
         drawDP(player);
       }
-        return false;
-      }
-      }
-      ctlswitch=player
-      skilltext1=skilltext[p].fir
-      skilltext2=skilltext[p].sec
-      skilltext3=skilltext[p].thr
-      target+=100;
-      SkillAnimation(p,target);
-      cx2.fillStyle = "rgba(20,20,20,0.5)";
-      cx2.fillRect(710,400,80,40)
       skillswitch[player]=1
       if(skillusage[player]>=2){skillswitch[player]=2}
+        ctl[player]=4
+        cpuplay(player);
       }
       }
-    if(p==3){//レナ→エルス出来たらコピペしてください
+    if(p==3){
+      //レナ
       if(player==1){
-      if(target>1){
-      cLock=0;
-      console.log('操作禁止')
-      switch(target){
-        case 2:
-        case 3:
-        case 4:
-        var Skin=Buff[target].findIndex(value=>value==1);
-        if(Skin ==-1){
-          Buff[target].push(6,6,6)
-          Buffdraw(target);
-          console.log(Buff[target]);
-          DP[player]-=20;
-          drawDP(player);
+        if(target>1){
+        switch(target){
+          case 2:
+          case 3:
+          case 4:
+          var Skin=Buff[target].findIndex(value=>value==1);
+          if(Skin ==-1){
+            Buff[target].push(6,6,6)
+            Buffdraw(target);
+            console.log(Buff[target]);
+            DP[player]-=20;
+            drawDP(player);
+          }
+          break;
         }
-        break;
-      default:
-        //スキル演出中
-        if(ctlswitch==5){
+        //ctlswitch=player
+        ponkanmap.removeAllChildren();
+        skillusage[player]+=1
+        skillswitch[player]=2
         cLock=1;
-        //handgraph(0,1);
-        console.log('操作可能')
-        }else{
-          setTimeout(function(){
-            SpecialSkill(player,target)
-            }, 550);
+        //player1();
+        }else if(target==0){
+        //対象選択画面
+        se5.play()
+        var s = new createjs.Shape();
+        s.graphics.beginFill("rgba(20,20,20,0.3)");
+        s.graphics.drawRect(0, 0, 630, 100)
+        s.graphics.drawRect(150, 100, 480, 300)
+        s.graphics.drawRect(0, 400, 630, 200);
+        ponkanmap.addChild(s);
+        var btn1 = createButton("キャンセル", 80, 40);
+          btn1.x = 710;
+          btn1.y = 440;
+          ponkanmap.addChild(btn1)
+          btn1.addEventListener("click",{card:1,handleEvent:SkillBt});
+        for(var i=0;i<3;i++){
+        var CKey = new createjs.Shape();
+        CKey.graphics.beginStroke("#0088f0").setStrokeStyle(5).drawRoundRect(0,100+100*i,150,100,10,10)
+        ponkanmap.addChild(CKey);
+        var tweeNcor;
+        tweeNcor=createjs.Tween.get(CKey, {loop: true})
+        .to({alpha:1},200)
+        .to({alpha:0.2},400)
+        .to({alpha:1},200);
         }
-        return false;
-        break;
-      }
-      e17.src=chrimg_src[p]
-      e17.onload=function(){
-      alpha=2;
-      cx4.globalAlpha=1
-      loopX=0;
-      loopX2=0;
-      ctlswitch=player
-      skilltext1=skilltext[p].fir
-      skilltext2=skilltext[p].sec
-      skilltext3=skilltext[p].thr
-      window.requestAnimationFrame((ts)=>SkillAnimation(ts));
-      se12.play();
-      //cx2.fillStyle = "rgba(20,20,20,0.5)";
-      drawbuttom(710,400,"スキル",1);
-      ponkanmap.removeAllChildren();
-      var C=canvas2.toDataURL();
-      var Cb = new createjs.Bitmap(C);
-      ponkanmap.addChild(Cb);
-      cx3.clearRect(0,0,800,600)
-      skillusage[player]+=1
-      skillswitch[player]=2
-      SpecialSkill(player,100);
-      //player1();
-      }}else if(target==0){
-      se5.play()
-      cx3.fillStyle = "rgba(20,20,20,0.3)";
-      cx3.fillRect(0,0,800,100)
-      cx3.fillRect(150,100,650,300)
-      cx3.fillRect(0,400,800,200)
-      cLock=2
-      }}else{//cpu
-          console.log('cpu skill')
-            if(player!==target && target!==100){
-            var Skin=Buff[target].findIndex(value=>value==1);
-            if(Skin ==-1){
-              Buff[target].push(6,6,6)
-              Buffdraw(target);
-              console.log(Buff[target]);
-              DP[player]-=20;
-              drawDP(player);
-            }
-          }else if(target==100){
-            //スキル演出中
-            if(ctlswitch!==5){
-              setTimeout(function(){
-                SpecialSkill(player,target)
-                }, 550);
-            }
-            return false;
-          }
-          e17.src=chrimg_src[p]
-          e17.onload=function(){
-          alpha=2;
-          cx4.globalAlpha=1
-          loopX=0;
-          loopX2=0;
-          ctlswitch=player
-          skilltext1=skilltext[p].fir
-          skilltext2=skilltext[p].sec
-          skilltext3=skilltext[p].thr
-          window.requestAnimationFrame((ts)=>SkillAnimation(ts));
-          se12.play();
-          skillusage[player]+=1
-          skillswitch[player]=2
-          SpecialSkill(player,100);
-          //player1();
-          }
-      }
-      }
+        cLock=2;
+        }}else{//cpu
+            console.log('cpu skill')
+              var Skin=Buff[target].findIndex(value=>value==1);
+              if(Skin ==-1){
+                Buff[target].push(6,6,6)
+                Buffdraw(target);
+                console.log(Buff[target]);
+                DP[player]-=20;
+                drawDP(player);
+              }
+            skillusage[player]+=1
+            skillswitch[player]=2
+            ctl[player]=4
+            cpuplay(player);
+        }
+      };
       if(p==4){//ヴン
-        console.log('操作禁止')
-      if(target==100){
-        //スキル演出中
-        if(ctlswitch!==5){
-          setTimeout(function(){
-            SpecialSkill(player,target)
-            }, 550);
-        }
-        return false;
-      }else{
+      if(target==1){
           //スキル演出中
           DP[player]-=30;
           drawDP(player);
+          ponkanmap.removeAllChildren();
           ryukyoku();
           cLock=1;
           //handgraph(0,1);
           console.log('操作可能')
-          }
-        e17.src=chrimg_src[p]
-        e17.onload=function(){
-        alpha=2;
-        cx4.globalAlpha=1
-        loopX=0;
-        loopX2=0;
-        ctlswitch=player
-        skilltext1=skilltext[p].fir
-        skilltext2=skilltext[p].sec
-        skilltext3=skilltext[p].thr
-        window.requestAnimationFrame((ts)=>SkillAnimation(ts));
-        se12.play();
-        //cx2.fillStyle = "rgba(20,20,20,0.5)";
-        drawbuttom(710,400,"スキル",1);
-        ponkanmap.removeAllChildren();
-        var C=canvas2.toDataURL();
-        var Cb = new createjs.Bitmap(C);
-        ponkanmap.addChild(Cb);
-        cx3.clearRect(0,0,800,600)
-        skillusage[player]+=1
-        skillswitch[player]=2
-        SpecialSkill(player,100);
+        }else{
+        se5.play()
+        var s = new createjs.Shape();
+          s.graphics.beginFill("rgba(20,20,20,0.3)");
+          s.graphics.drawRect(0, 0, 630, 600)
+          ponkanmap.addChild(s);
+          var CKey = new createjs.Shape();
+          CKey.graphics.beginStroke("#0088f0").setStrokeStyle(5).drawRoundRect(150,100,480,390,10,10)
+          ponkanmap.addChild(CKey);
+          var tweeNcor;
+          tweeNcor=createjs.Tween.get(CKey, {loop: true})
+          .to({alpha:1},200)
+          .to({alpha:0.2},400)
+          .to({alpha:1},200);
+          var btn1 = createButton("キャンセル", 80, 40);
+            btn1.x = 710;
+            btn1.y = 440;
+            ponkanmap.addChild(btn1)
+            btn1.addEventListener("click",{card:1,handleEvent:SkillBt});
+          cLock=4;
         }
-        }
+      }
     }
     }//specialskill
   socket.on("game-over", (data)=>{
@@ -11757,12 +11600,14 @@ if(opLock==0 && gamestate ==1){
     }
   });
   function gameover(word="クリックで進む"){//けっかはっぴょぉうする
+    gamestate =-2;//終了時3に
     tweeNsquare.paused=true;
     Csquare.alpha=0;
     Configmap.removeAllChildren();
     guidemap.removeAllChildren();
     handmap.removeAllChildren();
     ponkanmap.removeAllChildren();
+    fieldpai.removeAllChildren();
     jingle2.seek(1);
     jingle2.play();
     if(musicset[1]<=0){musicset[1]=0};
@@ -11777,7 +11622,7 @@ if(opLock==0 && gamestate ==1){
     Bgm.on("fade", ()=>{
     Bgm.stop();
     });
-            //ユーザー名をcpu2とかにされたらたまらんので
+    //ユーザー名をcpu2とかにされたらたまらんので
     var LPresult=[
       {pc:"Player", token:0, chara:chara[1], elia:LP[1]},
       {pc:"CPU2", token:0, chara:chara[2], elia:LP[2]},
@@ -12034,10 +11879,11 @@ if(opLock==0 && gamestate ==1){
         cx2.fillText("いつでも思い出せる.", 635, 310);
       }else{
       cx2.fillText("効果：②対象のパイを", 635, 230);
-      cx2.fillText("メモしたパイに変える.", 635, 250);
-      cx2.font = "bold 14px Arial";
-      cx2.fillText(donpai[skillusage2[player]].name, 640, 270);
-      cx2.fillText(donpai[skillusage2[player]].sub, 640, 290);
+      cx2.fillStyle="orange"
+      cx2.fillText(donpai[skillusage2[player]].name, 635, 250);
+      cx2.fillText("("+donpai[skillusage2[player]].sub+")", 635, 270);
+      cx2.fillStyle="white";
+      cx2.fillText("に変える.", 640, 290);
 
       }
       }else if(p==3){
