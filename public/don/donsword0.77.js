@@ -1,11 +1,9 @@
 //var1.025　season2 
 // npm run dev
 //全職75枚（エピックキャラは1枚ずつ増量）＋オールマイティ2枚＋マスター8枚×2（ガ、ロ、ベ、デ、ソ、ア、ハ）合計93枚→61枚スタート
-//いつか→デスマでキルアシに準じて順位をつける　タイトル画面でミュートの設定
-//deathを参照してください
-//シナジーの翻数調整
+//シナジーの翻数調整未
 //自分のターンで流局になる時、流局画面でクリックできず即進んでしまうことがある？
-//カン後、3ペアリーチした時にロンできない場合がある？
+//カン後、3ペアリーチした時にロンできない場合・3ペアがつかない場合がある？
 window.onload = function(){
   draw();
   };
@@ -330,13 +328,12 @@ window.onload = function(){
   //オーラスの時1　現在音楽のみに影響
   var Ronturn=[];
   //データベース
-  var LPlist=new Array("一般","ヘル","ミリオネア","∞","魔界血戦")
+  var LPlist=new Array("一般","ヘル","デスマッチ","∞","魔界血戦")
   var musiclist=new Array("ランダム","盲目のアストライア","Nine Jack","The Evil Sacrifice Archenemies","ロベリア","夜の迷宮の入口","決闘のテーマ","エルの樹の麓","リーチっぽい音楽","ベスマ-竜の道","ウォーリーの城","歎きの塔Phase3","狂乱のコンサート","リーチっぽい音楽R")
   var chrlist=new Array("名無しさん","エルス","アイシャ","レナ","レイヴン","イヴ")//"ラシェ","アラ","エド","ラビィ")
   var chrimg_src= new Array("don/Don_chara0.png","don/Don_chara1.png","don/Don_chara2.png","don/Don_chara3.png","don/Don_chara4.png","don/Don_chara5.png");
-  var atrbute_src= new Array("don/Don_DP.png","don/Duel_mana.png","don/Duel_sun.png","don/Duel_aqua.png","don/Duel_wind.png","don/Duel_moon.png","don/Duel_gaia.png","don/Duel_heat.png","don/Don_HA.png");
   //説明用
-  var epic_src =new Array("don/elstudio_bg1.png","don/Don_epic1.png","don/Don_epic2.png","don/Don_epic3.png","don/Don_epicline.png","don/Don_ss11.png","don/Don_epic4.png","don/Don_epic5.png");
+  var epic_src =new Array("don/elstudio_bg1.png","don/Don_epic1.png","don/Don_epic2.png","don/Don_epic3.png","don/Don_epic6.png","don/Don_ss11.png","don/Don_epic4.png","don/Don_epic5.png");
   //パイの裏
   var eltearB_src =new Array("don/Don_img0.png","don/Don_winbg.png");
   //donpaiのidは0から始める　ロゼimg40-43は位置が変わる
@@ -1004,6 +1001,9 @@ var queue = new createjs.LoadQueue(),
       manifest.push(epic_src[i])
     };
     manifest.push('don/circle88.png')
+    manifest.push('don/soL_option_bt2.png')
+    manifest.push('don/soL_option_bt3.png')
+    manifest.push('don/soL_option_bt4.png')
     console.log(manifest.length);
 // 同時接続数を設定
 queue.setMaxConnections(6);
@@ -1334,7 +1334,7 @@ function updateParticles() {
             return false;
           }
         }
-      if(LP[0]!==1 && (LP[1] <0 || LP[2]<0 || LP[3] <0 || LP[4]<0)){
+      if(LP[0]!==2 && (LP[1] <0 || LP[2]<0 || LP[3] <0 || LP[4]<0)){
         gameover();
         return false;
       }
@@ -1403,7 +1403,7 @@ function updateParticles() {
         }
         break;
         case 1:
-        //デスマッチ
+        //ヘル
             if(skillusage2[0]>=8){
             gameover();
             return false;
@@ -1418,15 +1418,28 @@ function updateParticles() {
           }
           break;
           case 2:
-      //ミリオネア
-      if(LP[1] >=1000000 || LP[2] >=1000000 || LP[3] >=1000000 || LP[4]>=1000000){
-            gameover();
-            return false;
-            }else{
-              gamestate =1
-              deckHandler();
+      //デスマッチ
+      if(pvpmode==1){
+        if(LP_PVP.Length[0]==1){
+            if(skillusage2[0]>=4){
+              gameover();
               return false;
             }
+        }else if(LP_PVP.Length[0]==2){
+            if(skillusage2[0]>=8){
+              gameover();
+              return false;
+            }
+          } 
+      }else{
+        if(skillusage2[0]>=8){
+        gameover();
+        return false;
+        }
+      }
+      gamestate =1
+      deckHandler();
+      return false;
             break;
             case 4:
     //魔界ルール
@@ -2468,21 +2481,16 @@ function menuMap(p=0){
               btn1.addEventListener("click", {card:0,handleEvent:HowtoBt});
               Textlist[0].text="3ペア・ライン通貫の他に特殊な役として";
               Textlist[1].text="国士無双とクレストシリーズがあります。";
-              var e = new createjs.Bitmap(queue.getResult(epic_src[2]));
-              e.sourceRect={x:0,y:270,width:600,height:128};
+              var e = new createjs.Bitmap(queue.getResult(epic_src[4]));
+              e.scale=600/650;
               e.x=90;
-              e.y=125;
+              e.y=120;
               menu_guide.addChild(e)
               var t = new createjs.Text("特殊な役-国士無双とクレストシリーズ", "26px 'Century Gothic'", "black");
               t.x=90;
               t.y=90;
               menu_guide.addChild(t);
-              var Y=280;
-              var t = new createjs.Text("3ペア・ライン通貫の他にも特殊な役があります。", "22px 'Century Gothic'", "black");
-              t.x=90;
-              t.y=Y;
-              Y+=30;
-              menu_guide.addChild(t);
+              var Y=400;
               var t = new createjs.Text("「国士無双」は、「マスターロード」のパイを", "22px 'Century Gothic'", "black");
               t.x=90;
               t.y=Y;
@@ -2493,12 +2501,12 @@ function menuMap(p=0){
               t.y=Y;
               Y+=30;
               menu_guide.addChild(t);
-              var t = new createjs.Text("「クレスト」シリーズは、属性（パイに描かれたマーク）が", "22px 'Century Gothic'", "black");
+              var t = new createjs.Text("「クレスト」シリーズは、マスターロードのパイを含み", "22px 'Century Gothic'", "black");
               t.x=90;
               t.y=Y;
               Y+=30;
               menu_guide.addChild(t);
-              var t = new createjs.Text("同じパイを9枚揃えることで成立します。", "22px 'Century Gothic'", "black");
+              var t = new createjs.Text("属性マークが同じパイを9枚揃えることで成立します。", "22px 'Century Gothic'", "black");
               t.x=90;
               t.y=Y;
               Y+=30;
@@ -2943,17 +2951,17 @@ function NameChange(){
     shape.graphics.drawRect(300, 200, 220, 250);
     shape.alpha=0.7;
     Configmap.addChild(shape);
-    var option_bt2 = new createjs.Bitmap('don/soL_option_bt2.png');
+    var option_bt2 = new createjs.Bitmap(queue.getResult('don/soL_option_bt2.png'));
     option_bt2.x=310;
     option_bt2.y=280;
     option_bt2.scale=1.2;
     Configmap.addChild(option_bt2)
-    var option_bt3 = new createjs.Bitmap('don/soL_option_bt3.png');
+    var option_bt3 = new createjs.Bitmap(queue.getResult('don/soL_option_bt3.png'));
     option_bt3.x=310;
     option_bt3.y=330;
     option_bt3.scale=1.2;
     Configmap.addChild(option_bt3)
-    var option_bt4 = new createjs.Bitmap('don/soL_option_bt4.png');
+    var option_bt4 = new createjs.Bitmap(queue.getResult('don/soL_option_bt4.png'));
     option_bt4.x=310;
     option_bt4.y=380;
     option_bt4.scale=1.2;
@@ -3280,9 +3288,7 @@ function NameChange(){
     menuMap();
     break;
         case 3:
-          //フリバからのキャンセルボタン
-          console.log('2439!')
-
+          //フリバ
           if(mouseX >510 && mouseX <560 && mouseY >80 && mouseY <110){
           se3.play();
           if(LP[0]==0){LP[0]=LPlist.length-1}else{LP[0]-=1}
@@ -3576,6 +3582,42 @@ function NameChange(){
               msgstate=3;
               se4.play();
               }
+            }
+            switch(msgstate){
+              case 0:
+                if(mouseX >530 && mouseX <730 && mouseY >400 && mouseY <450){
+                  se3.play();
+                  chara[1]=Math.floor((mouseX-530)/50);
+                }
+                if(mouseX >530 && mouseX <630 && mouseY >450 && mouseY <500){
+                  se3.play();
+                  chara[1]=4+Math.floor((mouseX-530)/50);
+                }
+              break;
+            case 1:
+              if(mouseX >195 && mouseX <380 && mouseY >95 && mouseY <495){
+                var I=Math.floor((mouseY-95)/20);
+                cx3.strokeRect(190,92+I*20,240,20);
+                if(achieveA[I].cleared>0 && Usercrest!==achieveA[I].name){
+                  se3.play();
+                  Usercrest=achieveA[I].name;
+                }else{
+                  Usercrest="称号なし";
+                };
+              }
+              if(mouseX >475 && mouseX <660 && mouseY >95 && mouseY <495){
+                var I=Math.floor((mouseY-95)/20)+20;
+                if(I>=achieveA.length){
+                  return false;
+                }
+                if(achieveA[I].cleared>0 && Usercrest!==achieveA[I].name){
+                  se3.play();
+                    Usercrest=achieveA[I].name;
+                  }else{
+                    Usercrest="称号なし";
+                  };
+                }
+              break;
             }
             menuMap(2);
             break;
@@ -3935,7 +3977,11 @@ function NameChange(){
               menu_duel.addChild(t);
             }}
             var e = new createjs.Bitmap(queue.getResult(chrimg_src[data.list[i].chr]));
+            if(data.list[i].chr==5){
+            e.sourceRect={x:460,y:0,width:300,height:600};              
+            }else{
             e.sourceRect={x:400,y:0,width:300,height:600};
+            }
             e.scale=1/2;
             e.x=9+150*i
             e.y=100;
@@ -4217,6 +4263,11 @@ if(opLock==0 && gamestate ==1){
   function compareFunc2(a,b){return(a.elia - b.elia);}  
   function compareFunc3(a,b){
     if(a>=68){return 3}else{return a%4-b%4;}}
+  function compareFunc4(a,b){
+    if (a.elia === b.elia) {
+      return a.nod - b.nod;
+    }
+    return a.elia - b.elia;}  
   function getIsDuplicate(arr1, arr2) {
     return [...arr1, ...arr2].filter(item => arr1.includes(item) && arr2.includes(item)).length > 0
   };
@@ -4301,7 +4352,7 @@ if(opLock==0 && gamestate ==1){
         var t = new createjs.Text("第"+(skillusage2[0])+"局 "+(skillusage2[5])+"本場", "24px 'Century Gothic'", "white");
         t.x=10;
         t.y=68;
-        if(LP[0]>=0 && LP[0] <=1 && skillusage2[0]==8){
+        if(LP[0]>=0 && LP[0]!==3 && skillusage2[0]==8){
           t.text="オーラス"+(skillusage2[5]);
           auras=1;
           Dlvup.alpha=0;
@@ -4379,17 +4430,16 @@ if(opLock==0 && gamestate ==1){
         field.addChild(e12);
         field.addChild(e13);
         field.addChild(e14);
-        //
         for(var i=1; i<skillswitch.length;i++){
           skillswitch[i]=1;
           }
           skillusage=new Array(0,0,0,0,0)
-        if(pvpmode==1){
-          if(LP_PVP.Rule[0]==2){
+          if(LP[0]==2){
             for(var i=1; i<5 ; i++){//復活
               if(LP[i]<0){
               skillusage2[i]-=1;
               if(skillusage2[i] <=-1){
+                console.log('revived!');
                 LP[i]=75000;
                 for (var I=0;I<4;I++){
                   if(I!==i){
@@ -4398,17 +4448,7 @@ if(opLock==0 && gamestate ==1){
                   }
                 }
               }}
-          }}
-        }else{
-        if(LP[0]==2){
-        for(var i=1; i<5 ; i++){//復活
-          if(LP[i]<0){
-          skillusage2[i]-=1;
-          if(skillusage2[i] <=-1){
-            LP[i]=75000;
-          }}
-            }}
-        };
+          }};
         LPtextlist=[];//HPテキスト
         parentY =450;
         var t = new createjs.Text(LP[1], "16px 'Century Gothic'", "#eb5600");
@@ -4723,7 +4763,7 @@ if(opLock==0 && gamestate ==1){
         hand3.sort(compareFunc);
         hand4.sort(compareFunc);
         //積み込み
-        //if(debugmode){hand1=[60,61,62,63,64,66,67,69]};
+        if(debugmode){hand1=[60,61,62,63,64,66,67,68]};
         //1番目の配列は上がり判定に使用
         hand1.unshift(-1)
         hand2.unshift(-1)
@@ -5853,7 +5893,7 @@ if(opLock==0 && gamestate ==1){
         ReachAnimation(player);
         //イヴ様
         for(var i=1;i<5;i++){
-          if(i!==player && chara[i]==5 && skillusage[i]==0){
+          if(pvpmode==0 && i!==player && chara[i]==5 && skillusage[i]==0){
             skillusage[i]=player;
           }
       }}else{//通常
@@ -6022,7 +6062,7 @@ if(opLock==0 && gamestate ==1){
         mode=1;
         break;
       case 2:
-        for(var i=1;i<LP.length;i++){LP[i]=100000}
+        for(var i=1;i<LP.length;i++){LP[i]=75000}
         mode=1;
         break;
       case 4:
@@ -6033,7 +6073,11 @@ if(opLock==0 && gamestate ==1){
       }
     }
     if(pvp==1){
-      if(LP_PVP.Rule[0]==3){LP[0]=4}else{
+      if(LP_PVP.Rule[0]==3){
+        LP[0]=4;
+      }else if(LP_PVP.Rule[0]==2){
+        LP[0]=2;
+      }else{
         LP[0]=0;
       };
       switch(LP_PVP.LP[0]){
@@ -7549,6 +7593,9 @@ if(opLock==0 && gamestate ==1){
       if(Astyle=="国士無双"){
         han[player]+=12;
       }
+      if(Astyle=="クレストオブガイア" || Astyle=="クレストオブソーレス" || Astyle=="クレストオブロッソ"||Astyle=="クレストオブデニフ"||Astyle=="クレストオブハルニエ"||Astyle=="クレストオブアドリアン"||Astyle=="クレストオブベントス"){
+        han[player]+=6;
+      }
       if(num==0 && ponsw[player] ==0){han[player] +=1}//門前ツモ
       if(nuki[0]>0){han[player]+=1}//嶺上
       if(ippatu[player]==1){han[player] +=1}
@@ -7616,7 +7663,11 @@ if(opLock==0 && gamestate ==1){
         }
         if(Astyle=="国士無双"){
           Resultary.push('国士無双 12翻')
-          PB("国士無双");
+          PB(Astyle);
+        }
+        if(Astyle=="クレストオブガイア" || Astyle=="クレストオブソーレス" || Astyle=="クレストオブロッソ"||Astyle=="クレストオブデニフ"||Astyle=="クレストオブハルニエ"||Astyle=="クレストオブアドリアン"||Astyle=="クレストオブベントス"){
+          Resultary.push(Astyle+' 6翻')
+          PB(Astyle);
         }
       if(nuki[0]>0){
         if(num==0){
@@ -8084,7 +8135,7 @@ if(opLock==0 && gamestate ==1){
       if(LP[0] !==3){
       LPtemp=[0,0,0,0,0]
       if(num >0){//ロン
-        if(pvpmode==0 ||(pvpmode==1 && LP_PVP.Rule[0]!==2)){
+        if(LP[0]!==2){
         LPtemp[player]=score;
       }
         var MS=Buff[num].filter(value=>value==2);
@@ -8093,7 +8144,7 @@ if(opLock==0 && gamestate ==1){
         }else{
       LPtemp[num]=-score
         }
-      if(LP_PVP.Rule[0]==2){
+      if(LP[0]==2){
         death[player-1].Admg[num-1]+=score;
         death[num-1].Bdmg[player-1]+=score;
       }
@@ -8102,7 +8153,7 @@ if(opLock==0 && gamestate ==1){
       if(player==parentS){//おやつも
       for(var i=1;i<LP.length;i++){
       if(i==player){
-        if(pvpmode==0 ||(pvpmode==1 && LP_PVP.Rule[0]!==2)){
+        if(LP[0]!==2){
           LPtemp[i]=score;
         }
       }else{
@@ -8112,23 +8163,22 @@ if(opLock==0 && gamestate ==1){
         }else{
           LPtemp[i]=-score/3;
         }
-        if(LP_PVP.Rule[0]==2){
+        if(LP[0]==2){
           death[i-1].Bdmg[player-1]+=score/3;
         }
       }
-      if(LP_PVP.Rule[0]==2){
+      if(LP[0]==2){
         death[player-1].Admg[player-1]+=score;
       }
       }}
       if(player!==parentS){//こつも
       for(var i=1;i<LP.length;i++){
       if(i==player){
-        if(pvpmode==0 ||(pvpmode==1 && LP_PVP.Rule[0]!==2)){
+        if(LP[0]!==2){
           LPtemp[i]=score;
-          if(LP_PVP.Rule[0]==2){
-            death[player-1].Admg[player-1]+=score;
-          }
-        }
+        }else{
+          death[player-1].Admg[player-1]+=score;
+        };
       }else if(i==parentS){
       var MS=Buff[i].filter(value=>value==2);
       if(MS.length){
@@ -8136,7 +8186,7 @@ if(opLock==0 && gamestate ==1){
       }else{
         LPtemp[i]=-score/2;
       }
-      if(LP_PVP.Rule[0]==2){
+      if(LP[0]==2){
         death[i-1].Bdmg[player-1]+=score/2;
       }
       }else{
@@ -8146,7 +8196,7 @@ if(opLock==0 && gamestate ==1){
       }else{
         LPtemp[i]=-score/4
       }
-      if(LP_PVP.Rule[0]==2){
+      if(LP[0]==2){
         death[i-1].Bdmg[player-1]+=score/4;
       }
     }
@@ -8166,7 +8216,7 @@ if(opLock==0 && gamestate ==1){
         if(skillusage2[i]==-1){
           skillusage2[i]=1;
         }
-        if(LP_PVP.Rule[0]==2){
+        if(LP[0]==2){
           //キルアシ
           var As=death[i-1].Bdmg.concat();
           var Bs=maxIndex1(As);
@@ -8207,16 +8257,22 @@ if(opLock==0 && gamestate ==1){
       }
       break;
       case 2:
-        //ミリオネア
-      if(LP[1]>=1000000 || LP[2]>=1000000 || LP[3]>=1000000 || LP[4]>=1000000){
-      var LPrank=[
-        {chara:1, elia:LP[1]},
-        {chara:2, elia:LP[2]},
-        {chara:3, elia:LP[3]},
-        {chara:4, elia:LP[4]},
-          ]
-        LPrank.sort(compareFunc2);
-      }
+        //デスマッチ
+        if(skillusage2[0]==7){//オーラスで1位が一意に決まっていれば終了
+          var LPrank=[
+          {chara:1, elia:death[0].kill,nod:death[0].assist},
+          {chara:2, elia:death[1].kill,nod:death[1].assist},
+          {chara:3, elia:death[2].kill,nod:death[2].assist},
+          {chara:4, elia:death[3].kill,nod:death[3].assist},
+            ]
+          LPrank.sort(compareFunc4);
+          if(LPrank[3].elia == LPrank[2].elia && LPrank[3].nod == LPrank[2].nod){
+          skillusage2[0]+=1;
+          console.log('オーラス',skillusage2[0])
+          }else{
+          console.log('オーラス続行',skillusage2[0])
+          }
+          }
       break;
       }}
     }
@@ -10326,16 +10382,16 @@ if(opLock==0 && gamestate ==1){
               Textlist[1].text="誰か一人が生き残るか半荘経過まで戦いが続きます。";  
             break;
             case 2:
-              Textlist[0].text=LPlist[LP[0]]+"：持ち点100,000から開始し、";
-              Textlist[1].text="誰かが1,000,000に到達するまで続きます。";  
+              Textlist[0].text=LPlist[LP[0]]+"：和了しても得点は増えず、飛んでも復活します。";
+              Textlist[1].text="半荘経過までにより多くの人を飛ばした人が勝者となります。";  
             break;
             case 3:
               Textlist[0].text=LPlist[LP[0]]+"：際限なく自由に打ち続けるモードです。";
               Textlist[1].text="Escキーでタイトル画面に戻ることで抜けられます。";  
             break;
             case 4:
-              Textlist[0].text=LPlist[LP[0]]+"：最大3人が和了するまで一局が続きます。";
-              Textlist[1].text="適応力デバフにより、後半になるほど高得点が出やすくなります。";  
+              Textlist[0].text=LPlist[LP[0]]+"：持ち点150,000の半荘戦です。";
+              Textlist[1].text="このモードでは一局に最大3人まで和了することができます。";  
               break;
           }
         }
@@ -11630,6 +11686,58 @@ if(opLock==0 && gamestate ==1){
     Bgm.stop();
     });
     //ユーザー名をcpu2とかにされたらたまらんので
+    if(LP[0]==2){
+    //デスマッチ
+    var LPresult=[
+      {pc:"Player", token:0, chara:chara[1], elia:death[0].kill,nod:death[0].assist,city:death[0].death},
+      {pc:"CPU2", token:0, chara:chara[2], elia:death[1].kill,nod:death[1].assist,city:death[1].death},
+      {pc:"CPU3", token:0, chara:chara[3], elia:death[2].kill,nod:death[2].assist,city:death[2].death},
+      {pc:"CPU1", token:0, chara:chara[4], elia:death[3].kill,nod:death[3].assist,city:death[3].death},
+        ]
+      if(pvpmode==1){
+        for(var i=0; i<LPresult.length;i++){
+          LPresult[i].pc=MEMBER[i].name;
+          LPresult[i].token=MEMBER[i].token
+        }
+      }
+      LPresult.sort(compareFunc4);
+      var RankingStr=["1st","2nd","3rd","4th"];
+    if(LPresult[3].elia==LPresult[2].elia && LPresult[3].nod==LPresult[2].nod){
+      RankingStr[1]=RankingStr[0];
+    }
+    if(LPresult[2].elia==LPresult[1].elia && LPresult[2].nod==LPresult[1].nod){
+      RankingStr[2]=RankingStr[1];
+    }
+    if(LPresult[1].elia==LPresult[0].elia && LPresult[1].nod==LPresult[0].nod){
+      RankingStr[3]=RankingStr[2];
+    }
+    cx2.clearRect(0,0,800,600)
+    cx2.font = "bold 45px Arial";
+    cx2.fillStyle = "white";
+    cx2.fillText("終　局", 350, 48);
+    cx2.font = "bold 40px Arial";
+    cx2.fillText(RankingStr[0], 50, 100);
+    cx2.font = "bold 32px Arial";
+    cx2.fillText(RankingStr[1], 50, 200);
+    cx2.fillText(RankingStr[2], 50, 300);
+    cx2.fillText(RankingStr[3], 50, 400);
+    //1位
+    cx2.font = "bold 30px Arial";
+    cx2.fillText(LPresult[3].pc, 100, 130);
+    cx2.font = "bold 26px Arial";
+    cx2.fillText(LPresult[2].pc, 120, 230);
+    cx2.fillText(LPresult[1].pc, 120, 330);
+    cx2.fillText(LPresult[0].pc, 120, 430);
+  cx2.font = "bold 26px Arial";
+  cx2.fillText("キル："+LPresult[3].elia+"　アシスト："+LPresult[3].nod+"　デス："+LPresult[3].city, 100, 160);
+  cx2.font = "bold 24px Arial";
+  cx2.fillText("キル："+LPresult[2].elia+"　アシスト："+LPresult[2].nod+"　デス："+LPresult[2].city, 120, 260);
+  cx2.fillText("キル："+LPresult[1].elia+"　アシスト："+LPresult[1].nod+"　デス："+LPresult[1].city, 120, 360);
+  cx2.fillText("キル："+LPresult[0].elia+"　アシスト："+LPresult[0].nod+"　デス："+LPresult[0].city, 120, 460);
+  Cbt=canvas2.toDataURL();
+  Cbutton = new createjs.Bitmap(Cbt);
+    }else{
+    //ソレ=イガイ
     var LPresult=[
       {pc:"Player", token:0, chara:chara[1], elia:LP[1]},
       {pc:"CPU2", token:0, chara:chara[2], elia:LP[2]},
@@ -11654,6 +11762,32 @@ if(opLock==0 && gamestate ==1){
     if(LPresult[1].elia==LPresult[0].elia){
       RankingStr[3]=RankingStr[2];
     }
+    cx2.clearRect(0,0,800,600)
+    cx2.font = "bold 45px Arial";
+    cx2.fillStyle = "white";
+    cx2.fillText("終　局", 350, 48);
+    cx2.font = "bold 40px Arial";
+    cx2.fillText(RankingStr[0], 50, 100);
+    cx2.font = "bold 32px Arial";
+    cx2.fillText(RankingStr[1], 50, 200);
+    cx2.fillText(RankingStr[2], 50, 300);
+    cx2.fillText(RankingStr[3], 50, 400);
+    //1位
+    cx2.font = "bold 30px Arial";
+    cx2.fillText(LPresult[3].pc, 120, 130);
+    cx2.font = "bold 26px Arial";
+    cx2.fillText(LPresult[2].pc, 120, 230);
+    cx2.fillText(LPresult[1].pc, 120, 330);
+    cx2.fillText(LPresult[0].pc, 120, 430);
+  cx2.font = "bold 28px Arial";
+  cx2.fillText(LPresult[3].elia, 120, 160);
+  cx2.font = "bold 24px Arial";
+  cx2.fillText(LPresult[2].elia, 120, 260);
+  cx2.fillText(LPresult[1].elia, 120, 360);
+  cx2.fillText(LPresult[0].elia, 120, 460);
+  Cbt=canvas2.toDataURL();
+  Cbutton = new createjs.Bitmap(Cbt);
+  }
     field.removeAllChildren();
     var s = new createjs.Shape();
     s.graphics.beginFill("#001c0d");
@@ -11690,6 +11824,7 @@ if(opLock==0 && gamestate ==1){
         .call(se1)
       field.addChild(e10);
     }
+    field.addChild(Cbutton);
     function se1(){
       se14.play();
     };
@@ -11703,32 +11838,6 @@ if(opLock==0 && gamestate ==1){
       field.addChild(D);
     }
     //
-    cx2.clearRect(0,0,800,600)
-    cx2.font = "bold 45px Arial";
-    cx2.fillStyle = "white";
-    cx2.fillText("終　局", 350, 48);
-    cx2.font = "bold 40px Arial";
-    cx2.fillText(RankingStr[0], 50, 100);
-    cx2.font = "bold 32px Arial";
-    cx2.fillText(RankingStr[1], 50, 200);
-    cx2.fillText(RankingStr[2], 50, 300);
-    cx2.fillText(RankingStr[3], 50, 400);
-    //1位
-    cx2.font = "bold 30px Arial";
-    cx2.fillText(LPresult[3].pc, 120, 130);
-    cx2.font = "bold 26px Arial";
-    cx2.fillText(LPresult[2].pc, 120, 230);
-    cx2.fillText(LPresult[1].pc, 120, 330);
-    cx2.fillText(LPresult[0].pc, 120, 430);
-  cx2.font = "bold 28px Arial";
-  cx2.fillText(LPresult[3].elia, 120, 160);
-  cx2.font = "bold 24px Arial";
-  cx2.fillText(LPresult[2].elia, 120, 260);
-  cx2.fillText(LPresult[1].elia, 120, 360);
-  cx2.fillText(LPresult[0].elia, 120, 460);
-  Cbt=canvas2.toDataURL();
-  Cbutton = new createjs.Bitmap(Cbt);
-  field.addChild(Cbutton)
       if(scoretemp[0]>=0){
         var A;
         if(pvpmode==1){
@@ -11931,9 +12040,9 @@ if(opLock==0 && gamestate ==1){
       cx2.fillText("・リーチが発生した時", 635, 130);
       cx2.fillText("危険パイを察知する.", 635, 150);
       cx2.fillText("・引いたばかりのパイは", 635, 170);
-      cx2.fillText("察知できず, 新たに.", 635, 190);
-      cx2.fillText("リーチが発生しても", 635, 210);
-      cx2.fillText("再発動はしない.", 635, 230);
+      cx2.fillText("察知できず, その局の", 635, 190);
+      cx2.fillText("最初のリーチに対して", 635, 210);
+      cx2.fillText("のみ発動する.", 635, 230);
       if(skillusage[player]>0){
       switch(skillusage[player]){
         case 1:
