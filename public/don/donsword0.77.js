@@ -4,6 +4,7 @@
 //いつか→pvEでのスキル　デスマでキルアシに準じて順位をつける　タイトル画面でミュートの設定
 //deathを参照してください
 //クレスト役未確認 シナジーの翻数調整
+//リザルト画面でクリックすると何度もセーブ完了ポップが出る
 //自分のターンで流局になる時、流局画面でクリックできず即進んでしまうことがある？
 //カン後、3ペアリーチした時にロンできない場合がある？
 window.onload = function(){
@@ -309,7 +310,7 @@ window.onload = function(){
   var Cskillprepare=[0,0,0,0,0];
   //chara0 0->cpuランダム 1->cpu決める
   //MPゲージ0-30 DPlist->create用 0->マナブレゲージ
-  var DP =new Array(0,0,0,0,0)
+  var DP=new Array(0,0,0,0,0)
   var DPlist=new Array(0,0,0,0,0)
   //バフ 1スキン 2マナシールド 3ネイチャ 4ナソコア 5やけど 6凍結 7適応力
   //11~修羅の戦で和了済みの人
@@ -1611,19 +1612,18 @@ function updateParticles() {
     if(cLock==3){
       //**スキルで自分のパイ選択画面
       //オールマイティは対象にできないようにする
-    cx3.clearRect(0,0,800,600)
     if(mouseY >490 && mouseY < 590 && mouseX >100 && mouseX <760){
         var SX=Math.floor((mouseX+size-100)/size);
           if(mouseX >100 && mouseX <660){
             if(hand1.length>SX+1){
-              if(hand1[SX] ==43 || hand1[SX] ==44){
+              if(hand1[SX] ==69 || hand1[SX] ==70){
                 cLock=1;
                 return false;
               }
               PlayertoCpu(SX);
             }
             if(ponsw[1]==1 && hand1.length==SX+1){
-              if(hand1[SX] ==43 || hand1[SX] ==44){
+              if(hand1[SX] ==69 || hand1[SX] ==70){
                 cLock=1;
                 return false;
               }
@@ -1641,14 +1641,10 @@ function updateParticles() {
     }else{cLock=1}
   }else if(cLock==2){//スキル対象選択画面
     if(mouseX >0 && mouseX <150 && mouseY >100){
-    if(mouseY >100 && mouseY <200){SpecialSkill(1,2)
-    }else if(mouseY >200 && mouseY <300){SpecialSkill(1,3);
-    }else if(mouseY >300 && mouseY <400){SpecialSkill(1,4)
-    }else if(mouseY >400 && mouseY <600){SpecialSkill(1,1)
+    if(mouseY >100 && mouseY <200){SkillAnimation(1,2);
+    }else if(mouseY >200 && mouseY <300){SkillAnimation(1,3);
+    }else if(mouseY >300 && mouseY <400){SkillAnimation(1,4);
     }
-    }else{
-    cx3.clearRect(0,0,800,600)
-    cLock=1
     }
     }else if(cLock==1){
     //クリックしてから捨て牌を描写してturnroleに繋げるところまで
@@ -6130,7 +6126,8 @@ if(opLock==0 && gamestate ==1){
       }};
     console.log('Setup',pvp);//socketで飛ばすとなんか3回くらい呼び出される
     navisw=0;
-    DP =new Array(0,0,0,0,0);
+    DP=new Array(0,0,0,0,0);
+    if(debugmode){DP[1]=20};
     skillusage2=new Array(0,-1,-1,-1,-1,0)
     death=[
       {kill:0,assist:0,death:0,Admg:[0,0,0,0],Bdmg:[0,0,0,0]},
@@ -6320,7 +6317,7 @@ if(opLock==0 && gamestate ==1){
     return false;
   }
   if(cLock==3){
-    SpecialSkill(1,num);
+    SkillAnimation(1,num);
   return false;
   };
   if(mpC>=10){
@@ -6563,6 +6560,7 @@ if(opLock==0 && gamestate ==1){
         btn1.x = 710;
         btn1.y = 440;
         ponkanmap.addChild(btn1);
+        btn1.addEventListener("click",{card:0,handleEvent:SkillBt});
       }
       }
     }
@@ -10215,6 +10213,7 @@ if(opLock==0 && gamestate ==1){
               btn1.x = 710;
               btn1.y = 440;
               ponkanmap.addChild(btn1);
+              btn1.addEventListener("click",{card:0,handleEvent:SkillBt});
           }
           reach[1]=1;
         break;
@@ -10323,17 +10322,12 @@ if(opLock==0 && gamestate ==1){
         case 0:
           //スキルボタン
           se5.play();
-          var btn1 = createButton("キャンセル", 80, 40);
-          btn1.x = 630;
-          btn1.y = 440;
-          ponkanmap.addChild(btn1)
-          btn1.addEventListener("click",{card:1,handleEvent:SkillBt});
           //リーチのパイを色付けたりリーチボタンを隠すなど
           SpecialSkill(1,0);
           Skillname(1);
           break;
         case 1:
-          se3.play()
+          se3.play();
           guidemap.removeAllChildren();
           ponkanmap.removeAllChildren();
           if(reach[1] ==1){
@@ -10364,8 +10358,8 @@ if(opLock==0 && gamestate ==1){
               btn1.x = 710;
               btn1.y = 440;
               ponkanmap.addChild(btn1);
+              btn1.addEventListener("click",{card:0,handleEvent:SkillBt});
           }
-          reach[1]=1;
         break;
       }
     }
@@ -11372,7 +11366,12 @@ if(opLock==0 && gamestate ==1){
         };
       };    
   function SkillAnimation(p=0,target=0){
+    cLock=0;
+    console.log('操作禁止')
     se12.play();
+    skilltext1=skilltext[p].fir
+    skilltext2=skilltext[p].sec
+    skilltext3=skilltext[p].thr
     var Container = new createjs.Container();
     Container.alpha=0;
     stage.addChild(Container);
@@ -11404,31 +11403,35 @@ if(opLock==0 && gamestate ==1){
     createjs.Tween.get(C)
     .to({x:0, scaleX:1, scaleY:1},200, createjs.Ease.cubicInOut)
     .wait(800)
-    .to({x:-400, scaleX:1.1, scaleY:1.1,alpha:0.5},150)
+    .to({x:-400, scaleX:1.1, scaleY:1.1,alpha:0.5},150);
+    createjs.Tween.get(Container)
+    .to({alpha: 1},60)
+    .wait(800)
+    .to({alpha: 0},100)
     .call(next);
     var t = new createjs.Text(skilltext1, "32px 'Century Gothic'", "#05ff9b");
     t.x=200;
-    t.y=240;
+    t.y=280;
     t.outline=5;
     Container.addChild(t);
     createjs.Tween.get(t)
     .to({x:300},400, createjs.Ease.cubicOut)
     var t = new createjs.Text(skilltext1, "32px 'Century Gothic'", "white");
     t.x=200;
-    t.y=240;
+    t.y=280;
     Container.addChild(t);
     createjs.Tween.get(t)
     .to({x:300},400, createjs.Ease.cubicOut)
     var t = new createjs.Text(skilltext2, "24px 'Century Gothic'", "#05ff9b");
     t.x=300;
-    t.y=280;
+    t.y=320;
     t.outline=5;
     Container.addChild(t);
     createjs.Tween.get(t)
     .to({x:360},400, createjs.Ease.cubicOut)
     var t = new createjs.Text(skilltext2, "24px 'Century Gothic'", "white");
     t.x=300;
-    t.y=280;
+    t.y=320;
     Container.addChild(t);
     createjs.Tween.get(t)
     .to({x:360},400, createjs.Ease.cubicOut)
@@ -11448,14 +11451,12 @@ if(opLock==0 && gamestate ==1){
   function SpecialSkill(player,target=0){
     var p=chara[player]
     console.log("skill",player,target)
-    if(target>=100 || skillswitch[player]==0){
+    if(skillswitch[player]==0){
       //target 100->演出中の待ち
     //skillswitch 0使用可能 1次の自分のターンにリセット 2この局では使用不可
     if(p==1){//エル
       if(player==1){
         if(target>1){
-        cLock=0;
-        console.log('操作禁止')
         switch(target){
           case 2:
           case 3:
@@ -11470,22 +11471,36 @@ if(opLock==0 && gamestate ==1){
           }
           break;
         }
-        ctlswitch=player
-        skilltext1=skilltext[p].fir
-        skilltext2=skilltext[p].sec
-        skilltext3=skilltext[p].thr
-        SkillAnimation(p,target);
+        //ctlswitch=player
         ponkanmap.removeAllChildren();
         skillusage[player]+=1
         skillswitch[player]=2
+        cLock=1;
         //player1();
         }else if(target==0){
         //対象選択画面
         se5.play()
-        cx3.fillStyle = "rgba(20,20,20,0.3)";
-        cx3.fillRect(0,0,800,100)
-        cx3.fillRect(150,100,650,300)
-        cx3.fillRect(0,400,800,200)
+        var s = new createjs.Shape();
+        s.graphics.beginFill("rgba(20,20,20,0.3)");
+        s.graphics.drawRect(0, 0, 800, 100)
+        s.graphics.drawRect(150, 100, 650, 300)
+        s.graphics.drawRect(0, 400, 800, 200);
+        ponkanmap.addChild(s);
+        var btn1 = createButton("キャンセル", 80, 40);
+          btn1.x = 710;
+          btn1.y = 440;
+          ponkanmap.addChild(btn1)
+          btn1.addEventListener("click",{card:1,handleEvent:SkillBt});
+        for(var i=0;i<3;i++){
+        var CKey = new createjs.Shape();
+        CKey.graphics.beginStroke("#0088f0").setStrokeStyle(5).drawRoundRect(0,100+100*i,150,100,10,10)
+        ponkanmap.addChild(CKey);
+        var tweeNcor;
+        tweeNcor=createjs.Tween.get(CKey, {loop: true})
+        .to({alpha:1},200)
+        .to({alpha:0.2},400)
+        .to({alpha:1},200);
+        }
         cLock=2;
         }}else{//cpu
             console.log('cpu skill')
@@ -11500,9 +11515,6 @@ if(opLock==0 && gamestate ==1){
               }
             }
             ctlswitch=player
-            skilltext1=skilltext[p].fir
-            skilltext2=skilltext[p].sec
-            skilltext3=skilltext[p].thr
             SkillAnimation(p,target);
             skillusage[player]+=1
             skillswitch[player]=2
@@ -11515,48 +11527,41 @@ if(opLock==0 && gamestate ==1){
       console.log('操作禁止')
       if(skillusage2[player]>-1){
         //メモライズしたパイに変える
-        if(target>=100){ 
-          if(ctlswitch==5){ 
-          cLock=1;
-          skillusage2[player]=-1;
-          handgraph(0,1);
-          judge(1);
-          //必要なら9枚目だけここで書いて
-        }
-          return false;
-        }else{
-          Cskillprepare[3]=hand1[target];
-          Cskillprepare[4]=skillusage2[player];
-          hand1[target]=skillusage2[player]}
+        Cskillprepare[3]=hand1[target];
+        Cskillprepare[4]=skillusage2[player];
+        hand1[target]=skillusage2[player]
+        cLock=1;
+        skillusage2[player]=-1;
+        handgraph(0,1);
+        judge(1);
+        //必要なら9枚目だけここで書いて
+        return false;
       }else{
         //メモライズしてから切る
-      if(target>=100){ 
-        if(ctlswitch==5){ 
         cLock=1;
-        skillusage2[player]=hand1[target-100];
+        ponkanmap.removeAllChildren();
+        skillswitch[player]=1
+        skillusage[player]+=1;
+        if(skillusage[player]>=4){skillswitch[player]=2}
+        skillusage2[player]=hand1[target];
         var SX=hand1.findIndex(value=>value==skillusage2[player])
         DP[player]-=10;
         drawDP(player);
         PlayertoCpu(SX);
-      }
         return false;
       }
-      }
-      ctlswitch=player
-      skilltext1=skilltext[p].fir
-      skilltext2=skilltext[p].sec
-      skilltext3=skilltext[p].thr
-      target+=100;
-      SkillAnimation(p,target);
-      ponkanmap.removeAllChildren();
-      skillswitch[player]=1
-      skillusage[player]+=1;
-      if(skillusage[player]>=4){skillswitch[player]=2}
+      //ctlswitch=player
       }else if(target==0){
       se5.play()
-      cx3.fillStyle = "rgba(20,20,20,0.3)";
-      cx3.fillRect(0,0,800,600)
-      cx3.clearRect(4,490,762,110)
+      var s = new createjs.Shape();
+        s.graphics.beginFill("rgba(20,20,20,0.3)");
+        s.graphics.drawRect(0, 0, 800, 490)
+        ponkanmap.addChild(s);
+        var btn1 = createButton("キャンセル", 80, 40);
+          btn1.x = 710;
+          btn1.y = 440;
+          ponkanmap.addChild(btn1)
+          btn1.addEventListener("click",{card:1,handleEvent:SkillBt});
       cLock=3;
       }}else{//cpu
       if(skillusage2[player]>-1){
