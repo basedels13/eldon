@@ -1,6 +1,6 @@
-//var1.025　season2 
+//var1.025　season2 テスト
 // npm run dev
-//全職75枚（エピックキャラは1枚ずつ増量）＋オールマイティ2枚＋マスター8枚×2（ガ、ロ、ベ、デ、ソ、ア、ハ）合計93枚→61枚スタート
+//全職75枚＋オールマイティ2枚＋マスター8枚×2（ガ、ロ、ベ、デ、ソ、ア、ハ）合計78枚スタート
 //シナジーの翻数調整未
 //自分のターンで流局になる時、流局画面でクリックできず即進んでしまうことがある？
 //カン後、3ペアリーチした時にロンできない場合・3ペアがつかない場合がある？
@@ -869,8 +869,8 @@ window.onload = function(){
     volume: 0.3,
     });
   var se18 = new Howl({
-    src:"don/Onoma-Impact09-1.mp3",
-    volume: 0.7,
+    src:"don/se_wood_kan01.mp3",
+    volume: 0.4,
     });
   const jingle =new Howl({
       src: "don/Don_jingle.mp3",
@@ -3355,14 +3355,14 @@ function NameChange(){
             if(chara[0]==1){
             se3.play();
             if(chara[3]==chrlist.length-1){chara[3]=0}else{chara[3]+=1}
-            menu_solo_list[4].text="◀ "+chrlist[chara[3]]
+            menu_solo_list[5].text="◀ "+chrlist[chara[3]]
             }
             }
           if(mouseX >670 && mouseX <705 && mouseY >310 && mouseY <340){
             if(chara[0]==1){
             se3.play();
             if(chara[4]==chrlist.length-1){chara[4]=0}else{chara[4]+=1}
-            menu_solo_list[5].text="◀ "+chrlist[chara[4]]
+            menu_solo_list[7].text="◀ "+chrlist[chara[4]]
             }
             }
             if(mouseX >510 && mouseX <560 && mouseY >230 && mouseY <260){
@@ -3376,14 +3376,14 @@ function NameChange(){
               if(chara[0]==1){
               se3.play();
               if(chara[3]==0){chara[3]=chrlist.length-1}else{chara[3]-=1}
-              menu_solo_list[4].text="◀ "+chrlist[chara[3]]
+              menu_solo_list[5].text="◀ "+chrlist[chara[3]]
               }
               }
             if(mouseX >510 && mouseX <560 && mouseY >310 && mouseY <340){
               if(chara[0]==1){
               se3.play();
               if(chara[4]==0){chara[4]=chrlist.length-1}else{chara[4]-=1}
-              menu_solo_list[5].text="◀ "+chrlist[chara[4]]
+              menu_solo_list[7].text="◀ "+chrlist[chara[4]]
               }
               }
         corsor();
@@ -4377,7 +4377,10 @@ if(opLock==0 && gamestate ==1){
           musicStart(musicnum);
         }else if(auras==1 && musicset[2]!==musicnum){
           if(musicset[2]==0){
+            //曲の抽選は最初だけ
+            if(skillusage2[5]==0){
             musicnum=musicrandom[2][Math.floor(Math.random()*musicrandom[2].length)];
+            }
           }else{
             musicnum=musicset[2]
           }
@@ -4688,7 +4691,7 @@ if(opLock==0 && gamestate ==1){
         for(var i =0; i<70; i++){
         deck.push(i);
         }
-        deck.push(0,4,9,13,17,20,24,28,32,37,42,45,49,52,56);
+        //deck.push(0,4,9,13,17,20,24,28,32,37,42,45,49,52,56);
         deck.push(60,61,62,63,64,65,66,67);
         if(debugmode){console.log(deck.length);}
         //expected84->93
@@ -4763,7 +4766,8 @@ if(opLock==0 && gamestate ==1){
         hand3.sort(compareFunc);
         hand4.sort(compareFunc);
         //積み込み
-        if(debugmode){hand1=[60,61,62,63,64,66,67,68]};
+        //if(debugmode){hand1=[60,61,62,63,64,66,67,68]};
+        //if(debugmode){hand1=[0,1,2,3,24,26,27,28]};
         //1番目の配列は上がり判定に使用
         hand1.unshift(-1)
         hand2.unshift(-1)
@@ -5334,7 +5338,6 @@ if(opLock==0 && gamestate ==1){
             }
           }
           }
-          //
             if(Pon(2)){
               if(pvpmode==1){
                 if(MEMBER[1].pc==1){
@@ -5770,11 +5773,12 @@ if(opLock==0 && gamestate ==1){
     shapeMask.y=B;
     Container.mask = shapeMask;
     var C = new createjs.Bitmap(queue.getResult(chrimg_src[chara[p]]));
-    C.x=-400;
+    C.x=-480;
     C.y=B-200;
+    if(chara[p]==5){C.y+=60};
     Container.addChild(C);
     createjs.Tween.get(C)
-    .to({x:-460},60);
+    .to({x:-560},60);
     MBicon.x=160;
     MBicon.y=B-50;
     Container.addChild(MBicon);
@@ -6039,7 +6043,7 @@ if(opLock==0 && gamestate ==1){
     console.log('Setup',pvp);//socketで飛ばすとなんか3回くらい呼び出される
     navisw=0;
     DP=new Array(0,0,0,0,0);
-    if(debugmode){DP[1]=20};
+    if(debugmode){DP[1]=20;DP[2]=20;DP[3]=20;DP[4]=20};
     skillusage2=new Array(0,-1,-1,-1,-1,0)
     death=[
       {kill:0,assist:0,death:0,Admg:[0,0,0,0],Bdmg:[0,0,0,0]},
@@ -7538,7 +7542,7 @@ if(opLock==0 && gamestate ==1){
       var ponf=0
       if(player ==1){
         handtemp = hand1.concat();
-        var T=handtemp.splice(9,1);
+        var T=handtemp.splice(handtemp.length-1,1);
         handtemp=handtemp.concat(pon1);
         handtemp=handtemp.concat(kan1);
         handtemp.sort(compareFunc);
@@ -9279,7 +9283,7 @@ if(opLock==0 && gamestate ==1){
         }
           var A=Math.floor(tumoP/4);
           var B=handtemp.filter(value=>value>=4*A && value<4*(A+1));
-          if(B.length>=4){kansw[player]=1;
+          if(B.length==4){kansw[player]=1;
             return true;
           }
         return false;
@@ -9293,7 +9297,7 @@ if(opLock==0 && gamestate ==1){
           }}
           var keyj=Object.keys(Count);
           for(var j=0;j<keyj.length;j++){
-          if(Count[keyj[j]]>=4){
+          if(Count[keyj[j]]==4){
             //同じキャラ4枚以上をカウント
             return true;
           }
@@ -10010,7 +10014,8 @@ if(opLock==0 && gamestate ==1){
     }
     function handOnCorsor(){
       //手札のカーソル
-      if(cLock==1 && (opLock==2 || gamestate !==1)){return false};//カーソル表示しない時　現在：esc中のみ非表示
+      if(opLock==2 || gamestate !==1){return false};//カーソル表示しない時
+      if(cLock==2 || cLock==4){return false};
       switch(this.card){
         case -1:
           tweeNcor.paused=true;
@@ -10302,6 +10307,7 @@ if(opLock==0 && gamestate ==1){
           break;
         case 1:
           se3.play();
+          cLock=1;
           guidemap.removeAllChildren();
           ponkanmap.removeAllChildren();
           if(reach[1] ==1){
@@ -11199,6 +11205,7 @@ if(opLock==0 && gamestate ==1){
     var C = new createjs.Bitmap(queue.getResult(chrimg_src[chara[p]]));
       C.x=-300;
       C.y=0;
+      if(chara[p]==5){C.y=60};
       Container.addChild(C);
     var t = new createjs.Text("PON!", "bold 64px Arial", "white");
     t.rotation=-15;
@@ -11255,6 +11262,7 @@ if(opLock==0 && gamestate ==1){
     };
   function NukiAnimation(p=0,pai=-1,type=0){
       console.log('Kan!',p,pai,type)
+      se8.play();
       se18.play();
       var Container = new createjs.Container();
       Container.alpha=0;
@@ -11275,6 +11283,7 @@ if(opLock==0 && gamestate ==1){
       var C = new createjs.Bitmap(queue.getResult(chrimg_src[chara[p]]));
         C.x=-300;
         C.y=0;
+        if(chara[p]==5){C.y=60};
         Container.addChild(C);
       var t = new createjs.Text("カン", "bold 64px Arial", "white");
       t.rotation=-15;
@@ -12000,7 +12009,6 @@ if(opLock==0 && gamestate ==1){
       cx2.fillText("("+donpai[skillusage2[player]].sub+")", 635, 270);
       cx2.fillStyle="white";
       cx2.fillText("に変える.", 640, 290);
-
       }
       }else if(p==3){
       cx2.font = "bold 15px Arial";
@@ -12060,6 +12068,43 @@ if(opLock==0 && gamestate ==1){
                 default:
                   cx2.fillText("対象：--", 635, 260);
       }}
+      }else if(p==6){
+      cx2.font = "bold 15px Arial";
+      cx2.fillText("変身", 635, 110);
+      cx2.font = "14px Arial";
+      cx2.fillText("・MPが3ゲージ溜まった", 635, 130);
+      cx2.fillText("状態で立直する時,", 635, 150);
+      cx2.fillText("ゲージを全消費して", 635, 170);
+      cx2.fillText("バーサクモードになる!", 635, 190);
+      cx2.fillText("・変身すると,高確率で", 635, 210);
+      cx2.fillText("一発ツモが発生する.", 635, 230);
+    }else if(p==7){
+      cx2.font = "bold 15px Arial";
+      cx2.fillText("連技-龍牙爆砕", 635, 110);
+      cx2.font = "14px Arial";
+      cx2.fillText("・1局に1度だけ,", 635, 130);
+      cx2.fillText("・1,2,3,4ラインの順に", 635, 150);
+      cx2.fillText("パイを切ると発動する.", 635, 170);
+      cx2.fillText("ドラを1つ追加する.", 635, 190);
+      cx2.font = "bold 15px Arial";
+      cx2.fillText("覇気天衝-千手華", 635, 210);
+      cx2.font = "14px Arial";
+      cx2.fillText("・カンをした時,", 635, 230);
+      cx2.fillText("MPを1ゲージ消費して", 635, 250);
+      cx2.fillText("ドラか当たりパイを引く.", 635, 270);
+    }else if(p==8){
+      cx2.font = "bold 15px Arial";
+      cx2.fillText("万能ニーシャ！", 635, 110);
+      cx2.font = "14px Arial";
+      cx2.fillText("MP消費:1ゲージ", 635, 130);
+      cx2.fillText("1局に1度だけ, ", 635, 150);
+      cx2.fillText("以下のどちらかを", 635, 170);
+      cx2.fillText("発動できる.", 635, 190);
+      cx2.fillText("①次の局,ニーシャが", 635, 210);
+      cx2.fillText("助けに来てくれる!", 635, 230);
+      cx2.fillText("②手札の「ニーシャ」を", 635, 250);
+      cx2.fillText("好きなパイに変える.", 635, 270);
+      cx2.fillText("(オールマイティを除く)", 635, 290);
       }else{
       cx2.font = "bold 16px Arial";
       cx2.fillText("パッシブスキル", 635, 110);
@@ -12478,7 +12523,7 @@ if(opLock==0 && gamestate ==1){
       se15.volume(0.3*sBar);
       se16.volume(0.3*sBar);
       se17.volume(0.3*sBar);
-      se18.volume(0.7*sBar);
+      se18.volume(0.4*sBar);
       jingle.volume(0.3*sBar);
       jingle2.volume(0.3*sBar);
       }
