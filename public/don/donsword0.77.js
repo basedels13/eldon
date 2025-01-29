@@ -869,8 +869,12 @@ window.onload = function(){
     volume: 0.3,
     });
   var se18 = new Howl({
-    src:"don/se_wood_kan01.mp3",
+    src:"don/tukkomi1.mp3",
     volume: 0.4,
+    });
+  var se19 = new Howl({
+    src:"don/Single_Accent04-3.mp3",
+    volume: 0.3,
     });
   const jingle =new Howl({
       src: "don/Don_jingle.mp3",
@@ -4377,10 +4381,7 @@ if(opLock==0 && gamestate ==1){
         console.log(auras,musicset)
         if(auras==0 && musicset[0]!==musicnum){
           if(musicset[0]==0){
-            //曲の抽選は最初だけ
-            if(skillusage2[5]==0){
             musicnum=musicrandom[0][Math.floor(Math.random()*musicrandom[0].length)]
-            };
           }else{
             musicnum=musicset[0]
           }
@@ -11014,7 +11015,7 @@ if(opLock==0 && gamestate ==1){
       bgOver.visible = false; // 非表示にする
       button.addChild(bgOver);
       //くるくる
-      var s = new createjs.Bitmap("don/circle88.png");
+      var s = new createjs.Bitmap(queue.getResult("don/circle88.png"));
       s.regX = 44;
       s.regY = 46;
       s.x=width/2+2;
@@ -11814,6 +11815,8 @@ if(opLock==0 && gamestate ==1){
     gamestate =-2;//終了時3に
     tweeNsquare.paused=true;
     Csquare.alpha=0;
+    tweeNcor.paused=true;
+    CorsorKey.alpha=0;
     Configmap.removeAllChildren();
     guidemap.removeAllChildren();
     handmap.removeAllChildren();
@@ -12647,6 +12650,7 @@ if(opLock==0 && gamestate ==1){
         se16.volume(0);
         se17.volume(0);
         se18.volume(0);
+        se19.volume(0);
         jingle.volume(0);
         jingle2.volume(0);
       }else{
@@ -12668,6 +12672,7 @@ if(opLock==0 && gamestate ==1){
       se16.volume(0.3*sBar);
       se17.volume(0.3*sBar);
       se18.volume(0.4*sBar);
+      se19.volume(0.3*sBar);
       jingle.volume(0.3*sBar);
       jingle2.volume(0.3*sBar);
       }
