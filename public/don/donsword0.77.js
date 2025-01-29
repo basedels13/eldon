@@ -1,6 +1,6 @@
 //var1.025　season2 テスト
 // npm run dev
-//全職75枚＋オールマイティ2枚＋マスター8枚×2（ガ、ロ、ベ、デ、ソ、ア、ハ）合計78枚スタート
+//全職75枚（エピックライン1枚ずつ増量）＋オールマイティ2枚＋マスター8枚×2（ガ、ロ、ベ、デ、ソ、ア、ハ）合計93枚スタート
 //シナジーの翻数調整未
 //自分のターンで流局になる時、流局画面でクリックできず即進んでしまうことがある？
 //カン後、3ペアリーチした時にロンできない場合・3ペアがつかない場合がある？
@@ -10,7 +10,7 @@ window.onload = function(){
   
   function draw(){
   var titletext="v1.025/Click to START";
-  var debugmode=false;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にfalseに
+  var debugmode=true;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にfalseに
   //自分自身の情報を入れる箱
   var IAM = {
     token: null,    // 戸別管理用のトークン
@@ -197,13 +197,13 @@ window.onload = function(){
     var tumonameA = new createjs.Text("　", "14px Arial", "white");
     var tumonameB = new createjs.Text("　", "14px Arial", "white");
     tumonameA.x=700;
-    tumonameA.y=320;
+    tumonameA.y=365;
     tumonameB.x=645;
-    tumonameB.y=335;
+    tumonameB.y=380;
     //soundボタン
-    var s = new createjs.Shape();
-    s.graphics.beginFill("#0a3361");
-    s.graphics.drawRect(710, 10, 80, 38);
+    var s = createButton("　", 78, 38);
+    s.x=710;
+    s.y=10
     soundmap.addChild(s);
     s.addEventListener("click", {handleEvent:SoundConfig});
     var t = new createjs.Text("SOUND", "12px Arial", "#ffffff");
@@ -284,7 +284,7 @@ window.onload = function(){
       playMusic () {
         this.play("start");
         this.once('end', ()=> {
-          console.log('bgm loop!');
+          if(debugmode){console.log('bgm loop!')};
           this.play("loop");
         });
       }
@@ -1067,7 +1067,6 @@ function UpdateParticles(event){
 function MouseCircle(event){
   //クリックした場所を教える
   //プレイ中はマナブレも
-  //console.log(mpC,'mpmoving',mpmoving);
   if(mpmoving){
   mpC+=0.4;
   if(mpC>DP[1]){mpC=DP[1]};
@@ -1443,7 +1442,7 @@ function updateParticles() {
             break;
             case 4:
     //魔界ルール
-    console.log(raidscore);
+    //console.log(raidscore);
     if(raidscore[0]==1){
       if(pvpmode==1){
         if(LP_PVP.Length[0]==1){
@@ -2754,6 +2753,13 @@ function menuMap(p=0){
                         menu_guide.addChild(t);
                         paiviewer.x=60;
                         paiviewer.alpha=1;
+                        Extrash=[];
+                        for(var i =0; i<70; i++){
+                          Extrash.push(i);
+                          }
+                          Extrash.push(60,61,62,63,64,65,66,67);
+                          Extrash.push(0,4,9,13,17,20,24,28,32,37,42,45,49,52,56);
+                        Remaincheck();
                         break;
     }
     break;
@@ -3028,7 +3034,7 @@ function NameChange(){
     }
   }
   function Menubutton(){
-    console.log('Menubutton',this.card);
+    if(debugmode){console.log('Menubutton',this.card)};
   if(opLock==0 && pagestate==1){
     //メイン画面を開いている間のみ受付
     switch(this.card){
@@ -3071,7 +3077,7 @@ function NameChange(){
   }
   };
   function Menu(){
-    console.log('Menu',pagestate);
+    //console.log('Menu',pagestate);
     switch(pagestate){
       case 0:
         musicnum=0;
@@ -4301,6 +4307,7 @@ if(opLock==0 && gamestate ==1){
           rect.graphics.beginFill("rgba(10,10,10,0.6)")
                         .drawRect(630, 400, 160, 80)
                         .drawRect(630, 10, 160, 350)
+                        .drawRect(630, 365, 160, 30)
                         .drawRect(10, 100, 135, 400)
                         .drawRect(10, 10, 220, 44)
                         .drawRect(10, 60, 135, 34)
@@ -4370,7 +4377,10 @@ if(opLock==0 && gamestate ==1){
         console.log(auras,musicset)
         if(auras==0 && musicset[0]!==musicnum){
           if(musicset[0]==0){
-            musicnum=musicrandom[0][Math.floor(Math.random()*musicrandom[0].length)];
+            //曲の抽選は最初だけ
+            if(skillusage2[5]==0){
+            musicnum=musicrandom[0][Math.floor(Math.random()*musicrandom[0].length)]
+            };
           }else{
             musicnum=musicset[0]
           }
@@ -4570,7 +4580,7 @@ if(opLock==0 && gamestate ==1){
         tumonameA.text="　"
         tumonameB.text="　"
         t.x=640;
-        t.y=320;
+        t.y=365;
         field.addChild(t);
         field.addChild(tumonameA);
         field.addChild(tumonameB);
@@ -4691,10 +4701,10 @@ if(opLock==0 && gamestate ==1){
         for(var i =0; i<70; i++){
         deck.push(i);
         }
-        //deck.push(0,4,9,13,17,20,24,28,32,37,42,45,49,52,56);
+        deck.push(0,4,9,13,17,20,24,28,32,37,42,45,49,52,56);
         deck.push(60,61,62,63,64,65,66,67);
         if(debugmode){console.log(deck.length);}
-        //expected84->93
+        //expected>93
         //山シャッフル
         shuffle();
         //初手積み込み
@@ -8122,7 +8132,7 @@ if(opLock==0 && gamestate ==1){
       if(player ==parentS){
         //連荘
       score =rootscore *1.5
-      if(LP[0]!==4){
+      if(LP[0]!==4 && LP[0]!==2){
         skillusage2[0]-=1;
         skillusage2[5]+=1
         if(player==1){
@@ -9320,7 +9330,6 @@ if(opLock==0 && gamestate ==1){
               //ポンすると手札がなくなるZE
               return false;
             }
-            //ponsw[1]=0;
             handtemp = hand1.concat();
           break;
           case 2:
@@ -9356,10 +9365,11 @@ if(opLock==0 && gamestate ==1){
         switch(player){
           case 1:
             if(reach[player]==3){
-                var N=Math.floor(hand1[hand1.length-1]/4);
+              var N=hand1[hand1.length-1]
+                var M=Math.floor(N/4);
                 if(pon1.length>=3){
                   var A=Math.floor(pon1[0]/4);
-                  if(A==N){
+                  if(A==M){
                     hand1.splice(hand1.length-1,1);
                     kan1.unshift(N,pon1[0],pon1[1],pon1[2]);
                     pon1.splice(0,3);
@@ -9371,7 +9381,7 @@ if(opLock==0 && gamestate ==1){
                 }
                 if(pon1.length>=6){
                   var A=Math.floor(pon1[3]/4);
-                  if(A==N){
+                  if(A==M){
                     hand1.splice(hand1.length-1,1);
                     kan1.unshift(N,pon1[3],pon1[4],pon1[5]);
                     pon1.splice(3,3);
@@ -9449,6 +9459,48 @@ if(opLock==0 && gamestate ==1){
             }
             break;
           case 2:
+            if(reach[player]==3){
+              var N=hand2[hand2.length-1]
+                var M=Math.floor(N/4);
+                if(pon2.length>=3){
+                  var A=Math.floor(pon2[0]/4);
+                  if(A==M){
+                    hand2.splice(hand2.length-1,1);
+                    kan2.unshift(N,pon2[0],pon2[1],pon2[2]);
+                    pon2.splice(0,3);
+                    hand2.push(100);
+                    ponkandraw(player);
+                    NukiAnimation(player,N);
+                    return true;
+                  }
+                }
+                if(pon2.length>=6){
+                  var A=Math.floor(pon2[3]/4);
+                  if(A==M){
+                    hand2.splice(hand2.length-1,1);
+                    kan2.unshift(N,pon2[3],pon2[4],pon2[5]);
+                    pon2.splice(3,3);
+                    hand2.push(100);
+                    ponkandraw(player);
+                    NukiAnimation(player,N);
+                    return true;
+                  }
+                }
+                var handtest=[];
+                handtest=hand2.concat();
+                var A=handtest.filter(value=>value>=N*4 && value<(N+1)*4)
+                if(A.length>=4){
+                  for(var i=0;i<4;i++){
+                    var pA=hand2.findIndex(value=>value>=N*4 && value<(N+1)*4);
+                    var kanA=hand2.splice(pA,1);
+                    kan2.unshift(kanA);
+                    };
+                  hand2.push(100);
+                  ponkandraw(player);
+                  NukiAnimation(player,-1);
+                }
+              return false;
+            }
             if(pon2.length>=3){
               var A=Math.floor(pon2[0]/4);
               var B=hand2.findIndex(value=>value>=4*A && value<4*(A+1));
@@ -9502,6 +9554,48 @@ if(opLock==0 && gamestate ==1){
             }
             break;
           case 3:
+            if(reach[player]==3){
+              var N=hand3[hand3.length-1]
+                var M=Math.floor(N/4);
+                if(pon3.length>=3){
+                  var A=Math.floor(pon3[0]/4);
+                  if(A==M){
+                    hand3.splice(hand3.length-1,1);
+                    kan3.unshift(N,pon3[0],pon3[1],pon3[2]);
+                    pon3.splice(0,3);
+                    hand3.push(100);
+                    ponkandraw(player);
+                    NukiAnimation(player,N);
+                    return true;
+                  }
+                }
+                if(pon3.length>=6){
+                  var A=Math.floor(pon3[3]/4);
+                  if(A==M){
+                    hand3.splice(hand1.length-1,1);
+                    kan3.unshift(N,pon3[3],pon3[4],pon3[5]);
+                    pon3.splice(3,3);
+                    hand3.push(100);
+                    ponkandraw(player);
+                    NukiAnimation(player,N);
+                    return true;
+                  }
+                }
+                var handtest=[];
+                handtest=hand3.concat();
+                var A=handtest.filter(value=>value>=N*4 && value<(N+1)*4)
+                if(A.length>=4){
+                  for(var i=0;i<4;i++){
+                    var pA=hand3.findIndex(value=>value>=N*4 && value<(N+1)*4);
+                    var kanA=hand3.splice(pA,1);
+                    kan3.unshift(kanA);
+                    };
+                  hand3.push(100);
+                  ponkandraw(player);
+                  NukiAnimation(player,-1);
+                }
+              return false;
+            }
             if(pon3.length>=3){
               var A=Math.floor(pon3[0]/4);
               var B=hand3.findIndex(value=>value>=4*A && value<4*(A+1));
@@ -9555,6 +9649,48 @@ if(opLock==0 && gamestate ==1){
             }
             break;
           case 4:
+            if(reach[player]==3){
+              var N=hand4[hand4.length-1]
+                var M=Math.floor(N/4);
+                if(pon4.length>=3){
+                  var A=Math.floor(pon4[0]/4);
+                  if(A==M){
+                    hand4.splice(hand4.length-1,1);
+                    kan4.unshift(N,pon4[0],pon4[1],pon4[2]);
+                    pon4.splice(0,3);
+                    hand4.push(100);
+                    ponkandraw(player);
+                    NukiAnimation(player,N);
+                    return true;
+                  }
+                }
+                if(pon4.length>=6){
+                  var A=Math.floor(pon4[3]/4);
+                  if(A==M){
+                    hand4.splice(hand4.length-1,1);
+                    kan4.unshift(N,pon4[3],pon4[4],pon4[5]);
+                    pon4.splice(3,3);
+                    hand4.push(100);
+                    ponkandraw(player);
+                    NukiAnimation(player,N);
+                    return true;
+                  }
+                }
+                var handtest=[];
+                handtest=hand4.concat();
+                var A=handtest.filter(value=>value>=N*4 && value<(N+1)*4)
+                if(A.length>=4){
+                  for(var i=0;i<4;i++){
+                    var pA=hand4.findIndex(value=>value>=N*4 && value<(N+1)*4);
+                    var kanA=hand4.splice(pA,1);
+                    kan4.unshift(kanA);
+                    };
+                  hand4.push(100);
+                  ponkandraw(player);
+                  NukiAnimation(player,-1);
+                }
+              return false;
+            }
             if(pon4.length>=3){
               var A=Math.floor(pon4[0]/4);
               var B=hand4.findIndex(value=>value>=4*A && value<4*(A+1));
@@ -9897,6 +10033,9 @@ if(opLock==0 && gamestate ==1){
     t.x=390;
     t.y=300;
     field.addChild(t);
+    createjs.Tween.get(s)
+            .wait(300)
+            .call(next);
     if(LP[0]!==4){
     if(parent ==0){parent =3}else{parent -=1}
     skillusage2[0]-=1;
@@ -9905,8 +10044,10 @@ if(opLock==0 && gamestate ==1){
     for(var i=1 ;i<5; i++){
     ctl[i]=2;
   }
+  function next(){
     cLock=0;
     gamestate=0;
+  }
     console.log('流局',ctl)
     if(LP[0]==4){
       raidscore[2]=1;
@@ -11312,10 +11453,10 @@ if(opLock==0 && gamestate ==1){
           stage.removeChild(Container);
           nuki[1]+=1;
           nuki[0]=p;
+          handgraph(0,1)
           if(pai==-1){
             switch(p){
               case 1:
-              handgraph(0,1)
               turn=0;
               Csquare.y=400;
               if(pvpmode==1){
@@ -11506,9 +11647,8 @@ if(opLock==0 && gamestate ==1){
         hand1[target]=skillusage2[player]
         cLock=1;
         skillusage2[player]=-1;
-        handgraph(0,1);
+        handgraph(0,1,1);
         judge(1);
-        //必要なら9枚目だけここで書いて
         return false;
       }else{
         //メモライズしてから切る
@@ -11631,7 +11771,6 @@ if(opLock==0 && gamestate ==1){
           ponkanmap.removeAllChildren();
           ryukyoku();
           cLock=1;
-          //handgraph(0,1);
           console.log('操作可能')
         }else{
         se5.play()
@@ -11941,179 +12080,184 @@ if(opLock==0 && gamestate ==1){
   }else{
   cx2.fillStyle = "#ff4c38";
   }
-  cx2.clearRect(630,10,160,310)
+  cx2.clearRect(630,10,160,350)
   var p=chara[player]
   if(pvpmode==1){
         if(IsHost(IAM.room)){
-        cx2.fillText("★"+MEMBER[player-1].name, 635, 58);
+        cx2.fillText("★"+MEMBER[player-1].name, 635, 62);
         }else{
-        cx2.fillText(MEMBER[player-1].name, 635, 58);
+        cx2.fillText(MEMBER[player-1].name, 635, 62);
         }
   }else{
   switch(player){
     case 1:
-      cx2.fillText(Username, 635, 58);
+      cx2.fillText(Username, 635, 62);
       break;
       case 2:
-        cx2.fillText("CPU1", 635, 58);
+        cx2.fillText("CPU1", 635, 62);
         break;
         case 3:
-          cx2.fillText("CPU2", 635, 58);
+          cx2.fillText("CPU2", 635, 62);
           break;
           case 4:
-            cx2.fillText("CPU3", 635, 58);
+            cx2.fillText("CPU3", 635, 62);
             break;            
   }}
-  cx2.fillText(chrlist[p], 635, 80);
+  cx2.font = "bold 16px Arial";
+  cx2.fillText(chrlist[p], 640, 80);
   cx2.fillStyle = "white";
+  if(LP[0]==2){
+    cx2.font = "bold 14px Arial";
+    cx2.fillText("キル"+death[player-1].kill+"/アシ"+death[player-1].assist+"/デス"+death[player-1].death, 645, 96);
+  }
   switch(num){
     case 0:
     drawbuttom(635,10,"スキル",1,50,20)
     if(p==1){
       cx2.font = "bold 16px Arial";
-      cx2.fillText("ストーンスキン", 635, 110);
+      cx2.fillText("ストーンスキン", 635, 130);
       cx2.font = "14px Arial";
-      cx2.fillText("・リーチしている間,", 635, 130);
-      cx2.fillText("他のスキルの効果を", 635, 150);
-      cx2.fillText("受けない。", 635, 170);
+      cx2.fillText("・リーチしている間,", 635, 150);
+      cx2.fillText("他のスキルの効果を", 635, 170);
+      cx2.fillText("受けない。", 635, 190);
       cx2.font = "bold 16px Arial";
-      cx2.fillText("フレイムガイザー", 635, 190);
+      cx2.fillText("フレイムガイザー", 635, 210);
       cx2.font = "13px Arial";
-      cx2.fillText("MP消費:2ゲージ", 635, 210);
-      cx2.fillText("対象:プレイヤー1人", 635, 230);
-      cx2.fillText("効果:対象を5巡の間", 635, 250);
-      cx2.fillText("「火傷」状態にする.", 635, 270);
+      cx2.fillText("MP消費:2ゲージ", 635, 230);
+      cx2.fillText("対象:プレイヤー1人", 635, 250);
+      cx2.fillText("効果:対象を5巡の間", 635, 270);
+      cx2.fillText("「火傷」状態にする.", 635, 290);
       }else if(p==2){
         var MS=Buff[player].filter(value=>value==2)
         if(!MS.length){MS=[]};
       cx2.font = "bold 16px Arial";
-      cx2.fillText("マナシールド", 635, 110);
+      cx2.fillText("マナシールド", 635, 130);
       cx2.font = "14px Arial";
-      cx2.fillText("・水パイを捨てる度に", 635, 130);
-      cx2.fillText("マナシールドを張る." ,635, 150);
+      cx2.fillText("・水パイを捨てる度に", 635, 150);
+      cx2.fillText("マナシールドを張る." ,635, 170);
       cx2.font = "bold 16px Arial";
-      cx2.fillText("メモライズ", 635, 170);
+      cx2.fillText("メモライズ", 635, 190);
       cx2.font = "14px Arial";
-      cx2.fillText("対象:手札のパイ1つ", 635, 190);
-      cx2.fillText("(オールマイティ以外)", 635, 210);
+      cx2.fillText("対象:手札のパイ1つ", 635, 210);
+      cx2.fillText("(オールマイティ以外)", 635, 230);
       if(skillusage2[player]==-1){
-        cx2.fillText("効果:MPを1ゲージ", 635, 230);
-        cx2.fillText("消費し,対象のパイを", 635, 250);
-        cx2.fillText("メモしてから切る.", 635, 270);
-        cx2.fillText("メモしたパイは,", 635, 290);
-        cx2.fillText("いつでも思い出せる.", 635, 310);
+        cx2.fillText("効果:MPを1ゲージ", 635, 250);
+        cx2.fillText("消費し,対象のパイを", 635, 270);
+        cx2.fillText("メモしてから切る.", 635, 290);
+        cx2.fillText("メモしたパイは,", 635, 310);
+        cx2.fillText("いつでも思い出せる.", 635, 330);
       }else{
-      cx2.fillText("効果：②対象のパイを", 635, 230);
+      cx2.fillText("効果：②対象のパイを", 635, 250);
       cx2.fillStyle="orange"
-      cx2.fillText(donpai[skillusage2[player]].name, 635, 250);
-      cx2.fillText("("+donpai[skillusage2[player]].sub+")", 635, 270);
+      cx2.fillText(donpai[skillusage2[player]].name, 635, 270);
+      cx2.fillText("("+donpai[skillusage2[player]].sub+")", 635, 290);
       cx2.fillStyle="white";
-      cx2.fillText("に変える.", 640, 290);
+      cx2.fillText("に変える.", 640, 310);
       }
       }else if(p==3){
       cx2.font = "bold 15px Arial";
-      cx2.fillText("ネイチャーフォース", 635, 110);
+      cx2.fillText("ネイチャーフォース", 635, 130);
       cx2.font = "14px Arial";
-      cx2.fillText("・風パイを切る度に", 635, 130);
-      cx2.fillText("NFバフを得る.", 635, 150);
-      cx2.fillText("・強靭番の時,風パイ", 635, 170);
-      cx2.fillText("が初手で入りやすい.", 635, 190);
+      cx2.fillText("・風パイを切る度に", 635, 150);
+      cx2.fillText("NFバフを得る.", 635, 170);
+      cx2.fillText("・強靭番の時,風パイ", 635, 190);
+      cx2.fillText("が初手で入りやすい.", 635, 210);
       cx2.font = "bold 15px Arial";
-      cx2.fillText("フリージングアロー", 635, 210);
+      cx2.fillText("フリージングアロー", 635, 230);
       cx2.font = "14px Arial";
-      cx2.fillText("MP消費:2ゲージ", 635, 230);
-      cx2.fillText("対象:他のプレイヤー1人", 635, 250);
-      cx2.fillText("効果:対象を3巡の間", 635, 270);
-      cx2.fillText("「凍結」状態にする.", 635, 290);
+      cx2.fillText("MP消費:2ゲージ", 635, 250);
+      cx2.fillText("対象:他のプレイヤー1人", 635, 270);
+      cx2.fillText("効果:対象を3巡の間", 635, 290);
+      cx2.fillText("「凍結」状態にする.", 635, 310);
       }else if(p==4){
       cx2.font = "bold 15px Arial";
-      cx2.fillText("ナソードコア", 635, 110);
+      cx2.fillText("ナソードコア", 635, 130);
       cx2.font = "14px Arial";
-      cx2.fillText("・太陽パイを切る度に", 635, 130);
-      cx2.fillText("ナソードコアを生成する", 635, 150);
-      cx2.fillText("・ナソードコアがある時", 635, 170);
-      cx2.fillText("致死ダメージを受けても", 635, 190);
-      cx2.fillText("1度だけ食いしばる.", 635, 210);
+      cx2.fillText("・太陽パイを切る度に", 635, 150);
+      cx2.fillText("ナソードコアを生成する", 635, 170);
+      cx2.fillText("・ナソードコアがある時", 635, 190);
+      cx2.fillText("致死ダメージを受けても", 635, 210);
+      cx2.fillText("1度だけ食いしばる.", 635, 230);
       cx2.font = "bold 15px Arial";
-      cx2.fillText("グラウンドクラッシュ", 635, 230);
+      cx2.fillText("グラウンドクラッシュ", 635, 250);
       cx2.font = "14px Arial";
-      cx2.fillText("MP消費:3ゲージ", 635, 250);
-      cx2.fillText("対象:全体", 635, 270);
-      cx2.fillText("効果:台パンにより", 635, 290);
-      cx2.fillText("この局を流局にする.", 635, 310);
+      cx2.fillText("MP消費:3ゲージ", 635, 270);
+      cx2.fillText("対象:全体", 635, 290);
+      cx2.fillText("効果:台パンにより", 635, 310);
+      cx2.fillText("この局を流局にする.", 635, 330);
     }else if(p==5){
       cx2.font = "bold 15px Arial";
-      cx2.fillText("クイーンズスローン", 635, 110);
+      cx2.fillText("クイーンズスローン", 635, 130);
       cx2.font = "14px Arial";
-      cx2.fillText("・リーチが発生した時", 635, 130);
-      cx2.fillText("危険パイを察知する.", 635, 150);
-      cx2.fillText("・引いたばかりのパイは", 635, 170);
-      cx2.fillText("察知できず, その局の", 635, 190);
-      cx2.fillText("最初のリーチに対して", 635, 210);
-      cx2.fillText("のみ発動する.", 635, 230);
+      cx2.fillText("・リーチが発生した時", 635, 150);
+      cx2.fillText("危険パイを察知する.", 635, 170);
+      cx2.fillText("・引いたばかりのパイは", 635, 190);
+      cx2.fillText("察知できず, その局の", 635, 210);
+      cx2.fillText("最初のリーチに対して", 635, 230);
+      cx2.fillText("のみ発動する.", 635, 250);
       if(skillusage[player]>0){
       switch(skillusage[player]){
         case 1:
-          cx2.fillText("対象："+Username, 635, 260);
+          cx2.fillText("対象："+Username, 635, 270);
           break;
           case 2:
-            cx2.fillText("対象：CPU1", 635, 260);
+            cx2.fillText("対象：CPU1", 635, 270);
             break;
             case 3:
-              cx2.fillText("対象：CPU2", 635, 260);
+              cx2.fillText("対象：CPU2", 635, 270);
               break;
               case 4:
-                cx2.fillText("対象：CPU3", 635, 260);
+                cx2.fillText("対象：CPU3", 635, 270);
                 break;
                 default:
-                  cx2.fillText("対象：--", 635, 260);
+                  cx2.fillText("対象：--", 635, 270);
       }}
       }else if(p==6){
       cx2.font = "bold 15px Arial";
-      cx2.fillText("変身", 635, 110);
+      cx2.fillText("変身", 635, 130);
       cx2.font = "14px Arial";
-      cx2.fillText("・MPが3ゲージ溜まった", 635, 130);
-      cx2.fillText("状態で立直する時,", 635, 150);
-      cx2.fillText("ゲージを全消費して", 635, 170);
-      cx2.fillText("バーサクモードになる!", 635, 190);
-      cx2.fillText("・変身すると,高確率で", 635, 210);
-      cx2.fillText("一発ツモが発生する.", 635, 230);
+      cx2.fillText("・MPが3ゲージ溜まった", 635, 150);
+      cx2.fillText("状態で立直する時,", 635, 170);
+      cx2.fillText("ゲージを全消費して", 635, 190);
+      cx2.fillText("バーサクモードになる!", 635, 210);
+      cx2.fillText("・変身すると,高確率で", 635, 230);
+      cx2.fillText("一発ツモが発生する.", 635, 250);
     }else if(p==7){
       cx2.font = "bold 15px Arial";
-      cx2.fillText("連技-龍牙爆砕", 635, 110);
+      cx2.fillText("連技-龍牙爆砕", 635, 130);
       cx2.font = "14px Arial";
-      cx2.fillText("・1局に1度だけ,", 635, 130);
-      cx2.fillText("・1,2,3,4ラインの順に", 635, 150);
-      cx2.fillText("パイを切ると発動する.", 635, 170);
-      cx2.fillText("ドラを1つ追加する.", 635, 190);
+      cx2.fillText("・1局に1度だけ,", 635, 150);
+      cx2.fillText("・1,2,3,4ラインの順に", 635, 170);
+      cx2.fillText("パイを切ると発動する.", 635, 190);
+      cx2.fillText("ドラを1つ追加する.", 635, 210);
       cx2.font = "bold 15px Arial";
-      cx2.fillText("覇気天衝-千手華", 635, 210);
+      cx2.fillText("覇気天衝-千手華", 635, 230);
       cx2.font = "14px Arial";
-      cx2.fillText("・カンをした時,", 635, 230);
-      cx2.fillText("MPを1ゲージ消費して", 635, 250);
-      cx2.fillText("ドラか当たりパイを引く.", 635, 270);
+      cx2.fillText("・カンをした時,", 635, 250);
+      cx2.fillText("MPを1ゲージ消費して", 635, 270);
+      cx2.fillText("ドラか当たりパイを引く.", 635, 290);
     }else if(p==8){
       cx2.font = "bold 15px Arial";
-      cx2.fillText("万能ニーシャ！", 635, 110);
+      cx2.fillText("万能ニーシャ", 635, 130);
       cx2.font = "14px Arial";
-      cx2.fillText("MP消費:1ゲージ", 635, 130);
-      cx2.fillText("1局に1度だけ, ", 635, 150);
-      cx2.fillText("以下のどちらかを", 635, 170);
-      cx2.fillText("発動できる.", 635, 190);
-      cx2.fillText("①次の局,ニーシャが", 635, 210);
-      cx2.fillText("助けに来てくれる!", 635, 230);
-      cx2.fillText("②手札の「ニーシャ」を", 635, 250);
-      cx2.fillText("好きなパイに変える.", 635, 270);
-      cx2.fillText("(オールマイティを除く)", 635, 290);
+      cx2.fillText("MP消費:1ゲージ", 635, 150);
+      cx2.fillText("1局に1度だけ, ", 635, 170);
+      cx2.fillText("以下のどちらかを", 635, 190);
+      cx2.fillText("発動できる.", 635, 210);
+      cx2.fillText("①次の局,ニーシャが", 635, 230);
+      cx2.fillText("助けに来てくれる!", 635, 250);
+      cx2.fillText("②手札の「ニーシャ」を", 635, 270);
+      cx2.fillText("好きなパイに変える.", 635, 290);
+      cx2.fillText("(オールマイティを除く)", 635, 310);
       }else{
       cx2.font = "bold 16px Arial";
-      cx2.fillText("パッシブスキル", 635, 110);
+      cx2.fillText("パッシブスキル", 635, 130);
       cx2.font = "14px Arial";
-      cx2.fillText("　なし", 635, 130);
+      cx2.fillText("　なし", 635, 150);
       cx2.font = "bold 16px Arial";
-      cx2.fillText("アクティブスキル", 635, 190);
+      cx2.fillText("アクティブスキル", 635, 210);
       cx2.font = "14px Arial";
-      cx2.fillText("　なし", 635, 210);
+      cx2.fillText("　なし", 635, 230);
       }
     break;
    default:
