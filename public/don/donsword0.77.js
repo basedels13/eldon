@@ -1,16 +1,14 @@
-//var1.025　season2 テスト
+// var1.025　season2 テスト
 // npm run dev
-//全職75枚（エピックライン1枚ずつ増量）＋オールマイティ2枚＋マスター8枚×2（ガ、ロ、ベ、デ、ソ、ア、ハ）合計93枚スタート
-//シナジーの翻数調整未
-//自分のターンで流局になる時、流局画面でクリックできず即進んでしまうことがある？
-//カン後、3ペアリーチした時にロンできない場合・3ペアがつかない場合がある？
+// キャラ追加→やる気があれば
+// 全職75枚（エピックライン1枚ずつ増量）＋オールマイティ2枚＋マスター8枚×2（ガ、ロ、ベ、デ、ソ、ア、ハ）合計93枚スタート
 window.onload = function(){
   draw();
   };
   
   function draw(){
   var titletext="v1.025/Click to START";
-  var debugmode=true;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にfalseに
+  var debugmode=false;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にfalseに
   //自分自身の情報を入れる箱
   var IAM = {
     token: null,    // 戸別管理用のトークン
@@ -451,35 +449,35 @@ window.onload = function(){
     donpai[i].id=i;
   }
   console.log(donpai.length);//70
-  //全部1ずつ引いてます
+  //han ->必要な枚数 han2 翻数
   var Sinagy=[
-    {id:"貫徹する足取り",chr:[24],han:[1]},
-    {id:"豊かな足取り",chr:[25],han:[1]},
-    {id:"上手な足取り",chr:[26],han:[1]},
-    {id:"交感の足取り",chr:[27],han:[1]},
-    {id:"ラビィの友達",chr:[50],han:[1]},
-    {id:"悪戯の王",chr:[51],han:[1]},
-    {id:"機械工学",chr:[43],han:[1]},
-    {id:"エルの巫女",chr:[67],han:[1]},
-    {id:"原初的な動き",chr:[0,12,28],han:[2]},
-    {id:"マナ守護",chr:[5,26,49,61],han:[2,3]},
-    {id:"殴り合い",chr:[13,32,48,60],han:[2]},
-    {id:"時空間",chr:[6,34,46],han:[2]},
-    {id:"戦場の天使",chr:[18,23,42],han:[2]},
-    {id:"精霊の加護",chr:[8,9,10,11,66],han:[2]},
-    {id:"魔族",chr:[36,37,38,39,62],han:[2,3]},
-    {id:"属性鍛錬者",chr:[1,4,20,29],han:[2,3]},
-    {id:"歪曲された視線",chr:[19,47,55,59,63],han:[2]},
-    {id:"ナソード研究",chr:[16,17,18,33,56,65],han:[2,4]},
-    {id:"正義を貫徹する者",chr:[0,3,20,24,28,44,64],han:[2,4]},
-    {id:"敏捷さ",chr:[2,8,12,21,31,42,52],han:[2,3]},
-    {id:"巨人審判者",chr:[2,14,22,40,44,53,55,66],han:[2,3]},
-    {id:"探求する者",chr:[4,7,17,22,33,35,43,53],han:[2,3]},
-    {id:"魔法特化",chr:[1,11,13,21,32,45,51,58],han:[2,3]},
-    {id:"物理特化",chr:[6,10,15,35,36,41,50,52,57],han:[2,3]},
-    {id:"痛いから問題ない",chr:[14,23,27,30,39,45,49,54,57],han:[2,3]},
-    {id:"鋭さ",chr:[3,9,16,19,29,31,37,40,48,54,58],han:[2,3]},
-    {id:"渇望",chr:[5,7,15,25,30,34,38,41,46,47],han:[2,3]},
+    {id:"貫徹する足取り",chr:[24],han:[1],han2:[1]},
+    {id:"豊かな足取り",chr:[25],han:[1],han2:[1]},
+    {id:"上手な足取り",chr:[26],han:[1],han2:[1]},
+    {id:"交感の足取り",chr:[27],han:[1],han2:[1]},
+    {id:"ラビィの友達",chr:[50],han:[1],han2:[1]},
+    {id:"悪戯の王",chr:[51],han:[1],han2:[1]},
+    {id:"機械工学",chr:[43],han:[1],han2:[1]},
+    {id:"エルの巫女",chr:[67],han:[1],han2:[1]},
+    {id:"原初的な動き",chr:[0,12,28],han:[2],han2:[1]},
+    {id:"戦場の天使",chr:[18,23,42],han:[2],han2:[1]},
+    {id:"マナ守護",chr:[5,26,49,61],han:[2,3],han2:[1,2]},
+    {id:"殴り合い",chr:[13,32,48,60],han:[2,3],han2:[1,2]},
+    {id:"時空間",chr:[6,34,46],han:[2,3],han2:[1,2]},
+    {id:"属性鍛錬者",chr:[1,4,20,29],han:[2,3],han2:[1,2]},
+    {id:"精霊の加護",chr:[8,9,10,11,66],han:[2,3],han2:[1,2]},
+    {id:"魔族",chr:[36,37,38,39,62],han:[3,4],han2:[2,3]},
+    {id:"歪曲された視線",chr:[19,47,55,59,63],han:[2,4],han2:[1,3]},
+    {id:"ナソード研究",chr:[16,17,18,33,56,65],han:[2,4],han2:[1,3]},
+    {id:"正義を貫徹する者",chr:[0,3,20,24,28,44,64],han:[2,3,5],han2:[1,2,3]},
+    {id:"敏捷さ",chr:[2,8,12,21,31,42,52],han:[2,3],han2:[1,2]},
+    {id:"巨人審判者",chr:[2,14,22,40,44,53,55,66],han:[2,3],han2:[1,2]},
+    {id:"探求する者",chr:[4,7,17,22,33,35,43,53],han:[2,3],han2:[1,2]},
+    {id:"魔法特化",chr:[1,11,13,21,32,45,51,58],han:[2,3],han2:[1,2]},
+    {id:"物理特化",chr:[6,10,15,35,36,41,50,52,57],han:[2,3],han2:[1,2]},
+    {id:"痛いから問題ない",chr:[14,23,27,30,39,45,49,54,57],han:[2,3],han2:[1,2]},
+    {id:"鋭さ",chr:[3,9,16,19,29,31,37,40,48,54,58],han:[2,3],han2:[1,2]},
+    {id:"渇望",chr:[5,7,15,25,30,34,38,41,46,47],han:[2,3],han2:[1,2]},
   ]
   //実績
   var achieveA=[
@@ -1687,7 +1685,6 @@ function updateParticles() {
   var menu_setting = new createjs.Container();//設定
   var menu_guide = new createjs.Container();//プレイガイド
   var menu_duel = new createjs.Container();//対戦
-  //
   var menu_solo_list=[];//createjsの可変リスト
   var menu_main_list=[];//createjsの可変リスト
 function menuMap(p=0){
@@ -2344,7 +2341,7 @@ function menuMap(p=0){
         btn1.x = 60;
         btn1.y = 260;
         menu_guide.addChild(btn1);
-        btn1.addEventListener("click", {card:5,handleEvent:HowtoBt});
+        btn1.addEventListener("click", {card:-5,handleEvent:HowtoBt});
         var btn1 = createButton("ポン", 130, 40);
         btn1.x = 60;
         btn1.y = 300;
@@ -2901,7 +2898,7 @@ function HowtoBt(){
     default:
       msgstate=this.card;
       se3.play();
-      menuMap(3);
+      if(msgstate>=0){menuMap(3)};
     break;
   }
 }
@@ -3555,6 +3552,14 @@ function NameChange(){
                     return false;
                     }
                 break;
+              default:
+                //シナジーが同時にスクロールされてしまうため-5で対応
+                if(msgstate<0){
+                  msgstate=-msgstate;
+                  menuMap(3);
+                  return false;
+                }
+                break;
             }
             break;
           case 5:
@@ -4080,8 +4085,6 @@ if(opLock==0 && gamestate ==1){
         if(move!==0){
         //上下移動
         yakumapY+=move;
-        //if(yakumapY<=-2840){yakumapY=0;}
-        //if(yakumapY>0){yakumapY=-2780;}
         if(yakumapY<=-yakumapYmax){yakumapY=0;}
         if(yakumapY>0){yakumapY=-yakumapYmax+60;}
         createjs.Tween.get(yakumapMask, {override: true})
@@ -4117,6 +4120,7 @@ if(opLock==0 && gamestate ==1){
       var s;
       var X
       var Y=120;
+      var ct=0;
       for(var i=0; i<Sinagy.length; i++){
         var Ary=hand1.concat(pon1);
         if(shiagytemp==1){
@@ -4126,21 +4130,30 @@ if(opLock==0 && gamestate ==1){
           };
         }
       X=110;
+      if(i<8){
+      ct+=1;
+      if(ct==2){
+        ct=0;
+        X=420;
+        Y-=115;
+      }
+      }
       t= new createjs.Text(Sinagy[i].id, "bold 16px Arial", "white");
       t.x=X-40;
       t.y=Y;
       yakumapMask.addChild(t);
       var Tx=""
+      var Ary=["Ⅰ","Ⅱ","Ⅲ"]
       for(var j=0;j<Sinagy[i].han.length;j++){
         if(Sinagy[i].han[j]==1){
-          Tx+=Sinagy[i].han[j]+"枚："+(j+1)+"翻";
+          Tx+=Ary[j]+"（"+Sinagy[i].han[j]+"枚）："+Sinagy[i].han2[j]+"翻";
         }else{
-          Tx+=Sinagy[i].han[j]+"枚以上："+(j+1)+"翻";
+          Tx+=Ary[j]+"（"+Sinagy[i].han[j]+"枚以上）："+Sinagy[i].han2[j]+"翻";
         }
         if(Sinagy[i].han.length>1 && j+1<Sinagy[i].han.length){Tx+=" / "}
       }
       tt= new createjs.Text(Tx, "14px Arial", "white");
-      tt.x=220;
+      tt.x=X+110;
       tt.y=Y;
       yakumapMask.addChild(tt);
       Y+=15;
@@ -4164,7 +4177,7 @@ if(opLock==0 && gamestate ==1){
       };
       Y+=100;
       };
-      if(shiagytemp==1){yakumapYmax=Y-330}else{yakumapYmax=2960};
+      if(shiagytemp==1){yakumapYmax=Y-330}else{yakumapYmax=2560};
       yakumapMask.addChild(t);
       // マスクを適用する
       yakumapMask.mask = shapeMask;
@@ -7826,7 +7839,7 @@ if(opLock==0 && gamestate ==1){
           for(var i=1 ;i<nodyaku.length;i++){
           cx2.fillText(nodyaku[i],haix,haiy)
           haiy+=25
-          if(haiy>400){
+          if(haiy>=400){
             haix+=240
             haiy=250
           }
@@ -7982,7 +7995,7 @@ if(opLock==0 && gamestate ==1){
         s.y=Y;
         s.textAlign = "right";
         Y+=25;
-        if(i==8){
+        if(i==7){
           X+=240;
           Y=225;
         }
@@ -8027,7 +8040,7 @@ if(opLock==0 && gamestate ==1){
       function flashText3(){
         s=slist[K];
         se14.play();
-        if(K>8){
+        if(K>=7){
         createjs.Tween.get(s)
         .to({x:720, alpha: 1},125, createjs.Ease.cubicInOut)  
         }else{
@@ -8218,42 +8231,40 @@ if(opLock==0 && gamestate ==1){
       }
       }}
       for(var i=1; i<LP.length;i++){
-      LP[i]+=LPtemp[i]
+      MS=Buff[i].filter(value=>value==4)
+      if(chara[i]==4 && LP[i]!==1 && MS.length>0 && LP[i]+LPtemp[i]<0){
+        //食いしばり
+        LP[i]=1;
+      }else{
+        LP[i]+=LPtemp[i]
+      }
       if(LP[i]<0){
-        if(chara[i]==4 && LP[i]!==1){
-          MS=Buff[i].filter(value=>value==4)
-          if(MS.length>0){
-          //食いしばり
-          LP[i]=1;
-        }
-        }
         //飛び
         if(skillusage2[i]==-1){
           skillusage2[i]=1;
-        }
-        if(LP[0]==2){
-          //キルアシ
-          var As=death[i-1].Bdmg.concat();
-          var Bs=maxIndex1(As);
-          function maxIndex1(a) {
-            let index = 0
-            let value = -Infinity
-            for (let i = 0, l = a.length; i < l; i++) {
-              if (value < a[i]) {
-                value = a[i]
-                index = i
+          if(LP[0]==2){
+            //キルアシ
+            var As=death[i-1].Bdmg.concat();
+            var Bs=maxIndex1(As);
+            function maxIndex1(a) {
+              let index = 0
+              let value = -Infinity
+              for (let i = 0, l = a.length; i < l; i++) {
+                if (value < a[i]) {
+                  value = a[i]
+                  index = i
+                }
               }
+              return index
             }
-            return index
+            death[i-1].death+=1;
+            death[player-1].kill+=1;
+            death[Bs].assist+=1;
           }
-          console.log(As,Bs);
-          death[i-1].death+=1;
-          death[player-1].kill+=1;
-          death[Bs].assist+=1;
-        }
+        };
       }
       }
-      console.log(death);
+      if(debugmode){console.log(death)};
     switch(LP[0]){
       case 0:
       case 1:
@@ -8444,7 +8455,6 @@ if(opLock==0 && gamestate ==1){
         var nodpair1
         var nodpair2
         var resultA=[0]
-        cx2.fillStyle = "white";
         var yy=210;
         var xx=635
         if(mode==-1){
@@ -8461,7 +8471,6 @@ if(opLock==0 && gamestate ==1){
               }
             }
           }
-          //
           for(var k=0; k<Sinagy.length; k++){
               if(!getIsDuplicate(handtemp,Sinagy[k].chr)){
                  //一つでも所持していればGO
@@ -8474,10 +8483,22 @@ if(opLock==0 && gamestate ==1){
                 if(A!==-1){nodpair2.push(nodpair1[i])}
               }
               if(nodpair2.length >=Sinagy[k].han[0]){
-                var B=1+Math.floor((nodpair2.length-1)/2)
-                resultA[0]+=B
-                PA(Sinagy[k].id,nodpair2.length);  
-                resultA.push(Sinagy[k].id+nodpair2.length+"/"+nodpair1.length+" "+B+"翻")}
+                //var B=1+Math.floor((nodpair2.length-1)/2)
+                PA(Sinagy[k].id,nodpair2.length);
+                var BB=Sinagy[k].han.findIndex(value=>value>nodpair2.length);
+                //nodpair2.length 4 han 1,3,5 -> expected 2
+                var C;
+                var D;
+                var Ary=["Ⅰ","Ⅱ","Ⅲ","Ⅳ","Ⅴ"]
+                if(BB==-1){
+                  C=Sinagy[k].han2[Sinagy[k].han2.length-1];
+                  D=Ary[Sinagy[k].han2.length-1];
+                }else{
+                  C=Sinagy[k].han2[BB-1];
+                  D=Ary[BB-1]
+                };
+                resultA[0]+=C
+                resultA.push(Sinagy[k].id+D+" "+C+"翻")}
           };
            //属性枠
            nodpair1=handtemp.filter(value=>value>=0 && value<=3);
@@ -8547,10 +8568,10 @@ if(opLock==0 && gamestate ==1){
             tt.textAlign="right";
             guidemap.addChild(tt);
             yy+=25;
-            if(nodpair2.length>=3 || nodpair2.length==Sinagy[P].chr.length){
+            if(nodpair2.length >=Sinagy[P].han[Sinagy[P].han.length-1]){
               t.color= "#ff4c38";
               tt.color= "#ff4c38";
-            }else if(nodpair2.length >=2){
+            }else if(nodpair2.length >=Sinagy[P].han[0] || (Sinagy[P].han.length>1 && nodpair2.length >=Sinagy[P].han[Sinagy[P].han.length-2])){
               t.color= "#388eff";
               tt.color= "#388eff";
             }
@@ -9394,10 +9415,10 @@ if(opLock==0 && gamestate ==1){
                 }
                 var handtest=[];
                 handtest=hand1.concat();
-                var A=handtest.filter(value=>value>=N*4 && value<(N+1)*4)
+                var A=handtest.filter(value=>value>=M*4 && value<(M+1)*4)
                 if(A.length>=4){
                   for(var i=0;i<4;i++){
-                    var pA=hand1.findIndex(value=>value>=N*4 && value<(N+1)*4);
+                    var pA=hand1.findIndex(value=>value>=M*4 && value<(M+1)*4);
                     var kanA=hand1.splice(pA,1);
                     kan1.unshift(kanA);
                     };
@@ -9489,10 +9510,10 @@ if(opLock==0 && gamestate ==1){
                 }
                 var handtest=[];
                 handtest=hand2.concat();
-                var A=handtest.filter(value=>value>=N*4 && value<(N+1)*4)
+                var A=handtest.filter(value=>value>=M*4 && value<(M+1)*4)
                 if(A.length>=4){
                   for(var i=0;i<4;i++){
-                    var pA=hand2.findIndex(value=>value>=N*4 && value<(N+1)*4);
+                    var pA=hand2.findIndex(value=>value>=M*4 && value<(M+1)*4);
                     var kanA=hand2.splice(pA,1);
                     kan2.unshift(kanA);
                     };
@@ -9584,10 +9605,10 @@ if(opLock==0 && gamestate ==1){
                 }
                 var handtest=[];
                 handtest=hand3.concat();
-                var A=handtest.filter(value=>value>=N*4 && value<(N+1)*4)
+                var A=handtest.filter(value=>value>=M*4 && value<(M+1)*4)
                 if(A.length>=4){
                   for(var i=0;i<4;i++){
-                    var pA=hand3.findIndex(value=>value>=N*4 && value<(N+1)*4);
+                    var pA=hand3.findIndex(value=>value>=M*4 && value<(M+1)*4);
                     var kanA=hand3.splice(pA,1);
                     kan3.unshift(kanA);
                     };
@@ -9679,10 +9700,10 @@ if(opLock==0 && gamestate ==1){
                 }
                 var handtest=[];
                 handtest=hand4.concat();
-                var A=handtest.filter(value=>value>=N*4 && value<(N+1)*4)
+                var A=handtest.filter(value=>value>=M*4 && value<(M+1)*4)
                 if(A.length>=4){
                   for(var i=0;i<4;i++){
-                    var pA=hand4.findIndex(value=>value>=N*4 && value<(N+1)*4);
+                    var pA=hand4.findIndex(value=>value>=M*4 && value<(M+1)*4);
                     var kanA=hand4.splice(pA,1);
                     kan4.unshift(kanA);
                     };
@@ -12266,7 +12287,7 @@ if(opLock==0 && gamestate ==1){
    default:
     //Buff
     drawbuttom(635,10,"バフ",1,60,20)
-    var y=110;
+    var y=130;
     if(LP[player]<0){
       cx2.font = "bold 20px Arial";
       cx2.fillText("戦闘不可", 635, y);
