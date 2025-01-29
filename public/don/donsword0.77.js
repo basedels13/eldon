@@ -1,12 +1,9 @@
-//var1.025　season2 
+//var1.025　season2 テスト
 // npm run dev
-//全職75枚（エピックキャラは1枚ずつ増量）＋オールマイティ2枚＋マスター8枚×2（ガ、ロ、ベ、デ、ソ、ア、ハ）合計93枚→61枚スタート
-//いつか→デスマでキルアシに準じて順位をつける　タイトル画面でミュートの設定
-//deathを参照してください
-//クレスト役未確認 シナジーの翻数調整
-//リザルト画面でクリックすると何度もセーブ完了ポップが出る
+//全職75枚＋オールマイティ2枚＋マスター8枚×2（ガ、ロ、ベ、デ、ソ、ア、ハ）合計78枚スタート
+//シナジーの翻数調整未
 //自分のターンで流局になる時、流局画面でクリックできず即進んでしまうことがある？
-//カン後、3ペアリーチした時にロンできない場合がある？
+//カン後、3ペアリーチした時にロンできない場合・3ペアがつかない場合がある？
 window.onload = function(){
   draw();
   };
@@ -331,16 +328,14 @@ window.onload = function(){
   //オーラスの時1　現在音楽のみに影響
   var Ronturn=[];
   //データベース
-  var LPlist=new Array("一般","ヘル","ミリオネア","∞","魔界血戦")
+  var LPlist=new Array("一般","ヘル","デスマッチ","∞","魔界血戦")
   var musiclist=new Array("ランダム","盲目のアストライア","Nine Jack","The Evil Sacrifice Archenemies","ロベリア","夜の迷宮の入口","決闘のテーマ","エルの樹の麓","リーチっぽい音楽","ベスマ-竜の道","ウォーリーの城","歎きの塔Phase3","狂乱のコンサート","リーチっぽい音楽R")
   var chrlist=new Array("名無しさん","エルス","アイシャ","レナ","レイヴン","イヴ")//"ラシェ","アラ","エド","ラビィ")
-  var chrimg_src= new Array("don/Don_chara0.png","don/Don_chara1.png","don/Don_chara2.png","don/Don_chara3.png","don/Don_chara4.png","don/Don_chara5_2.png");
-  var atrbute_src= new Array("don/Don_DP.png","don/Duel_mana.png","don/Duel_sun.png","don/Duel_aqua.png","don/Duel_wind.png","don/Duel_moon.png","don/Duel_gaia.png","don/Duel_heat.png","don/Don_HA.png");
+  var chrimg_src= new Array("don/Don_chara0.png","don/Don_chara1.png","don/Don_chara2.png","don/Don_chara3.png","don/Don_chara4.png","don/Don_chara5.png");
   //説明用
-  var epic_src =new Array("don/elstudio_bg1.png","don/Don_epic1.png","don/Don_epic2.png","don/Don_epic3.png","don/Don_epicline.png","don/Don_ss11.png","don/Don_epic4.png","don/Don_epic5.png");
+  var epic_src =new Array("don/elstudio_bg1.png","don/Don_epic1.png","don/Don_epic2.png","don/Don_epic3.png","don/Don_epic6.png","don/Don_ss11.png","don/Don_epic4.png","don/Don_epic5.png");
   //パイの裏
   var eltearB_src =new Array("don/Don_img0.png","don/Don_winbg.png");
-  var eltear= new Image();
   //donpaiのidは0から始める　ロゼimg40-43は位置が変わる
   var eltear_src = new Array("don/Don_img1.png","don/Don_img2.png","don/Don_img3.png","don/Don_img4_1.png","don/Don_img4.png","don/Don_img5.png","don/Don_img6.png","don/Don_img4_2.png","don/Don_img7.png","don/Don_img8.png","don/Don_img9.png","don/Don_img4_3.png","don/Don_img10.png",);
   eltear_src.push("don/Don_img11.png","don/Don_img12.png","don/Don_img4_4.png","don/Don_img13.png","don/Don_img14.png","don/Don_img15.png","don/Don_img4_5.png","don/Don_img16.png","don/Don_img17.png","don/Don_img18.png","don/Don_img4_6.png","don/Don_img19.png","don/Don_img20.png",);
@@ -524,7 +519,7 @@ window.onload = function(){
   {name:"変化無双",sub:"国士無双を和了する"},
   {name:"幸運の証票",sub:"天和を和了する"},
   {name:"海千山千",sub:"海底を和了する"},
-  {name:"クレストコンプリート",sub:"全てのキャラ役を1回以上成立させる"},
+  {name:"クレストコンプリート",sub:"全ての属性ペア役を1回以上成立させる"},
   {name:"シナジーコンプリート",sub:"全てのシナジー役を1回以上成立させる"},
   {name:"柔軟な実績コレクター",sub:"実績を10個以上開放する"},
   {name:"強靭な実績コレクター",sub:"実績を30個以上開放する"},
@@ -541,6 +536,13 @@ window.onload = function(){
     {name:"3ライン通貫",sub:"アガリ形"},
     {name:"4ライン通貫",sub:"アガリ形"},
     {name:"国士無双",sub:"アガリ形"},
+    {name:"クレストオブガイア",sub:"アガリ形"},
+    {name:"クレストオブソーレス",sub:"アガリ形"},
+    {name:"クレストオブベントス",sub:"アガリ形"},
+    {name:"クレストオブロッソ",sub:"アガリ形"},
+    {name:"クレストオブデニフ",sub:"アガリ形"},
+    {name:"クレストオブハルニエ",sub:"アガリ形"},
+    {name:"クレストオブアドリアン",sub:"アガリ形"},
     {name:"鋭さ",sub:"シナジー役",max:7},
     {name:"ナソード研究",sub:"シナジー役",max:5},
     {name:"精霊の加護",sub:"シナジー役",max:3},
@@ -568,13 +570,13 @@ window.onload = function(){
     {name:"悪戯の王",sub:"シナジー役",max:1},
     {name:"エルの巫女",sub:"シナジー役",max:1},
     {name:"戦場の天使",sub:"シナジー役",max:3},
-    {name:"クレストオブガイア",sub:"キャラ役"},
-    {name:"クレストオブソーレス",sub:"キャラ役"},
-    {name:"クレストオブベントス",sub:"キャラ役"},
-    {name:"クレストオブロッソ",sub:"キャラ役"},
-    {name:"クレストオブデニフ",sub:"キャラ役"},
-    {name:"クレストオブハルニエ",sub:"キャラ役"},
-    {name:"クレストオブアドリアン",sub:"キャラ役"},
+    {name:"大地のエル",sub:"キャラ役"},
+    {name:"太陽のエル",sub:"キャラ役"},
+    {name:"風のエル",sub:"キャラ役"},
+    {name:"火のエル",sub:"キャラ役"},
+    {name:"水のエル",sub:"キャラ役"},
+    {name:"原初のエル",sub:"キャラ役"},
+    {name:"闇のエル",sub:"キャラ役"},
     {name:"門前ツモ",sub:"アガリ形"},
     {name:"一発",sub:"アガリ形"},
     {name:"天和",sub:"アガリ形"},
@@ -867,8 +869,8 @@ window.onload = function(){
     volume: 0.3,
     });
   var se18 = new Howl({
-    src:"don/Onoma-Impact09-1.mp3",
-    volume: 0.7,
+    src:"don/se_wood_kan01.mp3",
+    volume: 0.4,
     });
   const jingle =new Howl({
       src: "don/Don_jingle.mp3",
@@ -984,18 +986,24 @@ var queue = new createjs.LoadQueue(),
 //ロード画像適宜追加
       manifest = [];
     for(var i=0;i<eltear_src.length;i++){
-      manifest.push({src:eltear_src[i]})
+      manifest.push(eltear_src[i])
     };
     for(var i=0;i<eltearB_src.length;i++){
-      manifest.push({src:eltearB_src[i]})
+      manifest.push(eltearB_src[i])
     };
     for(var i=0;i<chrimg_src.length;i++){
-      manifest.push({src:chrimg_src[i]})
+      manifest.push(chrimg_src[i])
     };
     for(var i=0;i<win_src.length;i++){
-      manifest.push({src:win_src[i]})
+      manifest.push(win_src[i])
     };
-    manifest.push({src: 'don/circle88.png'})
+    for(var i=0;i<epic_src.length;i++){
+      manifest.push(epic_src[i])
+    };
+    manifest.push('don/circle88.png')
+    manifest.push('don/soL_option_bt2.png')
+    manifest.push('don/soL_option_bt3.png')
+    manifest.push('don/soL_option_bt4.png')
     console.log(manifest.length);
 // 同時接続数を設定
 queue.setMaxConnections(6);
@@ -1173,14 +1181,14 @@ function updateParticles() {
   paiView();
   for(var i=0;i<6;i++){
     var A=Math.floor(Math.random()*70);
-    s = new createjs.Bitmap(eltear_src[A]);
+    s = new createjs.Bitmap(queue.getResult(eltear_src[A]));
     s.x=-120;
     s.y=5;
     ary.push(s);
   };
   for(var j=0;j<6;j++){
     var A=Math.floor(Math.random()*70);
-    s = new createjs.Bitmap(eltear_src[A]);
+    s = new createjs.Bitmap(queue.getResult(eltear_src[A]));
     s.x=920;
     s.y=425;
     ary.push(s);
@@ -1326,7 +1334,7 @@ function updateParticles() {
             return false;
           }
         }
-      if(LP[0]!==1 && (LP[1] <0 || LP[2]<0 || LP[3] <0 || LP[4]<0)){
+      if(LP[0]!==2 && (LP[1] <0 || LP[2]<0 || LP[3] <0 || LP[4]<0)){
         gameover();
         return false;
       }
@@ -1395,7 +1403,7 @@ function updateParticles() {
         }
         break;
         case 1:
-        //デスマッチ
+        //ヘル
             if(skillusage2[0]>=8){
             gameover();
             return false;
@@ -1410,15 +1418,28 @@ function updateParticles() {
           }
           break;
           case 2:
-      //ミリオネア
-      if(LP[1] >=1000000 || LP[2] >=1000000 || LP[3] >=1000000 || LP[4]>=1000000){
-            gameover();
-            return false;
-            }else{
-              gamestate =1
-              deckHandler();
+      //デスマッチ
+      if(pvpmode==1){
+        if(LP_PVP.Length[0]==1){
+            if(skillusage2[0]>=4){
+              gameover();
               return false;
             }
+        }else if(LP_PVP.Length[0]==2){
+            if(skillusage2[0]>=8){
+              gameover();
+              return false;
+            }
+          } 
+      }else{
+        if(skillusage2[0]>=8){
+        gameover();
+        return false;
+        }
+      }
+      gamestate =1
+      deckHandler();
+      return false;
             break;
             case 4:
     //魔界ルール
@@ -1678,12 +1699,12 @@ function menuMap(p=0){
         .beginFill("rgba(20,20,20,0.7)")
         .drawRect(0, 0, 800, 510);
       menu_solo.addChild(rect);
-      var solo = new createjs.Bitmap("don/Don_menu1.png");
+      var solo = new createjs.Bitmap(queue.getResult(win_src[0]));
       solo.x=0;
       solo.y=0;
       solo.scale=0.5;
       menu_solo.addChild(solo);
-      e4 = new createjs.Bitmap(eltearB_src[0]);
+      e4 = new createjs.Bitmap(queue.getResult(eltearB_src[0]));
       e4.x=360;
       e4.y=10;
       e4.scale=1.4;
@@ -1771,24 +1792,34 @@ function menuMap(p=0){
       t.y=350;
       menu_solo.addChild(t);
       menu_solo_list.push(t);
-      e10 = new createjs.Bitmap(chrimg_src[chara[1]]);
+      e10 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[1]]));
       e10.sourceRect={x:400,y:0,width:350,height:510}
       e10.x=10;
       e10.y=0;
       e10.scale=1;
       menu_solo.addChild(e10);
-      menu_solo_list.push(e10);    
+      menu_solo_list.push(e10);
+      var btn1 = createButton("もどる", 148, 40);
+      btn1.x = 2;
+      btn1.y = 80;
+      menu_solo.addChild(btn1);
+      btn1.addEventListener("click", {handleEvent:Totop}); 
+      function Totop(){
+        se2.play();
+        pagestate=0;
+        Menu();
+      };
       break;
     case 1:
       //setting
       menu_setting.removeAllChildren();
       cx2.clearRect(0,0,800,600);
-      var e = new createjs.Bitmap(epic_src[0]);
+      var e = new createjs.Bitmap(queue.getResult(epic_src[0]));
       e.x=50;
       e.y=30;
       e.scale=1.1;
       menu_setting.addChild(e);
-      var e = new createjs.Bitmap(epic_src[0]);
+      var e = new createjs.Bitmap(queue.getResult(epic_src[0]));
       e.x=400;
       e.y=30;
       e.scale=1.1;
@@ -2013,12 +2044,12 @@ function menuMap(p=0){
     case 2:
       menu_main.removeAllChildren();
           cx2.clearRect(0,0,800,600);
-          var e = new createjs.Bitmap(epic_src[0]);
+          var e = new createjs.Bitmap(queue.getResult(epic_src[0]));
           e.x=50;
           e.y=50;
           e.scale=1.1;
           menu_main.addChild(e);
-          var e = new createjs.Bitmap(epic_src[0]);
+          var e = new createjs.Bitmap(queue.getResult(epic_src[0]));
           e.x=400;
           e.y=50;
           e.scale=1.1;
@@ -2046,7 +2077,7 @@ function menuMap(p=0){
           for(var i=0;i<chrimg_src.length;i++){
             var j=i%4;
             var k=Math.floor(i/4);
-            e11 = new createjs.Bitmap(chrimg_src[i]);
+            e11 = new createjs.Bitmap(queue.getResult(chrimg_src[i]));
             e11.sourceRect={x:AryX[i],y:AryY[i],width:200,height:200}
             e11.x=530+50*j;
             e11.y=400+50*k;
@@ -2061,7 +2092,7 @@ function menuMap(p=0){
           rect.y=400+50*Math.floor(chara[1]/4)
           menu_main.addChild(rect);
           menu_main_list.push(rect);
-          e10 = new createjs.Bitmap(chrimg_src[chara[1]]);
+          e10 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[1]]));
           e10.sourceRect={x:400,y:0,width:350,height:490}
           e10.x=530;
           e10.y=120;
@@ -2070,7 +2101,8 @@ function menuMap(p=0){
           menu_main_list.push(e10);
           drawbuttom(60,80,"戦績",1,130,44);
           drawbuttom(60,125,"実績リスト",0,130,44);
-          drawbuttom(60,170,"達成役一覧",0,130,44);
+          drawbuttom(60,170,"達成役1",0,130,44);
+          drawbuttom(60,215,"達成役2",0,130,44);
           cx2.font = "32px 'Century Gothic'";
           cx2.fillStyle = "rgba(0,0,0,0.8)";
           cx2.fillRect(530,90,200,40)
@@ -2130,7 +2162,8 @@ function menuMap(p=0){
           }
             drawbuttom(60,80,"戦績",0,130,44);
             drawbuttom(60,125,"実績リスト",1,130,44);
-            drawbuttom(60,170,"達成役一覧",0,130,44);
+            drawbuttom(60,170,"達成役1",0,130,44);
+            drawbuttom(60,215,"達成役2",0,130,44);
             var A=achieveA.filter(value=>value.cleared>0);
             cx2.font = "bold 20px 'Century Gothic'";
             cx2.fillStyle = "black";
@@ -2160,64 +2193,15 @@ function menuMap(p=0){
           Textlist[1].text="かっこ内は達成した回数です。"
             drawbuttom(60,80,"戦績",0,130,44);
             drawbuttom(60,125,"実績リスト",0,130,44);
-            drawbuttom(60,170,"達成役一覧",1,130,44);
-            var achieveC=achieveB.filter(value=>value.sub=="シナジー役");
-            var A=achieveC.filter(value=>value.cleared>0);
-            cx2.font = "bold 20px 'Century Gothic'";
-            cx2.fillStyle = "black";
-            cx2.fillText("シナジー "+A.length+"/"+achieveC.length,200,85) 
-            var X=200;
-            var Y=110
-            for(var i=0;i<achieveC.length; i++){
-              if(achieveC[i].cleared==0){
-                cx2.fillStyle = "#8c8c8c";
-                cx2.font = "18px 'Century Gothic'";
-                cx2.fillText(achieveC[i].name,X,Y);
-                cx2.fillText(achieveC[i].count+"/"+achieveC[i].max,X+150,Y);
-              }else{
-                cx2.fillStyle = "black"; 
-                cx2.font = "bold 18px 'Century Gothic'";
-                cx2.fillText(achieveC[i].name,X,Y);
-                cx2.font = "18px 'Century Gothic'";
-                cx2.fillText(achieveC[i].count+"/"+achieveC[i].max+" ("+achieveC[i].cleared+")",X+150,Y);
-              }
-              Y+=20;
-              if(Y>=500){
-                X+=280;
-                Y=110;
-              }
-            }
-            var achieveD=achieveB.filter(value=>value.sub=="キャラ役");
-            var B=achieveD.filter(value=>value.cleared>0);
-            cx2.font = "bold 20px 'Century Gothic'";
-            cx2.fillStyle = "black";
-            cx2.fillText("クレスト "+B.length+"/"+achieveD.length,380,85) 
-            Y+=10;
-            for(var i=0;i<achieveD.length; i++){
-              if(achieveD[i].cleared==0){
-                cx2.fillStyle = "#8c8c8c";
-                cx2.font = "18px 'Century Gothic'";
-                cx2.fillText(achieveD[i].name,X,Y);
-                cx2.fillText(" ("+achieveD[i].cleared+")",X+200,Y);
-              }else{
-                cx2.fillStyle = "black"; 
-                cx2.font = "bold 18px 'Century Gothic'";
-                cx2.fillText(achieveD[i].name,X,Y);
-                cx2.font = "18px 'Century Gothic'";
-                cx2.fillText(" ("+achieveD[i].cleared+")",X+200,Y);
-              }
-              Y+=20;
-              if(Y>=500){
-                X+=280;
-                Y=110;
-              }
-            }
+            drawbuttom(60,170,"達成役1",1,130,44);
+            drawbuttom(60,215,"達成役2",0,130,44);
             var achieveC=achieveB.filter(value=>value.sub=="アガリ形");
             var A=achieveC.filter(value=>value.cleared>0);
             cx2.font = "bold 20px 'Century Gothic'";
             cx2.fillStyle = "black";
-            cx2.fillText("一般 "+A.length+"/"+achieveC.length,560,85) 
-            Y+=10
+            cx2.fillText("一般 "+A.length+"/"+achieveC.length,200,85) 
+            var X=200;
+            var Y=110
             for(var i=0;i<achieveC.length; i++){
               if(achieveC[i].cleared==0){
                 cx2.fillStyle = "#8c8c8c";
@@ -2237,6 +2221,66 @@ function menuMap(p=0){
               }
             }
           break;
+          case 3:
+            //達成役一覧
+            Textlist[0].text="達成役一覧です。";
+            Textlist[1].text="かっこ内は達成した回数です。"
+              drawbuttom(60,80,"戦績",0,130,44);
+              drawbuttom(60,125,"実績リスト",0,130,44);
+              drawbuttom(60,170,"達成役1",0,130,44);
+              drawbuttom(60,215,"達成役2",1,130,44);
+              var achieveC=achieveB.filter(value=>value.sub=="シナジー役");
+              var A=achieveC.filter(value=>value.cleared>0);
+              cx2.font = "bold 20px 'Century Gothic'";
+              cx2.fillStyle = "black";
+              cx2.fillText("シナジー "+A.length+"/"+achieveC.length,200,85) 
+              var X=200;
+              var Y=110
+              for(var i=0;i<achieveC.length; i++){
+                if(achieveC[i].cleared==0){
+                  cx2.fillStyle = "#8c8c8c";
+                  cx2.font = "18px 'Century Gothic'";
+                  cx2.fillText(achieveC[i].name,X,Y);
+                  cx2.fillText(achieveC[i].count+"/"+achieveC[i].max,X+150,Y);
+                }else{
+                  cx2.fillStyle = "black"; 
+                  cx2.font = "bold 18px 'Century Gothic'";
+                  cx2.fillText(achieveC[i].name,X,Y);
+                  cx2.font = "18px 'Century Gothic'";
+                  cx2.fillText(achieveC[i].count+"/"+achieveC[i].max+" ("+achieveC[i].cleared+")",X+150,Y);
+                }
+                Y+=20;
+                if(Y>=500){
+                  X+=280;
+                  Y=110;
+                }
+              }
+              var achieveD=achieveB.filter(value=>value.sub=="キャラ役");
+              var B=achieveD.filter(value=>value.cleared>0);
+              cx2.font = "bold 20px 'Century Gothic'";
+              cx2.fillStyle = "black";
+              cx2.fillText("属性ペア "+B.length+"/"+achieveD.length,380,85) 
+              Y+=10;
+              for(var i=0;i<achieveD.length; i++){
+                if(achieveD[i].cleared==0){
+                  cx2.fillStyle = "#8c8c8c";
+                  cx2.font = "18px 'Century Gothic'";
+                  cx2.fillText(achieveD[i].name,X,Y);
+                  cx2.fillText(" ("+achieveD[i].cleared+")",X+200,Y);
+                }else{
+                  cx2.fillStyle = "black"; 
+                  cx2.font = "bold 18px 'Century Gothic'";
+                  cx2.fillText(achieveD[i].name,X,Y);
+                  cx2.font = "18px 'Century Gothic'";
+                  cx2.fillText(" ("+achieveD[i].cleared+")",X+200,Y);
+                }
+                Y+=20;
+                if(Y>=500){
+                  X+=280;
+                  Y=110;
+                }
+              }
+            break;
       }
       var Cb=canvas2.toDataURL();
       Cbb = new createjs.Bitmap(Cb);
@@ -2245,12 +2289,12 @@ function menuMap(p=0){
     case 3:
     //プレイガイド
     menu_guide.removeAllChildren();
-    var e = new createjs.Bitmap(epic_src[0]);
+    var e = new createjs.Bitmap(queue.getResult(epic_src[0]));
     e.x=50;
     e.y=50;
     e.scale=1.1;
     menu_guide.addChild(e);
-    var e = new createjs.Bitmap(epic_src[0]);
+    var e = new createjs.Bitmap(queue.getResult(epic_src[0]));
     e.x=400;
     e.y=50;
     e.scale=1.1;
@@ -2263,7 +2307,7 @@ function menuMap(p=0){
     option_bt5.addEventListener("click", {card:-1,handleEvent:HowtoBt});
     switch(msgstate){
       case 0:
-        var e = new createjs.Bitmap(epic_src[5]);
+        var e = new createjs.Bitmap(queue.getResult(epic_src[5]));
         e.x=270;
         e.y=100;
         menu_guide.addChild(e)
@@ -2328,7 +2372,7 @@ function menuMap(p=0){
         btn1.addEventListener("click", {card:0,handleEvent:HowtoBt});
         Textlist[0].text="画面の見方です。";
         Textlist[1].text="（カーソルを当ててみてください）"
-        var e = new createjs.Bitmap(epic_src[1]);
+        var e = new createjs.Bitmap(queue.getResult(epic_src[1]));
         e.x=90;
         e.y=55;
         menu_guide.addChild(e)
@@ -2342,7 +2386,7 @@ function menuMap(p=0){
           btn1.addEventListener("click", {card:0,handleEvent:HowtoBt});
           Textlist[0].text="3ペアは最も基本的な役です。";
           Textlist[1].text="同じキャラ3枚を1組として、3組を揃える役です。"
-          var e = new createjs.Bitmap(epic_src[2]);
+          var e = new createjs.Bitmap(queue.getResult(epic_src[2]));
           e.sourceRect={x:0,y:0,width:600,height:128};
           e.x=90;
           e.y=125;
@@ -2392,7 +2436,7 @@ function menuMap(p=0){
             btn1.addEventListener("click", {card:0,handleEvent:HowtoBt});
             Textlist[0].text="ライン通貫は、同じラインのキャラを9枚揃える役です。";
             Textlist[1].text="シナジーでの高得点が狙いやすいかもしれません。"
-            var e = new createjs.Bitmap(epic_src[2]);
+            var e = new createjs.Bitmap(queue.getResult(epic_src[2]));
             e.sourceRect={x:0,y:0,width:600,height:128};
             e.x=90;
             e.y=125;
@@ -2437,21 +2481,16 @@ function menuMap(p=0){
               btn1.addEventListener("click", {card:0,handleEvent:HowtoBt});
               Textlist[0].text="3ペア・ライン通貫の他に特殊な役として";
               Textlist[1].text="国士無双とクレストシリーズがあります。";
-              var e = new createjs.Bitmap(epic_src[2]);
-              e.sourceRect={x:0,y:270,width:600,height:128};
+              var e = new createjs.Bitmap(queue.getResult(epic_src[4]));
+              e.scale=600/650;
               e.x=90;
-              e.y=125;
+              e.y=120;
               menu_guide.addChild(e)
               var t = new createjs.Text("特殊な役-国士無双とクレストシリーズ", "26px 'Century Gothic'", "black");
               t.x=90;
               t.y=90;
               menu_guide.addChild(t);
-              var Y=280;
-              var t = new createjs.Text("3ペア・ライン通貫の他にも特殊な役があります。", "22px 'Century Gothic'", "black");
-              t.x=90;
-              t.y=Y;
-              Y+=30;
-              menu_guide.addChild(t);
+              var Y=400;
               var t = new createjs.Text("「国士無双」は、「マスターロード」のパイを", "22px 'Century Gothic'", "black");
               t.x=90;
               t.y=Y;
@@ -2462,12 +2501,12 @@ function menuMap(p=0){
               t.y=Y;
               Y+=30;
               menu_guide.addChild(t);
-              var t = new createjs.Text("「クレスト」シリーズは、属性（パイに描かれたマーク）が", "22px 'Century Gothic'", "black");
+              var t = new createjs.Text("「クレスト」シリーズは、マスターロードのパイを含み", "22px 'Century Gothic'", "black");
               t.x=90;
               t.y=Y;
               Y+=30;
               menu_guide.addChild(t);
-              var t = new createjs.Text("同じパイを9枚揃えることで成立します。", "22px 'Century Gothic'", "black");
+              var t = new createjs.Text("属性マークが同じパイを9枚揃えることで成立します。", "22px 'Century Gothic'", "black");
               t.x=90;
               t.y=Y;
               Y+=30;
@@ -2498,7 +2537,7 @@ function menuMap(p=0){
                   btn1.addEventListener("click", {card:0,handleEvent:HowtoBt});
                   Textlist[0].text="1つ前のプレイヤーが捨てたパイと同じキャラのパイが";
                   Textlist[1].text="手元に2枚以上ある時、捨てパイを貰うことができます。"
-                  var e = new createjs.Bitmap(epic_src[3]);
+                  var e = new createjs.Bitmap(queue.getResult(epic_src[3]));
                   e.sourceRect={x:50,y:0,width:500,height:526};
                   e.x=365;
                   e.y=55;
@@ -2634,7 +2673,7 @@ function menuMap(p=0){
                       btn1.addEventListener("click", {card:0,handleEvent:HowtoBt});
                       Textlist[0].text="MPを消費してマナブレイクすることができます。";
                       Textlist[1].text="ここぞという時に使いましょう。"
-                      var e = new createjs.Bitmap(epic_src[6]);
+                      var e = new createjs.Bitmap(queue.getResult(epic_src[6]));
                       e.x=350;
                       e.y=120;
                       e.scale=0.66;
@@ -2724,12 +2763,12 @@ menu_duel.removeAllChildren();
 switch(msgstate){
   case 0:
 //ルーム入口
-var e = new createjs.Bitmap(epic_src[0]);
+var e = new createjs.Bitmap(queue.getResult(epic_src[0]));
 e.x=50;
 e.y=50;
 e.scale=1.1;
 menu_duel.addChild(e);
-var e = new createjs.Bitmap(epic_src[0]);
+var e = new createjs.Bitmap(queue.getResult(epic_src[0]));
 e.x=400;
 e.y=50;
 e.scale=1.1;
@@ -2912,17 +2951,17 @@ function NameChange(){
     shape.graphics.drawRect(300, 200, 220, 250);
     shape.alpha=0.7;
     Configmap.addChild(shape);
-    var option_bt2 = new createjs.Bitmap('don/soL_option_bt2.png');
+    var option_bt2 = new createjs.Bitmap(queue.getResult('don/soL_option_bt2.png'));
     option_bt2.x=310;
     option_bt2.y=280;
     option_bt2.scale=1.2;
     Configmap.addChild(option_bt2)
-    var option_bt3 = new createjs.Bitmap('don/soL_option_bt3.png');
+    var option_bt3 = new createjs.Bitmap(queue.getResult('don/soL_option_bt3.png'));
     option_bt3.x=310;
     option_bt3.y=330;
     option_bt3.scale=1.2;
     Configmap.addChild(option_bt3)
-    var option_bt4 = new createjs.Bitmap('don/soL_option_bt4.png');
+    var option_bt4 = new createjs.Bitmap(queue.getResult('don/soL_option_bt4.png'));
     option_bt4.x=310;
     option_bt4.y=380;
     option_bt4.scale=1.2;
@@ -3157,8 +3196,8 @@ function NameChange(){
       AK("ドカーン！")
     }
     //画像ID
-    e4 = new createjs.Bitmap(eltearB_src[0]);
-    e10 = new createjs.Bitmap(chrimg_src[chara[1]]);
+    e4 = new createjs.Bitmap(queue.getResult(eltearB_src[0]));
+    e10 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[1]]));
     //bitmap
     textmap.alpha=1;
     field.removeAllChildren();
@@ -3174,20 +3213,20 @@ function NameChange(){
     .drawRect(410, 210, 350, 240);
     field.addChild(rect);
       if(chara[1]==1){
-        e10.sourceRect={x:500,y:120,width:215,height:215}
+        e10.sourceRect={x:500,y:120,width:300,height:215}
       }else{
-        e10.sourceRect={x:500,y:50,width:215,height:215}
+        e10.sourceRect={x:500,y:50,width:300,height:215}
       }
     e10.x=40;
     e10.y=95;
     e10.scale=0.6;
     field.addChild(e10);
     var t = new createjs.Text(Username, "24px 'Century Gothic'", "white");
-    t.x=192;
+    t.x=232;
     t.y=175;
     field.addChild(t);
     var t = new createjs.Text(Usercrest, "14px 'Century Gothic'", "white");
-    t.x=182;
+    t.x=222;
     t.y=155;
     field.addChild(t);
     var t = new createjs.Text("戦 ★ 績", "28px 'Century Gothic'", "#ffffff");
@@ -3195,22 +3234,22 @@ function NameChange(){
     t.y=215;
     t.textAlign = "center";
     field.addChild(t);
-    var solo = new createjs.Bitmap("don/Don_menu1.png");
+    var solo = new createjs.Bitmap(queue.getResult(win_src[0]));
     solo.x=40;
     solo.y=210;
     solo.scale=0.6;
     field.addChild(solo);
-    var multi = new createjs.Bitmap("don/Don_menu2.png");
+    var multi = new createjs.Bitmap(queue.getResult(win_src[1]));
     multi.x=220;
     multi.y=210;
     multi.scale=0.6;
     field.addChild(multi);
-    var howto = new createjs.Bitmap("don/Don_menu3.png");
+    var howto = new createjs.Bitmap(queue.getResult(win_src[2]));
     howto.x=40;
     howto.y=300;
     howto.scale=0.6;
     field.addChild(howto);
-    var setting = new createjs.Bitmap("don/Don_menu4.png");
+    var setting = new createjs.Bitmap(queue.getResult(win_src[3]));
     setting.x=220;
     setting.y=300;
     setting.scale=0.6;
@@ -3249,13 +3288,7 @@ function NameChange(){
     menuMap();
     break;
         case 3:
-          //フリバからのキャンセルボタン
-          console.log('2439!')
-          if(mouseX >80 && mouseX <380 && mouseY >80 && mouseY <480){
-            se2.play();
-            pagestate=0;
-            Menu();
-          }
+          //フリバ
           if(mouseX >510 && mouseX <560 && mouseY >80 && mouseY <110){
           se3.play();
           if(LP[0]==0){LP[0]=LPlist.length-1}else{LP[0]-=1}
@@ -3272,7 +3305,7 @@ function NameChange(){
             menu_solo_list[2].text="◀ "+chrlist[chara[1]]
             menu_solo.removeChild(menu_solo_list[menu_solo_list.length-1]);
             menu_solo_list.pop();
-            e10 = new createjs.Bitmap(chrimg_src[chara[1]]);
+            e10 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[1]]));
             e10.sourceRect={x:400,y:0,width:350,height:510}
             e10.x=10;
             e10.y=0;
@@ -3286,7 +3319,7 @@ function NameChange(){
             menu_solo_list[2].text="◀ "+chrlist[chara[1]]
             menu_solo.removeChild(menu_solo_list[menu_solo_list.length-1]);
             menu_solo_list.pop();
-            e10 = new createjs.Bitmap(chrimg_src[chara[1]]);
+            e10 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[1]]));
             e10.sourceRect={x:400,y:0,width:350,height:510}
             e10.x=10;
             e10.y=0;
@@ -3322,14 +3355,14 @@ function NameChange(){
             if(chara[0]==1){
             se3.play();
             if(chara[3]==chrlist.length-1){chara[3]=0}else{chara[3]+=1}
-            menu_solo_list[4].text="◀ "+chrlist[chara[3]]
+            menu_solo_list[5].text="◀ "+chrlist[chara[3]]
             }
             }
           if(mouseX >670 && mouseX <705 && mouseY >310 && mouseY <340){
             if(chara[0]==1){
             se3.play();
             if(chara[4]==chrlist.length-1){chara[4]=0}else{chara[4]+=1}
-            menu_solo_list[5].text="◀ "+chrlist[chara[4]]
+            menu_solo_list[7].text="◀ "+chrlist[chara[4]]
             }
             }
             if(mouseX >510 && mouseX <560 && mouseY >230 && mouseY <260){
@@ -3343,14 +3376,14 @@ function NameChange(){
               if(chara[0]==1){
               se3.play();
               if(chara[3]==0){chara[3]=chrlist.length-1}else{chara[3]-=1}
-              menu_solo_list[4].text="◀ "+chrlist[chara[3]]
+              menu_solo_list[5].text="◀ "+chrlist[chara[3]]
               }
               }
             if(mouseX >510 && mouseX <560 && mouseY >310 && mouseY <340){
               if(chara[0]==1){
               se3.play();
               if(chara[4]==0){chara[4]=chrlist.length-1}else{chara[4]-=1}
-              menu_solo_list[5].text="◀ "+chrlist[chara[4]]
+              menu_solo_list[7].text="◀ "+chrlist[chara[4]]
               }
               }
         corsor();
@@ -3544,168 +3577,47 @@ function NameChange(){
               se4.play();
               }
             }
+            if(mouseX >60 && mouseX <190 && mouseY >215 && mouseY <260){
+              if(msgstate!==3 && msgstate !==-1){
+              msgstate=3;
+              se4.play();
+              }
+            }
             switch(msgstate){
               case 0:
-                  if(mouseX >530 && mouseX <730 && mouseY >400 && mouseY <450){
-                    se3.play();
-                    chara[1]=Math.floor((mouseX-530)/50);
-                    menu_main.removeChild(menu_main_list[menu_main_list.length-1])
-                    menu_main_list.pop();
-                    e10 = new createjs.Bitmap(chrimg_src[chara[1]]);
-                    e10.sourceRect={x:400,y:0,width:350,height:525}
-                    e10.x=530;
-                    e10.y=120;
-                    e10.scale=1/2;
-                    menu_main.addChild(e10);
-                    menu_main_list.push(e10);
-                    menu_main_list[0].x=530+50*(chara[1]%4)
-                    menu_main_list[0].y=400+50*Math.floor(chara[1]/4)
-                  }
-                  if(mouseX >530 && mouseX <630 && mouseY >450 && mouseY <500){
-                    se3.play();
-                    chara[1]=4+Math.floor((mouseX-530)/50);
-                    menu_main.removeChild(menu_main_list[menu_main_list.length-1])
-                    menu_main_list.pop();
-                    e10 = new createjs.Bitmap(chrimg_src[chara[1]]);
-                    e10.sourceRect={x:400,y:0,width:350,height:525}
-                    e10.x=530;
-                    e10.y=120;
-                    e10.scale=1/2;
-                    menu_main.addChild(e10);
-                    menu_main_list.push(e10);
-                    menu_main_list[0].x=530+50*(chara[1]%4)
-                    menu_main_list[0].y=400+50*Math.floor(chara[1]/4)
-                  };
-                break;
-              case 1:
-                if(mouseX >195 && mouseX <380 && mouseY >95 && mouseY <495){
-                  var I=Math.floor((mouseY-95)/20);
-                  cx3.strokeRect(190,92+I*20,240,20);
-                  if(achieveA[I].cleared>0 && Usercrest!==achieveA[I].name){
-                    se3.play();
+                if(mouseX >530 && mouseX <730 && mouseY >400 && mouseY <450){
+                  se3.play();
+                  chara[1]=Math.floor((mouseX-530)/50);
+                }
+                if(mouseX >530 && mouseX <630 && mouseY >450 && mouseY <500){
+                  se3.play();
+                  chara[1]=4+Math.floor((mouseX-530)/50);
+                }
+              break;
+            case 1:
+              if(mouseX >195 && mouseX <380 && mouseY >95 && mouseY <495){
+                var I=Math.floor((mouseY-95)/20);
+                cx3.strokeRect(190,92+I*20,240,20);
+                if(achieveA[I].cleared>0 && Usercrest!==achieveA[I].name){
+                  se3.play();
+                  Usercrest=achieveA[I].name;
+                }else{
+                  Usercrest="称号なし";
+                };
+              }
+              if(mouseX >475 && mouseX <660 && mouseY >95 && mouseY <495){
+                var I=Math.floor((mouseY-95)/20)+20;
+                if(I>=achieveA.length){
+                  return false;
+                }
+                if(achieveA[I].cleared>0 && Usercrest!==achieveA[I].name){
+                  se3.play();
                     Usercrest=achieveA[I].name;
                   }else{
                     Usercrest="称号なし";
                   };
                 }
-                if(mouseX >475 && mouseX <660 && mouseY >95 && mouseY <495){
-                  var I=Math.floor((mouseY-95)/20)+20;
-                  if(I>=achieveA.length){
-                    return false;
-                  }
-                  if(achieveA[I].cleared>0 && Usercrest!==achieveA[I].name){
-                    se3.play();
-                      Usercrest=achieveA[I].name;
-                    }else{
-                      Usercrest="称号なし";
-                    };
-                  }
-                break;
-              case 2:
-                cx2.clearRect(190,60,550,440)
-                  drawbuttom(60,80,"戦績",0,130,44);
-                  drawbuttom(60,125,"実績リスト",0,130,44);
-                  drawbuttom(60,170,"達成役一覧",1,130,44);
-                  cx2.font = "32px 'Century Gothic'";
-                  cx2.fillStyle = "black";
-                  cx2.fillText("　×",680,80)
-                  var achieveC=achieveB.filter(value=>value.sub=="シナジー役");
-                  var A=achieveC.filter(value=>value.cleared>0);
-                  cx2.font = "bold 20px 'Century Gothic'";
-                  cx2.fillStyle = "black";
-                  cx2.fillText("シナジー "+A.length+"/"+achieveC.length,200,85) 
-                  var X=200;
-                  var Y=110
-                  for(var i=0;i<achieveC.length; i++){
-                    if(achieveC[i].cleared==0){
-                      cx2.fillStyle = "#8c8c8c";
-                      cx2.font = "18px 'Century Gothic'";
-                      cx2.fillText(achieveC[i].name,X,Y);
-                      cx2.fillText(achieveC[i].count+"/"+achieveC[i].max,X+150,Y);
-                    }else{
-                      cx2.fillStyle = "black"; 
-                      cx2.font = "bold 18px 'Century Gothic'";
-                      cx2.fillText(achieveC[i].name,X,Y);
-                      cx2.font = "18px 'Century Gothic'";
-                      cx2.fillText(achieveC[i].count+"/"+achieveC[i].max+" ("+achieveC[i].cleared+")",X+150,Y);
-                    }
-                    Y+=20;
-                    if(Y>=500){
-                      X+=280;
-                      Y=110;
-                    }
-                  }
-                  var achieveD=achieveB.filter(value=>value.sub=="キャラ役");
-                  var B=achieveD.filter(value=>value.cleared>0);
-                  cx2.font = "bold 20px 'Century Gothic'";
-                  cx2.fillStyle = "black";
-                  cx2.fillText("クレスト "+B.length+"/"+achieveD.length,380,85) 
-                  Y+=10;
-                  for(var i=0;i<achieveD.length; i++){
-                    if(achieveD[i].cleared==0){
-                      cx2.fillStyle = "#8c8c8c";
-                      cx2.font = "18px 'Century Gothic'";
-                      cx2.fillText(achieveD[i].name,X,Y);
-                      cx2.fillText(" ("+achieveD[i].cleared+")",X+200,Y);
-                    }else{
-                      cx2.fillStyle = "black"; 
-                      cx2.font = "bold 18px 'Century Gothic'";
-                      cx2.fillText(achieveD[i].name,X,Y);
-                      cx2.font = "18px 'Century Gothic'";
-                      cx2.fillText(" ("+achieveD[i].cleared+")",X+200,Y);
-                    }
-                    Y+=20;
-                    if(Y>=500){
-                      X+=280;
-                      Y=110;
-                    }
-                  }
-                  var achieveC=achieveB.filter(value=>value.sub=="アガリ形");
-                  var A=achieveC.filter(value=>value.cleared>0);
-                  cx2.font = "bold 20px 'Century Gothic'";
-                  cx2.fillStyle = "black";
-                  cx2.fillText("一般 "+A.length+"/"+achieveC.length,560,85) 
-                  Y+=10
-                  for(var i=0;i<achieveC.length; i++){
-                    if(achieveC[i].cleared==0){
-                      cx2.fillStyle = "#8c8c8c";
-                      cx2.font = "18px 'Century Gothic'";
-                      cx2.fillText(achieveC[i].name,X,Y);
-                      cx2.fillText(" ("+achieveC[i].cleared+")",X+200,Y);
-                    }else{
-                      cx2.fillStyle = "black"; 
-                      cx2.font = "bold 18px 'Century Gothic'";
-                      cx2.fillText(achieveC[i].name,X,Y);
-                      cx2.font = "18px 'Century Gothic'";
-                      cx2.fillText(" ("+achieveC[i].cleared+")",X+200,Y);
-                    }
-                    Y+=20;
-                    if(Y>=500){
-                      break;
-                    }
-                  }
-                break;
-                default:
-                epic.src=epic_src[0]
-                epic.onload=function(){
-                  cx1.fillStyle = "rgba(20,20,20,0.7)";
-                  cx2.clearRect(0,0,800,510)
-                  cx1.fillRect(0,0,800,510)
-                  cx1.drawImage(epic,50,50,350,460)
-                  cx1.drawImage(epic,400,50,350,460)
-                  drawbuttom(60,80,"戦績",0,130,44);
-                  drawbuttom(60,125,"実績リスト",0,130,44);
-                  drawbuttom(60,170,"達成役一覧",0,130,44);
-                cx2.font = "32px 'Century Gothic'";
-                cx2.fillStyle = "black";
-                cx2.fillText("　×",680,80)
-                cx2.clearRect(80,530,670,70)
-                cx2.font = "18px Arial";
-                cx2.fillText("今までの対局の記録です。", 80, 550);
-                msgstate=0;
-                Menu();
-                      }
-                  break;
+              break;
             }
             menuMap(2);
             break;
@@ -4064,8 +3976,12 @@ function NameChange(){
               t.y=480;
               menu_duel.addChild(t);
             }}
-            var e = new createjs.Bitmap(chrimg_src[data.list[i].chr]);
+            var e = new createjs.Bitmap(queue.getResult(chrimg_src[data.list[i].chr]));
+            if(data.list[i].chr==5){
+            e.sourceRect={x:460,y:0,width:300,height:600};              
+            }else{
             e.sourceRect={x:400,y:0,width:300,height:600};
+            }
             e.scale=1/2;
             e.x=9+150*i
             e.y=100;
@@ -4347,6 +4263,11 @@ if(opLock==0 && gamestate ==1){
   function compareFunc2(a,b){return(a.elia - b.elia);}  
   function compareFunc3(a,b){
     if(a>=68){return 3}else{return a%4-b%4;}}
+  function compareFunc4(a,b){
+    if (a.elia === b.elia) {
+      return a.nod - b.nod;
+    }
+    return a.elia - b.elia;}  
   function getIsDuplicate(arr1, arr2) {
     return [...arr1, ...arr2].filter(item => arr1.includes(item) && arr2.includes(item)).length > 0
   };
@@ -4431,7 +4352,7 @@ if(opLock==0 && gamestate ==1){
         var t = new createjs.Text("第"+(skillusage2[0])+"局 "+(skillusage2[5])+"本場", "24px 'Century Gothic'", "white");
         t.x=10;
         t.y=68;
-        if(LP[0]>=0 && LP[0] <=1 && skillusage2[0]==8){
+        if(LP[0]>=0 && LP[0]!==3 && skillusage2[0]==8){
           t.text="オーラス"+(skillusage2[5]);
           auras=1;
           Dlvup.alpha=0;
@@ -4456,7 +4377,10 @@ if(opLock==0 && gamestate ==1){
           musicStart(musicnum);
         }else if(auras==1 && musicset[2]!==musicnum){
           if(musicset[2]==0){
+            //曲の抽選は最初だけ
+            if(skillusage2[5]==0){
             musicnum=musicrandom[2][Math.floor(Math.random()*musicrandom[2].length)];
+            }
           }else{
             musicnum=musicset[2]
           }
@@ -4485,22 +4409,22 @@ if(opLock==0 && gamestate ==1){
       field.addChild(t);
       };
         parentY =400
-        e11 = new createjs.Bitmap(chrimg_src[chara[1]]);
+        e11 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[1]]));
         e11.sourceRect={x:500,y:0,width:300,height:600}
         e11.x=0;
         e11.y=400;
         e11.scale=1/3;
-        e12 = new createjs.Bitmap(chrimg_src[chara[2]]);
+        e12 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[2]]));
         e12.sourceRect={x:500,y:0,width:300,height:300}
         e12.x=0;
         e12.y=100;
         e12.scale=1/3;
-        e13 = new createjs.Bitmap(chrimg_src[chara[3]]);
+        e13 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[3]]));
         e13.sourceRect={x:500,y:0,width:300,height:300}
         e13.x=0;
         e13.y=200;
         e13.scale=1/3;
-        e14 = new createjs.Bitmap(chrimg_src[chara[4]]);
+        e14 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[4]]));
         e14.sourceRect={x:500,y:0,width:300,height:300}
         e14.x=0;
         e14.y=300;
@@ -4509,17 +4433,16 @@ if(opLock==0 && gamestate ==1){
         field.addChild(e12);
         field.addChild(e13);
         field.addChild(e14);
-        //
         for(var i=1; i<skillswitch.length;i++){
           skillswitch[i]=1;
           }
           skillusage=new Array(0,0,0,0,0)
-        if(pvpmode==1){
-          if(LP_PVP.Rule[0]==2){
+          if(LP[0]==2){
             for(var i=1; i<5 ; i++){//復活
               if(LP[i]<0){
               skillusage2[i]-=1;
               if(skillusage2[i] <=-1){
+                console.log('revived!');
                 LP[i]=75000;
                 for (var I=0;I<4;I++){
                   if(I!==i){
@@ -4528,17 +4451,7 @@ if(opLock==0 && gamestate ==1){
                   }
                 }
               }}
-          }}
-        }else{
-        if(LP[0]==2){
-        for(var i=1; i<5 ; i++){//復活
-          if(LP[i]<0){
-          skillusage2[i]-=1;
-          if(skillusage2[i] <=-1){
-            LP[i]=75000;
-          }}
-            }}
-        };
+          }};
         LPtextlist=[];//HPテキスト
         parentY =450;
         var t = new createjs.Text(LP[1], "16px 'Century Gothic'", "#eb5600");
@@ -4778,7 +4691,7 @@ if(opLock==0 && gamestate ==1){
         for(var i =0; i<70; i++){
         deck.push(i);
         }
-        deck.push(0,4,9,13,17,20,24,28,32,37,42,45,49,52,56);
+        //deck.push(0,4,9,13,17,20,24,28,32,37,42,45,49,52,56);
         deck.push(60,61,62,63,64,65,66,67);
         if(debugmode){console.log(deck.length);}
         //expected84->93
@@ -4853,7 +4766,8 @@ if(opLock==0 && gamestate ==1){
         hand3.sort(compareFunc);
         hand4.sort(compareFunc);
         //積み込み
-        //if(debugmode){hand1=[60,61,62,63,64,66,67,69]};
+        //if(debugmode){hand1=[60,61,62,63,64,66,67,68]};
+        //if(debugmode){hand1=[0,1,2,3,24,26,27,28]};
         //1番目の配列は上がり判定に使用
         hand1.unshift(-1)
         hand2.unshift(-1)
@@ -5424,7 +5338,6 @@ if(opLock==0 && gamestate ==1){
             }
           }
           }
-          //
             if(Pon(2)){
               if(pvpmode==1){
                 if(MEMBER[1].pc==1){
@@ -5859,12 +5772,13 @@ if(opLock==0 && gamestate ==1){
     shapeMask.scaleY=0.1;
     shapeMask.y=B;
     Container.mask = shapeMask;
-    var C = new createjs.Bitmap(chrimg_src[chara[p]]);
-    C.x=-400;
+    var C = new createjs.Bitmap(queue.getResult(chrimg_src[chara[p]]));
+    C.x=-480;
     C.y=B-200;
+    if(chara[p]==5){C.y+=60};
     Container.addChild(C);
     createjs.Tween.get(C)
-    .to({x:-460},60);
+    .to({x:-560},60);
     MBicon.x=160;
     MBicon.y=B-50;
     Container.addChild(MBicon);
@@ -5983,7 +5897,7 @@ if(opLock==0 && gamestate ==1){
         ReachAnimation(player);
         //イヴ様
         for(var i=1;i<5;i++){
-          if(i!==player && chara[i]==5 && skillusage[i]==0){
+          if(pvpmode==0 && i!==player && chara[i]==5 && skillusage[i]==0){
             skillusage[i]=player;
           }
       }}else{//通常
@@ -6129,7 +6043,7 @@ if(opLock==0 && gamestate ==1){
     console.log('Setup',pvp);//socketで飛ばすとなんか3回くらい呼び出される
     navisw=0;
     DP=new Array(0,0,0,0,0);
-    if(debugmode){DP[1]=20};
+    if(debugmode){DP[1]=20;DP[2]=20;DP[3]=20;DP[4]=20};
     skillusage2=new Array(0,-1,-1,-1,-1,0)
     death=[
       {kill:0,assist:0,death:0,Admg:[0,0,0,0],Bdmg:[0,0,0,0]},
@@ -6152,7 +6066,7 @@ if(opLock==0 && gamestate ==1){
         mode=1;
         break;
       case 2:
-        for(var i=1;i<LP.length;i++){LP[i]=100000}
+        for(var i=1;i<LP.length;i++){LP[i]=75000}
         mode=1;
         break;
       case 4:
@@ -6163,7 +6077,11 @@ if(opLock==0 && gamestate ==1){
       }
     }
     if(pvp==1){
-      if(LP_PVP.Rule[0]==3){LP[0]=4}else{
+      if(LP_PVP.Rule[0]==3){
+        LP[0]=4;
+      }else if(LP_PVP.Rule[0]==2){
+        LP[0]=2;
+      }else{
         LP[0]=0;
       };
       switch(LP_PVP.LP[0]){
@@ -7624,7 +7542,7 @@ if(opLock==0 && gamestate ==1){
       var ponf=0
       if(player ==1){
         handtemp = hand1.concat();
-        var T=handtemp.splice(9,1);
+        var T=handtemp.splice(handtemp.length-1,1);
         handtemp=handtemp.concat(pon1);
         handtemp=handtemp.concat(kan1);
         handtemp.sort(compareFunc);
@@ -7678,6 +7596,9 @@ if(opLock==0 && gamestate ==1){
       }
       if(Astyle=="国士無双"){
         han[player]+=12;
+      }
+      if(Astyle=="クレストオブガイア" || Astyle=="クレストオブソーレス" || Astyle=="クレストオブロッソ"||Astyle=="クレストオブデニフ"||Astyle=="クレストオブハルニエ"||Astyle=="クレストオブアドリアン"||Astyle=="クレストオブベントス"){
+        han[player]+=6;
       }
       if(num==0 && ponsw[player] ==0){han[player] +=1}//門前ツモ
       if(nuki[0]>0){han[player]+=1}//嶺上
@@ -7746,7 +7667,11 @@ if(opLock==0 && gamestate ==1){
         }
         if(Astyle=="国士無双"){
           Resultary.push('国士無双 12翻')
-          PB("国士無双");
+          PB(Astyle);
+        }
+        if(Astyle=="クレストオブガイア" || Astyle=="クレストオブソーレス" || Astyle=="クレストオブロッソ"||Astyle=="クレストオブデニフ"||Astyle=="クレストオブハルニエ"||Astyle=="クレストオブアドリアン"||Astyle=="クレストオブベントス"){
+          Resultary.push(Astyle+' 6翻')
+          PB(Astyle);
         }
       if(nuki[0]>0){
         if(num==0){
@@ -7810,7 +7735,7 @@ if(opLock==0 && gamestate ==1){
       //描画 魔界モード以外の時はResultmapで描画
       if(LP[0]==4){
         //従来通りツモ画面の描画のみ
-        e15 = new createjs.Bitmap(chrimg_src[chara[player]]);
+        e15 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[player]]));
         e15.sourceRect={x:10,y:10,width:780,height:400};
         e15.x=10+raidscore[1]*800;
         e15.y=100;
@@ -7821,9 +7746,9 @@ if(opLock==0 && gamestate ==1){
       e.y=230;
       fieldmap.addChild(e);
       if(num==0){
-        e16 = new createjs.Bitmap(win_src[4]);
+        e16 = new createjs.Bitmap(queue.getResult(win_src[4]));
       }else{
-        e16 = new createjs.Bitmap(win_src[5]);
+        e16 = new createjs.Bitmap(queue.getResult(win_src[5]));
       }
       e16.scale=0.7;
       e16.x=raidscore[1]*800;
@@ -7974,7 +7899,7 @@ if(opLock==0 && gamestate ==1){
       guidemap.alpha=0;
       cx2.clearRect(0,0,800,600);
       handmap.removeAllChildren();
-      e15 = new createjs.Bitmap(chrimg_src[chara[player]]);
+      e15 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[player]]));
       e15.sourceRect={x:10,y:10,width:780,height:400};
       e15.x=10+raidscore[1]*800;
       e15.y=100;
@@ -7986,9 +7911,9 @@ if(opLock==0 && gamestate ==1){
      e.y=180;
      field.addChild(e);
      if(num==0){
-       e16 = new createjs.Bitmap(win_src[4]);
+       e16 = new createjs.Bitmap(queue.getResult(win_src[4]));
      }else{
-       e16 = new createjs.Bitmap(win_src[5]);
+       e16 = new createjs.Bitmap(queue.getResult(win_src[5]));
      }
      e16.scale=0.7;
      e16.x=0;
@@ -8174,7 +8099,7 @@ if(opLock==0 && gamestate ==1){
     function Score(player){
       //符　tumoronで一部出してる
       //オールマイティ1枚につき-10
-      var All=handtemp.filter(value=>value==43 || value==44)
+      var All=handtemp.filter(value=>value==69 || value==70)
       //console.log(All.length);
       fu-=10*(All.length)
       var Wind=Buff[player].filter(value=>value==3);
@@ -8214,7 +8139,7 @@ if(opLock==0 && gamestate ==1){
       if(LP[0] !==3){
       LPtemp=[0,0,0,0,0]
       if(num >0){//ロン
-        if(pvpmode==0 ||(pvpmode==1 && LP_PVP.Rule[0]!==2)){
+        if(LP[0]!==2){
         LPtemp[player]=score;
       }
         var MS=Buff[num].filter(value=>value==2);
@@ -8223,7 +8148,7 @@ if(opLock==0 && gamestate ==1){
         }else{
       LPtemp[num]=-score
         }
-      if(LP_PVP.Rule[0]==2){
+      if(LP[0]==2){
         death[player-1].Admg[num-1]+=score;
         death[num-1].Bdmg[player-1]+=score;
       }
@@ -8232,7 +8157,7 @@ if(opLock==0 && gamestate ==1){
       if(player==parentS){//おやつも
       for(var i=1;i<LP.length;i++){
       if(i==player){
-        if(pvpmode==0 ||(pvpmode==1 && LP_PVP.Rule[0]!==2)){
+        if(LP[0]!==2){
           LPtemp[i]=score;
         }
       }else{
@@ -8242,23 +8167,22 @@ if(opLock==0 && gamestate ==1){
         }else{
           LPtemp[i]=-score/3;
         }
-        if(LP_PVP.Rule[0]==2){
+        if(LP[0]==2){
           death[i-1].Bdmg[player-1]+=score/3;
         }
       }
-      if(LP_PVP.Rule[0]==2){
+      if(LP[0]==2){
         death[player-1].Admg[player-1]+=score;
       }
       }}
       if(player!==parentS){//こつも
       for(var i=1;i<LP.length;i++){
       if(i==player){
-        if(pvpmode==0 ||(pvpmode==1 && LP_PVP.Rule[0]!==2)){
+        if(LP[0]!==2){
           LPtemp[i]=score;
-          if(LP_PVP.Rule[0]==2){
-            death[player-1].Admg[player-1]+=score;
-          }
-        }
+        }else{
+          death[player-1].Admg[player-1]+=score;
+        };
       }else if(i==parentS){
       var MS=Buff[i].filter(value=>value==2);
       if(MS.length){
@@ -8266,7 +8190,7 @@ if(opLock==0 && gamestate ==1){
       }else{
         LPtemp[i]=-score/2;
       }
-      if(LP_PVP.Rule[0]==2){
+      if(LP[0]==2){
         death[i-1].Bdmg[player-1]+=score/2;
       }
       }else{
@@ -8276,7 +8200,7 @@ if(opLock==0 && gamestate ==1){
       }else{
         LPtemp[i]=-score/4
       }
-      if(LP_PVP.Rule[0]==2){
+      if(LP[0]==2){
         death[i-1].Bdmg[player-1]+=score/4;
       }
     }
@@ -8296,7 +8220,7 @@ if(opLock==0 && gamestate ==1){
         if(skillusage2[i]==-1){
           skillusage2[i]=1;
         }
-        if(LP_PVP.Rule[0]==2){
+        if(LP[0]==2){
           //キルアシ
           var As=death[i-1].Bdmg.concat();
           var Bs=maxIndex1(As);
@@ -8337,16 +8261,22 @@ if(opLock==0 && gamestate ==1){
       }
       break;
       case 2:
-        //ミリオネア
-      if(LP[1]>=1000000 || LP[2]>=1000000 || LP[3]>=1000000 || LP[4]>=1000000){
-      var LPrank=[
-        {chara:1, elia:LP[1]},
-        {chara:2, elia:LP[2]},
-        {chara:3, elia:LP[3]},
-        {chara:4, elia:LP[4]},
-          ]
-        LPrank.sort(compareFunc2);
-      }
+        //デスマッチ
+        if(skillusage2[0]==7){//オーラスで1位が一意に決まっていれば終了
+          var LPrank=[
+          {chara:1, elia:death[0].kill,nod:death[0].assist},
+          {chara:2, elia:death[1].kill,nod:death[1].assist},
+          {chara:3, elia:death[2].kill,nod:death[2].assist},
+          {chara:4, elia:death[3].kill,nod:death[3].assist},
+            ]
+          LPrank.sort(compareFunc4);
+          if(LPrank[3].elia == LPrank[2].elia && LPrank[3].nod == LPrank[2].nod){
+          skillusage2[0]+=1;
+          console.log('オーラス',skillusage2[0])
+          }else{
+          console.log('オーラス続行',skillusage2[0])
+          }
+          }
       break;
       }}
     }
@@ -8537,7 +8467,51 @@ if(opLock==0 && gamestate ==1){
                 resultA[0]+=B
                 PA(Sinagy[k].id,nodpair2.length);  
                 resultA.push(Sinagy[k].id+nodpair2.length+"/"+nodpair1.length+" "+B+"翻")}
-          }
+          };
+           //属性枠
+           nodpair1=handtemp.filter(value=>value>=0 && value<=3);
+           nodpair2=handtemp.filter(value=>value>=12 && value<=15);
+           if(nodpair1.length>=3 && nodpair2.length>=3){
+             resultA[0]+=1
+           PA("太陽のエル",1); 
+             resultA.push("太陽のエル 1翻")}
+           nodpair1=handtemp.filter(value=>value>=4 && value<=7);
+           nodpair2=handtemp.filter(value=>value>=20 && value<=23);
+           if(nodpair1.length>=3 && nodpair2.length>=3){
+             resultA[0]+=1
+             PA("水のエル",1); 
+             resultA.push("水のエル 1翻")}
+           nodpair1=handtemp.filter(value=>value>=8 && value<=11);
+           nodpair2=handtemp.filter(value=>value>=40 && value<=43);
+           if(nodpair1.length>=3 && nodpair2.length>=3){
+             resultA[0]+=1
+             PA("風のエル",1); 
+             resultA.push("風のエル 1翻")}
+           nodpair1=handtemp.filter(value=>value>=16 && value<=19);
+           nodpair2=handtemp.filter(value=>value>=32 && value<=35);
+           if(nodpair1.length>=3 && nodpair2.length>=3){
+             resultA[0]+=1
+             PA("闇のエル",1); 
+             resultA.push("闇のエル 1翻")}
+           nodpair1=handtemp.filter(value=>value>=28 && value<=31);
+           nodpair2=handtemp.filter(value=>value>=36 && value<=39);
+           if(nodpair1.length>=3 && nodpair2.length>=3){
+             resultA[0]+=1
+             PA("火のエル",1); 
+             resultA.push("火のエル 1翻")}
+           nodpair1=handtemp.filter(value=>value>=24 && value<=27);
+           nodpair2=handtemp.filter(value=>value>=48 && value<=51);
+           var nodpair3=handtemp.filter(value=>value>=56 && value<=59);
+           if(nodpair1.length + nodpair2.length + nodpair3.length>=6){
+             resultA[0]+=1
+             PA("大地のエル",1); 
+             resultA.push("大地のエル 1翻")}
+           nodpair1=handtemp.filter(value=>value>=44 && value<=47);
+           nodpair2=handtemp.filter(value=>value>=52 && value<=55);
+           if(nodpair1.length==3 && nodpair2.length==3){
+             resultA[0]+=1
+             PA("原初のエル",1); 
+             resultA.push("原初のエル 1翻")}
           console.log(resultA)
           return resultA
         }
@@ -9309,7 +9283,7 @@ if(opLock==0 && gamestate ==1){
         }
           var A=Math.floor(tumoP/4);
           var B=handtemp.filter(value=>value>=4*A && value<4*(A+1));
-          if(B.length>=4){kansw[player]=1;
+          if(B.length==4){kansw[player]=1;
             return true;
           }
         return false;
@@ -9323,7 +9297,7 @@ if(opLock==0 && gamestate ==1){
           }}
           var keyj=Object.keys(Count);
           for(var j=0;j<keyj.length;j++){
-          if(Count[keyj[j]]>=4){
+          if(Count[keyj[j]]==4){
             //同じキャラ4枚以上をカウント
             return true;
           }
@@ -10040,7 +10014,8 @@ if(opLock==0 && gamestate ==1){
     }
     function handOnCorsor(){
       //手札のカーソル
-      if(cLock==1 && (opLock==2 || gamestate !==1)){return false};//カーソル表示しない時　現在：esc中のみ非表示
+      if(opLock==2 || gamestate !==1){return false};//カーソル表示しない時
+      if(cLock==2 || cLock==4){return false};
       switch(this.card){
         case -1:
           tweeNcor.paused=true;
@@ -10332,6 +10307,7 @@ if(opLock==0 && gamestate ==1){
           break;
         case 1:
           se3.play();
+          cLock=1;
           guidemap.removeAllChildren();
           ponkanmap.removeAllChildren();
           if(reach[1] ==1){
@@ -10412,16 +10388,16 @@ if(opLock==0 && gamestate ==1){
               Textlist[1].text="誰か一人が生き残るか半荘経過まで戦いが続きます。";  
             break;
             case 2:
-              Textlist[0].text=LPlist[LP[0]]+"：持ち点100,000から開始し、";
-              Textlist[1].text="誰かが1,000,000に到達するまで続きます。";  
+              Textlist[0].text=LPlist[LP[0]]+"：和了しても得点は増えず、飛んでも復活します。";
+              Textlist[1].text="半荘経過までにより多くの人を飛ばした人が勝者となります。";  
             break;
             case 3:
               Textlist[0].text=LPlist[LP[0]]+"：際限なく自由に打ち続けるモードです。";
               Textlist[1].text="Escキーでタイトル画面に戻ることで抜けられます。";  
             break;
             case 4:
-              Textlist[0].text=LPlist[LP[0]]+"：最大3人が和了するまで一局が続きます。";
-              Textlist[1].text="適応力デバフにより、後半になるほど高得点が出やすくなります。";  
+              Textlist[0].text=LPlist[LP[0]]+"：持ち点150,000の半荘戦です。";
+              Textlist[1].text="このモードでは一局に最大3人まで和了することができます。";  
               break;
           }
         }
@@ -10789,7 +10765,7 @@ if(opLock==0 && gamestate ==1){
       }
       //
     }
-    function SoundConfig(event,p=0){
+    function SoundConfig(){
       SEbuffer(-1)
       if(!cLock && debugmode){
         //for debug
@@ -11023,7 +10999,7 @@ if(opLock==0 && gamestate ==1){
       var Container = new createjs.Container();
       Container.alpha=0;
       stage.addChild(Container);
-      var C = new createjs.Bitmap(win_src[7]);
+      var C = new createjs.Bitmap(queue.getResult(win_src[7]));
       C.regX=400
       C.regY=300;
       C.x=400;
@@ -11032,7 +11008,7 @@ if(opLock==0 && gamestate ==1){
       Container.addChild(C);
       createjs.Tween.get(C)
       .to({scale:1},200, createjs.Ease.cubicInOut);
-      var C = new createjs.Bitmap(chrimg_src[chara[player]]);
+      var C = new createjs.Bitmap(queue.getResult(chrimg_src[chara[player]]));
       C.x=-600
       C.y=0;
       C.scaleX=14/8;
@@ -11041,9 +11017,9 @@ if(opLock==0 && gamestate ==1){
       createjs.Tween.get(C)
       .to({x:0, scaleX:1, scaleY:1},200, createjs.Ease.cubicInOut)
       if(type==0){
-      var C = new createjs.Bitmap(win_src[4]);
+      var C = new createjs.Bitmap(queue.getResult(win_src[4]));
       }else{
-      var C = new createjs.Bitmap(win_src[5]);
+      var C = new createjs.Bitmap(queue.getResult(win_src[5]));
       }
       C.x=-20
       C.y=260;
@@ -11179,7 +11155,7 @@ if(opLock==0 && gamestate ==1){
       createjs.Tween.get(D, {loop: true})
       .to({x:D.x-800/3,y:D.y+100},1100);
       }
-      var C = new createjs.Bitmap(chrimg_src[chara[p]]);
+      var C = new createjs.Bitmap(queue.getResult(chrimg_src[chara[p]]));
       C.x=-600
       C.y=0;
       C.scaleX=14/8;
@@ -11189,7 +11165,7 @@ if(opLock==0 && gamestate ==1){
       .to({x:0, scaleX:1, scaleY:1},200, createjs.Ease.cubicInOut)
       .wait(800)
       .to({x:-400, scaleX:1.1, scaleY:1.1,alpha:0.5},150);
-      var C = new createjs.Bitmap(win_src[6]);
+      var C = new createjs.Bitmap(queue.getResult(win_src[6]));
       C.x=110
       C.y=260;
       C.scale=0.7
@@ -11226,9 +11202,10 @@ if(opLock==0 && gamestate ==1){
       shapeMask.scaleY=0.1;
       shapeMask.y=200;
       Container.mask = shapeMask;
-    var C = new createjs.Bitmap(chrimg_src[chara[p]]);
+    var C = new createjs.Bitmap(queue.getResult(chrimg_src[chara[p]]));
       C.x=-300;
       C.y=0;
+      if(chara[p]==5){C.y=60};
       Container.addChild(C);
     var t = new createjs.Text("PON!", "bold 64px Arial", "white");
     t.rotation=-15;
@@ -11285,6 +11262,7 @@ if(opLock==0 && gamestate ==1){
     };
   function NukiAnimation(p=0,pai=-1,type=0){
       console.log('Kan!',p,pai,type)
+      se8.play();
       se18.play();
       var Container = new createjs.Container();
       Container.alpha=0;
@@ -11302,9 +11280,10 @@ if(opLock==0 && gamestate ==1){
         shapeMask.scaleY=0.1;
         shapeMask.y=200;
         Container.mask = shapeMask;
-      var C = new createjs.Bitmap(chrimg_src[chara[p]]);
+      var C = new createjs.Bitmap(queue.getResult(chrimg_src[chara[p]]));
         C.x=-300;
         C.y=0;
+        if(chara[p]==5){C.y=60};
         Container.addChild(C);
       var t = new createjs.Text("カン", "bold 64px Arial", "white");
       t.rotation=-15;
@@ -11389,7 +11368,7 @@ if(opLock==0 && gamestate ==1){
     C.graphics.lineTo(0,600)
     C.graphics.lineTo(0,200)
     Container.addChild(C);
-    var C = new createjs.Bitmap(win_src[7]);
+    var C = new createjs.Bitmap(queue.getResult(win_src[7]));
       C.regX=400
       C.regY=300;
       C.x=400;
@@ -11398,7 +11377,7 @@ if(opLock==0 && gamestate ==1){
       Container.addChild(C);
       createjs.Tween.get(C)
       .to({scale:1},200, createjs.Ease.cubicInOut);
-    var C = new createjs.Bitmap(chrimg_src[chara[p]]);
+    var C = new createjs.Bitmap(queue.getResult(chrimg_src[chara[p]]));
     C.x=-600
     C.y=0;
     C.scaleX=14/8;
@@ -11693,12 +11672,14 @@ if(opLock==0 && gamestate ==1){
     }
   });
   function gameover(word="クリックで進む"){//けっかはっぴょぉうする
+    gamestate =-2;//終了時3に
     tweeNsquare.paused=true;
     Csquare.alpha=0;
     Configmap.removeAllChildren();
     guidemap.removeAllChildren();
     handmap.removeAllChildren();
     ponkanmap.removeAllChildren();
+    fieldpai.removeAllChildren();
     jingle2.seek(1);
     jingle2.play();
     if(musicset[1]<=0){musicset[1]=0};
@@ -11713,7 +11694,59 @@ if(opLock==0 && gamestate ==1){
     Bgm.on("fade", ()=>{
     Bgm.stop();
     });
-            //ユーザー名をcpu2とかにされたらたまらんので
+    //ユーザー名をcpu2とかにされたらたまらんので
+    if(LP[0]==2){
+    //デスマッチ
+    var LPresult=[
+      {pc:"Player", token:0, chara:chara[1], elia:death[0].kill,nod:death[0].assist,city:death[0].death},
+      {pc:"CPU2", token:0, chara:chara[2], elia:death[1].kill,nod:death[1].assist,city:death[1].death},
+      {pc:"CPU3", token:0, chara:chara[3], elia:death[2].kill,nod:death[2].assist,city:death[2].death},
+      {pc:"CPU1", token:0, chara:chara[4], elia:death[3].kill,nod:death[3].assist,city:death[3].death},
+        ]
+      if(pvpmode==1){
+        for(var i=0; i<LPresult.length;i++){
+          LPresult[i].pc=MEMBER[i].name;
+          LPresult[i].token=MEMBER[i].token
+        }
+      }
+      LPresult.sort(compareFunc4);
+      var RankingStr=["1st","2nd","3rd","4th"];
+    if(LPresult[3].elia==LPresult[2].elia && LPresult[3].nod==LPresult[2].nod){
+      RankingStr[1]=RankingStr[0];
+    }
+    if(LPresult[2].elia==LPresult[1].elia && LPresult[2].nod==LPresult[1].nod){
+      RankingStr[2]=RankingStr[1];
+    }
+    if(LPresult[1].elia==LPresult[0].elia && LPresult[1].nod==LPresult[0].nod){
+      RankingStr[3]=RankingStr[2];
+    }
+    cx2.clearRect(0,0,800,600)
+    cx2.font = "bold 45px Arial";
+    cx2.fillStyle = "white";
+    cx2.fillText("終　局", 350, 48);
+    cx2.font = "bold 40px Arial";
+    cx2.fillText(RankingStr[0], 50, 100);
+    cx2.font = "bold 32px Arial";
+    cx2.fillText(RankingStr[1], 50, 200);
+    cx2.fillText(RankingStr[2], 50, 300);
+    cx2.fillText(RankingStr[3], 50, 400);
+    //1位
+    cx2.font = "bold 30px Arial";
+    cx2.fillText(LPresult[3].pc, 100, 130);
+    cx2.font = "bold 26px Arial";
+    cx2.fillText(LPresult[2].pc, 120, 230);
+    cx2.fillText(LPresult[1].pc, 120, 330);
+    cx2.fillText(LPresult[0].pc, 120, 430);
+  cx2.font = "bold 26px Arial";
+  cx2.fillText("キル："+LPresult[3].elia+"　アシスト："+LPresult[3].nod+"　デス："+LPresult[3].city, 100, 160);
+  cx2.font = "bold 24px Arial";
+  cx2.fillText("キル："+LPresult[2].elia+"　アシスト："+LPresult[2].nod+"　デス："+LPresult[2].city, 120, 260);
+  cx2.fillText("キル："+LPresult[1].elia+"　アシスト："+LPresult[1].nod+"　デス："+LPresult[1].city, 120, 360);
+  cx2.fillText("キル："+LPresult[0].elia+"　アシスト："+LPresult[0].nod+"　デス："+LPresult[0].city, 120, 460);
+  Cbt=canvas2.toDataURL();
+  Cbutton = new createjs.Bitmap(Cbt);
+    }else{
+    //ソレ=イガイ
     var LPresult=[
       {pc:"Player", token:0, chara:chara[1], elia:LP[1]},
       {pc:"CPU2", token:0, chara:chara[2], elia:LP[2]},
@@ -11738,55 +11771,6 @@ if(opLock==0 && gamestate ==1){
     if(LPresult[1].elia==LPresult[0].elia){
       RankingStr[3]=RankingStr[2];
     }
-    field.removeAllChildren();
-    var s = new createjs.Shape();
-    s.graphics.beginFill("#001c0d");
-    s.graphics.drawRect(0, 0, 800, 600);
-    field.addChild(s);
-    var e10 = new createjs.Bitmap(chrimg_src[LPresult[3].chara]);
-      e10.x=-100;
-      e10.y=50;
-      e10.scale=1.2;
-      e10.alpha=0;
-      field.addChild(e10);
-      createjs.Tween.get(e10)
-      .wait(1800)
-      .to({alpha:1,x:100,scale:3/4}, 200, createjs.Ease.cubicInOut)
-      .call(next);
-    field.addChild(e10);
-    for(var i=0;i<3;i++){
-    var e10 = new createjs.Bitmap(chrimg_src[LPresult[2-i].chara]);
-    if(LPresult[2-i].chara==1){
-      e10.sourceRect={x:500,y:120,width:215,height:215}
-      e10.scale=60/215;
-      }else if(LPresult[2-i].chara==4){
-      e10.sourceRect={x:480,y:70,width:250,height:250}
-      e10.scale=60/250;
-      }else{
-      e10.sourceRect={x:500,y:50,width:215,height:215}
-      e10.scale=60/215;
-      }
-      e10.x=-100;
-      e10.y=201+100*i;
-      createjs.Tween.get(e10)
-        .wait(600*(2-i))
-        .to({x: 50}, 200, createjs.Ease.cubicInOut)
-        .call(se1)
-      field.addChild(e10);
-    }
-    function se1(){
-      se14.play();
-    };
-    function next(){
-      console.log(cLock,gamestate);
-      se17.play();
-      gamestate=3;
-      var D= new createjs.Text(word, "26px Arial", "white");
-      D.x=50;
-      D.y=530;    
-      field.addChild(D);
-    }
-    //
     cx2.clearRect(0,0,800,600)
     cx2.font = "bold 45px Arial";
     cx2.fillStyle = "white";
@@ -11812,7 +11796,57 @@ if(opLock==0 && gamestate ==1){
   cx2.fillText(LPresult[0].elia, 120, 460);
   Cbt=canvas2.toDataURL();
   Cbutton = new createjs.Bitmap(Cbt);
-  field.addChild(Cbutton)
+  }
+    field.removeAllChildren();
+    var s = new createjs.Shape();
+    s.graphics.beginFill("#001c0d");
+    s.graphics.drawRect(0, 0, 800, 600);
+    field.addChild(s);
+    var e10 = new createjs.Bitmap(queue.getResult(chrimg_src[LPresult[3].chara]));
+      e10.x=-100;
+      e10.y=50;
+      e10.scale=1.2;
+      e10.alpha=0;
+      field.addChild(e10);
+      createjs.Tween.get(e10)
+      .wait(1800)
+      .to({alpha:1,x:100,scale:3/4}, 200, createjs.Ease.cubicInOut)
+      .call(next);
+    field.addChild(e10);
+    for(var i=0;i<3;i++){
+    var e10 = new createjs.Bitmap(queue.getResult(chrimg_src[LPresult[2-i].chara]));
+    if(LPresult[2-i].chara==1){
+      e10.sourceRect={x:500,y:120,width:215,height:215}
+      e10.scale=60/215;
+      }else if(LPresult[2-i].chara==4){
+      e10.sourceRect={x:480,y:70,width:250,height:250}
+      e10.scale=60/250;
+      }else{
+      e10.sourceRect={x:500,y:50,width:215,height:215}
+      e10.scale=60/215;
+      }
+      e10.x=-100;
+      e10.y=201+100*i;
+      createjs.Tween.get(e10)
+        .wait(600*(2-i))
+        .to({x: 50}, 200, createjs.Ease.cubicInOut)
+        .call(se1)
+      field.addChild(e10);
+    }
+    field.addChild(Cbutton);
+    function se1(){
+      se14.play();
+    };
+    function next(){
+      console.log(cLock,gamestate);
+      se17.play();
+      gamestate=3;
+      var D= new createjs.Text(word, "26px Arial", "white");
+      D.x=50;
+      D.y=530;    
+      field.addChild(D);
+    }
+    //
       if(scoretemp[0]>=0){
         var A;
         if(pvpmode==1){
@@ -11975,7 +12009,6 @@ if(opLock==0 && gamestate ==1){
       cx2.fillText("("+donpai[skillusage2[player]].sub+")", 635, 270);
       cx2.fillStyle="white";
       cx2.fillText("に変える.", 640, 290);
-
       }
       }else if(p==3){
       cx2.font = "bold 15px Arial";
@@ -12015,9 +12048,9 @@ if(opLock==0 && gamestate ==1){
       cx2.fillText("・リーチが発生した時", 635, 130);
       cx2.fillText("危険パイを察知する.", 635, 150);
       cx2.fillText("・引いたばかりのパイは", 635, 170);
-      cx2.fillText("察知できず, 新たに.", 635, 190);
-      cx2.fillText("リーチが発生しても", 635, 210);
-      cx2.fillText("再発動はしない.", 635, 230);
+      cx2.fillText("察知できず, その局の", 635, 190);
+      cx2.fillText("最初のリーチに対して", 635, 210);
+      cx2.fillText("のみ発動する.", 635, 230);
       if(skillusage[player]>0){
       switch(skillusage[player]){
         case 1:
@@ -12035,6 +12068,43 @@ if(opLock==0 && gamestate ==1){
                 default:
                   cx2.fillText("対象：--", 635, 260);
       }}
+      }else if(p==6){
+      cx2.font = "bold 15px Arial";
+      cx2.fillText("変身", 635, 110);
+      cx2.font = "14px Arial";
+      cx2.fillText("・MPが3ゲージ溜まった", 635, 130);
+      cx2.fillText("状態で立直する時,", 635, 150);
+      cx2.fillText("ゲージを全消費して", 635, 170);
+      cx2.fillText("バーサクモードになる!", 635, 190);
+      cx2.fillText("・変身すると,高確率で", 635, 210);
+      cx2.fillText("一発ツモが発生する.", 635, 230);
+    }else if(p==7){
+      cx2.font = "bold 15px Arial";
+      cx2.fillText("連技-龍牙爆砕", 635, 110);
+      cx2.font = "14px Arial";
+      cx2.fillText("・1局に1度だけ,", 635, 130);
+      cx2.fillText("・1,2,3,4ラインの順に", 635, 150);
+      cx2.fillText("パイを切ると発動する.", 635, 170);
+      cx2.fillText("ドラを1つ追加する.", 635, 190);
+      cx2.font = "bold 15px Arial";
+      cx2.fillText("覇気天衝-千手華", 635, 210);
+      cx2.font = "14px Arial";
+      cx2.fillText("・カンをした時,", 635, 230);
+      cx2.fillText("MPを1ゲージ消費して", 635, 250);
+      cx2.fillText("ドラか当たりパイを引く.", 635, 270);
+    }else if(p==8){
+      cx2.font = "bold 15px Arial";
+      cx2.fillText("万能ニーシャ！", 635, 110);
+      cx2.font = "14px Arial";
+      cx2.fillText("MP消費:1ゲージ", 635, 130);
+      cx2.fillText("1局に1度だけ, ", 635, 150);
+      cx2.fillText("以下のどちらかを", 635, 170);
+      cx2.fillText("発動できる.", 635, 190);
+      cx2.fillText("①次の局,ニーシャが", 635, 210);
+      cx2.fillText("助けに来てくれる!", 635, 230);
+      cx2.fillText("②手札の「ニーシャ」を", 635, 250);
+      cx2.fillText("好きなパイに変える.", 635, 270);
+      cx2.fillText("(オールマイティを除く)", 635, 290);
       }else{
       cx2.font = "bold 16px Arial";
       cx2.fillText("パッシブスキル", 635, 110);
@@ -12453,7 +12523,7 @@ if(opLock==0 && gamestate ==1){
       se15.volume(0.3*sBar);
       se16.volume(0.3*sBar);
       se17.volume(0.3*sBar);
-      se18.volume(0.7*sBar);
+      se18.volume(0.4*sBar);
       jingle.volume(0.3*sBar);
       jingle2.volume(0.3*sBar);
       }
