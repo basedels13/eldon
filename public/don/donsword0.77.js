@@ -1,4 +1,4 @@
-// var1.025　season2 テスト
+// var1.00　season2 テスト
 // npm run dev
 // キャラ追加→やる気があれば
 // 全職75枚（エピックライン1枚ずつ増量）＋オールマイティ2枚＋マスター8枚×2（ガ、ロ、ベ、デ、ソ、ア、ハ）合計93枚スタート
@@ -7,8 +7,8 @@ window.onload = function(){
   };
   
   function draw(){
-  var titletext="v1.025/Click to START";
-  var debugmode=false;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にfalseに
+  var titletext="v1.00/Click to START";
+  var debugmode=true;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にfalseに
   //自分自身の情報を入れる箱
   var IAM = {
     token: null,    // 戸別管理用のトークン
@@ -573,7 +573,7 @@ window.onload = function(){
     {name:"風のエル",sub:"キャラ役"},
     {name:"火のエル",sub:"キャラ役"},
     {name:"水のエル",sub:"キャラ役"},
-    {name:"原初のエル",sub:"キャラ役"},
+    {name:"月のエル",sub:"キャラ役"},
     {name:"闇のエル",sub:"キャラ役"},
     {name:"門前ツモ",sub:"アガリ形"},
     {name:"一発",sub:"アガリ形"},
@@ -5864,19 +5864,19 @@ if(opLock==0 && gamestate ==1){
       riverx[player] =110
       }
       if(chara[player]==4 && pvpmode==0){
-        if((tumotemp>=0 && tumotemp<=3)||(tumotemp>=12 && tumotemp<=15)){
-          var MS=Buff[player].filter(value=>value==2)
+        if((tumotemp>=0 && tumotemp<=3)||(tumotemp>=12 && tumotemp<=15)||tumotemp==64){
+          var MS=Buff[player].filter(value=>value==4)
           if(MS.length<3){Buff[player].push(4)}
         };
         }
       if(chara[player]==3 && pvpmode==0){
-        if((tumotemp>=8 && tumotemp<=11)||(tumotemp>=40 && tumotemp<=43)){
-          var MS=Buff[player].filter(value=>value==2)
+        if((tumotemp>=8 && tumotemp<=11)||(tumotemp>=40 && tumotemp<=43)||tumotemp==66){
+          var MS=Buff[player].filter(value=>value==3)
           if(MS.length<3){Buff[player].push(3)}
         };
         }
       if(chara[player]==2 && pvpmode==0){
-        if((tumotemp>=4 && tumotemp<=7)||(tumotemp>=20 && tumotemp<=23)){
+        if((tumotemp>=4 && tumotemp<=7)||(tumotemp>=20 && tumotemp<=23)||tumotemp==61){
           var MS=Buff[player].filter(value=>value==2)
           if(MS.length<5){Buff[player].push(2)}
         };
@@ -8542,8 +8542,8 @@ if(opLock==0 && gamestate ==1){
            nodpair2=handtemp.filter(value=>value>=52 && value<=55);
            if(nodpair1.length==3 && nodpair2.length==3){
              resultA[0]+=1
-             PA("原初のエル",1); 
-             resultA.push("原初のエル 1翻")}
+             PA("月のエル",1); 
+             resultA.push("月のエル 1翻")}
           console.log(resultA)
           return resultA
         }
@@ -9348,26 +9348,26 @@ if(opLock==0 && gamestate ==1){
         handtemp=[];
         switch(player){
           case 1:
-            if(pon1.length>=6){
+            if(pon1.length+kan1.length>=6){
               //ポンすると手札がなくなるZE
               return false;
             }
             handtemp = hand1.concat();
           break;
           case 2:
-            if(pon2.length>=6){
+            if(pon2.length+kan2.length>=6){
               return false;
             }
             handtemp = hand2.concat();
           break;
           case 3:
-            if(pon3.length>=6){
+            if(pon3.length+kan3.length>=6){
               return false;
             }
             handtemp = hand3.concat();
           break;
           case 4:
-            if(pon4.length>=6){
+            if(pon4.length+kan4.length>=6){
               return false;
             }
             handtemp = hand4.concat();
@@ -9380,8 +9380,6 @@ if(opLock==0 && gamestate ==1){
           }
       }else{
         //実際にカンする動き
-        //自分ターン 現在playerのみ
-        //自動でカンするパイを選んでいるためリーチ中に想定しないカンが発生する可能性あるかも
         if(num==100){
           //ポンしているパイでカンできる時（加カン）はそっちを優先
         switch(player){
@@ -10069,8 +10067,6 @@ if(opLock==0 && gamestate ==1){
   function next(){
     cLock=0;
     gamestate=0;
-  }
-    console.log('流局',ctl)
     if(LP[0]==4){
       raidscore[2]=1;
       if(raidscore[0]==0){raidscore[0]=2};
@@ -10078,6 +10074,8 @@ if(opLock==0 && gamestate ==1){
         //以降resultphaseは↑のほうで呼び出し
       return false;
     };
+  }
+    console.log('流局',ctl)
     }
     function ResultPhase(){
       //ccanvasに保存した画像を順に見せる
