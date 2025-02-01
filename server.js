@@ -255,6 +255,10 @@ socket.on("setup_member", (data)=>{
     //ポン
     io.to(data.room).emit("pon-pai", data);
     });
+  socket.on("skill", (data)=>{
+    //スキル
+    io.to(data.room).emit("skill-pai", data);
+    });
   socket.on("ryukyoku", (data)=>{
     //流局
     io.to(data.room).emit("ryukyoku", data);

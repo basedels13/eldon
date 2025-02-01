@@ -1,21 +1,22 @@
 // var1.00　season2 テスト
 // npm run dev
-// キャラ追加→やる気があれば
+// やる気があれば→　オーラスの画像
+// 対戦でスキル開放　キャラ開放条件
 // 全職75枚（エピックライン1枚ずつ増量）＋オールマイティ2枚＋マスター8枚×2（ガ、ロ、ベ、デ、ソ、ア、ハ）合計93枚スタート
 window.onload = function(){
   draw();
   };
   
   function draw(){
-  var titletext="v1.00/Click to START";
-  var debugmode=false;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にfalseに
+  var titletext="v1.01/Click to START";
+  var debugmode=true;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にfalseに
   //自分自身の情報を入れる箱
   var IAM = {
     token: null,    // 戸別管理用のトークン
     name: null,     // 名前
     room: 0,     // ルーム 123
     mwah: 0,        // ホストでない場合に何個ずらすか
-    is_join: false,  // 入室中？
+    is_join: true,  // 入室中？
     is_ready: 0 // 0 1レディ
   };
   // メンバー一覧を入れる箱
@@ -115,7 +116,7 @@ window.onload = function(){
   var mute="ON"
   var alpha = 0;
   var Username = "player";
-  var UsernameText = new createjs.Text(Username, "24px Arial", "black");
+  var UsernameText = new createjs.Text(Username, "24px Arial", "white");
   var Usercrest = "称号なし";
   const canvas = document.getElementById("canvas0");//ベースレイヤ。背景、置物
   var canvas1 = document.getElementById("canvas1");//立ち絵,捨てパイ
@@ -294,8 +295,9 @@ window.onload = function(){
   var chara =new Array(0,0,0,0,0)
   //mpmove
   var Fever =-1;//fever->未使用
+  var HiddenChara =3;//chrlist管理
   //ルーム設定
-  var LP_PVP={Length:[1,"東風","半荘",],LP:[1,75000,150000,300000],Block:[1,"満貫あり","満貫なし"],Rule:[1,"サバイバル","デスマッチ","魔界血戦"]};//
+  var LP_PVP={Length:[1,"東風","半荘",],LP:[1,75000,150000,300000],Block:[1,"満貫あり","満貫なし"],Rule:[1,"サバイバル","デスマッチ","魔界血戦"],Skill:[1,"スキル禁止","スキルあり"]};
   var mpmoving=false;
   var mpC=0;
   var ManaBreak=0;
@@ -328,8 +330,8 @@ window.onload = function(){
   //データベース
   var LPlist=new Array("一般","ヘル","デスマッチ","∞","魔界血戦")
   var musiclist=new Array("ランダム","盲目のアストライア","Nine Jack","The Evil Sacrifice Archenemies","ロベリア","夜の迷宮の入口","決闘のテーマ","エルの樹の麓","リーチっぽい音楽","ベスマ-竜の道","ウォーリーの城","歎きの塔Phase3","狂乱のコンサート","リーチっぽい音楽R")
-  var chrlist=new Array("名無しさん","エルス","アイシャ","レナ","レイヴン","イヴ")//"ラシェ","アラ","エド","ラビィ")
-  var chrimg_src= new Array("don/Don_chara0.png","don/Don_chara1.png","don/Don_chara2.png","don/Don_chara3.png","don/Don_chara4.png","don/Don_chara5.png");
+  var chrlist=new Array("名無しさん","エルス","アイシャ","レナ","レイヴン","イヴ","ラシェ","アラ")//"エド","ラビィ")
+  var chrimg_src= new Array("don/Don_chara0.png","don/Don_chara1.png","don/Don_chara2.png","don/Don_chara3.png","don/Don_chara4.png","don/Don_chara5.png","don/Don_chara6.png","don/Don_chara7.png");
   //説明用
   var epic_src =new Array("don/elstudio_bg1.png","don/Don_epic1.png","don/Don_epic2.png","don/Don_epic3.png","don/Don_epic6.png","don/Don_ss11.png","don/Don_epic4.png","don/Don_epic5.png");
   //パイの裏
@@ -371,6 +373,8 @@ window.onload = function(){
   {fir:"フリージングアロー",sec:"FREEZING ARROW",thr:"0"},
   {fir:"グラウンドクラッシュ",sec:"GROUND CRUSH",thr:"0"},
   {fir:"クイーンズスローン",sec:"QUEEN'S THRONE",thr:"0"},
+  {fir:"ルナティック一発ツモ",sec:"Lunatic Ippatsu",thr:"0"},
+  {fir:"竜牙爆砕",sec:"Dragon Arts 'Blast'",thr:"0"},
   ]
   //name->キャラsub->職、役判定で使用　line->ライン役判定に使用 0->all　color->1234567陽水風月土火E 0->all
   var donpai=[
@@ -610,6 +614,7 @@ window.onload = function(){
     {name:"ツモ",count:0},
     {name:"ロン",count:0},
     {name:"ポン",count:0},
+    {name:"カン",count:0},
     {name:"放銃",count:0},
     {name:"ダブル放銃",count:0},
     {name:"飛び",count:0},
@@ -637,6 +642,7 @@ window.onload = function(){
     "tumoCon":tumoConfig,
     "PON":Ponrate,
     "FEV":Fever,
+    "HiddenChr":HiddenChara,
   };
   var key27=0;//esc
   var handlist=[];
@@ -756,6 +762,7 @@ window.onload = function(){
   var counter=new Array(0,0,0,0,0);//捨てたパイの数
   var counterR=new Array(0,0,0,0,0);//何巡目にリーチしたか
   //スペシャルスキル関連
+  //[0] -2->パッシブ・アクティブ全て適応しない -1->CPUスキル禁止＆プレイヤーは使用可能 0->無法地帯
   var skillswitch=new Array(-1,1,1,1,1)
   //1->初期　0->使用可 2->不可
   var skillusage=new Array(0,0,0,0,0)
@@ -872,7 +879,7 @@ window.onload = function(){
     });
   var se19 = new Howl({
     src:"don/Single_Accent04-3.mp3",
-    volume: 0.3,
+    volume: 0.6,
     });
   const jingle =new Howl({
       src: "don/Don_jingle.mp3",
@@ -1280,6 +1287,7 @@ function updateParticles() {
       se6.play();
       saveUP();
       saveUP_Local();
+      if(debugmode){HiddenChara=chrlist.length-1};
       Menu();
       soundmap.alpha=1;
     }
@@ -1620,7 +1628,7 @@ function updateParticles() {
         }
       }
       if(mouseX >0 && mouseX< 100){
-      if(pvpmode==0){
+      if(skillswitch[0] !==-2){
         if(cLock==1){
           se4.play();
           if(navisw==1){navisw=0}else{navisw=1};
@@ -1762,6 +1770,10 @@ function menuMap(p=0){
       t.x=670;
       t.y=130;
       menu_solo.addChild(t);
+      var t = new createjs.Text(" ▶", "24px 'Century Gothic'", "black");
+      t.x=670;
+      t.y=350;
+      menu_solo.addChild(t);
       var Ary=[["ＣＰＵ１","ＣＰＵ２","ＣＰＵ３"],["◀ "+chrlist[chara[2]],"◀ "+chrlist[chara[3]],"◀ "+chrlist[chara[4]]],[" ▶"," ▶"," ▶"]]
      for(var i=0;i<Ary.length;i++){
       var t = new createjs.Text(Ary[0][i], "24px 'Century Gothic'", "black");
@@ -1781,14 +1793,14 @@ function menuMap(p=0){
       menu_solo.addChild(t);
       menu_solo_list.push(t);
      }
-      var t = new createjs.Text("ＣＰＵスキル", "24px 'Century Gothic'", "black");
+      var t = new createjs.Text("スキル", "24px 'Century Gothic'", "black");
       t.x=390;
       t.y=350;
       menu_solo.addChild(t);
-      var Ary=["　禁止しない","✓禁止"]
+      var Ary=["　◀禁止しない","　◀プレイヤーのみ","　◀全て禁止"]
       //-1のときは禁止
       var t = new createjs.Text(Ary[-skillswitch[0]], "24px 'Century Gothic'", "black");
-      t.x=540;
+      t.x=460;
       t.y=350;
       menu_solo.addChild(t);
       menu_solo_list.push(t);
@@ -2070,13 +2082,22 @@ function menuMap(p=0){
           menu_main.addChild(rect);
           UsernameText.text=Username;
           UsernameText.x=532;
-          UsernameText.y=95;
+          UsernameText.y=98;
           menu_main.addChild(UsernameText);
-          var AryX=[500,500,500,530,480,510]
-          var AryY=[50,100,80,50,120,75]
+          var AryX=[500,500,500,530,480,520,490,400]
+          var AryY=[50,100,80,50,130,60,100,100]
           for(var i=0;i<chrimg_src.length;i++){
             var j=i%4;
             var k=Math.floor(i/4);
+            if(i>HiddenChara){
+              var rect = new createjs.Shape();
+              rect.graphics.beginFill("rgba(0,0,0,0.8)").drawRect(530+50*j, 400+50*k, 50, 50);
+              menu_main.addChild(rect);
+              var t = new createjs.Text("？", "26px 'Century Gothic'", "rgba(240,240,240,0.6)");
+              t.x=550+50*j;
+              t.y=415+50*k;
+              menu_main.addChild(t);
+            }
             e11 = new createjs.Bitmap(queue.getResult(chrimg_src[i]));
             e11.sourceRect={x:AryX[i],y:AryY[i],width:200,height:200}
             e11.x=530+50*j;
@@ -2086,7 +2107,7 @@ function menuMap(p=0){
           }
           var rect = new createjs.Shape();//キャラ設定欄
           rect.graphics
-              .beginFill("rgba(0,0,0,0.8)")
+              .beginFill("rgba(0, 35, 133, 0.7)")
               .drawRect(0, 0, 50, 50);
           rect.x=530+50*(chara[1]%4)
           rect.y=400+50*Math.floor(chara[1]/4)
@@ -2103,22 +2124,11 @@ function menuMap(p=0){
           drawbuttom(60,125,"実績リスト",0,130,44);
           drawbuttom(60,170,"達成役1",0,130,44);
           drawbuttom(60,215,"達成役2",0,130,44);
-          cx2.font = "32px 'Century Gothic'";
-          cx2.fillStyle = "rgba(0,0,0,0.8)";
-          cx2.fillRect(530,90,200,40)
-          if(chara[1]>=4){
-            cx2.fillRect(530+50*(chara[1]-4),450,50,50);
-          }else{
-          cx2.fillRect(530+50*chara[1],400,50,50);
-          }
           var wT=winrank[0]+winrank[1]+winrank[2]+winrank[3]
           var winrate=0;
           if(wT>0){
             winrate=Math.floor(winrank[0]/wT*1000)/10  
           }
-          cx2.font = "26px 'Century Gothic'";
-          cx2.fillStyle = "white";
-          cx2.fillText(Username,532,120);
           var X=200;
           cx2.font = "22px 'Century Gothic'";
           cx2.fillStyle = "black";
@@ -2754,13 +2764,7 @@ function menuMap(p=0){
                         menu_guide.addChild(t);
                         paiviewer.x=60;
                         paiviewer.alpha=1;
-                        Extrash=[];
-                        for(var i =0; i<70; i++){
-                          Extrash.push(i);
-                          }
-                          Extrash.push(60,61,62,63,64,65,66,67);
-                          Extrash.push(0,4,9,13,17,20,24,28,32,37,42,45,49,52,56);
-                        Remaincheck();
+                        Remaincheck(-2);
                         break;
     }
     break;
@@ -2829,6 +2833,10 @@ var rect = new createjs.Shape();
       .drawRect(311, 100, 148, 300)
       .drawRect(461, 100, 148, 300);
     menu_duel.addChild(rect);
+    var s = new createjs.Shape();
+    s.graphics.beginFill("rgba(107, 218, 203, 0.7)");
+    s.graphics.drawRoundRect(620,100,170,380,10,10,);
+    menu_duel.addChild(s);
     for(var i=0;i<4;i++){
     var t = new createjs.Text('CPU', "bold 30px Arial", "white");
     t.x=50+150*i;
@@ -2841,7 +2849,7 @@ var rect = new createjs.Shape();
     t.y=30;
     menu_duel.addChild(t);
     RoomConfigAry.push(t);
-    var t = new createjs.Text("持ち点 "+LP_PVP.LP[LP_PVP.LP[0]]+"　"+LP_PVP.Block[LP_PVP.Block[0]], "bold 30px Arial", "white");
+    var t = new createjs.Text("持ち点 "+LP_PVP.LP[LP_PVP.LP[0]]+"　"+LP_PVP.Block[LP_PVP.Block[0]]+"　"+LP_PVP.Skill[LP_PVP.Skill[0]], "bold 30px Arial", "white");
     t.x=170;
     t.y=65;
     menu_duel.addChild(t);
@@ -2856,12 +2864,12 @@ var rect = new createjs.Shape();
       t.y=10;
       menu_duel.addChild(t);
       if(IsHost(IAM.room)){
-        var Ary=["ルール","◀"+LP_PVP.Rule[LP_PVP.Rule[0]]+"▶",'持ち点',"◀"+LP_PVP.LP[LP_PVP.LP[0]]+"▶",'東風/半荘',"◀"+LP_PVP.Length[LP_PVP.Length[0]]+"▶",'満貫打ち止め',"◀"+LP_PVP.Block[LP_PVP.Block[0]]+"▶"]
+        var Ary=["ルール","◀"+LP_PVP.Rule[LP_PVP.Rule[0]]+"▶",'持ち点',"◀"+LP_PVP.LP[LP_PVP.LP[0]]+"▶",'東風/半荘',"◀"+LP_PVP.Length[LP_PVP.Length[0]]+"▶",'満貫打ち止め',"◀"+LP_PVP.Block[LP_PVP.Block[0]]+"▶",'スキル',"◀"+LP_PVP.Skill[LP_PVP.Skill[0]]+"▶"]
       }else{
-        var Ary=["ルール",LP_PVP.Rule[LP_PVP.Rule[0]],'持ち点',LP_PVP.LP[LP_PVP.LP[0]],'東風/半荘',LP_PVP.Length[LP_PVP.Length[0]],'満貫打ち止め',LP_PVP.Block[LP_PVP.Block[0]]]
+        var Ary=["ルール",LP_PVP.Rule[LP_PVP.Rule[0]],'持ち点',LP_PVP.LP[LP_PVP.LP[0]],'東風/半荘',LP_PVP.Length[LP_PVP.Length[0]],'満貫打ち止め',LP_PVP.Block[LP_PVP.Block[0]],'スキル',LP_PVP.Skill[LP_PVP.Skill[0]]]
       }
         var X=700;
-        var Y=130;
+        var Y=110;
         for(var i=0;i<Ary.length;i++){
         var t = new createjs.Text(Ary[i], "bold 22px Arial", "white");
         t.x=X;
@@ -3220,7 +3228,13 @@ function NameChange(){
     .drawRect(410, 210, 350, 240);
     field.addChild(rect);
       if(chara[1]==1){
-        e10.sourceRect={x:500,y:120,width:300,height:215}
+        e10.sourceRect={x:500,y:110,width:300,height:215}
+      }else if(chara[1]==4){
+        e10.sourceRect={x:460,y:120,width:300,height:215}
+      }else if(chara[1]==6){
+        e10.sourceRect={x:460,y:100,width:300,height:215}
+      }else if(chara[1]==7){
+          e10.sourceRect={x:400,y:100,width:300,height:215}
       }else{
         e10.sourceRect={x:500,y:50,width:300,height:215}
       }
@@ -3308,7 +3322,7 @@ function NameChange(){
             }
           if(mouseX >510 && mouseX <560 && mouseY >130 && mouseY <160){
             se3.play();
-            if(chara[1]==0){chara[1]=chrlist.length-1}else{chara[1]-=1}
+            if(chara[1]==0){chara[1]=HiddenChara}else{chara[1]-=1}
             menu_solo_list[2].text="◀ "+chrlist[chara[1]]
             menu_solo.removeChild(menu_solo_list[menu_solo_list.length-1]);
             menu_solo_list.pop();
@@ -3322,7 +3336,7 @@ function NameChange(){
             }
           if(mouseX >670 && mouseX <705 && mouseY >130 && mouseY <160){
             se3.play();
-            if(chara[1]==chrlist.length-1){chara[1]=0}else{chara[1]+=1}
+            if(chara[1]==HiddenChara){chara[1]=0}else{chara[1]+=1}
             menu_solo_list[2].text="◀ "+chrlist[chara[1]]
             menu_solo.removeChild(menu_solo_list[menu_solo_list.length-1]);
             menu_solo_list.pop();
@@ -3345,51 +3359,51 @@ function NameChange(){
               for(var i=0;i<6;i++){menu_solo_list[i+3].alpha=1};
               }
           }
-          if(mouseX >520 && mouseX <650 && mouseY >345 && mouseY <375){
+          if(mouseX >400 && mouseX <705 && mouseY >345 && mouseY <375){
             se3.play();
-            if(skillswitch[0]==0){skillswitch[0]=-1}else{skillswitch[0]=0};
-            var Ary=["　禁止しない","✓禁止"]
+            if(skillswitch[0]==0){skillswitch[0]=-2}else{skillswitch[0]+=1};
+            var Ary=["　◀禁止しない","　◀プレイヤーのみ","　◀全て禁止"]
             menu_solo_list[9].text=Ary[-skillswitch[0]]
             }
           if(mouseX >670 && mouseX <705 && mouseY >230 && mouseY <260){
             if(chara[0]==1){
             se3.play();
-            if(chara[2]==chrlist.length-1){chara[2]=0}else{chara[2]+=1}
+            if(chara[2]==HiddenChara){chara[2]=0}else{chara[2]+=1}
             menu_solo_list[3].text="◀ "+chrlist[chara[2]]
             }
             }
           if(mouseX >670 && mouseX <705 && mouseY >270 && mouseY <300){
             if(chara[0]==1){
             se3.play();
-            if(chara[3]==chrlist.length-1){chara[3]=0}else{chara[3]+=1}
+            if(chara[3]==HiddenChara){chara[3]=0}else{chara[3]+=1}
             menu_solo_list[5].text="◀ "+chrlist[chara[3]]
             }
             }
           if(mouseX >670 && mouseX <705 && mouseY >310 && mouseY <340){
             if(chara[0]==1){
             se3.play();
-            if(chara[4]==chrlist.length-1){chara[4]=0}else{chara[4]+=1}
+            if(chara[4]==HiddenChara){chara[4]=0}else{chara[4]+=1}
             menu_solo_list[7].text="◀ "+chrlist[chara[4]]
             }
             }
             if(mouseX >510 && mouseX <560 && mouseY >230 && mouseY <260){
               if(chara[0]==1){
               se3.play();
-              if(chara[2]==0){chara[2]=chrlist.length-1}else{chara[2]-=1}
+              if(chara[2]==0){chara[2]=HiddenChara}else{chara[2]-=1}
               menu_solo_list[3].text="◀ "+chrlist[chara[2]]
               }
               }
             if(mouseX >510 && mouseX <560 && mouseY >270 && mouseY <300){
               if(chara[0]==1){
               se3.play();
-              if(chara[3]==0){chara[3]=chrlist.length-1}else{chara[3]-=1}
+              if(chara[3]==0){chara[3]=HiddenChara}else{chara[3]-=1}
               menu_solo_list[5].text="◀ "+chrlist[chara[3]]
               }
               }
             if(mouseX >510 && mouseX <560 && mouseY >310 && mouseY <340){
               if(chara[0]==1){
               se3.play();
-              if(chara[4]==0){chara[4]=chrlist.length-1}else{chara[4]-=1}
+              if(chara[4]==0){chara[4]=HiddenChara}else{chara[4]-=1}
               menu_solo_list[7].text="◀ "+chrlist[chara[4]]
               }
               }
@@ -3604,7 +3618,8 @@ function NameChange(){
                   se3.play();
                   chara[1]=Math.floor((mouseX-530)/50);
                 }
-                if(mouseX >530 && mouseX <630 && mouseY >450 && mouseY <500){
+                if(mouseX >530 && mouseX <730 && mouseY >450 && mouseY <500){
+                  //下段はHiddenCharaに応じてアレしてください
                   se3.play();
                   chara[1]=4+Math.floor((mouseX-530)/50);
                 }
@@ -3648,39 +3663,10 @@ function NameChange(){
             switch(msgstate){
               case 2:
                 //case1は入場待機
-                if(mouseX >420 && mouseX <590 && mouseY >520 && mouseY <580){
-                  //Readyボタン
-                  msgstate=1;
-                  var roomId=RoomName[IAM.room];
-                  if(IsHost(IAM.room)){
-                    //他のプレイヤーが全員レディならスタート
-                    socket.emit('ready_to_start',{token: IAM.token,ready:-1,room:roomId});
-                  }else{
-                    socket.emit('ready_to_start',{token: IAM.token,ready: IAM.is_ready,room:roomId});
-                    if(IAM.is_ready==1){IAM.is_ready=0}else{IAM.is_ready=1};
-                  }
-                }
-                if(mouseX >600 && mouseX <770 && mouseY >520 && mouseY <580){
-                  //退出するボタン
-                  if(IsHost(IAM.room) || IAM.is_ready==0){
-                    msgstate=1;
-                    se3.play();
-                    var clientId=Username;
-                    var clientChr=chara[1];
-                    var roomId=RoomName[IAM.room];
-                    //個人のルーム設定を初期化
-                    LP_PVP={Length:[1,"東風","半荘",],LP:[1,75000,150000,300000],Block:[1,"満貫あり","満貫なし"],Rule:[1,"サバイバル","デスマッチ","魔界血戦"]};//
-                    socket.emit('leave_to_room',{token: IAM.token,name:clientId,chr:clientChr,room:roomId});
-                  }else{
-                    se3.play();
-                    alert("退室する際はReady状態を解除してください。");
-                    console.log('退室する際はReady状態を解除してください')
-                  }
-                }
                 //room_config
                 //LP_PVP={Length:[1,"東風","半荘",],LP:[1,75000,150000,300000],Block:[1,"満貫あり","満貫なし"],Rule:[1,"サドンデス","デスマッチ"]};
                 if(IsHost(IAM.room)){
-                if(mouseX >610 && mouseX <680 && mouseY >130 && mouseY <180){
+                if(mouseX >610 && mouseX <680 && mouseY >110 && mouseY <160){
                   LP_PVP.Rule[0]-=1;
                   if(LP_PVP.Rule[0]<=0){LP_PVP.Rule[0]=LP_PVP.Rule.length-1;}
                   se3.play();
@@ -3688,7 +3674,7 @@ function NameChange(){
                   msgstate=1;
                   socket.emit('room_config',{token: IAM.token,room:RoomName[IAM.room],config:LP_PVP});
                 }
-                if(mouseX >720 && mouseX <790 && mouseY >130 && mouseY <180){
+                if(mouseX >720 && mouseX <790 && mouseY >110 && mouseY <160){
                   LP_PVP.Rule[0]+=1;
                   if(LP_PVP.Rule[0]>=LP_PVP.Rule.length){LP_PVP.Rule[0]=1;}
                   se3.play();
@@ -3696,46 +3682,62 @@ function NameChange(){
                   msgstate=1;
                   socket.emit('room_config',{token: IAM.token,room:RoomName[IAM.room],config:LP_PVP});
                 }
-                if(mouseX >610 && mouseX <680 && mouseY >200 && mouseY <250){
+                if(mouseX >610 && mouseX <680 && mouseY >180 && mouseY <230){
                   msgstate=1;
                   LP_PVP.LP[0]-=1;
                   if(LP_PVP.LP[0]<=0){LP_PVP.LP[0]=LP_PVP.LP.length-1;}
                   se3.play();
                   socket.emit('room_config',{token: IAM.token,room:RoomName[IAM.room],config:LP_PVP});
                 }
-                if(mouseX >720 && mouseX <790 && mouseY >200 && mouseY <250){
+                if(mouseX >720 && mouseX <790 && mouseY >180 && mouseY <230){
                   msgstate=1;
                   LP_PVP.LP[0]+=1;
                   if(LP_PVP.LP[0]>=LP_PVP.LP.length){LP_PVP.LP[0]=1;}
                   se3.play();
                   socket.emit('room_config',{token: IAM.token,room:RoomName[IAM.room],config:LP_PVP});
                 }
-                if(mouseX >610 && mouseX <680 && mouseY >270 && mouseY <320){
+                if(mouseX >610 && mouseX <680 && mouseY >250 && mouseY <300){
                   msgstate=1;
                   LP_PVP.Length[0]-=1;
                   if(LP_PVP.Length[0]<=0){LP_PVP.Length[0]=LP_PVP.Length.length-1;}
                   se3.play();
                   socket.emit('room_config',{token: IAM.token,room:RoomName[IAM.room],config:LP_PVP});
                 }
-                if(mouseX >720 && mouseX <790 && mouseY >270 && mouseY <320){
+                if(mouseX >720 && mouseX <790 && mouseY >250 && mouseY <300){
                   msgstate=1;
                   LP_PVP.Length[0]+=1;
                   if(LP_PVP.Length[0]>=LP_PVP.Length.length){LP_PVP.Length[0]=1;}
                   se3.play();
                   socket.emit('room_config',{token: IAM.token,room:RoomName[IAM.room],config:LP_PVP});
                 }
-                if(mouseX >610 && mouseX <680 && mouseY >340 && mouseY <390){
+                if(mouseX >610 && mouseX <680 && mouseY >320 && mouseY <370){
                   msgstate=1;
                   LP_PVP.Block[0]-=1;
                   if(LP_PVP.Block[0]<=0){LP_PVP.Block[0]=LP_PVP.Block.length-1;}
                   se3.play();
                   socket.emit('room_config',{token: IAM.token,room:RoomName[IAM.room],config:LP_PVP});
                 }
-                if(mouseX >720 && mouseX <790 && mouseY >340 && mouseY <390){
+                if(mouseX >720 && mouseX <790 && mouseY >320 && mouseY <370){
                   msgstate=1;
                   LP_PVP.Block[0]+=1;
                   if(LP_PVP.Block[0]>=LP_PVP.Block.length){LP_PVP.Block[0]=1;}
                   se3.play();
+                  socket.emit('room_config',{token: IAM.token,room:RoomName[IAM.room],config:LP_PVP});
+                }
+                if(mouseX >610 && mouseX <680 && mouseY >390 && mouseY <440){
+                  LP_PVP.Skill[0]-=1;
+                  if(LP_PVP.Skill[0]<=0){LP_PVP.Skill[0]=LP_PVP.Skill.length-1;}
+                  se3.play();
+                  corsor();
+                  msgstate=1;
+                  socket.emit('room_config',{token: IAM.token,room:RoomName[IAM.room],config:LP_PVP});
+                }
+                if(mouseX >720 && mouseX <790 && mouseY >390 && mouseY <440){
+                  LP_PVP.Skill[0]+=1;
+                  if(LP_PVP.Skill[0]>=LP_PVP.Skill.length){LP_PVP.Skill[0]=1;}
+                  se3.play();
+                  corsor();
+                  msgstate=1;
                   socket.emit('room_config',{token: IAM.token,room:RoomName[IAM.room],config:LP_PVP});
                 }
               };
@@ -3840,6 +3842,7 @@ function NameChange(){
       LP_PVP.LP[0]=data.LP[0];
       LP_PVP.Block[0]=data.Block[0];
       LP_PVP.Rule[0]=data.Rule[0];
+      LP_PVP.Skill[0]=data.Skill[0];
       }else{
     //Host
       if(msgstate!==2){
@@ -3847,9 +3850,9 @@ function NameChange(){
         }
       }
       if(IsHost(IAM.room)){
-        var Ary=[LP_PVP.Rule[LP_PVP.Rule[0]]+"　"+LP_PVP.Length[LP_PVP.Length[0]]+"戦","持ち点 "+LP_PVP.LP[LP_PVP.LP[0]]+"　"+LP_PVP.Block[LP_PVP.Block[0]],"◀"+LP_PVP.Rule[LP_PVP.Rule[0]]+"▶","◀"+LP_PVP.LP[LP_PVP.LP[0]]+"▶","◀"+LP_PVP.Length[LP_PVP.Length[0]]+"▶","◀"+LP_PVP.Block[LP_PVP.Block[0]]+"▶"]
+        var Ary=[LP_PVP.Rule[LP_PVP.Rule[0]]+"　"+LP_PVP.Length[LP_PVP.Length[0]]+"戦","持ち点 "+LP_PVP.LP[LP_PVP.LP[0]]+"　"+LP_PVP.Block[LP_PVP.Block[0]]+"　"+LP_PVP.Skill[LP_PVP.Skill[0]],"◀"+LP_PVP.Rule[LP_PVP.Rule[0]]+"▶","◀"+LP_PVP.LP[LP_PVP.LP[0]]+"▶","◀"+LP_PVP.Length[LP_PVP.Length[0]]+"▶","◀"+LP_PVP.Block[LP_PVP.Block[0]]+"▶","◀"+LP_PVP.Skill[LP_PVP.Skill[0]]+"▶"]
       }else{
-        var Ary=[LP_PVP.Rule[LP_PVP.Rule[0]]+"　"+LP_PVP.Length[LP_PVP.Length[0]]+"戦","持ち点 "+LP_PVP.LP[LP_PVP.LP[0]]+"　"+LP_PVP.Block[LP_PVP.Block[0]],LP_PVP.Rule[LP_PVP.Rule[0]],LP_PVP.LP[LP_PVP.LP[0]],LP_PVP.Length[LP_PVP.Length[0]],LP_PVP.Block[LP_PVP.Block[0]]]
+        var Ary=[LP_PVP.Rule[LP_PVP.Rule[0]]+"　"+LP_PVP.Length[LP_PVP.Length[0]]+"戦","持ち点 "+LP_PVP.LP[LP_PVP.LP[0]]+"　"+LP_PVP.Block[LP_PVP.Block[0]]+"　"+LP_PVP.Skill[LP_PVP.Skill[0]],LP_PVP.Rule[LP_PVP.Rule[0]],LP_PVP.LP[LP_PVP.LP[0]],LP_PVP.Length[LP_PVP.Length[0]],LP_PVP.Block[LP_PVP.Block[0]],LP_PVP.Skill[LP_PVP.Skill[0]]]
       }
       for(var i=0;i<RoomConfigAry.length;i++){
         RoomConfigAry[i].text=Ary[i];
@@ -3886,20 +3889,20 @@ function NameChange(){
         if(data.focus==2){
           var t = new createjs.Text('♪「STARDUST LEMON」', "14px Arial", "white");
           t.x=530
-          t.y=55;
+          t.y=10;
           menu_duel.addChild(t);
           var t = new createjs.Text('/yuhei komatsu', "14px Arial", "white");
           t.x=560
-          t.y=75;
+          t.y=30;
           menu_duel.addChild(t);
         }
         if(IsHost(IAM.room)){
           var btn1 = createButton("対局開始", 170, 60,"#ffbb4d","#ff7b00","#372d23","#5e5e5e");
-          btn1.x = 420;
+          btn1.x = 260;
           btn1.y = 420;
           menu_duel.addChild(btn1);   
           var btn2 = createButton("退出する", 170, 60,"#ffbb4d","#ff7b00","#372d23","#5e5e5e");
-          btn2.x = 600;
+          btn2.x = 440;
           btn2.y = 420;
           menu_duel.addChild(btn2);   
           btn1.addEventListener("click", {card:1,handleEvent:getReady}); 
@@ -3912,22 +3915,22 @@ function NameChange(){
             }
             if(A>0 && data.list[A].ready){
           var btn1 = createButton("Quit", 170, 60,"#ffbb4d","#ff7b00","#372d23","#5e5e5e");
-          btn1.x = 420;
+          btn1.x = 260;
           btn1.y = 420;
           menu_duel.addChild(btn1);   
           var btn2 = createButton("退出する", 170, 60,"#ffbb4d","#ff7b00","#372d23","#5e5e5e");
-          btn2.x = 600;
+          btn2.x = 440;
           btn2.y = 420;
           menu_duel.addChild(btn2);  
           btn1.addEventListener("click", {card:1,handleEvent:getReady}); 
           btn2.addEventListener("click", {card:-1,handleEvent:getReady}); 
             }else if(A>0){
           var btn1 = createButton("Ready", 170, 60,"#ffbb4d","#ff7b00","#372d23","#5e5e5e");
-          btn1.x = 420;
+          btn1.x = 260;
           btn1.y = 420;
           menu_duel.addChild(btn1);   
           var btn2 = createButton("退出する", 170, 60,"#ffbb4d","#ff7b00","#372d23","#5e5e5e");
-          btn2.x = 600;
+          btn2.x = 440;
           btn2.y = 420;
           menu_duel.addChild(btn2);  
           btn1.addEventListener("click", {card:1,handleEvent:getReady}); 
@@ -3947,7 +3950,7 @@ function NameChange(){
                 var clientChr=chara[1];
                 var roomId=RoomName[IAM.room];
                 //個人のルーム設定を初期化
-                LP_PVP={Length:[1,"東風","半荘",],LP:[1,75000,150000,300000],Block:[1,"満貫あり","満貫なし"],Rule:[1,"サバイバル","デスマッチ","魔界血戦"]};//
+                LP_PVP={Length:[1,"東風","半荘",],LP:[1,75000,150000,300000],Block:[1,"満貫あり","満貫なし"],Rule:[1,"サバイバル","デスマッチ","魔界血戦"],Skill:[1,"スキル禁止","スキルあり",]};//
                 socket.emit('leave_to_room',{token: IAM.token,name:clientId,chr:clientChr,room:roomId});
                 menuMap(4);
             break;
@@ -3964,44 +3967,48 @@ function NameChange(){
             break;
           }
           };
-          var Cstar = new createjs.Shape(graphics);
+          for(var i=0;i<data.list.length;i++){
+            var e = new createjs.Bitmap(queue.getResult(chrimg_src[data.list[i].chr]));
+            if(data.list[i].chr==5){
+            e.sourceRect={x:460,y:0,width:298,height:600};              
+            }else{
+            e.sourceRect={x:400,y:0,width:298,height:600};
+            }
+            e.scale=1/2;
+            e.x=10+150*i
+            e.y=100;
+            menu_duel.addChild(e);
+            var rect = new createjs.Shape();
+            rect.graphics.beginFill("rgba(20,20,20,0.7)").drawRect(11+150*i, 340, 148, 60);
+            rect.graphics.beginFill("rgba(111, 255, 231, 0.7)").drawRect(11+150*i, 105, 148, 32);
+            menu_duel.addChild(rect);
+            var t = new createjs.Text(data.list[i].crest, "14px Arial", "white");
+            t.x=12+150*i
+            t.y=350;
+            menu_duel.addChild(t);
+            var t = new createjs.Text(data.list[i].name, "bold 24px Arial", "white");
+            t.x=13+150*i
+            t.y=375;
+            menu_duel.addChild(t);
+            if(i==0){
+            var t = new createjs.Text("ルーム長", "bold 26px Arial", "rgb(255, 111, 55)");
+            t.x=50+150*i
+            t.y=110;
+            menu_duel.addChild(t);
+            }else{
+            if(data.list[i].ready){
+              var t = new createjs.Text("READY", "bold 26px Arial", "rgb(255, 111, 55)");
+              t.x=45+150*i
+              t.y=110;
+              menu_duel.addChild(t);
+            }}
+            }
+            var Cstar = new createjs.Shape(graphics);
             Cstar.x=30;
             Cstar.y=120;
             Cstar.rotation=-15;
             Cstar.scale=0.6;
             menu_duel.addChild(Cstar)
-          for(var i=0;i<data.list.length;i++){
-            var t = new createjs.Text(data.list[i].crest, "14px Arial", "white");
-            t.x=10+150*i
-            t.y=425;
-            menu_duel.addChild(t);
-            var t = new createjs.Text(data.list[i].name, "bold 24px Arial", "white");
-            t.x=10+150*i
-            t.y=450;
-            menu_duel.addChild(t);
-            if(i==0){
-            var t = new createjs.Text("ルーム長", "bold 26px Arial", "orange");
-            t.x=40+150*i
-            t.y=480;
-            menu_duel.addChild(t);
-            }else{
-            if(data.list[i].ready){
-              var t = new createjs.Text("READY", "bold 26px Arial", "orange");
-              t.x=40+150*i
-              t.y=480;
-              menu_duel.addChild(t);
-            }}
-            var e = new createjs.Bitmap(queue.getResult(chrimg_src[data.list[i].chr]));
-            if(data.list[i].chr==5){
-            e.sourceRect={x:460,y:0,width:300,height:600};              
-            }else{
-            e.sourceRect={x:400,y:0,width:300,height:600};
-            }
-            e.scale=1/2;
-            e.x=9+150*i
-            e.y=100;
-            menu_duel.addChild(e);
-            }
       }
   }
   });
@@ -4207,13 +4214,24 @@ if(opLock==0 && gamestate ==1){
       };
   function Remaincheck(num=-1){
     //残パイ
-    //num -1->リスト n~->指定パイのチェック
-    var RemainPack=deck.concat();
-    RemainPack=RemainPack.concat(hand2);
-    RemainPack=RemainPack.concat(hand3);
-    RemainPack=RemainPack.concat(hand4);
-    RemainPack=RemainPack.concat(Extrash);
+    //num -2->チュートリアル -1->リスト n~->指定パイのチェック
+  if(num==-2){
+    deck=[];
+    for(var i =0; i<70; i++){
+      deck.push(i);
+      }
+      deck.push(60,61,62,63,64,65,66,67);
+      deck.push(0,4,9,13,17,20,24,28,32,37,42,45,49,52,56);
+      var RemainPack=deck.concat();
+  }else{
+      var RemainPack=deck.concat();
+      RemainPack=RemainPack.concat(hand2);
+      RemainPack=RemainPack.concat(hand3);
+      RemainPack=RemainPack.concat(hand4);
+      RemainPack=RemainPack.concat(Extrash);
+  }
     switch(num){
+      case -2:
       case -1:
         paiviewerMask.removeAllChildren();
         for(var i=0;i<70;i++){
@@ -4426,30 +4444,32 @@ if(opLock==0 && gamestate ==1){
       t.x=720;
       t.y=410;
       field.addChild(t);
-      if(pvpmode==0){
+      if(skillswitch[0] !==-2){
       var t = new createjs.Text("スキル", "16px 'Century Gothic'", "white");
       t.x=720;
       t.y=450;
       field.addChild(t);
       };
         parentY =400
+        var Ary=[500,500,500,500,500,500,500,400];
+        var Ary2=[0,50,0,0,60,0,60,0];
         e11 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[1]]));
-        e11.sourceRect={x:500,y:0,width:300,height:600}
+        e11.sourceRect={x:Ary[chara[1]],y:Ary2[chara[1]],width:300,height:600}
         e11.x=0;
         e11.y=400;
         e11.scale=1/3;
         e12 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[2]]));
-        e12.sourceRect={x:500,y:0,width:300,height:300}
+        e12.sourceRect={x:Ary[chara[2]],y:Ary2[chara[2]],width:300,height:300}
         e12.x=0;
         e12.y=100;
         e12.scale=1/3;
         e13 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[3]]));
-        e13.sourceRect={x:500,y:0,width:300,height:300}
+        e13.sourceRect={x:Ary[chara[3]],y:Ary2[chara[3]],width:300,height:300}
         e13.x=0;
         e13.y=200;
         e13.scale=1/3;
         e14 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[4]]));
-        e14.sourceRect={x:500,y:0,width:300,height:300}
+        e14.sourceRect={x:Ary[chara[4]],y:Ary2[chara[4]],width:300,height:300}
         e14.x=0;
         e14.y=300;
         e14.scale=1/3;
@@ -5095,6 +5115,13 @@ if(opLock==0 && gamestate ==1){
         var N=1+MEMBER.findIndex(value=>value.id==data.who);
         tumo2=data.Tumo;
         TumoRon(N,0);
+        return true;
+        //ここいるかどうかわからない
+        if(ippatu[N]==1 && chara[N]==6 && skillusage[chr]==1){
+          SkillAnimation(N,0,1);
+        }else{
+          TumoRon(N,0);
+        }
       };
       });
     socket.on("ron-pai", (data)=>{
@@ -5178,6 +5205,28 @@ if(opLock==0 && gamestate ==1){
       }
       };
     });
+    socket.on("skill-pai", (data)=>{
+      //socket.emit("skill", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[0].id,to:target,SEtype:SEtype,status:true});
+      if(debugmode){console.log('skill-pai',N,data.status);}
+      if(IAM.token!== data.Token){
+        var N=1+MEMBER.findIndex(value=>value.id==data.who);
+        var M=1+MEMBER.findIndex(value=>value.id==data.to);
+        var Tg;
+        switch(chara[who]){
+          case 1:
+          case 3:
+            Tg=M;
+            break;
+          default:
+            Tg=data.Target;
+            break;
+        }
+        //キャラごとにtargetの扱いが異なる
+        //エルス、レナ→targetの相手に対して
+        //アイシャ、レイヴン、ラシェ→targetの値そのまま
+        SkillAnimation(N,Tg,data.SEtype);
+      };
+    })
       function turnchecker(n=-1){
         console.log('turnchecker'+turn,ponsw[0],nuki[0],ManaBreak)
         if(n>=0){tumotemp=n};
@@ -5690,6 +5739,80 @@ if(opLock==0 && gamestate ==1){
         }
         }}
   
+      socket.on("skill-pai", (data)=>{
+        if(debugmode){console.log('throwed-pai',data,IAM.mwah);}
+        if(IAM.token!== data.Token){
+          var I=MEMBER.findIndex(value=>value.token==data.Token);
+          switch(I){
+            case 3:
+              //
+              hand1=data.Hand.hand2.concat();
+              hand2=data.Hand.hand3.concat();
+              hand3=data.Hand.hand4.concat();
+              hand4=data.Hand.hand1.concat();
+              for(var i=1;i<4;i++){
+                //reach 0 2 3 4 1
+                //Reach 0 1 2 3 4
+                buff[i]=data.Buff[i+1];
+                DP[i]=data.Dp[i+1];
+                ippatu[i]=data.Ippatu[i+1];
+                nuki[i]=data.Nuki[i+1];
+              }
+              reach[4]=data.Reach[1];
+              DP[4]=data.Dp[1];
+              ippatu[4]=data.Ippatu[1];
+              nuki[4]=data.Nuki[1];
+              break;
+            case 2:
+              hand1=data.Hand.hand3.concat();
+              hand2=data.Hand.hand4.concat();
+              hand3=data.Hand.hand1.concat();
+              hand4=data.Hand.hand2.concat();
+              for(var i=1;i<3;i++){
+                //reach   3 4 1 2
+                //Reach 0 1 2 3 4
+                reach[i]=data.Reach[i+2];
+                reach[i+2]=data.Reach[i];
+                DP[i]=data.Dp[i+2];
+                DP[i+2]=data.Dp[i];
+                nuki[i]=data.Nuki[i+2];
+                nuki[i+2]=data.Nuki[i];
+                ippatu[i]=data.Ippatu[i+2];
+                ippatu[i+2]=data.Ippatu[i];
+              }
+              break;
+            case 1:
+              hand1=data.Hand.hand4.concat();
+              hand2=data.Hand.hand1.concat();
+              hand3=data.Hand.hand2.concat();
+              hand4=data.Hand.hand3.concat();
+              for(var i=2;i<5;i++){
+                //reach   4 1 2 3
+                //Reach 0 1 2 3 4
+                reach[i]=data.Reach[i-1];
+                DP[i]=data.Dp[i-1];
+                ippatu[i]=data.Ippatu[i-1];
+                nuki[i]=data.Nuki[i-1];
+              }
+              reach[1]=data.Reach[4];
+              DP[1]=data.Dp[4];
+              ippatu[1]=data.Ippatu[4];
+              nuki[1]=data.Nuki[4];
+              break;
+            default:
+              console.log('member error',I)
+                hand1=data.Hand.hand1.concat();
+                hand2=data.Hand.hand2.concat();
+                hand3=data.Hand.hand3.concat();
+                hand4=data.Hand.hand4.concat();
+                reach=data.Reach.concat();
+                DP=data.Dp.concat();
+                ippatu=data.Ippatu.concat();
+                nuki=data.Nuki.concat();
+                break;
+          }
+        };           
+      })
       socket.on("throwed-pai", (data)=>{
         if(debugmode){console.log('throwed-pai',data,IAM.mwah);}
         //非送信者なら2行目の内容を更新する
@@ -5800,9 +5923,15 @@ if(opLock==0 && gamestate ==1){
     C.x=-480;
     C.y=B-200;
     if(chara[p]==5){C.y+=60};
+    if(chara[p]==7){C.x+=100};
     Container.addChild(C);
-    createjs.Tween.get(C)
-    .to({x:-560},60);
+    if(chara[p]==7){
+      createjs.Tween.get(C)
+      .to({x:-460},60);
+    }else{
+      createjs.Tween.get(C)
+      .to({x:-560},60);
+    }
     MBicon.x=160;
     MBicon.y=B-50;
     Container.addChild(MBicon);
@@ -5863,24 +5992,48 @@ if(opLock==0 && gamestate ==1){
       rivery[player] +=50
       riverx[player] =110
       }
-      if(chara[player]==4 && pvpmode==0){
+      if(chara[player]==4 && skillswitch[0] !==-2){
         if((tumotemp>=0 && tumotemp<=3)||(tumotemp>=12 && tumotemp<=15)||tumotemp==64){
           var MS=Buff[player].filter(value=>value==4)
           if(MS.length<3){Buff[player].push(4)}
         };
         }
-      if(chara[player]==3 && pvpmode==0){
+      if(chara[player]==3 && skillswitch[0] !==-2){
         if((tumotemp>=8 && tumotemp<=11)||(tumotemp>=40 && tumotemp<=43)||tumotemp==66){
           var MS=Buff[player].filter(value=>value==3)
           if(MS.length<3){Buff[player].push(3)}
         };
         }
-      if(chara[player]==2 && pvpmode==0){
+      if(chara[player]==2 && skillswitch[0] !==-2){
         if((tumotemp>=4 && tumotemp<=7)||(tumotemp>=20 && tumotemp<=23)||tumotemp==61){
           var MS=Buff[player].filter(value=>value==2)
           if(MS.length<5){Buff[player].push(2)}
         };
         }
+      if(chara[player]==7 && skillswitch[0] !==-2 && skillswitch[player]!==2){
+        //[0,1,2,3,4,5] 6
+        var MS=0;
+        if(trash[player-1].length>=4){
+          for(var i=0;i<4;i++){
+            var M=trash[player-1][trash[player-1].length-4+i];
+            if(M%4 == i){
+              MS+=1;
+            }
+          }
+        }
+        console.log(MS);
+        if(MS==4){
+          skillswitch[player]=2;
+          //ドラを1枚追加
+          dora.push(king.splice(0,1));
+          dorax+=40;
+          e7 = new createjs.Bitmap(eltear_src[dora[dora.length-1]]);
+          e7.x=dorax;
+          e7.y=10;
+          e7.scale=33/120;
+          field.addChild(e7);
+        }
+      }
       if(ippatu[player]==1){//守備表示
       counterR[player]=counter[player];
       riverx[player] +=43.5
@@ -5912,19 +6065,36 @@ if(opLock==0 && gamestate ==1){
       if(player==parent){DP[player] +=mpVelocity*1.2}else{DP[player] +=mpVelocity};
       if(DP[player]>30){DP[player]=30}
       drawDP(player);
-      if(chara[player]==1 && pvpmode==0){Buff[player].push(1)};
+      if(chara[player]==1 && skillswitch[0] !==-2){Buff[player].push(1)};
         se9.play();
         if(auras==0 && musicnum!==Math.abs(musicset[1])){
           musicnum=Math.abs(musicset[1]);
           musicStart(musicnum);
         };
-        ReachAnimation(player);
+        //ラシェ
+        if(skillswitch[0] !==-2 && skillusage[player]==0 && chara[player]==6){
+          var N=LP.filter(value=>value>=0);
+          if(DP[player]==30 && deck.length>=N.length){
+          //デッキトップから生存メンバーの数だけ手前の部分のデッキに当たりパイを挿入する
+          console.log('変身');
+          DP[player]=0
+          drawDP(player);
+          skillusage[player]=1;
+          skillswitch[player]=0;
+          var Wait=Reachwait(-1,player);
+          if(Wait.length>=2){
+            var M=Wait[1+Math.floor(Math.random()*(Wait.length-1))]
+            deck.splice(N.length-2,1,M);
+          }};
+          }
         //イヴ様
         for(var i=1;i<5;i++){
-          if(pvpmode==0 && i!==player && chara[i]==5 && skillusage[i]==0){
+          if(skillswitch[0] !==-2 && i!==player && chara[i]==5 && skillusage[i]==0){
             skillusage[i]=player;
           }
-      }}else{//通常
+        }
+        ReachAnimation(player);
+    }else{//通常
       riverx[player] +=33
       e5.x=riverx[player];
       e5.y=rivery[player];
@@ -5944,7 +6114,6 @@ if(opLock==0 && gamestate ==1){
       t.x=riverx[player]+5;
       t.y=rivery[player]+5;
       field.addChild(t);
-      //
           }
       counter[player] +=1
       if(player==parent){DP[player] +=mpVelocity*1.2}else{DP[player] +=mpVelocity};
@@ -5952,7 +6121,7 @@ if(opLock==0 && gamestate ==1){
       drawDP(player);
       turnchecker();
       }
-      }
+      };
       if(num ==0){
       reachhand=[];
       var ponnum=pon1.length;
@@ -6120,6 +6289,7 @@ if(opLock==0 && gamestate ==1){
           break;
         }
       if(LP_PVP.Block[0]==2){mode=1;}else{mode=0};
+      if(LP_PVP.Skill[0]==1){skillswitch[0]=-2}else{skillswitch[0]=-1};
       }
       if(pvp==1 && !IsHost(IAM.room)){return false};
       if(pvp==1 && IsHost(IAM.room)){
@@ -6135,7 +6305,7 @@ if(opLock==0 && gamestate ==1){
         var A=MEMBER.length;
         if(A<4){
         for(var i=A; i<4; i++){
-          var R=Math.floor(Math.random()*chrlist.length)
+          var R=Math.floor(Math.random()*(1+HiddenChara))
         //chara[i]=R;
         chara[i+1]=i;
             MEMBER.push({id:MEMBER.length,token:0,name:"CPU"+i,chr:chara[i+1],score:LP[i+1],turnflag:0,pc:0});
@@ -6156,7 +6326,7 @@ if(opLock==0 && gamestate ==1){
       };
     if(chara[0]==0){
       for(var i=2;i<chara.length;i++){
-        var R=Math.floor(Math.random()*chrlist.length)
+        var R=Math.floor(Math.random()*(1+HiddenChara))
         chara[i]=R
       }
     }
@@ -6417,7 +6587,7 @@ if(opLock==0 && gamestate ==1){
           ponkanmap.addChild(btn1);
           btn1.addEventListener("click",{card:0,handleEvent:ReachBt});
       }
-      if(chara[1] !==0 && skillswitch[1]==0 && pvpmode==0){
+      if(chara[1] !==0 && skillswitch[1]==0 && skillswitch[0] !==-2){
         var btn1 = createButton("スキル", 80, 40);
           btn1.x = 710;
           btn1.y = 440;
@@ -6430,9 +6600,25 @@ if(opLock==0 && gamestate ==1){
         },100)
     if(reach[1] ==0){cx2.clearRect(630,440,80,40)}
     }else{
-    //山から1枚引いてくる nuki>0の場合はデッキ外から2枚ドロー
+    //山から1枚引いてくる nuki>0の場合はデッキ外からランダムにドロー
     if(nuki[0]>0){
+      if(chara[1]==7 && skillswitch[0] !==-2 && DP[1]>10){
+        //アラ裁定
+        DP[1]-=10;
+        drawDP(1);
+        if(reach[1]==3){
+        var Wait=Reachwait(-1,1);
+        if(Wait.length>=2){
+          tumo=Wait[1+Math.floor(Math.random()*(Wait.length-1))]
+          }else{
+          tumo=Math.floor(Math.random()*60);            
+          }
+        }else{
+          tumo=dora[Math.floor(Math.random()*(dora.length-1))]
+        }
+      }else{
       tumo=Math.floor(Math.random()*60);
+      }
     }else{
     if(deck.length<=0){
         console.log('deckerror');
@@ -6502,7 +6688,7 @@ if(opLock==0 && gamestate ==1){
           break;
       }
       }
-    if(chara[1] !==0 && skillswitch[1]==0 && pvpmode==0){
+    if(chara[1] !==0 && skillswitch[1]==0 && skillswitch[0] !==-2){
       var btn1 = createButton("スキル", 80, 40);
       btn1.x = 710;
       btn1.y = 440;
@@ -6614,7 +6800,7 @@ if(opLock==0 && gamestate ==1){
           socket.emit("deck_length",{Token:IAM.token,room:RoomName[IAM.room],Deck:deck});
         }
           decklength();
-          if(skillswitch[chr]==1 && skillswitch[0] !==-1){
+          if(skillswitch[chr]==1 && skillswitch[0] !==-2){
             switch(chara[chr]){
               case 1:
             if(DP[chr]>=20){
@@ -6660,7 +6846,12 @@ if(opLock==0 && gamestate ==1){
           if(reach[chr]==3 || deck.length==0 || counter[chr]==0){//流す理由が無い、つも
           console.log('cp',chr,'ツモ',han[chr])
           ctl[chr]=2
-          TumoRon(chr,0)
+          if(ippatu[chr]==1 && chara[chr]==6 && skillusage[chr]==1){
+            SkillAnimation(chr,0,1);
+          }else{
+            TumoRon(chr,0);
+          }
+
           if(pvpmode==1){
             socket.emit("tumo", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[chr-1].id,Tumo:tumo2,status:true});
             }
@@ -6677,8 +6868,8 @@ if(opLock==0 && gamestate ==1){
      }};
   
      function cpuskill(chr){
-      console.log(chr,reach)
-      if(pvpmode==1){return false};
+      console.log(chr,reach,skillswitch[0])
+      if(skillswitch[0] !==0){return false};
       if(reach[chr]==1 && skillswitch[chr]==0){//スキルを使用するかここで決める
         switch(chara[chr]){
           case 1://エ
@@ -6708,7 +6899,7 @@ if(opLock==0 && gamestate ==1){
         if(skillusage2[chr]>-1){
           SkillAnimation(chr,r4);
           return true;
-      }else if((Cpuhandtemp[r4]>=3 && Cpuhandtemp[r4]<=5)||(Cpuhandtemp[r4]>=15 && Cpuhandtemp[r4]<=17)){
+      }else if((Cpuhandtemp[r4]>=4 && Cpuhandtemp[r4]<=7)||(Cpuhandtemp[r4]>=20 && Cpuhandtemp[r4]<=23)){
         SkillAnimation(chr,r4);
         return true;
       }else{
@@ -7741,6 +7932,7 @@ if(opLock==0 && gamestate ==1){
       }
       if(LP[1]<=0){PB("飛び",1,1)};
       PB("ポン",ponsw[1]/3,1);
+      PB("カン",kan1.length/4,1);
       if(rootscore==220000){
         PB("数え役満");}
         if(rootscore==150000){
@@ -7760,8 +7952,12 @@ if(opLock==0 && gamestate ==1){
       if(LP[0]==4){
         //従来通りツモ画面の描画のみ
         e15 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[player]]));
-        e15.sourceRect={x:10,y:10,width:780,height:400};
-        e15.x=10+raidscore[1]*800;
+      if(ippatu[player]==1 && chara[player]==6 && skillusage[player]==1){
+        e15.sourceRect={x:0,y:10,width:400,height:400};
+      }else{
+        e15.sourceRect={x:400,y:10,width:400,height:400}
+      }
+        e15.x=400+raidscore[1]*800;
         e15.y=100;
       fieldmap.addChild(e15);
       var e = new createjs.Bitmap(eltearB_src[1]);
@@ -7924,8 +8120,12 @@ if(opLock==0 && gamestate ==1){
       cx2.clearRect(0,0,800,600);
       handmap.removeAllChildren();
       e15 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[player]]));
-      e15.sourceRect={x:10,y:10,width:780,height:400};
-      e15.x=10+raidscore[1]*800;
+      if(ippatu[player]==1 && chara[player]==6 && skillusage[player]==1){
+        e15.sourceRect={x:0,y:10,width:400,height:400};
+      }else{
+        e15.sourceRect={x:400,y:10,width:400,height:400}
+      }
+      e15.x=400+raidscore[1]*800;
       e15.y=100;
      field.addChild(e15);
      var e = new createjs.Bitmap(eltearB_src[1]);
@@ -8845,29 +9045,76 @@ if(opLock==0 && gamestate ==1){
         }
       }
    
-    function Reachwait(num){
+    function Reachwait(num,p=1){
       //hand1のnum番目を切った場合に何待ちなのか3枚くらいパイを表示する
       //0に○○待ちの文字、1~3に待ちパイ
-      console.log('Reachwait',num)
+      //p->player
+      //num -1->現在の手パイで判定 -2->残パイを無視（予定）
+      console.log('Reachwait',num,p)
       var Count={};
       var Line={};
       var Color={};
       var Result=[];
       Result.push("ノーテン");
-      handtemp = hand1.concat(pon1);
-      //カンは1つ減らしてポンと同じ裁定にしてみる
-      if(kan1.length){
-        var A=kan1.concat();
-        if(kan1.length>=8){
-          A.splice(4,1);
-        }
-        if(kan1.length>=4){
-          A.splice(0,1);
-        }
-        handtemp = handtemp.concat(A);
+      switch(p){
+        case 1:
+          handtemp = hand1.concat(pon1);
+          if(kan1.length){
+            var A=kan1.concat();
+            if(kan1.length>=8){
+              A.splice(4,1);
+            }
+            if(kan1.length>=4){
+              A.splice(0,1);
+            }
+            handtemp = handtemp.concat(A);
+          }
+          break;
+        case 2:
+          handtemp = hand2.concat(pon2);
+          if(kan2.length){
+            var A=kan2.concat();
+            if(kan2.length>=8){
+              A.splice(4,1);
+            }
+            if(kan2.length>=4){
+              A.splice(0,1);
+            }
+            handtemp = handtemp.concat(A);
+          }
+          break;
+        case 3:
+          handtemp = hand3.concat(pon3);
+          if(kan3.length){
+            var A=kan3.concat();
+            if(kan3.length>=8){
+              A.splice(4,1);
+            }
+            if(kan3.length>=4){
+              A.splice(0,1);
+            }
+            handtemp = handtemp.concat(A);
+          }
+          break;
+        case 4:
+          handtemp = hand4.concat(pon4);
+          if(kan4.length){
+            var A=kan4.concat();
+            if(kan4.length>=8){
+              A.splice(4,1);
+            }
+            if(kan4.length>=4){
+              A.splice(0,1);
+            }
+            handtemp = handtemp.concat(A);
+          }
+          break;
       }
             //下でCがエラー吐いたので
-            handtemp.splice(num,1);
+            if(num>=0){handtemp.splice(num,1)}else{
+              var X=handtemp.findIndex(value=>value==100)
+                if(X!==-1){handtemp.splice(X,1);};
+            };
             handtemp.sort(compareFunc);
             for(var i=1; i<handtemp.length;i++){
               var C=donpai.findIndex(value=>value.id==handtemp[i])
@@ -9059,11 +9306,9 @@ if(opLock==0 && gamestate ==1){
                 //マスロパイ待ち
                 console.log('crest reach')
                 var E=donpai.filter(value=>value.color==resultF && value.id>=60);
-                for(var i=0; i<E.length ; i++){
                   if(Remaincheck(E[i].id)){
                     Result.push(E[i].id);
                   }
-                }
               }
             }
           break;
@@ -10348,7 +10593,7 @@ if(opLock==0 && gamestate ==1){
             ponkanmap.addChild(btn1)
             btn1.addEventListener("click", {card:1,handleEvent:TumoronBt});
           };
-          if(chara[1] !==0 && skillswitch[1]==0 && pvpmode==0){
+          if(chara[1] !==0 && skillswitch[1]==0 && skillswitch[0] !==-2){
             var btn1 = createButton("スキル", 80, 40);
               btn1.x = 710;
               btn1.y = 440;
@@ -10421,7 +10666,11 @@ if(opLock==0 && gamestate ==1){
           if(pvpmode==1){
             socket.emit("tumo", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[0].id,Tumo:tumo,status:true});
             }
-          TumoRon(1,0);
+            if(ippatu[1]==1 && chara[1]==6 && skillusage[1]==1){
+              SkillAnimation(1,0,1);
+            }else{
+              TumoRon(1,0);
+            }
           };
           break;
         case 2:
@@ -10494,7 +10743,7 @@ if(opLock==0 && gamestate ==1){
             ponkanmap.addChild(btn1)
             btn1.addEventListener("click", {card:1,handleEvent:TumoronBt});
           };
-          if(chara[1] !==0 && skillswitch[1]==0 && pvpmode==0){
+          if(chara[1] !==0 && skillswitch[1]==0 && skillswitch[0] !==-2){
             var btn1 = createButton("スキル", 80, 40);
               btn1.x = 710;
               btn1.y = 440;
@@ -10567,8 +10816,8 @@ if(opLock==0 && gamestate ==1){
           Textlist[1].text="おまかせにするとランダムに決定されます。";  
         }
         if(mouseX >520 && mouseX <650 && mouseY >345 && mouseY <375){
-          Textlist[0].text="CPUのアクティブスキルの設定です。";
-          Textlist[1].text="禁止するとCPUはスキルを使用しません（パッシブスキルは適用）";  
+          Textlist[0].text="キャラごとのパッシブ・アクティブスキルの設定です。";
+          Textlist[1].text="「プレイヤーのみ」では、CPUのパッシブスキルは適用されます。";  
         }
             break;
           case 2:
@@ -10709,11 +10958,12 @@ if(opLock==0 && gamestate ==1){
                 cx2.font = "18px Arial";
                 var elskunn=[
                   {name:"サバイバル　一般的な麻雀のようなルールです。",sub:"誰かが飛ぶかオーラス終了までドンジャラをします。"},
-                  {name:"デスマッチ　和了しても自分の持ち点は増えず、誰かが飛んでも",sub:"試合が続きます。（飛んだプレイヤーは2局後に75000点で復活）"},
+                  {name:"デスマッチ　より多くの相手を飛ばした人が勝つルールです。",sub:"和了で自分の得点が増えず、飛んだ人は1局経過後に復活します。"},
                   {name:"魔界血戦　4人中3人が和了するまで対局が続きます。",sub:"後の局ほど点数が高くなります。"},
                   {name:"持ち点　ゲーム開始時の持ち点です。",sub:"※得点基準参考：親が満貫の場合、75000点"},
                   {name:"対局数の設定　東風では最大4局まで、",sub:"半荘では最大8局までドンジャラが続きます。"},
                   {name:"満貫打ち止め　満貫ブロックの有無の設定です。",sub:"「なし」にすると高得点が出やすくなります。"},
+                  {name:"スキル　キャラごとのパッシブ/アクティブスキルの設定です。",sub:"スキルありにすると、無法地帯になりやすくなります。"},
                 ];
                 if(mouseX >160 && mouseX <330 && mouseY >0 && mouseY <45){
                   if(LP_PVP.Rule[0]==1){
@@ -10739,8 +10989,12 @@ if(opLock==0 && gamestate ==1){
                   Textlist[0].text=elskunn[5].name
                   Textlist[1].text=elskunn[5].sub
                 }
+                if(mouseX >530 && mouseX <660 && mouseY >45 && mouseY <80){
+                  Textlist[0].text=elskunn[6].name
+                  Textlist[1].text=elskunn[6].sub
+                }
                 if(IsHost(IAM.room)){
-                  if(mouseX >610 && mouseX <790 && mouseY >100 && mouseY <170){
+                  if(mouseX >610 && mouseX <790 && mouseY >80 && mouseY <150){
                     cx2.clearRect(10,521,400,70)
                     if(LP_PVP.Rule[0]==1){
                       Textlist[0].text=elskunn[0].name
@@ -10753,17 +11007,21 @@ if(opLock==0 && gamestate ==1){
                       Textlist[1].text=elskunn[2].sub
                     }
                   }
-                  if(mouseX >610 && mouseX <790 && mouseY >180 && mouseY <240){
+                  if(mouseX >610 && mouseX <790 && mouseY >160 && mouseY <220){
                     Textlist[0].text=elskunn[3].name
                     Textlist[1].text=elskunn[3].sub
                   }
-                  if(mouseX >610 && mouseX <790 && mouseY >250 && mouseY <310){
+                  if(mouseX >610 && mouseX <790 && mouseY >230 && mouseY <290){
                     Textlist[0].text=elskunn[4].name
                     Textlist[1].text=elskunn[4].sub
                   }
-                  if(mouseX >610 && mouseX <790 && mouseY >310 && mouseY <390){
+                  if(mouseX >610 && mouseX <790 && mouseY >300 && mouseY <360){
                     Textlist[0].text=elskunn[5].name
                     Textlist[1].text=elskunn[5].sub
+                  }
+                  if(mouseX >610 && mouseX <790 && mouseY >370 && mouseY <430){
+                    Textlist[0].text=elskunn[6].name
+                    Textlist[1].text=elskunn[6].sub
                   }
                 } 
               break;      
@@ -11170,13 +11428,18 @@ if(opLock==0 && gamestate ==1){
       createjs.Tween.get(C)
       .to({scale:1},200, createjs.Ease.cubicInOut);
       var C = new createjs.Bitmap(queue.getResult(chrimg_src[chara[player]]));
-      C.x=-600
+      if(ippatu[player]==1 && chara[player]==6 && skillusage[player]==1){
+        C.sourceRect={x:0,y:0,width:400,height:600};
+      }else{
+        C.sourceRect={x:400,y:0,width:400,height:600}
+      }
+      C.x=-200
       C.y=0;
       C.scaleX=14/8;
       C.scaleY=2;
       Container.addChild(C);
       createjs.Tween.get(C)
-      .to({x:0, scaleX:1, scaleY:1},200, createjs.Ease.cubicInOut)
+      .to({x:400, scaleX:1, scaleY:1},200, createjs.Ease.cubicInOut)
       if(type==0){
       var C = new createjs.Bitmap(queue.getResult(win_src[4]));
       }else{
@@ -11317,13 +11580,18 @@ if(opLock==0 && gamestate ==1){
       .to({x:D.x-800/3,y:D.y+100},1100);
       }
       var C = new createjs.Bitmap(queue.getResult(chrimg_src[chara[p]]));
-      C.x=-600
+      if(ippatu[p]==1 && chara[p]==6 && skillusage[p]==1){
+        C.sourceRect={x:0,y:0,width:400,height:600};
+      }else{
+        C.sourceRect={x:400,y:0,width:400,height:600}
+      }
+      C.x=-200
       C.y=0;
       C.scaleX=14/8;
       C.scaleY=2;
       Container.addChild(C);
       createjs.Tween.get(C)
-      .to({x:0, scaleX:1, scaleY:1},200, createjs.Ease.cubicInOut)
+      .to({x:400, scaleX:1, scaleY:1},200, createjs.Ease.cubicInOut)
       .wait(800)
       .to({x:-400, scaleX:1.1, scaleY:1.1,alpha:0.5},150);
       var C = new createjs.Bitmap(queue.getResult(win_src[6]));
@@ -11364,7 +11632,12 @@ if(opLock==0 && gamestate ==1){
       shapeMask.y=200;
       Container.mask = shapeMask;
     var C = new createjs.Bitmap(queue.getResult(chrimg_src[chara[p]]));
-      C.x=-300;
+    if(ippatu[p]==1 && chara[p]==6 && skillusage[p]==1){
+      C.sourceRect={x:0,y:0,width:400,height:400};
+    }else{
+      C.sourceRect={x:400,y:0,width:400,height:400}
+    }
+      C.x=100;
       C.y=0;
       if(chara[p]==5){C.y=60};
       Container.addChild(C);
@@ -11386,8 +11659,13 @@ if(opLock==0 && gamestate ==1){
     .call(next);
     createjs.Tween.get(shapeMask)
     .to({y:150,scaleY: 1},60);
+    if(chara[p]==7){
+      createjs.Tween.get(C)
+      .to({x:100},60);  
+    }else{
     createjs.Tween.get(C)
     .to({x:0},60);
+    }
     //
       function next(){
         Container.removeAllChildren();
@@ -11442,7 +11720,12 @@ if(opLock==0 && gamestate ==1){
         shapeMask.y=200;
         Container.mask = shapeMask;
       var C = new createjs.Bitmap(queue.getResult(chrimg_src[chara[p]]));
-        C.x=-300;
+      if(ippatu[p]==1 && chara[p]==6 && skillusage[p]==1){
+        C.sourceRect={x:0,y:0,width:400,height:400};
+      }else{
+        C.sourceRect={x:400,y:0,width:400,height:400}
+      }
+        C.x=100;
         C.y=0;
         if(chara[p]==5){C.y=60};
         Container.addChild(C);
@@ -11464,8 +11747,13 @@ if(opLock==0 && gamestate ==1){
       .call(next);
       createjs.Tween.get(shapeMask)
       .to({y:150,scaleY: 1},60);
+      if(chara[p]==7){
+        createjs.Tween.get(C)
+        .to({x:100},60);  
+      }else{
       createjs.Tween.get(C)
       .to({x:0},60);
+      }
         function next(){
           //pai -1-> もう一度自分のターン 0- ->加カンで使用 
           ponkanmap.removeAllChildren();
@@ -11509,10 +11797,17 @@ if(opLock==0 && gamestate ==1){
           }
         };
       };    
-  function SkillAnimation(p=0,target=0){
+  function SkillAnimation(p=0,target=0,SEtype=0){
+    if(pvpmode==1){
+      if(target>0 && target<5){
+      socket.emit("skill", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[0].id,to:MEMBER[target-1].id,Target:target,SEtype:SEtype,status:true});
+      }else{
+      socket.emit("skill", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[0].id,to:MEMBER[0].id,Target:target,SEtype:SEtype,status:true});
+      }
+    }
     cLock=0;
     console.log('操作禁止')
-    se12.play();
+    if(SEtype==0){se12.play()}else{se19.play()};
     skilltext1=skilltext[chara[p]].fir
     skilltext2=skilltext[chara[p]].sec
     skilltext3=skilltext[chara[p]].thr
@@ -11539,13 +11834,18 @@ if(opLock==0 && gamestate ==1){
       createjs.Tween.get(C)
       .to({scale:1},200, createjs.Ease.cubicInOut);
     var C = new createjs.Bitmap(queue.getResult(chrimg_src[chara[p]]));
-    C.x=-600
+    if(chara[p]==6){
+      C.sourceRect={x:0,y:0,width:400,height:600};
+    }else{
+      C.sourceRect={x:400,y:0,width:400,height:600}
+    }
+    C.x=-200
     C.y=0;
     C.scaleX=14/8;
     C.scaleY=2;
     Container.addChild(C);
     createjs.Tween.get(C)
-    .to({x:0, scaleX:1, scaleY:1},200, createjs.Ease.cubicInOut)
+    .to({x:400, scaleX:1, scaleY:1},200, createjs.Ease.cubicInOut)
     .wait(800)
     .to({x:-400, scaleX:1.1, scaleY:1.1,alpha:0.5},150);
     createjs.Tween.get(Container)
@@ -11587,8 +11887,9 @@ if(opLock==0 && gamestate ==1){
   }
   };
   function SpecialSkill(player,target=0){
+    //skillanimationではp=1-4に対してこちらではp=charaなので注意　こら！
     var p=chara[player]
-    console.log("skill",player,target)
+    console.log("skill",player,target,skillswitch[player])
     if(skillswitch[player]==0){
     //skillswitch 0使用可能 1次の自分のターンにリセット 2この局では使用不可
     if(p==1){//エル
@@ -11707,7 +12008,7 @@ if(opLock==0 && gamestate ==1){
         skillusage[player]+=1;
       }else{
         //メモライズしてから切る
-        skillusage2[player]=Cpuhandtemp[target-100];
+        skillusage2[player]=Cpuhandtemp[target];
         var SX=Cpuhandtemp[target]
         DP[player]-=10;
         drawDP(player);
@@ -11814,6 +12115,9 @@ if(opLock==0 && gamestate ==1){
           cLock=4;
         }
       }
+    if(p==6){//ラシェ
+      TumoRon(player,0);
+    }
     }
     }//specialskill
   socket.on("game-over", (data)=>{
@@ -11964,28 +12268,23 @@ if(opLock==0 && gamestate ==1){
     s.graphics.drawRect(0, 0, 800, 600);
     field.addChild(s);
     var e10 = new createjs.Bitmap(queue.getResult(chrimg_src[LPresult[3].chara]));
-      e10.x=-100;
+      e10.sourceRect={x:400,y:0,width:400,height:600}
+      e10.x=200;
       e10.y=50;
       e10.scale=1.2;
       e10.alpha=0;
       field.addChild(e10);
       createjs.Tween.get(e10)
       .wait(1800)
-      .to({alpha:1,x:100,scale:3/4}, 200, createjs.Ease.cubicInOut)
+      .to({alpha:1,x:400,scale:3/4}, 200, createjs.Ease.cubicInOut)
       .call(next);
     field.addChild(e10);
+    var Ary=[500,500,500,500,480,500,500,400];
+    var Ary2=[50,120,50,50,70,50,70,50];
     for(var i=0;i<3;i++){
     var e10 = new createjs.Bitmap(queue.getResult(chrimg_src[LPresult[2-i].chara]));
-    if(LPresult[2-i].chara==1){
-      e10.sourceRect={x:500,y:120,width:215,height:215}
+      e10.sourceRect={x:Ary[LPresult[2-i].chara],y:Ary2[LPresult[2-i].chara],width:215,height:215}
       e10.scale=60/215;
-      }else if(LPresult[2-i].chara==4){
-      e10.sourceRect={x:480,y:70,width:250,height:250}
-      e10.scale=60/250;
-      }else{
-      e10.sourceRect={x:500,y:50,width:215,height:215}
-      e10.scale=60/215;
-      }
       e10.x=-100;
       e10.y=201+100*i;
       createjs.Tween.get(e10)
@@ -12134,7 +12433,7 @@ if(opLock==0 && gamestate ==1){
   }
   switch(num){
     case 0:
-    drawbuttom(635,10,"スキル",1,50,20)
+    drawbuttom(635,10,"スキル",1,70,40)
     if(p==1){
       cx2.font = "bold 16px Arial";
       cx2.fillText("ストーンスキン", 635, 130);
@@ -12163,7 +12462,7 @@ if(opLock==0 && gamestate ==1){
       cx2.fillText("対象:手札のパイ1つ", 635, 210);
       cx2.fillText("(オールマイティ以外)", 635, 230);
       if(skillusage2[player]==-1){
-        cx2.fillText("効果:MPを1ゲージ", 635, 250);
+        cx2.fillText("効果:①MPを1ゲージ", 635, 250);
         cx2.fillText("消費し,対象のパイを", 635, 270);
         cx2.fillText("メモしてから切る.", 635, 290);
         cx2.fillText("メモしたパイは,", 635, 310);
@@ -12249,7 +12548,7 @@ if(opLock==0 && gamestate ==1){
       cx2.fillText("連技-龍牙爆砕", 635, 130);
       cx2.font = "14px Arial";
       cx2.fillText("・1局に1度だけ,", 635, 150);
-      cx2.fillText("・1,2,3,4ラインの順に", 635, 170);
+      cx2.fillText("1,2,3,4ラインの順に", 635, 170);
       cx2.fillText("パイを切ると発動する.", 635, 190);
       cx2.fillText("ドラを1つ追加する.", 635, 210);
       cx2.font = "bold 15px Arial";
@@ -12284,7 +12583,7 @@ if(opLock==0 && gamestate ==1){
     break;
    default:
     //Buff
-    drawbuttom(635,10,"バフ",1,60,20)
+    drawbuttom2(635,10,"バフ",1,70,40,1)
     var y=130;
     if(LP[player]<0){
       cx2.font = "bold 20px Arial";
@@ -12430,6 +12729,7 @@ if(opLock==0 && gamestate ==1){
         "tumoCon":tumoConfig,
         "PON":Ponrate,
         "FEV":Fever,
+        "HiddenChr":HiddenChara,
       };    
   console.log(UserData_Don);
   PopAnm("セーブ完了");
@@ -12454,6 +12754,7 @@ if(opLock==0 && gamestate ==1){
   tumoConfig=getdata.tumoCon;
   Ponrate=getdata.PON;
   Fever=getdata.FEV;
+  HiddenChara=getdata.HiddenChr;
   //追加データ部分　undefinedなら初期値にしておく
   if (mpVelocity === void 0) {
     mpVelocity=1;
@@ -12466,6 +12767,9 @@ if(opLock==0 && gamestate ==1){
   }
   if (Fever === void 0) {
     Fever=-1;
+  }
+  if (HiddenChara === void 0) {
+    HiddenChara=3;
   }
   if (Ponrate === void 0) {
     Ponrate=0.4;
@@ -12497,7 +12801,7 @@ if(opLock==0 && gamestate ==1){
   chara =new Array(0,0,0,0,0);
   vBar=1;
   sBar=1;
-  musicset=new Array(3,7,8);
+  musicset=new Array(0,0,0);
   winrank=[0,0,0,0,0];
   highscore=[0,0,0,0];
   tumoConfig=0;
@@ -12543,6 +12847,7 @@ if(opLock==0 && gamestate ==1){
       "tumoCon":tumoConfig,
       "PON":Ponrate,
       "FEV":Fever,
+      "HiddenChr":HiddenChara,
     }
     console.log(json_obj)
     var write_json=JSON.stringify(json_obj);
@@ -12604,6 +12909,7 @@ if(opLock==0 && gamestate ==1){
     tumoConfig=data.tumoCon;
     Ponrate=data.PON;
     Fever=data.FEV;
+    HiddenChara=data.HiddenChr;
     //追加データ部分　undefinedなら初期値にしておく
     if (mpVelocity === void 0) {
       mpVelocity=1;
@@ -12616,6 +12922,9 @@ if(opLock==0 && gamestate ==1){
     }
     if (Fever === void 0) {
       Fever=-1;
+    }
+    if (HiddenChara === void 0) {
+      HiddenChara=3;
     }
     if (Ponrate === void 0) {
       Ponrate=0.4;
@@ -12691,7 +13000,7 @@ if(opLock==0 && gamestate ==1){
       se16.volume(0.3*sBar);
       se17.volume(0.3*sBar);
       se18.volume(0.4*sBar);
-      se19.volume(0.3*sBar);
+      se19.volume(0.6*sBar);
       jingle.volume(0.3*sBar);
       jingle2.volume(0.3*sBar);
       }
