@@ -6178,7 +6178,6 @@ if(opLock==0 && gamestate ==1){
       }
       if(player==1){Elname(tumotemp)};
       e5= new createjs.Bitmap(queue.getResult(eltear_src[tumotemp]));
-      e5.src=eltear_src[tumotemp]
       if(counter[player]==28){
       rivery[player] +=50
       riverx[player] =110
@@ -6834,7 +6833,7 @@ if(opLock==0 && gamestate ==1){
     ctl[1]=1
     var PE=hand1.findIndex(value=>value==100);
     hand1[PE]=tumo;
-    drawcard= new createjs.Bitmapqueue.getResult((eltear_src[tumo]));
+    drawcard= new createjs.Bitmap(queue.getResult(eltear_src[tumo]));
     drawcard.alpha=0;
     drawcard.x=690;
     drawcard.y=470;
