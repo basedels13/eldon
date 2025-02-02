@@ -1,14 +1,12 @@
 // var1.00　season2 テスト
 // npm run dev
-// やる気があれば→　オーラスの画像　通産省率をモードごとに
-// 対戦でスキル開放　キャラ開放条件
-// 全職75枚（エピックライン1枚ずつ増量）＋オールマイティ2枚＋マスター8枚×2（ガ、ロ、ベ、デ、ソ、ア、ハ）合計93枚スタート
+// 対戦中のスキルテスト未　やる気があれば→パッシブのスキル演出
 window.onload = function(){
   draw();
   };
   
   function draw(){
-  var titletext="v1.01/Click to START";
+  var titletext="v1.00/Click to START";
   var debugmode=false;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にfalseに
   //自分自身の情報を入れる箱
   var IAM = {
