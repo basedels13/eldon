@@ -254,7 +254,7 @@ window.onload = function(){
   var Clvup = new createjs.Bitmap("don/Don_fever.png");
   Clvup.alpha=0;
   stage.addChild(Clvup);
-  var Dlvup = new createjs.Bitmap(queue.getResult("don/Don_aurus.png"));
+  var Dlvup = new createjs.Bitmap("don/Don_aurus.png");
   Dlvup.alpha=0;
   stage.addChild(Dlvup);
     //アップデートする
