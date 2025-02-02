@@ -11800,7 +11800,7 @@ if(opLock==0 && gamestate ==1){
       }else if(chara[p]==6){
         C.sourceRect={x:400,y:0,width:400,height:600}
       }else{
-        C.sourceRect={x:0,y:0,width:400,height:600}
+        C.sourceRect={x:0,y:0,width:800,height:600}
       }
       if(chara[p]==6){
         C.x=-200;
