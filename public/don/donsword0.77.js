@@ -1,6 +1,6 @@
 // var1.00　season2 テスト
 // npm run dev
-// やる気があれば→　オーラスの画像
+// やる気があれば→　オーラスの画像　通産省率をモードごとに
 // 対戦でスキル開放　キャラ開放条件
 // 全職75枚（エピックライン1枚ずつ増量）＋オールマイティ2枚＋マスター8枚×2（ガ、ロ、ベ、デ、ソ、ア、ハ）合計93枚スタート
 window.onload = function(){
@@ -9,7 +9,7 @@ window.onload = function(){
   
   function draw(){
   var titletext="v1.01/Click to START";
-  var debugmode=true;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にfalseに
+  var debugmode=false;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にfalseに
   //自分自身の情報を入れる箱
   var IAM = {
     token: null,    // 戸別管理用のトークン
@@ -114,7 +114,6 @@ window.onload = function(){
   var mouseY;
   var Savetitle =new Array("This is savedata of <https://azurelsword.web.fc2.com/ronan.html>",0,0);
   var mute="ON"
-  var alpha = 0;
   var Username = "player";
   var UsernameText = new createjs.Text(Username, "24px Arial", "white");
   var Usercrest = "称号なし";
@@ -336,7 +335,7 @@ window.onload = function(){
   var epic_src =new Array("don/elstudio_bg1.png","don/Don_epic1.png","don/Don_epic2.png","don/Don_epic3.png","don/Don_epic6.png","don/Don_ss11.png","don/Don_epic4.png","don/Don_epic5.png");
   //パイの裏
   var eltearB_src =new Array("don/Don_img0.png","don/Don_winbg.png");
-  //donpaiのidは0から始める　ロゼimg40-43は位置が変わる
+  //donpaiのidは0から始める
   var eltear_src = new Array("don/Don_img1.png","don/Don_img2.png","don/Don_img3.png","don/Don_img4_1.png","don/Don_img4.png","don/Don_img5.png","don/Don_img6.png","don/Don_img4_2.png","don/Don_img7.png","don/Don_img8.png","don/Don_img9.png","don/Don_img4_3.png","don/Don_img10.png",);
   eltear_src.push("don/Don_img11.png","don/Don_img12.png","don/Don_img4_4.png","don/Don_img13.png","don/Don_img14.png","don/Don_img15.png","don/Don_img4_5.png","don/Don_img16.png","don/Don_img17.png","don/Don_img18.png","don/Don_img4_6.png","don/Don_img19.png","don/Don_img20.png",);
   eltear_src.push("don/Don_img21.png","don/Don_img4_7.png","don/Don_img22.png","don/Don_img23.png","don/Don_img24.png","don/Don_img4_8.png","don/Don_img25.png","don/Don_img26.png","don/Don_img27.png","don/Don_img4_9.png","don/Don_img28.png","don/Don_img29.png","don/Don_img30.png",);
@@ -374,7 +373,7 @@ window.onload = function(){
   {fir:"グラウンドクラッシュ",sec:"GROUND CRUSH",thr:"0"},
   {fir:"クイーンズスローン",sec:"QUEEN'S THRONE",thr:"0"},
   {fir:"ルナティック一発ツモ",sec:"Lunatic Ippatsu",thr:"0"},
-  {fir:"竜牙爆砕",sec:"Dragon Arts 'Blast'",thr:"0"},
+  {fir:"龍牙爆砕",sec:"Dragon Arts 'Blast'",thr:"0"},
   ]
   //name->キャラsub->職、役判定で使用　line->ライン役判定に使用 0->all　color->1234567陽水風月土火E 0->all
   var donpai=[
@@ -518,6 +517,7 @@ window.onload = function(){
   {name:"必殺の一撃",sub:"600000点以上の手を和了する"},
   {name:"回れ！回れ！回れ！",sub:"通算30回ポンする"},
   {name:"YOUならやれるポン",sub:"通算100回ポンする"},
+  {name:"フォルギネイの果実",sub:"嶺上開花で和了する"},
   {name:"変化無双",sub:"国士無双を和了する"},
   {name:"幸運の証票",sub:"天和を和了する"},
   {name:"海千山千",sub:"海底を和了する"},
@@ -589,6 +589,7 @@ window.onload = function(){
     {name:"ダブル放銃",sub:"その他"},
     {name:"飛び",sub:"その他"},
     {name:"ポン",sub:"その他"},
+    {name:"カン",sub:"その他"},
     {name:"満貫",sub:"その他"},
     {name:"跳満",sub:"その他"},
     {name:"二倍満",sub:"その他"},
@@ -600,15 +601,17 @@ window.onload = function(){
       achieveB[i].cleared=0;
       achieveB[i].count=0;
     }
-    //通算順位割合
-  var winrank=[0,0,0,0,0];
-  var highscore=[0,0,0,0];//0->通算プレイ回数 1->最大終了得点 2->1回の最大得点 3->連荘回数
+  //通算順位割合
+  var winrank=[[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]];//一般、ヘル、デスマッチ、魔界血戦、予備
+  //winrank[0][4]をP切り替えに利用
+  var highscore=[0,0,0,0,0,0];//0->通算プレイ回数 1->最大終了得点 2->1回の最大得点 3->連荘回数 4->対戦回数 5->予備
   var scoretemp=[0,0,0,0,0,0];//0->0:escで途中抜けした1-4:順位 3->最大火力 1->連荘 245未使用
   var achievetemp=[];//name,達成回数,シナジーの場合はcountを記録
   //countミスってますがclearedに加算してください
   var achievetempB=[
     {name:"門前ツモ",count:0},
     {name:"一発",count:0},
+    {name:"嶺上開花",count:0},
     {name:"天和",count:0},
     {name:"海底",count:0},
     {name:"ツモ",count:0},
@@ -887,6 +890,10 @@ window.onload = function(){
     });
     const jingle2 =new Howl({
       src: "don/Result_li.mp3",
+      volume: 0.3,
+    });
+    const jingle3 =new Howl({
+      src: "don/soL_jingle.mp3",
       volume: 0.3,
     });
   const bgm1data ={
@@ -1287,7 +1294,7 @@ function updateParticles() {
       se6.play();
       saveUP();
       saveUP_Local();
-      if(debugmode){HiddenChara=chrlist.length-1};
+      if(debugmode){HiddenChara=3};
       Menu();
       soundmap.alpha=1;
     }
@@ -2073,8 +2080,9 @@ function menuMap(p=0){
         case 0:
           //プロフィール
           Textlist[0].text="今までの主な戦績です。";
-          Textlist[1].text="ニックネームやキャラクターを変更できます。"
-          var rect = new createjs.Shape();//名前入力欄
+          Textlist[1].text="ニックネームやキャラクターを変更できます。";
+          //名前入力欄
+          var rect = new createjs.Shape()
           rect.graphics
               .beginFill("rgba(0,0,0,0.8)")
               .drawRect(530, 90, 200, 40);
@@ -2094,16 +2102,17 @@ function menuMap(p=0){
               rect.graphics.beginFill("rgba(0,0,0,0.8)").drawRect(530+50*j, 400+50*k, 50, 50);
               menu_main.addChild(rect);
               var t = new createjs.Text("？", "26px 'Century Gothic'", "rgba(240,240,240,0.6)");
-              t.x=550+50*j;
-              t.y=415+50*k;
+              t.x=540+50*j;
+              t.y=410+50*k;
               menu_main.addChild(t);
-            }
+            }else{
             e11 = new createjs.Bitmap(queue.getResult(chrimg_src[i]));
             e11.sourceRect={x:AryX[i],y:AryY[i],width:200,height:200}
             e11.x=530+50*j;
             e11.y=400+50*k;
             e11.scale=1/4;
             menu_main.addChild(e11);
+            }
           }
           var rect = new createjs.Shape();//キャラ設定欄
           rect.graphics
@@ -2124,23 +2133,55 @@ function menuMap(p=0){
           drawbuttom(60,125,"実績リスト",0,130,44);
           drawbuttom(60,170,"達成役1",0,130,44);
           drawbuttom(60,215,"達成役2",0,130,44);
-          var wT=winrank[0]+winrank[1]+winrank[2]+winrank[3]
+          var wT=winrank[winrank[0][4]][0]+winrank[winrank[0][4]][1]+winrank[winrank[0][4]][2]+winrank[winrank[0][4]][3]
           var winrate=0;
           if(wT>0){
-            winrate=Math.floor(winrank[0]/wT*1000)/10  
+            winrate=Math.floor(winrank[winrank[0][4]][0]/wT*1000)/10  
           }
           var X=200;
           cx2.font = "22px 'Century Gothic'";
           cx2.fillStyle = "black";
-          cx2.fillText( "総プレイ回数："+highscore[0]+"回",X,105);
-          cx2.fillText( "通算勝率："+winrate+"%",X,135);
+          cx2.fillText( "打数　ソロ："+highscore[0]+"回 /対戦："+highscore[4]+"回",X,105);
+          cx2.fillText( "勝率："+winrate+"%",X,135);
+          cx2.textAlign="center";
+          cx2.fillText( LPlist[winrank[0][4]],450,135);
+          cx2.textAlign="start";
           cx2.fillText( "最大戦闘力："+highscore[1],X,185);
           cx2.fillText( "瞬間最大火力："+highscore[2],X,215);
           cx2.font = "18px 'Century Gothic'";
-          cx2.fillText( "(1位："+winrank[0]+" /2位："+winrank[1]+" /3位："+winrank[2]+" /4位："+winrank[3]+")",X,155);
+          cx2.fillText( "順位別　1位："+winrank[winrank[0][4]][0]+" /2位："+winrank[winrank[0][4]][1]+" /3位："+winrank[winrank[0][4]][2]+" /4位："+winrank[winrank[0][4]][3],X,155);
+          var option_arrow = new createjs.Shape();
+                option_arrow.graphics.beginFill("#0080ff").beginStroke("#68ceed").setStrokeStyle(2)
+                        .moveTo(0, 0).lineTo(18, -12).lineTo(18, 12).lineTo(0, 0)
+                option_arrow.x=370;
+                option_arrow.y=125;
+                menu_main.addChild(option_arrow);
+                option_arrow.addEventListener("click", {card:1,handleEvent:SoundBar});
+                var option_arrow = new createjs.Shape();
+                option_arrow.graphics.beginFill("#0080ff").beginStroke("#68ceed").setStrokeStyle(2)
+                        .moveTo(0, -12).lineTo(18, 0).lineTo(0, 12).lineTo(0, -12)
+                option_arrow.x=510;
+                option_arrow.y=125;
+                menu_main.addChild(option_arrow);
+                option_arrow.addEventListener("click", {card:2,handleEvent:SoundBar});
+                function SoundBar(){
+                  if(this.card==1){
+                    se3.play()
+                    winrank[0][4]-=1;
+                    if(winrank[0][4]==-1){winrank[0][4]=4};
+                    if(winrank[0][4]==3){winrank[0][4]=2};
+                  }
+                  if(this.card==2){
+                    se3.play()
+                    winrank[0][4]+=1;
+                    if(winrank[0][4]==3){winrank[0][4]=4};
+                    if(winrank[0][4]==5){winrank[0][4]=0};
+                  }
+                  menuMap(2);
+                };
           var achieveC=achieveB.filter(value=>value.sub=="その他");
           X+=10;
-          var Y=250
+          var Y=245
           cx2.fillStyle = "black"; 
           cx2.font = "20px 'Century Gothic'";
           cx2.fillText("最大連荘",X,Y);
@@ -2150,7 +2191,7 @@ function menuMap(p=0){
               cx2.fillText(achieveC[i].name,X,Y);
               cx2.fillText(achieveC[i].cleared+"回",X+130,Y);
             Y+=22;
-            if(Y>=500){
+            if(Y>510){
               X+=280;
               Y=110;
             }
@@ -2162,12 +2203,12 @@ function menuMap(p=0){
           Textlist[1].text="クリックで装着することができます。（効果はない）"
           var A=achieveA.findIndex(value=>value.name==Usercrest);
           if(A>=0){
-            if(A<20){
+            if(A<=20){
               cx2.fillStyle = "rgba(0,0,0,0.3)";
               cx2.fillRect(190,92+20*A,240,20);
             }else{
               cx2.fillStyle = "rgba(0,0,0,0.3)";
-              cx2.fillRect(470,92+20*(A-20),240,20);
+              cx2.fillRect(470,92+20*(A-21),240,20);
             }
           }
             drawbuttom(60,80,"戦績",0,130,44);
@@ -2191,7 +2232,7 @@ function menuMap(p=0){
                 cx2.font = "18px 'Century Gothic'";
               }
               Y+=20;
-              if(Y>=500){
+              if(Y>=520){
                 X+=280;
                 Y=110;
               }
@@ -3204,11 +3245,157 @@ function NameChange(){
     if(A.length>=30){
       AK("強靭な実績コレクター");
     }
-    if(winrank[0]>=3){
+    if(winrank[0][0]>=3 || winrank[1][0]>=3 || winrank[2][0]>=3 || winrank[3][0]>=3){
       AK("甘美な勝利")
     }
-    if(winrank[3]>=5){
+    if(winrank[0][3]>=5 || winrank[1][3]>=5 || winrank[2][3]>=5 || winrank[3][3]>=5){
       AK("ドカーン！")
+    }
+    //キャラクター解放
+    switch(HiddenChara){
+      case 3:
+        var A=achieveA.findIndex(value=>value.name=="もう一度かかってこい");
+        var B=achieveB.findIndex(value=>value.name=="殴り合い");
+        if(achieveA[A].cleared>0 && achieveB[B].cleared>0 && scoretemp[0]>0){
+          CharaUnlock(HiddenChara);
+        }
+        break;
+      case 4:
+      var A=achievetempB.findIndex(value=>value.name=="放銃");
+      var B=achieveB.findIndex(value=>value.name=="ナソード研究");
+      if(achievetempB[A].count==0 && achieveB[B].cleared>0 && scoretemp[0]>0){
+        CharaUnlock(HiddenChara);
+      }
+        break;
+      case 5:
+      var A=achieveA.findIndex(value=>value.name=="スケアチェイス");
+      var B=achieveB.findIndex(value=>value.name=="一発");
+      if(achieveA[A].cleared>0 && achieveB[B].cleared>=5 && scoretemp[0]>0){
+        CharaUnlock(HiddenChara);
+      }
+        break;
+      case 6:
+        var A=achieveB.findIndex(value=>value.name=="貫徹する足取り");
+        var B=achieveB.findIndex(value=>value.name=="豊かな足取り");
+        var C=achieveB.findIndex(value=>value.name=="上手な足取り");
+        var D=achieveB.findIndex(value=>value.name=="交感の足取り");
+        var E=achievetempB.findIndex(value=>value.name=="カン");
+        if(achieveB[A].cleared>0 && achieveB[B].cleared>0 && achieveB[C].cleared>0 && achieveB[D].cleared>0 && achievetempB[E].count>0 && scoretemp[0]>0){
+          CharaUnlock(HiddenChara);
+        }
+        break;
+        default:
+          break;
+    }
+    function CharaUnlock(){
+      //適当なコンテナをお借りする
+      jingle3.seek(1);
+      jingle3.play();
+      var Ary=[
+        ["パッシブスキル：ナソードコア","a","　太陽パイを切る度にナソードコアを生成","a","　ナソードコア1つにつき+10符","a","　コアがある時、一度だけ食いしばり発動","b","アクティブスキル：グラウンドクラッシュ","a","　MPを3ゲージ消費","a","　台パンによりその局を流局にする"],
+        ["パッシブスキル：クイーンズスローン","a","　リーチが発生した時に一度だけ危険パイを察知する"],
+        ["パッシブスキル：変身/ルナティックフューリー","a","　MPが満タンの時にリーチ時に変身","a","　変身時、高確率で一発ツモが発生する"],
+        ["パッシブスキル：連技-龍牙爆砕","a","　1,2,3,4ライン順にパイを切った時に発動","a","ドラを1つ追加する","b","パッシブスキル：花蓮","a","　カンした時にMPを1ゲージ消費して発動","a","　リーチしていれば当たりパイを、","a","　非リーチ時であればドラをドローする"]
+      ]
+      HiddenChara+=1;
+      handmap.removeAllChildren();
+      var shape = new createjs.Shape();
+      shape.graphics.beginFill("rgb(45,45,45)");
+      shape.graphics.drawRect(0, 0, 800, 600);
+      handmap.addChild(shape);
+      var e = new createjs.Bitmap(queue.getResult(chrimg_src[HiddenChara]));
+      e.sourceRect={x:400,y:0,width:400,height:510}
+      e.x=40;
+      e.y=0;
+      e.scale=1.5;
+      e.alpha=0.2;
+      handmap.addChild(e);
+      var C = new createjs.Bitmap(queue.getResult(win_src[7]));
+      C.scale=1;
+      handmap.addChild(C);
+      createjs.Tween.get(C)
+      .wait(4980).call(end);
+      var shape = new createjs.Shape();
+      shape.graphics.beginFill("rgba(166, 255, 155, 0.7)");
+      shape.graphics.drawRect(10, 100, 550, 12);
+      shape.graphics.beginFill("rgba(0, 161, 100, 0.7)");
+      shape.graphics.drawRect(10, 60, 550, 40);
+      shape.graphics.drawRect(10, 110, 550, 4);
+      shape.graphics.drawRect(40, 140, 550, 200);
+      handmap.addChild(shape);
+      var t = new createjs.Text("N E W   C H A R A C T E R !", "18px 'Century Gothic'", "white");
+      t.x=20;
+      t.y=95;
+      handmap.addChild(t);
+      var t = new createjs.Text("新たにキャラクターが使用可能になりました！", "26px 'Century Gothic'", "white");
+      t.x=15;
+      t.y=65;
+      handmap.addChild(t);
+      var X=145;
+      for(var i=0;i<Ary[HiddenChara-4].length;i++){
+      if(Ary[HiddenChara-4][i]=="a"){
+        i+=1;
+        var t = new createjs.Text(Ary[HiddenChara-4][i], "18px 'Century Gothic'", "white");
+      }else if(Ary[HiddenChara-4][i]=="b"){
+        i+=1;
+        X+=15;
+        var t = new createjs.Text(Ary[HiddenChara-4][i], "22px 'Century Gothic'", "white");
+      }else{
+      var t = new createjs.Text(Ary[HiddenChara-4][i], "22px 'Century Gothic'", "white");
+      }
+      t.x=5;
+      t.y=X;
+      t.alpha=0;
+      X+=21;
+      handmap.addChild(t);
+      createjs.Tween.get(t)
+      .wait(i*350)
+      .to({x:55,alpha:1},175);
+      };
+            //ウィンドウを非アクティブ等にするとジングルとタイミングずれるけど仕方がない
+            function end(){
+              se19.play();
+              var t = new createjs.Text(chrlist[HiddenChara], "65px 'Century Gothic'", "rgba(247, 63, 17, 0.75)");
+              t.x=100;
+              t.y=430;
+              t.outline=8;
+              t.rotation=-6;
+              t.scale=1.2;
+              t.alpha=0;
+              handmap.addChild(t);
+              createjs.Tween.get(t)
+              .to({alpha:1,scale:1},200, createjs.Ease.cubicInOut);
+              var t = new createjs.Text(chrlist[HiddenChara], "65px 'Century Gothic'", "white");
+              t.x=100;
+              t.y=430;
+              t.rotation=-6;
+              t.scale=1.2;
+              t.alpha=0;
+              handmap.addChild(t);
+              createjs.Tween.get(t)
+            .to({alpha:1,scale:1},200, createjs.Ease.cubicInOut);
+            var e = new createjs.Bitmap(queue.getResult(chrimg_src[HiddenChara]));
+            e.sourceRect={x:400,y:0,width:400,height:600}
+            e.x=320;
+            e.y=-11;
+            e.alpha=0;
+            handmap.addChild(e);
+            createjs.Tween.get(e)
+            .to({x:390,alpha:1,scale:1},200);
+            var option_bt5 = new createjs.Bitmap('don/soL_batu.png');
+            option_bt5.x=700;
+            option_bt5.y=60;
+            option_bt5.scale=0.4;
+            handmap.addChild(option_bt5)
+            option_bt5.addEventListener("click", {card:-1,handleEvent:ExitCt});
+            }
+            function ExitCt(){
+              if(this.card==-1){
+                se3.play();
+                handmap.removeAllChildren();
+                return true;
+              }
+            }
     }
     //画像ID
     e4 = new createjs.Bitmap(queue.getResult(eltearB_src[0]));
@@ -3280,20 +3467,20 @@ function NameChange(){
     multi.addEventListener("click", {card:4,handleEvent:Menubutton});
     howto.addEventListener("click", {card:1,handleEvent:Menubutton});
     setting.addEventListener("click", {handleEvent:OptionConfig});
-    var wT=winrank[0]+winrank[1]+winrank[2]+winrank[3]
+    var wT=winrank[winrank[0][4]][0]+winrank[winrank[0][4]][1]+winrank[winrank[0][4]][2]+winrank[winrank[0][4]][3]
     var winrate=0;
     if(wT>0){
-      winrate=Math.floor(winrank[0]/wT*1000)/10  
+      winrate=Math.floor(winrank[winrank[0][4]][0]/wT*1000)/10  
     }
     var Ach=achieveA.filter(value=>value.cleared>0);
-    var Ary=["総プレイ回数："+highscore[0]+"回","通算勝率："+winrate+"%","最大戦闘力："+highscore[1],"瞬間最大火力："+highscore[2],"実績："+Ach.length+"/"+achieveA.length]
+    var Ary=["打数　ソロ："+highscore[0]+"回 /対戦："+highscore[4]+"回","勝率："+winrate+"%（"+LPlist[[winrank[0][4]]]+"）","最大戦闘力："+highscore[1],"瞬間最大火力："+highscore[2],"実績："+Ach.length+"/"+achieveA.length]
     for( i=0 ; i<Ary.length ; i++ ) {
       var t=new createjs.Text(Ary[i],"22px 'Century Gothic'","#ffffff");
       t.x=420;
       t.y=250+i*40;
       field.addChild(t);
     };
-    var t=new createjs.Text( "(1位："+winrank[0]+" /2位："+winrank[1]+" /3位："+winrank[2]+" /4位："+winrank[3]+")","16px 'Century Gothic'","#ffffff");
+    var t=new createjs.Text( "(1位："+winrank[winrank[0][4]][0]+" /2位："+winrank[winrank[0][4]][1]+" /3位："+winrank[winrank[0][4]][2]+" /4位："+winrank[winrank[0][4]][3]+")","16px 'Century Gothic'","#ffffff");
     t.x=420;
     t.y=310;
     field.addChild(t);
@@ -3620,12 +3807,21 @@ function NameChange(){
                 }
                 if(mouseX >530 && mouseX <730 && mouseY >450 && mouseY <500){
                   //下段はHiddenCharaに応じてアレしてください
-                  se3.play();
+                  var M=4+Math.floor((mouseX-530)/50);
+                  console.log(M,HiddenChara);
+                  if(M<=HiddenChara){
                   chara[1]=4+Math.floor((mouseX-530)/50);
+                  se3.play();
+                  }else{
+                  se2.play();
+                  Textlist[0].text="？マークがついているキャラクターは";
+                  Textlist[1].text="特定の条件を達成すると解放されます。"
+                  return false;
+                  }
                 }
               break;
             case 1:
-              if(mouseX >195 && mouseX <380 && mouseY >95 && mouseY <495){
+              if(mouseX >195 && mouseX <380 && mouseY >95 && mouseY <515){
                 var I=Math.floor((mouseY-95)/20);
                 cx3.strokeRect(190,92+I*20,240,20);
                 if(achieveA[I].cleared>0 && Usercrest!==achieveA[I].name){
@@ -3635,8 +3831,8 @@ function NameChange(){
                   Usercrest="称号なし";
                 };
               }
-              if(mouseX >475 && mouseX <660 && mouseY >95 && mouseY <495){
-                var I=Math.floor((mouseY-95)/20)+20;
+              if(mouseX >475 && mouseX <660 && mouseY >95 && mouseY <515){
+                var I=Math.floor((mouseY-95)/20)+21;
                 if(I>=achieveA.length){
                   return false;
                 }
@@ -7890,7 +8086,8 @@ if(opLock==0 && gamestate ==1){
         }
       if(nuki[0]>0){
         if(num==0){
-          Resultary.push('嶺上開花 1翻')
+          Resultary.push('嶺上開花 1翻');
+          PB("嶺上開花");
       }else{
           Resultary.push('槍槓 1翻');
       }
@@ -7954,10 +8151,16 @@ if(opLock==0 && gamestate ==1){
         e15 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[player]]));
       if(ippatu[player]==1 && chara[player]==6 && skillusage[player]==1){
         e15.sourceRect={x:0,y:10,width:400,height:400};
-      }else{
-        e15.sourceRect={x:400,y:10,width:400,height:400}
-      }
+        }else if(chara[player]==6){
+          e15.sourceRect={x:400,y:10,width:400,height:400}
+        }else{
+          e15.sourceRect={x:0,y:10,width:800,height:400};
+        }
+        if(chara[player]==6){
         e15.x=400+raidscore[1]*800;
+        }else{
+        e15.x=raidscore[1]*800
+        }
         e15.y=100;
       fieldmap.addChild(e15);
       var e = new createjs.Bitmap(eltearB_src[1]);
@@ -8122,10 +8325,16 @@ if(opLock==0 && gamestate ==1){
       e15 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[player]]));
       if(ippatu[player]==1 && chara[player]==6 && skillusage[player]==1){
         e15.sourceRect={x:0,y:10,width:400,height:400};
-      }else{
+      }else if(chara[player]==6){
         e15.sourceRect={x:400,y:10,width:400,height:400}
+      }else{
+        e15.sourceRect={x:0,y:10,width:800,height:400};
       }
+      if(chara[player]==6){
       e15.x=400+raidscore[1]*800;
+      }else{
+      e15.x=raidscore[1]*800
+      }
       e15.y=100;
      field.addChild(e15);
      var e = new createjs.Bitmap(eltearB_src[1]);
@@ -8326,7 +8535,7 @@ if(opLock==0 && gamestate ==1){
       var All=handtemp.filter(value=>value==69 || value==70)
       //console.log(All.length);
       fu-=10*(All.length)
-      var Wind=Buff[player].filter(value=>value==3);
+      var Wind=Buff[player].filter(value=>value==3 || value==4);
       if(Wind.length){
         fu+=10*Wind.length;
       }
@@ -10930,21 +11139,21 @@ if(opLock==0 && gamestate ==1){
             //実績
             switch(msgstate){
               case 1:
-              if(mouseX >195 && mouseX <380 && mouseY >95 && mouseY <495){
+              if(mouseX >195 && mouseX <380 && mouseY >95 && mouseY <515){
                 var I=Math.floor((mouseY-95)/20);
                 if(achieveA[I].cleared>0){
                 Textlist[0].text=achieveA[I].name;
                 Textlist[1].text=achieveA[I].sub;
                 }
               }
-              if(mouseX >475 && mouseX <660 && mouseY >95 && mouseY <495){
+              if(mouseX >475 && mouseX <660 && mouseY >95 && mouseY <515){
                 var I=Math.floor((mouseY-95)/20);
                 if(I>=achieveA.length){
                   return false;
                 }
                 if(achieveA[I+20].cleared>0){
-                  Textlist[0].text=achieveA[I+20].name;
-                  Textlist[1].text=achieveA[I+20].sub;
+                  Textlist[0].text=achieveA[I+21].name;
+                  Textlist[1].text=achieveA[I+21].sub;
                 }
               }
                 break;
@@ -11430,16 +11639,24 @@ if(opLock==0 && gamestate ==1){
       var C = new createjs.Bitmap(queue.getResult(chrimg_src[chara[player]]));
       if(ippatu[player]==1 && chara[player]==6 && skillusage[player]==1){
         C.sourceRect={x:0,y:0,width:400,height:600};
-      }else{
+      }else if(chara[player]==6){
         C.sourceRect={x:400,y:0,width:400,height:600}
+      }else{
+        C.sourceRect={x:0,y:0,width:800,height:600}
       }
-      C.x=-200
+      if(chara[player]==6){
+        C.x=-200;
+        createjs.Tween.get(C)
+        .to({x:400, scaleX:1, scaleY:1},200, createjs.Ease.cubicInOut)
+      }else{
+        C.x=-600;
+        createjs.Tween.get(C)
+        .to({x:-0, scaleX:1, scaleY:1},200, createjs.Ease.cubicInOut)
+      };
       C.y=0;
       C.scaleX=14/8;
       C.scaleY=2;
       Container.addChild(C);
-      createjs.Tween.get(C)
-      .to({x:400, scaleX:1, scaleY:1},200, createjs.Ease.cubicInOut)
       if(type==0){
       var C = new createjs.Bitmap(queue.getResult(win_src[4]));
       }else{
@@ -11582,18 +11799,28 @@ if(opLock==0 && gamestate ==1){
       var C = new createjs.Bitmap(queue.getResult(chrimg_src[chara[p]]));
       if(ippatu[p]==1 && chara[p]==6 && skillusage[p]==1){
         C.sourceRect={x:0,y:0,width:400,height:600};
-      }else{
+      }else if(chara[p]==6){
         C.sourceRect={x:400,y:0,width:400,height:600}
+      }else{
+        C.sourceRect={x:800,y:0,width:400,height:600}
       }
-      C.x=-200
+      if(chara[p]==6){
+        C.x=-200;
+        createjs.Tween.get(C)
+        .to({x:400, scaleX:1, scaleY:1},200, createjs.Ease.cubicInOut)
+        .wait(800)
+        .to({x:-400, scaleX:1.1, scaleY:1.1,alpha:0.5},150);
+      }else{
+        C.x=-600;
+        createjs.Tween.get(C)
+        .to({x:0, scaleX:1, scaleY:1},200, createjs.Ease.cubicInOut)
+        .wait(800)
+        .to({x:-800, scaleX:1.1, scaleY:1.1,alpha:0.5},150);
+      }
       C.y=0;
       C.scaleX=14/8;
       C.scaleY=2;
       Container.addChild(C);
-      createjs.Tween.get(C)
-      .to({x:400, scaleX:1, scaleY:1},200, createjs.Ease.cubicInOut)
-      .wait(800)
-      .to({x:-400, scaleX:1.1, scaleY:1.1,alpha:0.5},150);
       var C = new createjs.Bitmap(queue.getResult(win_src[6]));
       C.x=110
       C.y=260;
@@ -11661,10 +11888,10 @@ if(opLock==0 && gamestate ==1){
     .to({y:150,scaleY: 1},60);
     if(chara[p]==7){
       createjs.Tween.get(C)
-      .to({x:100},60);  
+      .to({x:300},60);  
     }else{
     createjs.Tween.get(C)
-    .to({x:0},60);
+    .to({x:200},60);
     }
     //
       function next(){
@@ -11749,10 +11976,10 @@ if(opLock==0 && gamestate ==1){
       .to({y:150,scaleY: 1},60);
       if(chara[p]==7){
         createjs.Tween.get(C)
-        .to({x:100},60);  
+        .to({x:300},60);  
       }else{
       createjs.Tween.get(C)
-      .to({x:0},60);
+      .to({x:200},60);
       }
         function next(){
           //pai -1-> もう一度自分のターン 0- ->加カンで使用 
@@ -12323,27 +12550,36 @@ if(opLock==0 && gamestate ==1){
         }
         switch(RankingStr[A]){
           case "1st":
-            scoretemp[0]=0;
-            break;
-          case "2nd":
             scoretemp[0]=1;
             break;
-          case "3rd":
+          case "2nd":
             scoretemp[0]=2;
             break;
-          case "4th":
+          case "3rd":
             scoretemp[0]=3;
+            break;
+          case "4th":
+            scoretemp[0]=4;
             break;
           default:
             break;
         };
+      if(pvpmode==0){
         highscore[0]+=1;
+      }else{
+        highscore[4]+=1;
+      }
       //スコア更新
       console.log(scoretemp,achievetemp,achievetempB)
         if(scoretemp[1]>highscore[3]){highscore[3]=scoretemp[1];};
         if(LP[1]>highscore[1]){highscore[1]=LP[1]};
         //if(LP[1]<=0){};
-        winrank[scoretemp[0]]+=1;
+        if(pvpmode==0 && LP[0]!==3){
+        var N=LP[0];
+        //3フリバ, 4魔界血戦なので
+          if(N==4){N=3};
+        winrank[N][scoretemp[0]-1]+=1;
+        };
         if(scoretemp[3]>highscore[2]){highscore[2]=scoretemp[3]};
         for(var i=0;i<achievetemp.length;i++){
             var A=achieveB.findIndex(value=>value.name==achievetemp[i].name);
@@ -12364,7 +12600,7 @@ if(opLock==0 && gamestate ==1){
         var S=achievetempB.findIndex(value=>value.name=="ロン");
         var R=achievetempB.findIndex(value=>value.name=="ポン");
         var U=achievetempB.findIndex(value=>value.name=="放銃");
-      if(scoretemp[0]==0 && achievetempB[U].count==0){
+      if(scoretemp[0]==1 && achievetempB[U].count==0){
         AK("見える、見えるぞ！")
       }
       if(achievetempB[U].count>=3){
@@ -12552,7 +12788,7 @@ if(opLock==0 && gamestate ==1){
       cx2.fillText("パイを切ると発動する.", 635, 190);
       cx2.fillText("ドラを1つ追加する.", 635, 210);
       cx2.font = "bold 15px Arial";
-      cx2.fillText("覇気天衝-千手華", 635, 230);
+      cx2.fillText("花蓮", 635, 230);
       cx2.font = "14px Arial";
       cx2.fillText("・カンをした時,", 635, 250);
       cx2.fillText("MPを1ゲージ消費して", 635, 270);
@@ -12756,6 +12992,9 @@ if(opLock==0 && gamestate ==1){
   Fever=getdata.FEV;
   HiddenChara=getdata.HiddenChr;
   //追加データ部分　undefinedなら初期値にしておく
+  if(!winrank[0].length){
+    winrank=[[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]];
+  }
   if (mpVelocity === void 0) {
     mpVelocity=1;
   }
@@ -12787,6 +13026,10 @@ if(opLock==0 && gamestate ==1){
     }
   }
   highscore=getdata.Highscore.concat();
+  if(highscore.length==4){
+    var B=[0,0];
+    highscore=highscore.concat(B);
+  }
   SEbuffer();
   PopAnm("データロード完了",800,200);
   console.log('Userdata loaded');
@@ -12802,8 +13045,8 @@ if(opLock==0 && gamestate ==1){
   vBar=1;
   sBar=1;
   musicset=new Array(0,0,0);
-  winrank=[0,0,0,0,0];
-  highscore=[0,0,0,0];
+  winrank=[[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]];
+  highscore=[0,0,0,0,0,0];
   tumoConfig=0;
   Ponrate=0.4;
   mpVelocity=1;
@@ -12911,6 +13154,9 @@ if(opLock==0 && gamestate ==1){
     Fever=data.FEV;
     HiddenChara=data.HiddenChr;
     //追加データ部分　undefinedなら初期値にしておく
+    if(!winrank[0].length){
+      winrank=[[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]];
+    }
     if (mpVelocity === void 0) {
       mpVelocity=1;
     }
@@ -12944,6 +13190,10 @@ if(opLock==0 && gamestate ==1){
       }
     }
     highscore=data.Highscore.concat();
+    if(highscore.length==4){
+      var B=[0,0];
+      highscore=highscore.concat(B);
+    }
     SEbuffer();
       jingle.seek(1);
       jingle.play();
@@ -12981,6 +13231,7 @@ if(opLock==0 && gamestate ==1){
         se19.volume(0);
         jingle.volume(0);
         jingle2.volume(0);
+        jingle3.volume(0);
       }else{
       se1.volume(0.25*sBar);
       se2.volume(0.4*sBar);
@@ -13003,6 +13254,7 @@ if(opLock==0 && gamestate ==1){
       se19.volume(0.6*sBar);
       jingle.volume(0.3*sBar);
       jingle2.volume(0.3*sBar);
+      jingle3.volume(0.3*sBar);
       }
     }   
   };
