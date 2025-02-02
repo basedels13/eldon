@@ -254,7 +254,7 @@ window.onload = function(){
   var Clvup = new createjs.Bitmap("don/Don_fever.png");
   Clvup.alpha=0;
   stage.addChild(Clvup);
-  var Dlvup = new createjs.Bitmap("don/Don_aurus.png");
+  var Dlvup = new createjs.Bitmap(queue.getResult("don/Don_aurus.png"));
   Dlvup.alpha=0;
   stage.addChild(Dlvup);
     //アップデートする
@@ -1015,6 +1015,7 @@ var queue = new createjs.LoadQueue(),
       manifest.push(epic_src[i])
     };
     manifest.push('don/circle88.png')
+    manifest.push('don/Don_aurus.png')
     manifest.push('don/soL_option_bt2.png')
     manifest.push('don/soL_option_bt3.png')
     manifest.push('don/soL_option_bt4.png')
@@ -4359,7 +4360,7 @@ if(opLock==0 && gamestate ==1){
       yakumapMask.addChild(tt);
       Y+=15;
       for(var j=0; j<Sinagy[i].chr.length ; j++){
-        s= new createjs.Bitmap(eltear_src[Sinagy[i].chr[j]]);
+        s= new createjs.Bitmap(queue.getResult(eltear_src[Sinagy[i].chr[j]]));
         s.scaleX=1/2;
         s.scaleY=1/2;
         if(j==9){
@@ -6176,7 +6177,7 @@ if(opLock==0 && gamestate ==1){
       trash[player-1].push(-1);
       }
       if(player==1){Elname(tumotemp)};
-      e5= new createjs.Bitmap(eltear_src[tumotemp]);
+      e5= new createjs.Bitmap(queue.getResult(eltear_src[tumotemp]));
       e5.src=eltear_src[tumotemp]
       if(counter[player]==28){
       rivery[player] +=50
@@ -6334,7 +6335,7 @@ if(opLock==0 && gamestate ==1){
       handlist=[];//左から順にパイの画像idが入る
       //handmap.removeAllChildren();
       for(var h=1;h<hand1.length;h++){
-      e1= new createjs.Bitmap(eltear_src[hand1[h]]);
+      e1= new createjs.Bitmap(queue.getResult(eltear_src[hand1[h]]));
         if(op==1 && h==hand1.length-1){
           e1.x=690;
           e1.y=500;
@@ -6363,7 +6364,7 @@ if(opLock==0 && gamestate ==1){
         handlist=[];//左から順にパイの画像idが入る
         //handmap.removeAllChildren();
         for(var h=1;h<10;h++){
-        e1= new createjs.Bitmap(eltear_src[hand1[h]]);
+        e1= new createjs.Bitmap(queue.getResult(eltear_src[hand1[h]]));
         e1.alpha=0;
         e1.x=100+size*(h-1);
         e1.y=500;
@@ -6833,7 +6834,7 @@ if(opLock==0 && gamestate ==1){
     ctl[1]=1
     var PE=hand1.findIndex(value=>value==100);
     hand1[PE]=tumo;
-    drawcard= new createjs.Bitmap(eltear_src[tumo]);
+    drawcard= new createjs.Bitmapqueue.getResult((eltear_src[tumo]));
     drawcard.alpha=0;
     drawcard.x=690;
     drawcard.y=470;
@@ -8181,7 +8182,7 @@ if(opLock==0 && gamestate ==1){
         s.x=raidscore[1]*800
       fieldmap.addChild(s);
         for (var i=1;i<vichand.length;i++){
-        var drawcard=new createjs.Bitmap(eltear_src[vichand[i]]);
+        var drawcard=new createjs.Bitmap(queue.getResult(eltear_src[vichand[i]]));
         drawcard.x=15+size*(i-1)+raidscore[1]*800;
         if(i==vichand.length-1){drawcard.x+=15}
         drawcard.y=120;
@@ -8359,7 +8360,7 @@ if(opLock==0 && gamestate ==1){
       var drawcard;
       var drawcardlist=[];
       for (var i=1;i<vichand.length;i++){
-      drawcard=new createjs.Bitmap(eltear_src[vichand[i]]);
+      drawcard=new createjs.Bitmap(queue.getResult(eltear_src[vichand[i]]));
       drawcard.alpha=0;
       drawcard.x=15+size*(i-1);
       if(i==vichand.length-1){drawcard.x+=15}
@@ -10356,7 +10357,7 @@ if(opLock==0 && gamestate ==1){
         case 1:
           if(pon1.length){
             for(var i=0;i<pon1.length;i++){
-              e9 = new createjs.Bitmap(eltear_src[pon1[i]]);
+              e9 = new createjs.Bitmap(queue.getResult(eltear_src[pon1[i]]));
               e9.x=590-33*i;
               e9.y=450;
               e9.scale=33/120;
@@ -10369,7 +10370,7 @@ if(opLock==0 && gamestate ==1){
             }
           if(kan1.length){
             for(var i=0;i<kan1.length;i++){
-              e9 = new createjs.Bitmap(eltear_src[kan1[i]]);
+              e9 = new createjs.Bitmap(queue.getResult(eltear_src[kan1[i]]));
               e9.x=590-33*(pon1.length+i);
               e9.y=450;
               e9.scale=33/120;
@@ -10384,7 +10385,7 @@ if(opLock==0 && gamestate ==1){
         case 2:
           if(pon2.length){
             for(var i=0;i<pon2.length;i++){
-              e9 = new createjs.Bitmap(eltear_src[pon2[i]]);
+              e9 = new createjs.Bitmap(queue.getResult(eltear_src[pon2[i]]));
               e9.x=590-33*i;
               e9.y=150;
               e9.scale=33/120;
@@ -10397,7 +10398,7 @@ if(opLock==0 && gamestate ==1){
             }
           if(kan2.length){
             for(var i=0;i<kan2.length;i++){
-              e9 = new createjs.Bitmap(eltear_src[kan2[i]]);
+              e9 = new createjs.Bitmap(queue.getResult(eltear_src[kan2[i]]));
               e9.x=590-33*(pon2.length+i);
               e9.y=150;
               e9.scale=33/120;
@@ -10412,7 +10413,7 @@ if(opLock==0 && gamestate ==1){
         case 3:
           if(pon3.length){
             for(var i=0;i<pon3.length;i++){
-              e9 = new createjs.Bitmap(eltear_src[pon3[i]]);
+              e9 = new createjs.Bitmap(queue.getResult(eltear_src[pon3[i]]));
               e9.x=590-33*i;
               e9.y=250;
               e9.scale=33/120;
@@ -10425,7 +10426,7 @@ if(opLock==0 && gamestate ==1){
             }
           if(kan3.length){
             for(var i=0;i<kan3.length;i++){
-              e9 = new createjs.Bitmap(eltear_src[kan3[i]]);
+              e9 = new createjs.Bitmap(queue.getResult(eltear_src[kan3[i]]));
               e9.x=590-33*(pon3.length+i);
               e9.y=250;
               e9.scale=33/120;
@@ -10440,7 +10441,7 @@ if(opLock==0 && gamestate ==1){
         case 4:
           if(pon4.length){
             for(var i=0;i<pon4.length;i++){
-              e9 = new createjs.Bitmap(eltear_src[pon4[i]]);
+              e9 = new createjs.Bitmap(queue.getResult(eltear_src[pon4[i]]));
               e9.x=590-33*i;
               e9.y=350;
               e9.scale=33/120;
@@ -10453,7 +10454,7 @@ if(opLock==0 && gamestate ==1){
             }
           if(kan4.length){
             for(var i=0;i<kan4.length;i++){
-              e9 = new createjs.Bitmap(eltear_src[kan4[i]]);
+              e9 = new createjs.Bitmap(queue.getResult(eltear_src[kan4[i]]));
               e9.x=590-33*(pon4.length+i);
               e9.y=350;
               e9.scale=33/120;
@@ -11299,7 +11300,7 @@ if(opLock==0 && gamestate ==1){
             console.log('Donpai error!')
             return false;
           }
-          var e6 = new createjs.Bitmap(eltear_src[type1]);
+          var e6 = new createjs.Bitmap(queue.getResult(eltear_src[type1]));
           e6.x=635;
           e6.y=15;
           e6.scale=7/12;
@@ -11340,7 +11341,7 @@ if(opLock==0 && gamestate ==1){
             };
             if(Wait.length>1){
               for(var i=1;i<Wait.length;i++){
-              var e9 = new createjs.Bitmap(eltear_src[Wait[i]]);
+              var e9 = new createjs.Bitmap(queue.getResult(eltear_src[Wait[i]]));
               e9.x=140+70*i;
               e9.y=410;
               e9.scale=1/2;
@@ -11800,7 +11801,7 @@ if(opLock==0 && gamestate ==1){
       }else if(chara[p]==6){
         C.sourceRect={x:400,y:0,width:400,height:600}
       }else{
-        C.sourceRect={x:800,y:0,width:400,height:600}
+        C.sourceRect={x:0,y:0,width:400,height:600}
       }
       if(chara[p]==6){
         C.x=-200;
@@ -11829,7 +11830,6 @@ if(opLock==0 && gamestate ==1){
       .wait(1000)
       .to({alpha: 0},100)
       .call(next);
-    //
     function next (){
       Container.removeAllChildren();
       stage.removeChild(Container);
