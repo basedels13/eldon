@@ -7,7 +7,7 @@ window.onload = function(){
   
   function draw(){
   var titletext="v1.00/Click to START";
-  var debugmode=false;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にfalseに
+  var debugmode=true;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にtrueに
   //自分自身の情報を入れる箱
   var IAM = {
     token: null,    // 戸別管理用のトークン
