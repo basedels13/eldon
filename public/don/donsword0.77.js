@@ -7,7 +7,7 @@ window.onload = function(){
   
   function draw(){
   var titletext="v1.00/Click to START";
-  var debugmode=true;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にtrueに
+  var debugmode=false;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にfalseに
   //自分自身の情報を入れる箱
   var IAM = {
     token: null,    // 戸別管理用のトークン
@@ -12492,16 +12492,28 @@ if(opLock==0 && gamestate ==1){
     s.graphics.drawRect(0, 0, 800, 600);
     field.addChild(s);
     var e10 = new createjs.Bitmap(queue.getResult(chrimg_src[LPresult[3].chara]));
+    if(LPresult[3].chara==6){
       e10.sourceRect={x:400,y:0,width:400,height:600}
-      e10.x=200;
+    }else{
+      e10.sourceRect={x:0,y:0,width:800,height:600}
+    }
       e10.y=50;
       e10.scale=1.2;
       e10.alpha=0;
       field.addChild(e10);
+    if(LPresult[3].chara==6){
+      e10.x=200;
       createjs.Tween.get(e10)
       .wait(1800)
       .to({alpha:1,x:400,scale:3/4}, 200, createjs.Ease.cubicInOut)
       .call(next);
+    }else{
+      e10.x=-200;
+      createjs.Tween.get(e10)
+      .wait(1800)
+      .to({alpha:1,x:0,scale:3/4}, 200, createjs.Ease.cubicInOut)
+      .call(next);
+    }
     field.addChild(e10);
     var Ary=[500,500,500,500,480,500,500,400];
     var Ary2=[50,120,50,50,70,50,70,50];
