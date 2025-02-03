@@ -3274,8 +3274,8 @@ function NameChange(){
         var B=achieveB.findIndex(value=>value.name=="豊かな足取り");
         var C=achieveB.findIndex(value=>value.name=="上手な足取り");
         var D=achieveB.findIndex(value=>value.name=="交感の足取り");
-        var E=achievetempB.findIndex(value=>value.name=="カン");
-        if(achieveB[A].cleared>0 && achieveB[B].cleared>0 && achieveB[C].cleared>0 && achieveB[D].cleared>0 && achievetempB[E].count>0 && scoretemp[0]>0){
+        var E=achieveB.findIndex(value=>value.name=="カン");
+        if(achieveB[A].cleared>0 && achieveB[B].cleared>0 && achieveB[C].cleared>0 && achieveB[D].cleared>0 && achieveB[E].cleared>=10 && scoretemp[0]>0){
           CharaUnlock(HiddenChara);
         }
         break;
@@ -3810,8 +3810,9 @@ function NameChange(){
                   se3.play();
                   }else{
                   se2.play();
-                  Textlist[0].text="？マークがついているキャラクターは";
-                  Textlist[1].text="特定の条件を達成すると解放されます。"
+                  var Ary=["①3連荘する　②「殴り合い」達成","①「ナソード研究」達成　②一度も放銃せずに勝利","①ダブル放銃達成　②一発ツモ5回達成","①「足取り」シナジー4つ達成　②10回以上カンをする"];
+                  Textlist[0].text="？？？（特定の条件を満たすとキャラ開放）";
+                  Textlist[1].text="NEXT："+Ary[HiddenChara-3];
                   return false;
                   }
                 }
