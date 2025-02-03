@@ -3258,7 +3258,7 @@ function NameChange(){
       case 4:
       var A=achievetempB.findIndex(value=>value.name=="放銃");
       var B=achieveB.findIndex(value=>value.name=="ナソード研究");
-      if(achievetempB[A].count==0 && achieveB[B].cleared>0 && scoretemp[0]>0){
+      if(achievetempB[A].count==0 && achieveB[B].cleared>0 && scoretemp[0]==1){
         CharaUnlock(HiddenChara);
       }
         break;
@@ -3810,7 +3810,7 @@ function NameChange(){
                   se3.play();
                   }else{
                   se2.play();
-                  var Ary=["①3連荘する　②「殴り合い」達成","①「ナソード研究」達成　②一度も放銃せずに勝利","①ダブル放銃達成　②一発ツモ5回達成","①「足取り」シナジー4つ達成　②10回以上カンをする"];
+                  var Ary=["①「殴り合い」達成　②3連荘する","①「ナソード研究」達成　②一度も放銃せずに勝利","①3回以上放銃する　②一発ツモ5回達成","①「足取り」シナジー4つ達成　②10回以上カンをする"];
                   Textlist[0].text="？？？（特定の条件を満たすとキャラ開放）";
                   Textlist[1].text="NEXT："+Ary[HiddenChara-3];
                   return false;
