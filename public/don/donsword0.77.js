@@ -4320,10 +4320,10 @@ if(opLock==0 && gamestate ==1){
       var X
       var Y=120;
       var ct=0;
+      var HandAry=hand1.concat(pon1);
       for(var i=0; i<Sinagy.length; i++){
-        var Ary=hand1.concat(pon1);
         if(shiagytemp==1){
-          if(!getIsDuplicate(Ary,Sinagy[i].chr)){
+          if(!getIsDuplicate(HandAry,Sinagy[i].chr)){
              //一つでも所持していればGO
             continue;
           };
@@ -4366,7 +4366,7 @@ if(opLock==0 && gamestate ==1){
         }
         s.x=X-40;
         s.y=Y;
-        var A=Ary.findIndex(value=>value==Sinagy[i].chr[j]);
+        var A=HandAry.findIndex(value=>value==Sinagy[i].chr[j]);
         if(shiagytemp==1 && A==-1){
           s.filters = [new createjs.ColorFilter(0.3, 1, 1, 0.4)];
           s.cache(0,0,120,156);
