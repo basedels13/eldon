@@ -1,13 +1,13 @@
 // var1.00　season2 テスト
 // npm run dev
-// 対戦中のスキルテスト未　やる気があれば→パッシブのスキル演出
+// 対戦中のスキルテスト ターゲットにバフつかない・・
 window.onload = function(){
   draw();
   };
   
   function draw(){
-  var titletext="v1.00/Click to START";
-  var debugmode=false;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にfalseに
+  var titletext="v1.001/Click to START";
+  var debugmode=true;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にtrueに
   //自分自身の情報を入れる箱
   var IAM = {
     token: null,    // 戸別管理用のトークン
@@ -370,8 +370,8 @@ window.onload = function(){
   {fir:"フリージングアロー",sec:"FREEZING ARROW",thr:"0"},
   {fir:"グラウンドクラッシュ",sec:"GROUND CRUSH",thr:"0"},
   {fir:"クイーンズスローン",sec:"QUEEN'S THRONE",thr:"0"},
-  {fir:"ルナティック一発ツモ",sec:"Lunatic Ippatsu",thr:"0"},
-  {fir:"龍牙爆砕",sec:"Dragon Arts 'Blast'",thr:"0"},
+  {fir:"ルナティックフューリー",sec:"LINATIC FURY",thr:"0"},
+  {fir:"龍牙爆砕",sec:"DRAGON ARTS 'BLAST'",thr:"0"},
   ]
   //name->キャラsub->職、役判定で使用　line->ライン役判定に使用 0->all　color->1234567陽水風月土火E 0->all
   var donpai=[
@@ -677,8 +677,7 @@ window.onload = function(){
   //属性マーク
   var Aicon=new Image();
   //マナブレアイコン
-  var MBicon= new createjs.Bitmap("don/Don_mbicon.png");
-  var epic= new Image();
+  var MBicon= new createjs.Bitmap("don/Don_mbicon.png");;
   var zoom=  new createjs.Bitmap("don/zoom650.png");
   zoom.scale=0.4;
   //ツモロンボタン
@@ -737,7 +736,6 @@ window.onload = function(){
   //cpuのインターバルをクリアするスイッチ
   var ctl=new Array(0,0,0,0,0)
   var ctlerror=new Array(0,0,0,0,0)
-  var ctlswitch
   var cLock=1
   var opLock=0;//
   //残パイ確認・役確認等用
@@ -796,8 +794,6 @@ window.onload = function(){
   var turntemp
   var parent=0
   var dorax=0
-  var loopX
-  var loopX2
   var parentY
   var tumo
   var tumo2
@@ -1379,7 +1375,7 @@ function updateParticles() {
                 return false;
               }
             }
-          if(LP[0]!==1 && (LP[1] <0 || LP[2]<0 || LP[3] <0 || LP[4]<0)){
+          if(LP[0]!==2 && (LP[1] <0 || LP[2]<0 || LP[3] <0 || LP[4]<0)){
             gameover();
             return false;
         }
@@ -1635,7 +1631,7 @@ function updateParticles() {
       }
       if(mouseX >0 && mouseX< 100){
       if(skillswitch[0] !==-2){
-        if(cLock==1){
+        if(cLock==1|| (pvpmode==1 && opLock>=0)){
           se4.play();
           if(navisw==1){navisw=0}else{navisw=1};
         //クリックで切り替えできるように
@@ -3253,7 +3249,7 @@ function NameChange(){
     //キャラクター解放
     switch(HiddenChara){
       case 3:
-        var A=achieveA.findIndex(value=>value.name=="もう一度かかってこい");
+        var A=achieveA.findIndex(value=>value.name=="まだだ");
         var B=achieveB.findIndex(value=>value.name=="殴り合い");
         if(achieveA[A].cleared>0 && achieveB[B].cleared>0 && scoretemp[0]>0){
           CharaUnlock(HiddenChara);
@@ -5311,12 +5307,6 @@ if(opLock==0 && gamestate ==1){
         tumo2=data.Tumo;
         TumoRon(N,0);
         return true;
-        //ここいるかどうかわからない
-        if(ippatu[N]==1 && chara[N]==6 && skillusage[chr]==1){
-          SkillAnimation(N,0,1);
-        }else{
-          TumoRon(N,0);
-        }
       };
       });
     socket.on("ron-pai", (data)=>{
@@ -5402,12 +5392,12 @@ if(opLock==0 && gamestate ==1){
     });
     socket.on("skill-pai", (data)=>{
       //socket.emit("skill", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[0].id,to:target,SEtype:SEtype,status:true});
-      if(debugmode){console.log('skill-pai',N,data.status);}
+      if(debugmode){console.log('skill-pai',data.status);}
       if(IAM.token!== data.Token){
         var N=1+MEMBER.findIndex(value=>value.id==data.who);
         var M=1+MEMBER.findIndex(value=>value.id==data.to);
         var Tg;
-        switch(chara[who]){
+        switch(chara[N]){
           case 1:
           case 3:
             Tg=M;
@@ -5418,8 +5408,9 @@ if(opLock==0 && gamestate ==1){
         }
         //キャラごとにtargetの扱いが異なる
         //エルス、レナ→targetの相手に対して
-        //アイシャ、レイヴン、ラシェ→targetの値そのまま
-        SkillAnimation(N,Tg,data.SEtype);
+        //アイシャ、レイヴン、ラシェ、アラ→targetの値そのまま
+        skillswitch[N]=0;
+        SkillAnimation(N,Tg,data.SEtype,1);
       };
     })
       function turnchecker(n=-1){
@@ -5932,82 +5923,7 @@ if(opLock==0 && gamestate ==1){
         Buffdraw();
         turnrole();
         }
-        }}
-  
-      socket.on("skill-pai", (data)=>{
-        if(debugmode){console.log('throwed-pai',data,IAM.mwah);}
-        if(IAM.token!== data.Token){
-          var I=MEMBER.findIndex(value=>value.token==data.Token);
-          switch(I){
-            case 3:
-              //
-              hand1=data.Hand.hand2.concat();
-              hand2=data.Hand.hand3.concat();
-              hand3=data.Hand.hand4.concat();
-              hand4=data.Hand.hand1.concat();
-              for(var i=1;i<4;i++){
-                //reach 0 2 3 4 1
-                //Reach 0 1 2 3 4
-                buff[i]=data.Buff[i+1];
-                DP[i]=data.Dp[i+1];
-                ippatu[i]=data.Ippatu[i+1];
-                nuki[i]=data.Nuki[i+1];
-              }
-              reach[4]=data.Reach[1];
-              DP[4]=data.Dp[1];
-              ippatu[4]=data.Ippatu[1];
-              nuki[4]=data.Nuki[1];
-              break;
-            case 2:
-              hand1=data.Hand.hand3.concat();
-              hand2=data.Hand.hand4.concat();
-              hand3=data.Hand.hand1.concat();
-              hand4=data.Hand.hand2.concat();
-              for(var i=1;i<3;i++){
-                //reach   3 4 1 2
-                //Reach 0 1 2 3 4
-                reach[i]=data.Reach[i+2];
-                reach[i+2]=data.Reach[i];
-                DP[i]=data.Dp[i+2];
-                DP[i+2]=data.Dp[i];
-                nuki[i]=data.Nuki[i+2];
-                nuki[i+2]=data.Nuki[i];
-                ippatu[i]=data.Ippatu[i+2];
-                ippatu[i+2]=data.Ippatu[i];
-              }
-              break;
-            case 1:
-              hand1=data.Hand.hand4.concat();
-              hand2=data.Hand.hand1.concat();
-              hand3=data.Hand.hand2.concat();
-              hand4=data.Hand.hand3.concat();
-              for(var i=2;i<5;i++){
-                //reach   4 1 2 3
-                //Reach 0 1 2 3 4
-                reach[i]=data.Reach[i-1];
-                DP[i]=data.Dp[i-1];
-                ippatu[i]=data.Ippatu[i-1];
-                nuki[i]=data.Nuki[i-1];
-              }
-              reach[1]=data.Reach[4];
-              DP[1]=data.Dp[4];
-              ippatu[1]=data.Ippatu[4];
-              nuki[1]=data.Nuki[4];
-              break;
-            default:
-              console.log('member error',I)
-                hand1=data.Hand.hand1.concat();
-                hand2=data.Hand.hand2.concat();
-                hand3=data.Hand.hand3.concat();
-                hand4=data.Hand.hand4.concat();
-                reach=data.Reach.concat();
-                DP=data.Dp.concat();
-                ippatu=data.Ippatu.concat();
-                nuki=data.Nuki.concat();
-                break;
-          }
-        };           
-      })
+        }};
       socket.on("throwed-pai", (data)=>{
         if(debugmode){console.log('throwed-pai',data,IAM.mwah);}
         //非送信者なら2行目の内容を更新する
@@ -6150,15 +6066,34 @@ if(opLock==0 && gamestate ==1){
   function handgraph(num,player,op=0){
     //捨てパイ・手札の描画
     //op 1→一番右の手パイをずらして描きたい時
-    console.log('handgraph',num,player,tumotemp)
+    if(debugmode){console.log('handgraph',num,player,tumotemp)};
       if(num>0){
       //e5を使って捨て牌の描写してアガリ判定後ターンを進める
+      Tumoname();
+      //アラ裁定　演出あればhandgraphやり直し
+      if(chara[player]==7 && skillswitch[0] !==-2 && skillswitch[player]!==2){
+        //[0,1,2,3,4,5] 6
+        var MS=0;
+        if(trash[player-1].length>=3){
+          for(var i=0;i<3;i++){
+            var M=trash[player-1][trash[player-1].length-3+i];
+            if(M>=0 && M<=67 && M%4 == i){
+              MS+=1;
+            }
+          }
+        if(MS==3 && tumotemp%4==3){
+          skillswitch[player]=0;
+          SkillAnimation(player,0,1,1);
+          return false;
+          //ドラを1枚追加
+        }}
+      }
+      //
       if(dahaiSE==1){
         se4.play()
       }else{
       se16.play();
       }
-      Tumoname();
       if(nuki[0]>0){
         nuki[0]=0;
         //ドラを1枚追加
@@ -6173,7 +6108,6 @@ if(opLock==0 && gamestate ==1){
       if(ManaBreak==0 || player==1){
       trash[player-1].push(tumotemp);
       }else{
-      //KEが0なので-tumotempは使えない・・
       trash[player-1].push(-1);
       }
       if(player==1){Elname(tumotemp)};
@@ -6204,30 +6138,6 @@ if(opLock==0 && gamestate ==1){
           if(MS.length<5){Buff[player].push(2)}
         };
         }
-      if(chara[player]==7 && skillswitch[0] !==-2 && skillswitch[player]!==2){
-        //[0,1,2,3,4,5] 6
-        var MS=0;
-        if(trash[player-1].length>=4){
-          for(var i=0;i<4;i++){
-            var M=trash[player-1][trash[player-1].length-4+i];
-            if(M%4 == i){
-              MS+=1;
-            }
-          }
-        }
-        console.log(MS);
-        if(MS==4){
-          skillswitch[player]=2;
-          //ドラを1枚追加
-          dora.push(king.splice(0,1));
-          dorax+=40;
-          e7 = new createjs.Bitmap(eltear_src[dora[dora.length-1]]);
-          e7.x=dorax;
-          e7.y=10;
-          e7.scale=33/120;
-          field.addChild(e7);
-        }
-      }
       if(ippatu[player]==1){//守備表示
       counterR[player]=counter[player];
       riverx[player] +=43.5
@@ -6625,8 +6535,8 @@ if(opLock==0 && gamestate ==1){
     return false;
   }
   if(cLock==3){
-    SkillAnimation(1,num);
-  return false;
+    if(chara[1]==1){SkillAnimation(1,num)};
+    return false;
   };
   if(mpC>=10){
     //マナブレイク
@@ -7036,19 +6946,17 @@ if(opLock==0 && gamestate ==1){
             Cpuhandtemp[0]=-3;
           };
           if(Cpuhandtemp[0]==-3){
-          //console.log(chr,'ツモスルーする条件がある？');
-          if(reach[chr]==3 || deck.length==0 || counter[chr]==0){//流す理由が無い、つも
+          if(reach[chr]==3 || deck.length==0 || counter[chr]==0){
           console.log('cp',chr,'ツモ',han[chr])
           ctl[chr]=2
           if(ippatu[chr]==1 && chara[chr]==6 && skillusage[chr]==1){
-            SkillAnimation(chr,0,1);
+            SkillAnimation(chr,tumo2,1);
           }else{
             TumoRon(chr,0);
+            if(pvpmode==1){
+              socket.emit("tumo", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[chr-1].id,Tumo:tumo2,status:true});
+              }
           }
-
-          if(pvpmode==1){
-            socket.emit("tumo", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[chr-1].id,Tumo:tumo2,status:true});
-            }
           return false;
           }}
           if(Cpuhandtemp[0]==-1){
@@ -10870,13 +10778,13 @@ if(opLock==0 && gamestate ==1){
           if(hand1[0]==-3){
           if(debugmode){console.log('アガリ',han[1])}
           ponkanmap.removeAllChildren();
-          if(pvpmode==1){
-            socket.emit("tumo", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[0].id,Tumo:tumo,status:true});
-            }
             if(ippatu[1]==1 && chara[1]==6 && skillusage[1]==1){
-              SkillAnimation(1,0,1);
+              SkillAnimation(1,tumo,1);
             }else{
               TumoRon(1,0);
+              if(pvpmode==1){
+                socket.emit("tumo", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[0].id,Tumo:tumo,status:true});
+              }
             }
           };
           break;
@@ -11271,7 +11179,7 @@ if(opLock==0 && gamestate ==1){
       if(gamestate ==1){
       //スキルは右下に移動
         if(mouseX >0 && mouseX< 100){
-          if(pvpmode==1){
+          if(skillswitch[0]==-2){
             if(mouseY >100 && mouseY<200){Skillname(2,1);}
             if(mouseY >200 && mouseY<300){Skillname(3,1);}
             if(mouseY >300 && mouseY<400){Skillname(4,1);}
@@ -12021,8 +11929,9 @@ if(opLock==0 && gamestate ==1){
           }
         };
       };    
-  function SkillAnimation(p=0,target=0,SEtype=0){
-    if(pvpmode==1){
+  function SkillAnimation(p=0,target=0,SEtype=0,pp=0){
+    //pp 1-> socket送信しない　したくない場合に
+    if(pvpmode==1 && pp==0){
       if(target>0 && target<5){
       socket.emit("skill", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[0].id,to:MEMBER[target-1].id,Target:target,SEtype:SEtype,status:true});
       }else{
@@ -12113,7 +12022,7 @@ if(opLock==0 && gamestate ==1){
   function SpecialSkill(player,target=0){
     //skillanimationではp=1-4に対してこちらではp=charaなので注意　こら！
     var p=chara[player]
-    console.log("skill",player,target,skillswitch[player])
+    console.log("skill",player,p,target,skillswitch[player])
     if(skillswitch[player]==0){
     //skillswitch 0使用可能 1次の自分のターンにリセット 2この局では使用不可
     if(p==1){//エル
@@ -12340,10 +12249,29 @@ if(opLock==0 && gamestate ==1){
         }
       }
     if(p==6){//ラシェ
+      if(pvpmode==1 && target>=0){
+        tumo2=target;
+      }
       TumoRon(player,0);
     }
+    if(p==7){//アラ
+      //ドラ追加
+        skillswitch[player]=2;
+        //ドラを1枚追加
+        dora.push(king.splice(0,1));
+        dorax+=40;
+        e7 = new createjs.Bitmap(eltear_src[dora[dora.length-1]]);
+        e7.x=dorax;
+        e7.y=10;
+        e7.scale=33/120;
+        field.addChild(e7);
+        DP[player]-=10;
+        drawDP(player);
+        handgraph(1,player);
     }
-    }//specialskill
+    }
+    };//specialskill
+    
   socket.on("game-over", (data)=>{
     if(IAM.token!==data.Token){
       if(data.scoretemp==-1){
@@ -12650,23 +12578,23 @@ if(opLock==0 && gamestate ==1){
   var p=chara[player]
   if(pvpmode==1){
         if(IsHost(IAM.room)){
-        cx2.fillText("★"+MEMBER[player-1].name, 635, 62);
+        cx2.fillText("★"+MEMBER[player-1].name, 635, 66);
         }else{
-        cx2.fillText(MEMBER[player-1].name, 635, 62);
+        cx2.fillText(MEMBER[player-1].name, 635, 66);
         }
   }else{
   switch(player){
     case 1:
-      cx2.fillText(Username, 635, 62);
+      cx2.fillText(Username, 635, 66);
       break;
       case 2:
-        cx2.fillText("CPU1", 635, 62);
+        cx2.fillText("CPU1", 635, 66);
         break;
         case 3:
-          cx2.fillText("CPU2", 635, 62);
+          cx2.fillText("CPU2", 635, 66);
           break;
           case 4:
-            cx2.fillText("CPU3", 635, 62);
+            cx2.fillText("CPU3", 635, 66);
             break;            
   }}
   cx2.font = "bold 16px Arial";
