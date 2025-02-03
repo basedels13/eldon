@@ -10610,7 +10610,7 @@ if(opLock==0 && gamestate ==1){
           Y[i] +=50
           X[i] =143
           }
-          if(counterR[i]>0 && counterR[i]==j){
+          if(counterR[i]>=0 && counterR[i]==j){
             if(chrlinecheck(pai,Ary[j])){
             var rect = new createjs.Shape();
             rect.graphics.beginFill("rgba(0, 200, 173, 0.5)").drawRoundRect(X[i]-10.5, Y[i]+5.25, 43.5, 33,5,5)
