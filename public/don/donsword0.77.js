@@ -3249,7 +3249,7 @@ function NameChange(){
     //キャラクター解放
     switch(HiddenChara){
       case 3:
-        var A=achieveA.findIndex(value=>value.name=="まだだ");
+        var A=achieveA.findIndex(value=>value.name=="もう一度かかってこい");
         var B=achieveB.findIndex(value=>value.name=="殴り合い");
         if(achieveA[A].cleared>0 && achieveB[B].cleared>0 && scoretemp[0]>0){
           CharaUnlock(HiddenChara);
@@ -3284,6 +3284,7 @@ function NameChange(){
     }
     function CharaUnlock(){
       //適当なコンテナをお借りする
+      scoretemp[0]=0;
       jingle3.seek(1);
       jingle3.play();
       var Ary=[
