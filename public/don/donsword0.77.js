@@ -1,12 +1,12 @@
-// var1.00　season2 テスト
+// var1.001　season2 テスト
 // npm run dev
-// 対戦中のスキルテスト ターゲットにバフつかない・・
+// 対戦中のスキルテスト中
 window.onload = function(){
   draw();
   };
   
   function draw(){
-  var titletext="v1.001/Click to START";
+  var titletext="v1.002/Click to START";
   var debugmode=false;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にfalseに
   //自分自身の情報を入れる箱
   var IAM = {
@@ -759,7 +759,7 @@ window.onload = function(){
   var riverx=new Array(0,120,120,120,120)
   var rivery=new Array(0,400,100,200,300)
   var counter=new Array(0,0,0,0,0);//捨てたパイの数
-  var counterR=new Array(0,0,0,0,0);//何巡目にリーチしたか
+  var counterR=new Array(-1,-1,-1,-1,-1);//何巡目にリーチしたか
   //スペシャルスキル関連
   //[0] -2->パッシブ・アクティブ全て適応しない -1->CPUスキル禁止＆プレイヤーは使用可能 0->無法地帯
   var skillswitch=new Array(-1,1,1,1,1)
@@ -4848,7 +4848,7 @@ if(opLock==0 && gamestate ==1){
         if(LP[i]<=0){rorder[i]=2}else{rorder[i]=0}
         }
         counter=new Array(0,0,0,0,0)
-        counterR=new Array(0,0,0,0,0)
+        counterR=new Array(-1,-1,-1,-1,-1)
         riverx=new Array(0,120,120,120,120)
         rivery=new Array(0,400,100,200,300)
         DPlist=new Array(0,0,0,0,0);
