@@ -9410,17 +9410,18 @@ if(opLock==0 && gamestate ==1){
               Result[0]="クレストオブ"+Ary[resultF];
               if(M!==-1){
               var E=donpai.filter(value=>value.color==resultF);
+              if(E.length){
               for(var i=0; i<E.length ; i++){
                 if(Remaincheck(E[i].id)){
                   Result.push(E[i].id);
                 }
                 if(Result.length>5){break;}
-              }
+              }};
               }else{
                 //マスロパイ待ち
                 console.log('crest reach')
                 var E=donpai.filter(value=>value.color==resultF && value.id>=60);
-                  if(Remaincheck(E[i].id)){
+                  if(E.length && Remaincheck(E[i].id)){
                     Result.push(E[i].id);
                   }
               }
