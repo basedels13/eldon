@@ -921,15 +921,15 @@ window.onload = function(){
       volume: 0.6,
     };
   const bgm6data ={
-    src: "don/Duel.mp3",
-    loopStart: 10200,
-    loopEnd: 111250,
-    volume: 0.45,
+    src: "don/Unrest_Duel2.mp3",
+    loopStart: 9330,
+    loopEnd: 110500,
+    volume: 0.3,
   };
   const bgm7data ={
-    src: "don/Sortie_Rena.mp3",
-    loopStart: 10200,
-    loopEnd: 171500,
+    src: "don/Rena_li.mp3",
+    loopStart: 9250,
+    loopEnd: 170500,
     volume: 0.3,
   };
   const bgm8data ={
@@ -6074,7 +6074,6 @@ if(opLock==0 && gamestate ==1){
       Tumoname();
       //アラ裁定　演出あればhandgraphやり直し
       if(chara[player]==7 && skillswitch[0] !==-2 && skillswitch[player]!==2){
-        //[0,1,2,3,4,5] 6
         var MS=0;
         if(trash[player-1].length>=3){
           for(var i=0;i<3;i++){
@@ -6087,10 +6086,8 @@ if(opLock==0 && gamestate ==1){
           skillswitch[player]=0;
           SkillAnimation(player,0,1,1);
           return false;
-          //ドラを1枚追加
         }}
       }
-      //
       if(dahaiSE==1){
         se4.play()
       }else{
@@ -9676,7 +9673,7 @@ if(opLock==0 && gamestate ==1){
           return false;
         }
           var A=Math.floor(tumoP/4);
-          var B=handtemp.filter(value=>value>=4*A && value<4*(A+1));
+          var B=handtest.filter(value=>value>=4*A && value<4*(A+1));
           if(B.length==4){kansw[player]=1;
             return true;
           }
@@ -11894,6 +11891,16 @@ if(opLock==0 && gamestate ==1){
           Container.removeAllChildren();
           stage.removeChild(Container);
           nuki[1]+=1;
+          if(nuki[0]>0){
+            //もいっこカン！の場合にドラを追加しておく
+            dora.push(king.splice(0,1));
+            dorax+=40;
+            e7 = new createjs.Bitmap(eltear_src[dora[dora.length-1]]);
+            e7.x=dorax;
+            e7.y=10;
+            e7.scale=33/120;
+            field.addChild(e7);
+          };
           nuki[0]=p;
           handgraph(0,1)
           if(pai==-1){
