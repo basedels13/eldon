@@ -4499,7 +4499,11 @@ if(opLock==0 && gamestate ==1){
     if(a>=68){return 3}else{return a%4-b%4;}}
   function compareFunc4(a,b){
     if (a.elia === b.elia) {
+      if (a.nod === b.nod) {
+        return b.city - a.city;
+      }else{
       return a.nod - b.nod;
+      };
     }
     return a.elia - b.elia;}  
   function getIsDuplicate(arr1, arr2) {
@@ -7917,7 +7921,10 @@ if(opLock==0 && gamestate ==1){
       if(Astyle=="国士無双"){
         han[player]+=12;
       }
-      if(Astyle=="クレストオブガイア" || Astyle=="クレストオブソーレス" || Astyle=="クレストオブロッソ"||Astyle=="クレストオブデニフ"||Astyle=="クレストオブハルニエ"||Astyle=="クレストオブアドリアン"||Astyle=="クレストオブベントス"){
+      if(Astyle=="クレストオブガイア"){
+        han[player]+=4;
+      }
+      if(Astyle=="クレストオブソーレス" || Astyle=="クレストオブロッソ"||Astyle=="クレストオブデニフ"||Astyle=="クレストオブハルニエ"||Astyle=="クレストオブアドリアン"||Astyle=="クレストオブベントス"){
         han[player]+=6;
       }
       if(num==0 && ponsw[player] ==0){han[player] +=1}//門前ツモ
@@ -7989,7 +7996,11 @@ if(opLock==0 && gamestate ==1){
           Resultary.push('国士無双 12翻')
           PB(Astyle);
         }
-        if(Astyle=="クレストオブガイア" || Astyle=="クレストオブソーレス" || Astyle=="クレストオブロッソ"||Astyle=="クレストオブデニフ"||Astyle=="クレストオブハルニエ"||Astyle=="クレストオブアドリアン"||Astyle=="クレストオブベントス"){
+        if(Astyle=="クレストオブガイア"){
+          Resultary.push(Astyle+' 4翻')
+          PB(Astyle);
+        }
+        if(Astyle=="クレストオブソーレス" || Astyle=="クレストオブロッソ"||Astyle=="クレストオブデニフ"||Astyle=="クレストオブハルニエ"||Astyle=="クレストオブアドリアン"||Astyle=="クレストオブベントス"){
           Resultary.push(Astyle+' 6翻')
           PB(Astyle);
         }
@@ -12351,31 +12362,6 @@ if(opLock==0 && gamestate ==1){
     if(LPresult[1].elia==LPresult[0].elia && LPresult[1].nod==LPresult[0].nod){
       RankingStr[3]=RankingStr[2];
     }
-    cx2.clearRect(0,0,800,600)
-    cx2.font = "bold 45px Arial";
-    cx2.fillStyle = "white";
-    cx2.fillText("終　局", 350, 48);
-    cx2.font = "bold 40px Arial";
-    cx2.fillText(RankingStr[0], 50, 100);
-    cx2.font = "bold 32px Arial";
-    cx2.fillText(RankingStr[1], 50, 200);
-    cx2.fillText(RankingStr[2], 50, 300);
-    cx2.fillText(RankingStr[3], 50, 400);
-    //1位
-    cx2.font = "bold 30px Arial";
-    cx2.fillText(LPresult[3].pc, 100, 130);
-    cx2.font = "bold 26px Arial";
-    cx2.fillText(LPresult[2].pc, 120, 230);
-    cx2.fillText(LPresult[1].pc, 120, 330);
-    cx2.fillText(LPresult[0].pc, 120, 430);
-  cx2.font = "bold 26px Arial";
-  cx2.fillText("キル："+LPresult[3].elia+"　アシスト："+LPresult[3].nod+"　デス："+LPresult[3].city, 100, 160);
-  cx2.font = "bold 24px Arial";
-  cx2.fillText("キル："+LPresult[2].elia+"　アシスト："+LPresult[2].nod+"　デス："+LPresult[2].city, 120, 260);
-  cx2.fillText("キル："+LPresult[1].elia+"　アシスト："+LPresult[1].nod+"　デス："+LPresult[1].city, 120, 360);
-  cx2.fillText("キル："+LPresult[0].elia+"　アシスト："+LPresult[0].nod+"　デス："+LPresult[0].city, 120, 460);
-  Cbt=canvas2.toDataURL();
-  Cbutton = new createjs.Bitmap(Cbt);
     }else{
     //ソレ=イガイ
     var LPresult=[
@@ -12402,31 +12388,6 @@ if(opLock==0 && gamestate ==1){
     if(LPresult[1].elia==LPresult[0].elia){
       RankingStr[3]=RankingStr[2];
     }
-    cx2.clearRect(0,0,800,600)
-    cx2.font = "bold 45px Arial";
-    cx2.fillStyle = "white";
-    cx2.fillText("終　局", 350, 48);
-    cx2.font = "bold 40px Arial";
-    cx2.fillText(RankingStr[0], 50, 100);
-    cx2.font = "bold 32px Arial";
-    cx2.fillText(RankingStr[1], 50, 200);
-    cx2.fillText(RankingStr[2], 50, 300);
-    cx2.fillText(RankingStr[3], 50, 400);
-    //1位
-    cx2.font = "bold 30px Arial";
-    cx2.fillText(LPresult[3].pc, 120, 130);
-    cx2.font = "bold 26px Arial";
-    cx2.fillText(LPresult[2].pc, 120, 230);
-    cx2.fillText(LPresult[1].pc, 120, 330);
-    cx2.fillText(LPresult[0].pc, 120, 430);
-  cx2.font = "bold 28px Arial";
-  cx2.fillText(LPresult[3].elia, 120, 160);
-  cx2.font = "bold 24px Arial";
-  cx2.fillText(LPresult[2].elia, 120, 260);
-  cx2.fillText(LPresult[1].elia, 120, 360);
-  cx2.fillText(LPresult[0].elia, 120, 460);
-  Cbt=canvas2.toDataURL();
-  Cbutton = new createjs.Bitmap(Cbt);
   }
     field.removeAllChildren();
     var s = new createjs.Shape();
@@ -12453,9 +12414,52 @@ if(opLock==0 && gamestate ==1){
       e10.x=-200;
       createjs.Tween.get(e10)
       .wait(1800)
-      .to({alpha:1,x:0,scale:3/4}, 200, createjs.Ease.cubicInOut)
+      .to({alpha:1,x:100,scale:3/4}, 200, createjs.Ease.cubicInOut)
       .call(next);
     }
+    //字幕
+    var D= new createjs.Text("終　局", "bold 45px Arial", "white");
+    D.x=350;
+    D.y=15;  
+    field.addChild(D);
+    var D= new createjs.Text(RankingStr[0], "bold 40px Arial", "white");
+    D.x=-100;
+    D.y=100;  
+    D.alpha=0;  
+    field.addChild(D);
+    createjs.Tween.get(D)
+    .wait(1800)
+    .to({x: 50,alpha:1}, 200, createjs.Ease.cubicInOut)
+    field.addChild(D);
+    var D= new createjs.Text(LPresult[3].pc, "bold 30px Arial", "white");
+    D.x=-100;
+    D.y=130;  
+    D.alpha=0;  
+    field.addChild(D);
+    createjs.Tween.get(D)
+    .wait(1800)
+    .to({x: 120,alpha:1}, 200, createjs.Ease.cubicInOut)
+    field.addChild(D);
+    if(LP[0]==2){
+    //デスマッチ
+    var D= new createjs.Text("キル："+LPresult[3].elia+"　アシスト："+LPresult[3].nod+"　デス："+LPresult[3].city, "bold 24px Arial", "white");
+    D.x=-100;
+    D.y=160; 
+    D.alpha=0;     
+    field.addChild(D);
+    createjs.Tween.get(D)
+    .wait(1800)
+    .to({x: 120,alpha:1}, 200, createjs.Ease.cubicInOut)
+      }else{
+    var D= new createjs.Text("戦闘力："+LPresult[3].elia, "bold 28px Arial", "white");
+    D.x=-100;
+    D.y=160;    
+    D.alpha=0;  
+    field.addChild(D);
+    createjs.Tween.get(D)
+    .wait(1800)
+    .to({x: 120,alpha:1}, 200, createjs.Ease.cubicInOut)
+      }
     field.addChild(e10);
     var Ary=[500,500,500,500,480,500,500,400];
     var Ary2=[50,120,50,50,70,50,70,50];
@@ -12464,14 +12468,52 @@ if(opLock==0 && gamestate ==1){
       e10.sourceRect={x:Ary[LPresult[2-i].chara],y:Ary2[LPresult[2-i].chara],width:215,height:215}
       e10.scale=60/215;
       e10.x=-100;
-      e10.y=201+100*i;
+      e10.y=231+100*i;
       createjs.Tween.get(e10)
         .wait(600*(2-i))
         .to({x: 50}, 200, createjs.Ease.cubicInOut)
         .call(se1)
       field.addChild(e10);
+    //字幕
+    var D= new createjs.Text(RankingStr[i+1], "bold 32px Arial", "white");
+    D.x=-100;
+    D.y=200+100*i;  
+    D.alpha=0;  
+    field.addChild(D);
+    createjs.Tween.get(D)
+    .wait(600*(2-i))
+    .to({x: 50,alpha:1}, 200, createjs.Ease.cubicInOut)
+    field.addChild(D);
+    var D= new createjs.Text(LPresult[2-i].pc, "bold 26px Arial", "white");
+    D.x=-100;
+    D.y=230+100*i;  
+    D.alpha=0;  
+    field.addChild(D);
+    createjs.Tween.get(D)
+    .wait(600*(2-i))
+    .to({x: 120,alpha:1}, 200, createjs.Ease.cubicInOut)
+    field.addChild(D);
+    if(LP[0]==2){
+    //デスマッチ
+    var D= new createjs.Text("キル："+LPresult[2-i].elia+"　アシスト："+LPresult[2-i].nod+"　デス："+LPresult[2-i].city, "bold 24px Arial", "white");
+    D.x=-100;
+    D.y=260+100*i; 
+    D.alpha=0;     
+    field.addChild(D);
+    createjs.Tween.get(D)
+    .wait(600*(2-i))
+    .to({x: 120,alpha:1}, 200, createjs.Ease.cubicInOut)
+      }else{
+    var D= new createjs.Text("戦闘力："+LPresult[2-i].elia, "bold 24px Arial", "white");
+    D.x=-100;
+    D.y=260+100*i;    
+    D.alpha=0;  
+    field.addChild(D);
+    createjs.Tween.get(D)
+    .wait(600*(2-i))
+    .to({x: 120,alpha:1}, 200, createjs.Ease.cubicInOut)
+      }
     }
-    field.addChild(Cbutton);
     function se1(){
       se14.play();
     };
