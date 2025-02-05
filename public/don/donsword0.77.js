@@ -3289,9 +3289,9 @@ function NameChange(){
       jingle3.play();
       var Ary=[
         ["パッシブスキル：ナソードコア","a","　太陽パイを切る度にナソードコアを生成","a","　ナソードコア1つにつき+10符","a","　コアがある時、一度だけ食いしばり発動","b","アクティブスキル：グラウンドクラッシュ","a","　MPを3ゲージ消費","a","　台パンによりその局を流局にする"],
-        ["パッシブスキル：クイーンズスローン","a","　リーチが発生した時に一度だけ危険パイを察知する"],
-        ["パッシブスキル：変身/ルナティックフューリー","a","　MPが満タンの時にリーチ時に変身","a","　変身時、高確率で一発ツモが発生する"],
-        ["パッシブスキル：連技-龍牙爆砕","a","　1,2,3,4ライン順にパイを切った時に発動","a","ドラを1つ追加する","b","パッシブスキル：花蓮","a","　カンした時にMPを1ゲージ消費して発動","a","　リーチしていれば当たりパイを、","a","　非リーチ時であればドラをドローする"]
+        ["パッシブスキル：チートコード","a","　リーチが発生した時に一度だけ危険パイを察知する"],
+        ["パッシブスキル：変身/ルナティックフューリー","a","　MPが満タンの時にリーチ時、","a","　MPを全消費してバーサクモードに変身","a","　変身時、高確率で一発ツモが発生する"],
+        ["パッシブスキル：連技-龍牙爆砕","a","　1,2,3,4ライン順にパイを切った時、","a","　ドラを1つ増やす","b","パッシブスキル：花蓮","a","　カンした時にMPを1ゲージ消費して発動","a","　リーチしていれば当たりパイを、","a","　非リーチ時であればドラをドローする"]
       ]
       HiddenChara+=1;
       handmap.removeAllChildren();
@@ -5509,6 +5509,10 @@ if(opLock==0 && gamestate ==1){
         var Fr2=Buff[2].findIndex(value=>value==6 || value==11);
         var Fr3=Buff[3].findIndex(value=>value==6 || value==11);
         var Fr4=Buff[4].findIndex(value=>value==6 || value==11);
+        var Flame1=Buff[1].findIndex(value=>value==5);
+        var Flame2=Buff[2].findIndex(value=>value==5);
+        var Flame3=Buff[3].findIndex(value=>value==5);
+        var Flame4=Buff[4].findIndex(value=>value==5);
         if(rorder[1] !==2){
         if(rorder[1]==0 && turn !==0 && Fr1==-1 && ManaBreak==0){ron(1)};
         if(rorder[2]==0 && turn !==1 && Fr2==-1 && ManaBreak==0){ron(2)}
@@ -5570,7 +5574,7 @@ if(opLock==0 && gamestate ==1){
             return false;
           }
           //次の人のポンへ
-          if(turn==0 && ponsw[0]==0 && Fr2==-1 && LP[2]>=0 && ManaBreak==0){
+          if(turn==0 && ponsw[0]==0 && Fr2==-1 && Flame2==-1 && LP[2]>=0 && ManaBreak==0){
           //可能な限りポン->ライン揃えに行く場合はポンしない
           if(Kan(2)){
             if(pvpmode==1){
@@ -5626,7 +5630,7 @@ if(opLock==0 && gamestate ==1){
             }
           }}
           };
-          if(turn==1 && ponsw[0]==0 && Fr3==-1 && LP[3]>=0 && ManaBreak==0){
+          if(turn==1 && ponsw[0]==0 && Fr3==-1 && Flame3==-1 && LP[3]>=0 && ManaBreak==0){
             if(Kan(3)){
               if(pvpmode==1){
                   if(MEMBER[2].pc==1){
@@ -5680,7 +5684,7 @@ if(opLock==0 && gamestate ==1){
             }
             }}
           }
-          if(turn==2 && ponsw[0]==0 && Fr4==-1 && LP[4]>=0 && ManaBreak==0){
+          if(turn==2 && ponsw[0]==0 && Fr4==-1 && Flame4==-1 && LP[4]>=0 && ManaBreak==0){
             if(Kan(4)){
               if(pvpmode==1){
                   if(MEMBER[3].pc==1){
@@ -5735,7 +5739,7 @@ if(opLock==0 && gamestate ==1){
             }
             }}
           }
-          if(turn==3 && ponsw[0]==0 && Fr1==-1 && LP[1]>=0 && ManaBreak==0){
+          if(turn==3 && ponsw[0]==0 && Fr1==-1 && Flame1==-1 && LP[1]>=0 && ManaBreak==0){
             if(Kan(1)){
               //カンができるということはポンもできる
               se5.play();
@@ -6767,7 +6771,7 @@ if(opLock==0 && gamestate ==1){
       if(skillswitch[1]==1){
         switch(chara[1]){
           case 1:
-        if(DP[1]>=20){
+        if(DP[1]>=10){
           skillswitch[1]=0       
         }
           break;
@@ -6906,7 +6910,7 @@ if(opLock==0 && gamestate ==1){
           if(skillswitch[chr]==1 && skillswitch[0] !==-2){
             switch(chara[chr]){
               case 1:
-            if(DP[chr]>=20){
+            if(DP[chr]>=10){
               skillswitch[chr]=0       
             }
               break;
@@ -12627,10 +12631,12 @@ if(opLock==0 && gamestate ==1){
       cx2.font = "bold 16px Arial";
       cx2.fillText("フレイムガイザー", 635, 210);
       cx2.font = "13px Arial";
-      cx2.fillText("MP消費:2ゲージ", 635, 230);
+      cx2.fillText("MP消費:1ゲージ", 635, 230);
       cx2.fillText("対象:プレイヤー1人", 635, 250);
       cx2.fillText("効果:対象を5巡の間", 635, 270);
       cx2.fillText("「火傷」状態にする.", 635, 290);
+      cx2.fillText("(火傷状態の間は", 635, 310);
+      cx2.fillText(" ポン・カンできない)", 635, 330);
       }else if(p==2){
         var MS=Buff[player].filter(value=>value==2)
         if(!MS.length){MS=[]};
@@ -12691,7 +12697,7 @@ if(opLock==0 && gamestate ==1){
       cx2.fillText("この局を流局にする.", 635, 330);
     }else if(p==5){
       cx2.font = "bold 15px Arial";
-      cx2.fillText("クイーンズスローン", 635, 130);
+      cx2.fillText("チートコード", 635, 130);
       cx2.font = "14px Arial";
       cx2.fillText("・リーチが発生した時", 635, 150);
       cx2.fillText("危険パイを察知する.", 635, 170);
@@ -12738,8 +12744,10 @@ if(opLock==0 && gamestate ==1){
       cx2.fillText("花蓮", 635, 230);
       cx2.font = "14px Arial";
       cx2.fillText("・カンをした時,", 635, 250);
-      cx2.fillText("MPを1ゲージ消費して", 635, 270);
-      cx2.fillText("ドラか当たりパイを引く.", 635, 290);
+      cx2.fillText("MPを1ゲージ消費して,", 635, 270);
+      cx2.fillText("リーチ時は当たりパイを,", 635, 290);
+      cx2.fillText("非リーチ時はドラを,", 635, 310);
+      cx2.fillText("ランダムにドローする.", 635, 330);
     }else if(p==8){
       cx2.font = "bold 15px Arial";
       cx2.fillText("万能ニーシャ", 635, 130);
