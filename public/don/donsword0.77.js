@@ -1,4 +1,4 @@
-// var1.001　season2 テスト
+// var1.003　season2 テスト bgm音質修正
 // npm run dev
 // 対戦中のスキルテスト中
 window.onload = function(){
@@ -326,7 +326,7 @@ window.onload = function(){
   var Ronturn=[];
   //データベース
   var LPlist=new Array("一般","ヘル","デスマッチ","∞","魔界血戦")
-  var musiclist=new Array("ランダム","盲目のアストライア","Nine Jack","The Evil Sacrifice Archenemies","ロベリア","夜の迷宮の入口","決闘のテーマ","エルの樹の麓","リーチっぽい音楽","ベスマ-竜の道","ウォーリーの城","歎きの塔Phase3","狂乱のコンサート","リーチっぽい音楽R")
+  var musiclist=new Array("ランダム","盲目のアストライア","Nine Jack","The Evil Sacrifice Archenemies","ロベリア","夜の迷宮の入口","決闘のテーマ","エルの樹の麓","リーチっぽい音楽","竜の道","ウォーリーの城メドレー","歎きの塔Phase3","狂乱のコンサート","リーチっぽい音楽R")
   var chrlist=new Array("名無しさん","エルス","アイシャ","レナ","レイヴン","イヴ","ラシェ","アラ")//"エド","ラビィ")
   var chrimg_src= new Array("don/Don_chara0.png","don/Don_chara1.png","don/Don_chara2.png","don/Don_chara3.png","don/Don_chara4.png","don/Don_chara5.png","don/Don_chara6.png","don/Don_chara7.png");
   //説明用
@@ -358,8 +358,8 @@ window.onload = function(){
   {title:"決闘のテーマ",elia:"提供",nod:"from Elsword music <耳コピアレンジ>"},
   {title:"エルの樹の麓",elia:"提供",nod:"from Elsword music <耳コピアレンジ>"},
   {title:"リーチっぽい音楽",elia:"提供",nod:"アトラスシティーのイメージ"},
-  {title:"ベスマ-竜の道",elia:"提供",nod:"from Elsword music <耳コピアレンジ>"},
-  {title:"ウォーリーの城",elia:"提供",nod:"from Elsword music <アレンジメドレー>"},
+  {title:"竜の道",elia:"提供",nod:"from Elsword music <耳コピアレンジ>"},
+  {title:"ウォーリーの城メドレー",elia:"提供",nod:"from Elsword music <アレンジメドレー>"},
   {title:"歎きの塔Phase3",elia:"提供",nod:"from Elsword music <耳コピアレンジ>"},
   {title:"狂乱のコンサート",elia:"提供",nod:"from Elsword music <耳コピアレンジ>"},
   {title:"リーチっぽい音楽R",elia:"提供",nod:"（おまけトラック）"},
