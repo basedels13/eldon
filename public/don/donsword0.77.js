@@ -1,4 +1,4 @@
-// var1.003　season2 テスト bgm音質修正
+// var1.003　season2 テスト リザルト中にパイが切れてしまう時がある？
 // npm run dev
 // 対戦中のスキルテスト中
 window.onload = function(){
@@ -2163,14 +2163,12 @@ function menuMap(p=0){
                   if(this.card==1){
                     se3.play()
                     winrank[0][4]-=1;
-                    if(winrank[0][4]==-1){winrank[0][4]=4};
-                    if(winrank[0][4]==3){winrank[0][4]=2};
+                    if(winrank[0][4]==-1){winrank[0][4]=3};
                   }
                   if(this.card==2){
                     se3.play()
                     winrank[0][4]+=1;
-                    if(winrank[0][4]==3){winrank[0][4]=4};
-                    if(winrank[0][4]==5){winrank[0][4]=0};
+                    if(winrank[0][4]==4){winrank[0][4]=0};
                   }
                   menuMap(2);
                 };
@@ -8113,7 +8111,7 @@ if(opLock==0 && gamestate ==1){
         }
         var haix
         var haiy
-        haix=60;
+        haix=30;
         haiy=250;
         cx2.font = "20px 'Century Gothic'";
         cx2.fillStyle ="white";
@@ -8152,7 +8150,7 @@ if(opLock==0 && gamestate ==1){
             haiy +=25
         }
           haiy=250
-          haix=390;
+          haix=480;
         cx2.textAlign = "right";
         if(nodyaku[0] >0){
           for(var i=1 ;i<nodyaku.length;i++){
@@ -12570,8 +12568,11 @@ if(opLock==0 && gamestate ==1){
         if(pvpmode==0 && LP[0]!==3){
         var N=LP[0];
         //3フリバ, 4魔界血戦なので
-          if(N==4){N=3};
-        winrank[N][scoretemp[0]-1]+=1;
+          if(N==4){
+            winrank[3][scoretemp[0]-1]+=1;
+          }else{
+            winrank[N][scoretemp[0]-1]+=1;
+          };
         };
         if(scoretemp[3]>highscore[2]){highscore[2]=scoretemp[3]};
         for(var i=0;i<achievetemp.length;i++){
