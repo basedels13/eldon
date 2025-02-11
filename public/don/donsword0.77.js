@@ -600,7 +600,7 @@ window.onload = function(){
       achieveB[i].count=0;
     }
   //通算順位割合
-  var winrank=[[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]];//一般、ヘル、デスマッチ、魔界血戦、予備
+  var winrank=[[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]];//一般、ヘル、デスマッチ、予備、魔界血戦
   //winrank[0][4]をP切り替えに利用
   var highscore=[0,0,0,0,0,0];//0->通算プレイ回数 1->最大終了得点 2->1回の最大得点 3->連荘回数 4->対戦回数 5->予備
   var scoretemp=[0,0,0,0,0,0];//0->0:escで途中抜けした1-4:順位 3->最大火力 1->連荘 245未使用
@@ -652,10 +652,7 @@ window.onload = function(){
   //背景
   var BGimg= new createjs.Bitmap("don/Don_bg1.png");
   BGimg.scale=2;
-  //赤背景はBGimg.y=-600に;
   var e1= new Image();
-  var e2= new Image();
-  var e3= new Image();
   //メニュー用
   var e4= new Image();
   var e5= new Image();
@@ -673,9 +670,6 @@ window.onload = function(){
   //立ち絵
   var e15= new Image();
   var e16= new Image();
-  var e17= new Image();
-  //属性マーク
-  var Aicon=new Image();
   //マナブレアイコン
   var MBicon= new createjs.Bitmap("don/Don_mbicon.png");;
   var zoom=  new createjs.Bitmap("don/zoom650.png");
@@ -2163,12 +2157,14 @@ function menuMap(p=0){
                   if(this.card==1){
                     se3.play()
                     winrank[0][4]-=1;
-                    if(winrank[0][4]==-1){winrank[0][4]=3};
+                    if(winrank[0][4]==-1){winrank[0][4]=4};
+                    if(winrank[0][4]==3){winrank[0][4]=2};
                   }
                   if(this.card==2){
                     se3.play()
                     winrank[0][4]+=1;
-                    if(winrank[0][4]==4){winrank[0][4]=0};
+                    if(winrank[0][4]==3){winrank[0][4]=4};
+                    if(winrank[0][4]==5){winrank[0][4]=0};
                   }
                   menuMap(2);
                 };
@@ -3238,10 +3234,10 @@ function NameChange(){
     if(A.length>=30){
       AK("強靭な実績コレクター");
     }
-    if(winrank[0][0]>=3 || winrank[1][0]>=3 || winrank[2][0]>=3 || winrank[3][0]>=3){
+    if(winrank[0][0]>=3 || winrank[1][0]>=3 || winrank[2][0]>=3 || winrank[4][0]>=3){
       AK("甘美な勝利")
     }
-    if(winrank[0][3]>=5 || winrank[1][3]>=5 || winrank[2][3]>=5 || winrank[3][3]>=5){
+    if(winrank[0][3]>=5 || winrank[1][3]>=5 || winrank[2][3]>=5 || winrank[4][3]>=5){
       AK("ドカーン！")
     }
     //キャラクター解放
@@ -12568,11 +12564,9 @@ if(opLock==0 && gamestate ==1){
         if(pvpmode==0 && LP[0]!==3){
         var N=LP[0];
         //3フリバ, 4魔界血戦なので
-          if(N==4){
-            winrank[3][scoretemp[0]-1]+=1;
-          }else{
+        if(N!==3){
             winrank[N][scoretemp[0]-1]+=1;
-          };
+        }
         };
         if(scoretemp[3]>highscore[2]){highscore[2]=scoretemp[3]};
         for(var i=0;i<achievetemp.length;i++){
