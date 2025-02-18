@@ -1,4 +1,4 @@
-// var1.003　season2 テスト リザルト中にパイが切れてしまう時がある？
+// var1.005　season2 テスト リザルト中にパイが切れてしまう時がある？
 // npm run dev
 // 対戦中のスキルテスト中
 window.onload = function(){
@@ -8,6 +8,49 @@ window.onload = function(){
   function draw(){
   var titletext="v1.003/Click to START";
   var debugmode=false;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にfalseに
+  var today = new Date();
+  var fool=false;
+  if((today.getMonth()+1==4)&&(today.getDate()==1)){
+    fool=true;
+  }
+  //epril fool
+  (function () {
+    var wait = 1500,
+      standby = true,
+      // コマンドのキーコード
+      command = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65],
+      length = command.length,
+      index = 0,
+      timer = null;  
+    document.addEventListener('keydown', function (ev) {
+      if(gamestate==10 && pagestate==-1){
+      // タイマーのリセット
+      clearTimeout(timer);
+      // コマンドの確認
+      if (standby && ev.keyCode === command[index]) {
+        index++;
+        if (index >= length) {
+          // すべてのコマンドを入力した！
+          standby = false;  // 処理中にコマンドを受け付けないようにする
+          index = 0;  // コマンドリセット
+          if(!fool){fool=true;}else{fool=false}
+          se17.play();
+          handleComplete();
+          standby = true;
+        } else {
+          // 一定時間入力がなかったらリセット
+          timer = setTimeout(function () {
+            index = 0;
+          }, wait);
+        }
+      } else {
+        // コマンドが間違っていたらリセット
+        index = 0;
+      }
+    }
+    });
+  })();
+  //
   //自分自身の情報を入れる箱
   var IAM = {
     token: null,    // 戸別管理用のトークン
@@ -329,6 +372,7 @@ window.onload = function(){
   var musiclist=new Array("ランダム","盲目のアストライア","Nine Jack","The Evil Sacrifice Archenemies","ロベリア","夜の迷宮の入口","決闘のテーマ","エルの樹の麓","リーチっぽい音楽","竜の道","ウォーリーの城メドレー","歎きの塔Phase3","狂乱のコンサート","リーチっぽい音楽R")
   var chrlist=new Array("名無しさん","エルス","アイシャ","レナ","レイヴン","イヴ","ラシェ","アラ")//"エド","ラビィ")
   var chrimg_src= new Array("don/Don_chara0.png","don/Don_chara1.png","don/Don_chara2.png","don/Don_chara3.png","don/Don_chara4.png","don/Don_chara5.png","don/Don_chara6.png","don/Don_chara7.png");
+  var chrimgR_src= new Array("don/Don_chara0.png","don/Don_chara1R.png","don/Don_chara2R.png","don/Don_chara3R.png","don/Don_chara4R.png","don/Don_chara5R.png","don/Don_chara6.png","don/Don_chara7.png");
   //説明用
   var epic_src =new Array("don/elstudio_bg1.png","don/Don_epic1.png","don/Don_epic2.png","don/Don_epic3.png","don/Don_epic6.png","don/Don_ss11.png","don/Don_epic4.png","don/Don_epic5.png");
   //パイの裏
@@ -997,6 +1041,9 @@ var queue = new createjs.LoadQueue(),
     };
     for(var i=0;i<chrimg_src.length;i++){
       manifest.push(chrimg_src[i])
+    };
+    for(var i=0;i<chrimgR_src.length;i++){
+      manifest.push(chrimgR_src[i])
     };
     for(var i=0;i<win_src.length;i++){
       manifest.push(win_src[i])
@@ -4206,6 +4253,15 @@ function NameChange(){
     }}
     window.addEventListener("keydown", keyDownHandler, false);
     function keyDownHandler(e) {
+      switch(e.keyCode) {
+        case 32: // space
+        case 37: // ←
+        case 38: // ↑
+        case 39: // →
+        case 40: // ↓
+          e.preventDefault();
+          break;
+        }
       if(e.keyCode==27 && key27==0){
         key27=1;
         if(pvpmode==1){
@@ -4644,22 +4700,38 @@ if(opLock==0 && gamestate ==1){
         parentY =400
         var Ary=[500,500,500,500,500,500,500,400];
         var Ary2=[0,50,0,0,60,0,60,0];
-        e11 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[1]]));
+        if(fool){
+          e11 = new createjs.Bitmap(queue.getResult(chrimgR_src[chara[1]]));          
+        }else{
+          e11 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[1]]));
+        }
         e11.sourceRect={x:Ary[chara[1]],y:Ary2[chara[1]],width:300,height:600}
         e11.x=0;
         e11.y=400;
         e11.scale=1/3;
-        e12 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[2]]));
+        if(fool){
+          e12 = new createjs.Bitmap(queue.getResult(chrimgR_src[chara[2]]));          
+        }else{
+          e12 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[2]]));
+        }
         e12.sourceRect={x:Ary[chara[2]],y:Ary2[chara[2]],width:300,height:300}
         e12.x=0;
         e12.y=100;
         e12.scale=1/3;
+        if(fool){
+          e13 = new createjs.Bitmap(queue.getResult(chrimgR_src[chara[3]]));          
+        }else{
         e13 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[3]]));
+          }
         e13.sourceRect={x:Ary[chara[3]],y:Ary2[chara[3]],width:300,height:300}
         e13.x=0;
         e13.y=200;
         e13.scale=1/3;
+        if(fool){
+          e14 = new createjs.Bitmap(queue.getResult(chrimgR_src[chara[4]]));          
+        }else{
         e14 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[4]]));
+        }
         e14.sourceRect={x:Ary[chara[4]],y:Ary2[chara[4]],width:300,height:300}
         e14.x=0;
         e14.y=300;
@@ -6034,7 +6106,11 @@ if(opLock==0 && gamestate ==1){
     shapeMask.scaleY=0.1;
     shapeMask.y=B;
     Container.mask = shapeMask;
+    if(fool){
+    var C = new createjs.Bitmap(queue.getResult(chrimgR_src[chara[p]]));          
+    }else{
     var C = new createjs.Bitmap(queue.getResult(chrimg_src[chara[p]]));
+    }
     C.x=-480;
     C.y=B-200;
     if(chara[p]==5){C.y+=60};
@@ -8062,7 +8138,11 @@ if(opLock==0 && gamestate ==1){
       //描画 魔界モード以外の時はResultmapで描画
       if(LP[0]==4){
         //従来通りツモ画面の描画のみ
+        if(fool){
+          e15 = new createjs.Bitmap(queue.getResult(chrimgR_src[chara[player]]));          
+        }else{
         e15 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[player]]));
+        }
       if(ippatu[player]==1 && chara[player]==6 && skillusage[player]==1){
         e15.sourceRect={x:0,y:10,width:400,height:400};
         }else if(chara[player]==6){
@@ -8236,7 +8316,11 @@ if(opLock==0 && gamestate ==1){
       guidemap.alpha=0;
       cx2.clearRect(0,0,800,600);
       handmap.removeAllChildren();
+      if(fool){
+        e15 = new createjs.Bitmap(queue.getResult(chrimgR_src[chara[player]]));          
+      }else{
       e15 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[player]]));
+      }
       if(ippatu[player]==1 && chara[player]==6 && skillusage[player]==1){
         e15.sourceRect={x:0,y:10,width:400,height:400};
       }else if(chara[player]==6){
@@ -11551,7 +11635,11 @@ if(opLock==0 && gamestate ==1){
       Container.addChild(C);
       createjs.Tween.get(C)
       .to({scale:1},200, createjs.Ease.cubicInOut);
+      if(fool){
+      var C = new createjs.Bitmap(queue.getResult(chrimgR_src[chara[player]]));          
+      }else{
       var C = new createjs.Bitmap(queue.getResult(chrimg_src[chara[player]]));
+      }
       if(ippatu[player]==1 && chara[player]==6 && skillusage[player]==1){
         C.sourceRect={x:0,y:0,width:400,height:600};
       }else if(chara[player]==6){
@@ -11711,7 +11799,11 @@ if(opLock==0 && gamestate ==1){
       createjs.Tween.get(D, {loop: true})
       .to({x:D.x-800/3,y:D.y+100},1100);
       }
+      if(fool){
+      var C = new createjs.Bitmap(queue.getResult(chrimgR_src[chara[p]]));          
+      }else{
       var C = new createjs.Bitmap(queue.getResult(chrimg_src[chara[p]]));
+      }
       if(ippatu[p]==1 && chara[p]==6 && skillusage[p]==1){
         C.sourceRect={x:0,y:0,width:400,height:600};
       }else if(chara[p]==6){
@@ -11772,7 +11864,11 @@ if(opLock==0 && gamestate ==1){
       shapeMask.scaleY=0.1;
       shapeMask.y=200;
       Container.mask = shapeMask;
-    var C = new createjs.Bitmap(queue.getResult(chrimg_src[chara[p]]));
+      if(fool){
+        var C = new createjs.Bitmap(queue.getResult(chrimgR_src[chara[p]]));          
+        }else{
+        var C = new createjs.Bitmap(queue.getResult(chrimg_src[chara[p]]));
+        }
     if(ippatu[p]==1 && chara[p]==6 && skillusage[p]==1){
       C.sourceRect={x:0,y:0,width:400,height:400};
     }else{
@@ -11860,7 +11956,11 @@ if(opLock==0 && gamestate ==1){
         shapeMask.scaleY=0.1;
         shapeMask.y=200;
         Container.mask = shapeMask;
-      var C = new createjs.Bitmap(queue.getResult(chrimg_src[chara[p]]));
+        if(fool){
+          var C = new createjs.Bitmap(queue.getResult(chrimgR_src[chara[p]]));          
+          }else{
+          var C = new createjs.Bitmap(queue.getResult(chrimg_src[chara[p]]));
+          }
       if(ippatu[p]==1 && chara[p]==6 && skillusage[p]==1){
         C.sourceRect={x:0,y:0,width:400,height:400};
       }else{
@@ -11985,7 +12085,11 @@ if(opLock==0 && gamestate ==1){
       Container.addChild(C);
       createjs.Tween.get(C)
       .to({scale:1},200, createjs.Ease.cubicInOut);
-    var C = new createjs.Bitmap(queue.getResult(chrimg_src[chara[p]]));
+      if(fool){
+        var C = new createjs.Bitmap(queue.getResult(chrimgR_src[chara[p]]));          
+        }else{
+        var C = new createjs.Bitmap(queue.getResult(chrimg_src[chara[p]]));
+        }
     if(chara[p]==6){
       C.sourceRect={x:0,y:0,width:400,height:600};
     }else{
