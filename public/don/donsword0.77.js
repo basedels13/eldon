@@ -8737,7 +8737,31 @@ if(opLock==0 && gamestate ==1){
             }
             console.log(Count);
             console.log(Line);
-            //アガリ系は3ペアorライン統一
+          //クレストシリーズは最優先
+          var keyj3=Object.keys(Color);
+          var Ary=["0","ソーレス","デニフ","ベントス","アドリアン","ガイア","ロッソ","ハルニエ"];
+          switch(Color["0"]){
+            case 2:
+            case 1:
+              if(keyj3.length==2){
+                console.log('crest tumo',keyj3[1]);
+                var resultF=Object.keys(Color).find((key)=>Color[key]>2);
+                result="クレストオブ"+Ary[resultF];
+                  return result;
+              }
+              break;
+            default:
+              if(keyj3.length==1){
+                var M=handtemp.findIndex(value=>value>=60 && value<=67);
+                var resultF=Object.keys(Color).find((key)=>Color[key]>2);
+                if(M!==-1){
+                console.log('crest tumo',keyj3[0]);
+                result="クレストオブ"+Ary[resultF];
+                return result;
+                }
+              }
+            break;
+          }
             //ラインチェック
             var keyj2=Object.keys(Line);
             //console.log(keyj2.length);//expected 1~5
@@ -8812,31 +8836,6 @@ if(opLock==0 && gamestate ==1){
                 }
                 break;
           };
-          //クレストシリーズ
-          var keyj3=Object.keys(Color);
-          var Ary=["0","ソーレス","デニフ","ベントス","アドリアン","ガイア","ロッソ","ハルニエ"];
-          switch(Color["0"]){
-            case 2:
-            case 1:
-              if(keyj3.length==2){
-                console.log('crest tumo',keyj3[1]);
-                var resultF=Object.keys(Color).find((key)=>Color[key]>2);
-                result="クレストオブ"+Ary[resultF];
-                  return result;
-              }
-              break;
-            default:
-              if(keyj3.length==1){
-                var M=handtemp.findIndex(value=>value>=60 && value<=67);
-                var resultF=Object.keys(Color).find((key)=>Color[key]>2);
-                if(M!==-1){
-                console.log('crest tumo',keyj3[0]);
-                result="クレストオブ"+Ary[resultF];
-                return result;
-                }
-              }
-            break;
-          }
             //国士無双:エピックラインのみ、かつ同パイを含まない
             var Kokushi=[60,61,62,63,64,65,66,67,68,69]
             var Kreach=0;
