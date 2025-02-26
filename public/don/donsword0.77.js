@@ -372,7 +372,7 @@ window.onload = function(){
   var musiclist=new Array("ランダム","盲目のアストライア","Nine Jack","The Evil Sacrifice Archenemies","ロベリア","夜の迷宮の入口","決闘のテーマ","エルの樹の麓","リーチっぽい音楽","竜の道","ウォーリーの城メドレー","歎きの塔Phase3","狂乱のコンサート","リーチっぽい音楽R")
   var chrlist=new Array("名無しさん","エルス","アイシャ","レナ","レイヴン","イヴ","ラシェ","アラ")//"エド","ラビィ")
   var chrimg_src= new Array("don/Don_chara0.png","don/Don_chara1.png","don/Don_chara2.png","don/Don_chara3.png","don/Don_chara4.png","don/Don_chara5.png","don/Don_chara6.png","don/Don_chara7.png");
-  var chrimgR_src= new Array("don/Don_chara0.png","don/Don_chara1R.png","don/Don_chara2R.png","don/Don_chara3R.png","don/Don_chara4R.png","don/Don_chara5R.png","don/Don_chara6.png","don/Don_chara7.png");
+  var chrimgR_src= new Array("don/Don_chara0.png","don/Don_chara1R.png","don/Don_chara2R.png","don/Don_chara3R.png","don/Don_chara4R.png","don/Don_chara5R.png","don/Don_chara6R.png","don/Don_chara7R.png");
   //説明用
   var epic_src =new Array("don/elstudio_bg1.png","don/Don_epic1.png","don/Don_epic2.png","don/Don_epic3.png","don/Don_epic6.png","don/Don_ss11.png","don/Don_epic4.png","don/Don_epic5.png");
   //パイの裏
@@ -3436,7 +3436,11 @@ function NameChange(){
     }
     //画像ID
     e4 = new createjs.Bitmap(queue.getResult(eltearB_src[0]));
-    e10 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[1]]));
+    if(fool){
+      e10 = new createjs.Bitmap(queue.getResult(chrimgR_src[chara[1]]));          
+    }else{
+      e10 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[1]]));
+    }
     //bitmap
     textmap.alpha=1;
     field.removeAllChildren();
@@ -4254,7 +4258,6 @@ function NameChange(){
     window.addEventListener("keydown", keyDownHandler, false);
     function keyDownHandler(e) {
       switch(e.keyCode) {
-        case 32: // space
         case 37: // ←
         case 38: // ↑
         case 39: // →
