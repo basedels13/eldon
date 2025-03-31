@@ -1,6 +1,7 @@
 // var1.005　season2 テスト リザルト中にパイが切れてしまう時がある？
 // npm run dev
 // 対戦中のスキルテスト中
+// 魔界血戦後にclockされてしまう場合がある
 window.onload = function(){
   draw();
   };
@@ -1847,7 +1848,11 @@ function menuMap(p=0){
       t.y=350;
       menu_solo.addChild(t);
       menu_solo_list.push(t);
-      e10 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[1]]));
+      if(fool){
+        e10 = new createjs.Bitmap(queue.getResult(chrimgR_src[chara[1]]));          
+      }else{
+        e10 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[1]]));
+      }
       e10.sourceRect={x:400,y:0,width:350,height:510}
       e10.x=10;
       e10.y=0;
@@ -2142,7 +2147,11 @@ function menuMap(p=0){
               t.y=410+50*k;
               menu_main.addChild(t);
             }else{
-            e11 = new createjs.Bitmap(queue.getResult(chrimg_src[i]));
+              if(fool){
+                e11 = new createjs.Bitmap(queue.getResult(chrimgR_src[i]));          
+              }else{
+                e11 = new createjs.Bitmap(queue.getResult(chrimg_src[i]));
+              }
             e11.sourceRect={x:AryX[i],y:AryY[i],width:200,height:200}
             e11.x=530+50*j;
             e11.y=400+50*k;
@@ -2158,7 +2167,11 @@ function menuMap(p=0){
           rect.y=400+50*Math.floor(chara[1]/4)
           menu_main.addChild(rect);
           menu_main_list.push(rect);
-          e10 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[1]]));
+          if(fool){
+            e10 = new createjs.Bitmap(queue.getResult(chrimgR_src[chara[1]]));          
+          }else{
+            e10 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[1]]));
+          }
           e10.sourceRect={x:400,y:0,width:350,height:490}
           e10.x=530;
           e10.y=120;
@@ -3554,7 +3567,11 @@ function NameChange(){
             menu_solo_list[2].text="◀ "+chrlist[chara[1]]
             menu_solo.removeChild(menu_solo_list[menu_solo_list.length-1]);
             menu_solo_list.pop();
-            e10 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[1]]));
+            if(fool){
+              e10 = new createjs.Bitmap(queue.getResult(chrimgR_src[chara[1]]));          
+            }else{
+              e10 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[1]]));
+            }
             e10.sourceRect={x:400,y:0,width:350,height:510}
             e10.x=10;
             e10.y=0;
@@ -3568,7 +3585,11 @@ function NameChange(){
             menu_solo_list[2].text="◀ "+chrlist[chara[1]]
             menu_solo.removeChild(menu_solo_list[menu_solo_list.length-1]);
             menu_solo_list.pop();
-            e10 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[1]]));
+            if(fool){
+              e10 = new createjs.Bitmap(queue.getResult(chrimgR_src[chara[1]]));          
+            }else{
+              e10 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[1]]));
+            }
             e10.sourceRect={x:400,y:0,width:350,height:510}
             e10.x=10;
             e10.y=0;
@@ -4206,7 +4227,11 @@ function NameChange(){
           }
           };
           for(var i=0;i<data.list.length;i++){
-            var e = new createjs.Bitmap(queue.getResult(chrimg_src[data.list[i].chr]));
+            if(fool){
+             var e = new createjs.Bitmap(queue.getResult(chrimgR_src[data.list[i].chr]));          
+            }else{
+             var e = new createjs.Bitmap(queue.getResult(chrimg_src[data.list[i].chr]));
+            }
             if(data.list[i].chr==5){
             e.sourceRect={x:460,y:0,width:298,height:600};              
             }else{
@@ -12494,7 +12519,11 @@ if(opLock==0 && gamestate ==1){
     s.graphics.beginFill("#001c0d");
     s.graphics.drawRect(0, 0, 800, 600);
     field.addChild(s);
-    var e10 = new createjs.Bitmap(queue.getResult(chrimg_src[LPresult[3].chara]));
+    if(fool){
+     var e10 = new createjs.Bitmap(queue.getResult(chrimgR_src[LPresult[3].chara]));          
+    }else{
+     var e10 = new createjs.Bitmap(queue.getResult(chrimg_src[LPresult[3].chara]));
+    }
     if(LPresult[3].chara==6){
       e10.sourceRect={x:400,y:0,width:400,height:600}
     }else{
@@ -12564,7 +12593,11 @@ if(opLock==0 && gamestate ==1){
     var Ary=[500,500,500,500,480,500,500,400];
     var Ary2=[50,120,50,50,70,50,70,50];
     for(var i=0;i<3;i++){
-    var e10 = new createjs.Bitmap(queue.getResult(chrimg_src[LPresult[2-i].chara]));
+    if(fool){
+      var e10 = new createjs.Bitmap(queue.getResult(chrimgR_src[LPresult[2-i].chara]));          
+     }else{
+      var e10 = new createjs.Bitmap(queue.getResult(chrimg_src[LPresult[2-i].chara]));
+     }
       e10.sourceRect={x:Ary[LPresult[2-i].chara],y:Ary2[LPresult[2-i].chara],width:215,height:215}
       e10.scale=60/215;
       e10.x=-100;
