@@ -113,42 +113,9 @@ window.onload = function(){
     return false;
     break;
   }};
-  //接続
-  const socket = io();
-  socket.on('connect', () => {
-    console.log('connect');
-  });
-  /**
-   * [イベント] トークンが発行されたら
-   */
-  socket.on("token", (data)=>{
-    // トークンを保存
-    IAM.token = data.token;
-  });
   //
   var RoomAry=[];//ルーム人数表示テキスト
   var RoomConfigAry=[];//ルーム内の設定ボタン等テキスト
-  //接続人数を受け取る 変化していれば反映する
-  socket.on('lobby-update',(data)=>{
-    //room:Room,state:State
-    RoomNum=data.room.concat();
-    RoomState=data.state.concat();
-    if(pagestate==6 && msgstate==0){
-      var k=0;
-      for(var i=0;i<3;i++){
-        RoomAry[k].text="人数："+RoomNum[i]+"/4";
-        RoomAry[k+1].text="状態："+RoomState[i];
-        k+=2;
-       }
-    }
-  });
-  socket.on('xxx', (data)=>{
-    if(Usercount !== data.message){
-    Usercount=data.message;
-    if(pagestate==6 && msgstate==0){
-      Textlist[1].text="現在の接続人数："+Usercount;
-    }}
-    });
   var Usercount=0;
   var RoomNum=[0,0,0];
   var RoomState=["open","open","open"];
@@ -1345,18 +1312,6 @@ function updateParticles() {
         //メニュー画面
         Menu();
       }
-
-  socket.on("game-ready", (data)=>{
-    if(IsHost(IAM.room)){
-    var N=MEMBER.findIndex(value=>value.id==data.who);
-    MEMBER[N].turnflag=2;
-    var M=MEMBER.filter(value=>value.turnflag==2)
-    var MM=4-M.length
-    //どこかでOKtextをaddする
-    OKtext1.text="OK ("+MM+")";
-    OKtext2.text="OK ("+MM+")";
-    }
-  });
   if(gamestate ==0){//ほんぺ
     //ニューゲーム
     handmap.removeAllChildren();
@@ -1403,7 +1358,6 @@ function updateParticles() {
       //ホスト以外は待機
       if(LP[0]!==4 || (LP[0]==4 && raidscore[0]==1)){
         gamestate =1;
-        socket.emit("game_ready", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[0].id});
         OKtext1.text="waiting…"
         OKtext2.text="waiting…"
         if(LP_PVP.Length[0]==1){
@@ -1575,7 +1529,6 @@ function updateParticles() {
             if(!IsHost(IAM.room)){
               if(IAM.is_ready==1){IAM.is_ready=0};
             }
-            socket.emit("game_over", {Token:IAM.token,room:RoomName[IAM.room],type:1});
             return false;
       }
       if(pvpmode==0){
@@ -3008,7 +2961,6 @@ function Nyusitu(){
   var clientCrest=Usercrest;
   var clientChr=chara[1];
   var roomId=RoomName[rn];
-  socket.emit('join_to_room',{token: IAM.token,name:clientId,crest:clientCrest,chr:clientChr,room:roomId});
   cx4.globalAlpha=1;
   se3.play();
   cx4.fillStyle = "rgba(20,20,20,0.7)";
@@ -3156,13 +3108,8 @@ function NameChange(){
         break;
       case 4:
         //たいせん
-        pagestate=6;
-        msgstate=0;
         se5.play();
-        socket.emit('lobby_update');
-        socket.emit("join", {name:Username});
-        menuMap(4);
-        field.addChild(menu_duel);
+        window.open('https://eldontest.glitch.me/', '_blank');
         break;
       case 5:
         //実績等
@@ -3911,12 +3858,10 @@ function NameChange(){
             menuMap(2);
             break;
           case 6:
-            //たいせん画面
+            //たいせん画面 glitchのオンライン版へ飛ぶ
             if(mouseX >700 && mouseX <750 && mouseY >50 && mouseY <100){
-              pagestate=0;
-              msgstate=0;
               se2.play();
-              Menu();
+              window.open('https://eldontest.glitch.me/', '_blank')
               return false;
             }
             switch(msgstate){
@@ -11006,8 +10951,8 @@ if(opLock==0 && gamestate ==1){
               Textlist[1].text="基本的に半荘戦（全員が親を2回行うと終了）です。";  
             }
             if(mouseX >220 && mouseX <400 && mouseY >210 && mouseY < 300){
-              Textlist[0].text="対戦ルームで友達とドンジャラができます。";
-              Textlist[1].text="クリック後、対戦ルームのロビーに移動します。";  
+              Textlist[0].text="glitch版ではおともだちと対戦ができます。";
+              Textlist[1].text="（クリック後、オンライン版を開きます）";  
             }
             if(mouseX >220 && mouseX <400 && mouseY >300 && mouseY < 390){
               Textlist[0].text="対局の設定や音楽の設定などができます。";
