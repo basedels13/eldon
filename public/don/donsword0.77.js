@@ -1120,8 +1120,6 @@ function UpdateParticles(event){
 function MouseCircle(event){
   //クリックした場所を教える
   //プレイ中はマナブレも
-  mouseX = stage.mouseX;
-  mouseY = stage.mouseY;
   if(mpmoving){
   mpC+=0.4;
   if(mpC>DP[1]){mpC=DP[1]};
@@ -1587,7 +1585,7 @@ function updateParticles() {
     //console.log(pagestate)
     }else if(gamestate ==1){
       if(opLock==3){
-        if(mouseX >300 && mouseY > 55 && mouseX <400 && mouseY <100){
+        if(stage.mouseX >300 && stage.mouseY > 55 && stage.mouseX <400 && stage.mouseY <100){
           se3.play();
           if(shiagytemp==0){
             shiagytemp=1;
@@ -1597,19 +1595,19 @@ function updateParticles() {
           Yakucheck(0);
           return false;
         }
-        if(mouseX >40 && mouseY > 100 && mouseX <620 && mouseY <200){
+        if(stage.mouseX >40 && stage.mouseY > 100 && stage.mouseX <620 && stage.mouseY <200){
           Yakucheck(180);
         return false;
         }
-        if(mouseX >40 && mouseY > 200 && mouseX <620 && mouseY <300){
+        if(stage.mouseX >40 && stage.mouseY > 200 && stage.mouseX <620 && stage.mouseY <300){
           Yakucheck(90);
           return false;
           }
-        if(mouseX >40 && mouseY > 300 && mouseX <620 && mouseY <400){
+        if(stage.mouseX >40 && stage.mouseY > 300 && stage.mouseX <620 && stage.mouseY <400){
           Yakucheck(-90);
         return false;
         }
-        if(mouseX >40 && mouseY > 400 && mouseX <620 && mouseY <480){
+        if(stage.mouseX >40 && stage.mouseY > 400 && stage.mouseX <620 && stage.mouseY <480){
           Yakucheck(-180);
           return false;
           }
@@ -1620,14 +1618,14 @@ function updateParticles() {
         return false;
       }
       if(opLock==2){
-        if(mouseX >460 && mouseY > 240 && mouseX <580 && mouseY <300){
+        if(stage.mouseX >460 && stage.mouseY > 240 && stage.mouseX <580 && stage.mouseY <300){
           cx4.clearRect(0,0,800,600)
           Configmap.removeAllChildren();
           opLock=0;
           se3.play();
         }
         //escによる終了
-        if(mouseX >220 && mouseY > 240 && mouseX <340 && mouseY <300){
+        if(stage.mouseX >220 && stage.mouseY > 240 && stage.mouseX <340 && stage.mouseY <300){
         se3.play();
         scoretemp[0]=-2;
         opLock=0;
@@ -1651,7 +1649,7 @@ function updateParticles() {
         se2.play();
         return false;
       }
-      if(mouseX >290 && mouseY > 10 && mouseX <400 && mouseY <55){
+      if(stage.mouseX >290 && stage.mouseY > 10 && stage.mouseX <400 && stage.mouseY <55){
         //役一覧を出す
         if(cLock==1 || (pvpmode==1 && opLock>=0)){
           opLock=3;
@@ -1662,7 +1660,7 @@ function updateParticles() {
           return false;
           }
       }
-      if(mouseX >400 && mouseY > 10 && mouseX <530 && mouseY <55){
+      if(stage.mouseX >400 && stage.mouseY > 10 && stage.mouseX <530 && stage.mouseY <55){
         //残パイチェック欄を押す　ゲームを進めない
         if(cLock==1 || (pvpmode==1 && opLock>=0)){
         opLock=1;
@@ -1673,16 +1671,16 @@ function updateParticles() {
         return false;
         }
       }
-      if(mouseX >0 && mouseX< 100){
+      if(stage.mouseX >0 && stage.mouseX< 100){
       if(skillswitch[0] !==-2){
         if(cLock==1|| (pvpmode==1 && opLock>=0)){
           se4.play();
           if(navisw==1){navisw=0}else{navisw=1};
         //クリックで切り替えできるように
-        if(mouseY >100 && mouseY<200){Skillname(2,navisw);}
-        if(mouseY >200 && mouseY<300){Skillname(3,navisw);}
-        if(mouseY >300 && mouseY<400){Skillname(4,navisw);}
-        if(mouseY >400 && mouseY<480){Skillname(1,navisw);}
+        if(stage.mouseY >100 && stage.mouseY<200){Skillname(2,navisw);}
+        if(stage.mouseY >200 && stage.mouseY<300){Skillname(3,navisw);}
+        if(stage.mouseY >300 && stage.mouseY<400){Skillname(4,navisw);}
+        if(stage.mouseY >400 && stage.mouseY<480){Skillname(1,navisw);}
         }
     }}
     if(cLock==3){
@@ -10644,7 +10642,7 @@ if(opLock==0 && gamestate ==1){
       if(turn ==0){
       if(reach[1] !==3){
       //自分のツモ
-      if(mouseY >490 && mouseY < 590){
+      if(stage.mouseY >490 && stage.mouseY < 590){
         PlayertoCpu(this.card);
         }
       }else{//reach[1] ==3
