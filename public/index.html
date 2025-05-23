@@ -31,20 +31,23 @@ margin: 50px 0 0 0;
 }
 .canvas-wrapper{
 position: relative;
-  width: 800px;
-margin: 0 auto;
+/* margin: 0 auto; */
+overflow: hidden;
+padding-top: 75%;
 }
 .canvas-wrapper canvas{
   position: absolute;
   top: 0;
   left: 0;
+  width: 100%;
+  height: 100%;
 }
     .article{
    margin: 40px 0 12px 0;
   text-align: start;
 }
     .parent{
-   margin: 640px 0 12px 0;
+   margin: auto;
   text-align: center;
 }
     .child{
@@ -88,15 +91,13 @@ margin: 0 auto;
     <div class="main">
   <p>エルドンオンライン</p>
    </div>
-<div class="canvas-wrapper" WIDTH="800"; HEIGHT="600">
-   <canvas id="canvas6" WIDTH="800"; HEIGHT="600"></canvas>
-   <canvas id="canvas0" style="background-color: #eee;" WIDTH="800"; HEIGHT="600"></canvas>
-   <canvas id="canvas1" WIDTH="800"; HEIGHT="600"></canvas>
-   <canvas id="canvas2" WIDTH="800"; HEIGHT="600"></canvas>
-   <canvas id="canvas3" WIDTH="800"; HEIGHT="600"></canvas>
-   <canvas id="canvas4" WIDTH="800"; HEIGHT="600"></canvas>
-   <canvas id="canvas7" WIDTH="800"; HEIGHT="600"></canvas>
-   <canvas id="canvas5" WIDTH="800"; HEIGHT="600"></canvas>
+<div class="canvas-wrapper">
+   <canvas id="canvas0" style="background-color: #eee;" ></canvas>
+   <canvas id="canvas1" ></canvas>
+   <canvas id="canvas2" ></canvas>
+   <canvas id="canvas3" ></canvas>
+   <canvas id="canvas4" ></canvas>
+   <canvas id="canvas5" ></canvas>
 </div>
 <div class="parent">
   <span id="child"><h1>エルドン</h1></span>
@@ -107,7 +108,7 @@ margin: 0 auto;
       <b>はじめに</b><br>
       　エルソードに登場するキャラクターがパイになったドンジャラ風のボードゲームです。<br>
       　マルチモードではおともだちと最大4人で遊べます。<br>
-      <b>　PCでのみ</b>動作確認。スマートフォン端末対応予定（いつか）<br>
+      　PC推奨ですがスマートフォン端末でも遊べるようになりました。<br>
       　自動的にロードを行います。<br>
       　BGM,SEが鳴ります。<br>
       　ローカルストレージに自動セーブ機能付き。バックアップ用にデータを出力できます。<br><br>
@@ -187,6 +188,7 @@ margin: 0 auto;
     v1.00<br>
     ・（追加）season2に移行- 4ライン追加、キャラ追加、カン追加<br>
     ・（対戦）特定のタイミングで対局が止まる問題を修正（たぶん）<br>
+    ・（修正）スマートフォン端末でも操作できるように修正、若干レスポンシブ対応<br>
   </div></div></div>
 </body>
 <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>

@@ -1,13 +1,14 @@
 // var1.005　season2 テスト リザルト中にパイが切れてしまう時がある？
 // npm run dev
 // 対戦中のスキルテスト中
-// 魔界血戦後にclockされてしまう場合がある
+// 対戦中のカンでドラの数がズレる？
+// 魔界血戦後にclockされてしまう場合がある？
 window.onload = function(){
   draw();
   };
   
   function draw(){
-  var titletext="v1.004/Click to START";
+  var titletext="v1.005/Click to START";
   var debugmode=false;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にfalseに
   var today = new Date();
   var fool=false;
@@ -152,8 +153,6 @@ window.onload = function(){
   var Usercount=0;
   var RoomNum=[0,0,0];
   var RoomState=["open","open","open"];
-  var mouseX;
-  var mouseY;
   var Savetitle =new Array("This is savedata of <https://azurelsword.web.fc2.com/ronan.html>",0,0);
   var mute="ON"
   var Username = "player";
@@ -164,8 +163,7 @@ window.onload = function(){
   var canvas2 = document.getElementById("canvas2");//パイ、ボタン
   var canvas3 = document.getElementById("canvas3");//カーソル、
   var canvas4 = document.getElementById("canvas4");//残パイ、アニメーション用
-  var canvas5 = document.getElementById("canvas5");//カーソルのアニメーション用
-  
+  var canvas5 = document.getElementById("canvas5");//カーソルのアニメーション
     if ( ! canvas || ! canvas.getContext ) { return false; }
     var cx = canvas.getContext("2d");
     var cx1 = canvas1.getContext("2d");
@@ -173,11 +171,31 @@ window.onload = function(){
     var cx3 = canvas3.getContext("2d");
     var cx4 = canvas4.getContext("2d");
     var cx5 = canvas5.getContext("2d");
+    // canvasのサイズの実験
+    canvas.width=800;
+    canvas.height=600;
+    canvas1.width=800;
+    canvas1.height=600;
+    canvas2.width=800;
+    canvas2.height=600;
+    canvas3.width=800;
+    canvas3.height=600;
+    canvas4.width=800;
+    canvas4.height=600;
+    canvas5.width=800;
+    canvas5.height=600;
+    var window_scaleX = window.innerWidth / 800;
+    var window_scaleY = window.innerHeight / 600;
+    var window_scale=Math.min(window_scaleX,window_scaleY)
+    console.log(window_scaleX,window_scaleY,window_scale)
+    //サイズ変更ここまで
     var stage = new createjs.Stage("canvas5");//Stage
     if (createjs.Touch.isSupported() == true) {
-      createjs.Touch.enable(stage);//タップに対応するがcanvas.addeventlistenerが効かなくなる？
+      createjs.Touch.enable(stage);
+      //タップに対応するがcanvas.addeventlistenerが効かなくなる？→stage.mouseXの修正で解決
       }
     stage.enableMouseOver();//onmouseイベントに対応
+
     var backyard = new createjs.Container();//背景の緑芝
     stage.addChild(backyard);
     //backyard.addEventListener("click", {handleEvent:clickHandler})
@@ -1286,9 +1304,6 @@ function updateParticles() {
   
     canvas5.onmousemove = mouseMoveListener;
     function mouseMoveListener(e) {
-      var rect = e.target.getBoundingClientRect();
-      mouseX = Math.floor(e.clientX - rect.left);
-      mouseY = Math.floor(e.clientY - rect.top);
       //カーソル
      corsor();
     }
@@ -1312,7 +1327,7 @@ function updateParticles() {
     
     function mouseDownHandler(e) {
       if(debugmode){
-      console.log("X座標：" + mouseX,"Y座標：" + mouseY);
+      console.log("X座標：" + stage.mouseX,"Y座標：" + stage.mouseY);
       }
     };
     function mouseUpHandler(e) {
@@ -1336,10 +1351,6 @@ function updateParticles() {
       soundmap.alpha=1;
     }
     function clickHandler(e) {
-      //少しずつ外部委託予定
-      var rect = e.target.getBoundingClientRect();
-      mouseX =  Math.floor(e.clientX - rect.left);
-      mouseY =  Math.floor(e.clientY - rect.top);
       if(debugmode){console.log('click!',cLock,"pagestate",pagestate,"msgstate",msgstate,"gamestate",gamestate)};  
       if(gamestate ==10){
         //メニュー画面
@@ -1685,9 +1696,9 @@ function updateParticles() {
     }}
     if(cLock==3){
       //スキルで自分のパイ選択画面 手札
-    if(mouseY >490 && mouseY < 590 && mouseX >100 && mouseX <760){
-        var SX=Math.floor((mouseX+size-100)/size);
-          if(mouseX >100 && mouseX <660){
+    if(stage.mouseY >490 && stage.mouseY < 590 && stage.mouseX >100 && stage.mouseX <760){
+        var SX=Math.floor((stage.mouseX+size-100)/size);
+          if(stage.mouseX >100 && stage.mouseX <660){
             if(hand1.length>SX+1){
               if(hand1[SX] ==69 || hand1[SX] ==70){
                 cLock=1;
@@ -1702,7 +1713,7 @@ function updateParticles() {
               }
               PlayertoCpu(SX);
             }
-          }else if(mouseX >690 && mouseX <690+size){
+          }else if(stage.mouseX >690 && stage.mouseX <690+size){
             if(turn==0){
               if(hand1[hand1.length-1] ==43 || hand1[hand1.length-1] ==44){
                 cLock=1;
@@ -1713,14 +1724,14 @@ function updateParticles() {
           }
     }
   }else if(cLock==2){//スキル対象選択画面 キャラ
-    if(mouseX >0 && mouseX <150 && mouseY >100){
-    if(mouseY >100 && mouseY <200){SkillAnimation(1,2);
-    }else if(mouseY >200 && mouseY <300){SkillAnimation(1,3);
-    }else if(mouseY >300 && mouseY <400){SkillAnimation(1,4);
+    if(stage.mouseX >0 && stage.mouseX <150 && stage.mouseY >100){
+    if(stage.mouseY >100 && stage.mouseY <200){SkillAnimation(1,2);
+    }else if(stage.mouseY >200 && stage.mouseY <300){SkillAnimation(1,3);
+    }else if(stage.mouseY >300 && stage.mouseY <400){SkillAnimation(1,4);
     }
     }
   }else if(cLock==4){//スキル対象選択画面 場
-    if(mouseX >150 && mouseX <630 && mouseY >100 && mouseY <490){SkillAnimation(1,1);
+    if(stage.mouseX >150 && stage.mouseX <630 && stage.mouseY >100 && stage.mouseY <490){SkillAnimation(1,1);
   }
   }else if(cLock==1){
     //クリックしてから捨て牌を描写してturnroleに繋げるところまで
@@ -3551,17 +3562,17 @@ function NameChange(){
     break;
         case 3:
           //フリバ
-          if(mouseX >510 && mouseX <560 && mouseY >80 && mouseY <110){
+          if(stage.mouseX >510 && stage.mouseX <560 && stage.mouseY >80 && stage.mouseY <110){
           se3.play();
           if(LP[0]==0){LP[0]=LPlist.length-1}else{LP[0]-=1}
           menu_solo_list[1].text="◀ "+LPlist[LP[0]]
           }
-          if(mouseX >670 && mouseX <705 && mouseY >80 && mouseY <110){
+          if(stage.mouseX >670 && stage.mouseX <705 && stage.mouseY >80 && stage.mouseY <110){
             se3.play();
             if(LP[0]==LPlist.length-1){LP[0]=0}else{LP[0]+=1}
             menu_solo_list[1].text="◀ "+LPlist[LP[0]]
             }
-          if(mouseX >510 && mouseX <560 && mouseY >130 && mouseY <160){
+          if(stage.mouseX >510 && stage.mouseX <560 && stage.mouseY >130 && stage.mouseY <160){
             se3.play();
             if(chara[1]==0){chara[1]=HiddenChara}else{chara[1]-=1}
             menu_solo_list[2].text="◀ "+chrlist[chara[1]]
@@ -3579,7 +3590,7 @@ function NameChange(){
             menu_solo.addChild(e10);
             menu_solo_list.push(e10);
             }
-          if(mouseX >670 && mouseX <705 && mouseY >130 && mouseY <160){
+          if(stage.mouseX >670 && stage.mouseX <705 && stage.mouseY >130 && stage.mouseY <160){
             se3.play();
             if(chara[1]==HiddenChara){chara[1]=0}else{chara[1]+=1}
             menu_solo_list[2].text="◀ "+chrlist[chara[1]]
@@ -3597,7 +3608,7 @@ function NameChange(){
             menu_solo.addChild(e10);
             menu_solo_list.push(e10);
             } 
-          if(mouseX >520 && mouseX <650 && mouseY >175 && mouseY <205){
+          if(stage.mouseX >520 && stage.mouseX <650 && stage.mouseY >175 && stage.mouseY <205){
             se3.play();
             if(chara[0]==0){chara[0]=1}else{chara[0]=0};
             if(chara[0]==0){
@@ -3608,48 +3619,48 @@ function NameChange(){
               for(var i=0;i<6;i++){menu_solo_list[i+3].alpha=1};
               }
           }
-          if(mouseX >400 && mouseX <705 && mouseY >345 && mouseY <375){
+          if(stage.mouseX >400 && stage.mouseX <705 && stage.mouseY >345 && stage.mouseY <375){
             se3.play();
             if(skillswitch[0]==0){skillswitch[0]=-2}else{skillswitch[0]+=1};
             var Ary=["　◀禁止しない","　◀プレイヤーのみ","　◀全て禁止"]
             menu_solo_list[9].text=Ary[-skillswitch[0]]
             }
-          if(mouseX >670 && mouseX <705 && mouseY >230 && mouseY <260){
+          if(stage.mouseX >670 && stage.mouseX <705 && stage.mouseY >230 && stage.mouseY <260){
             if(chara[0]==1){
             se3.play();
             if(chara[2]==HiddenChara){chara[2]=0}else{chara[2]+=1}
             menu_solo_list[3].text="◀ "+chrlist[chara[2]]
             }
             }
-          if(mouseX >670 && mouseX <705 && mouseY >270 && mouseY <300){
+          if(stage.mouseX >670 && stage.mouseX <705 && stage.mouseY >270 && stage.mouseY <300){
             if(chara[0]==1){
             se3.play();
             if(chara[3]==HiddenChara){chara[3]=0}else{chara[3]+=1}
             menu_solo_list[5].text="◀ "+chrlist[chara[3]]
             }
             }
-          if(mouseX >670 && mouseX <705 && mouseY >310 && mouseY <340){
+          if(stage.mouseX >670 && stage.mouseX <705 && stage.mouseY >310 && stage.mouseY <340){
             if(chara[0]==1){
             se3.play();
             if(chara[4]==HiddenChara){chara[4]=0}else{chara[4]+=1}
             menu_solo_list[7].text="◀ "+chrlist[chara[4]]
             }
             }
-            if(mouseX >510 && mouseX <560 && mouseY >230 && mouseY <260){
+            if(stage.mouseX >510 && stage.mouseX <560 && stage.mouseY >230 && stage.mouseY <260){
               if(chara[0]==1){
               se3.play();
               if(chara[2]==0){chara[2]=HiddenChara}else{chara[2]-=1}
               menu_solo_list[3].text="◀ "+chrlist[chara[2]]
               }
               }
-            if(mouseX >510 && mouseX <560 && mouseY >270 && mouseY <300){
+            if(stage.mouseX >510 && stage.mouseX <560 && stage.mouseY >270 && stage.mouseY <300){
               if(chara[0]==1){
               se3.play();
               if(chara[3]==0){chara[3]=HiddenChara}else{chara[3]-=1}
               menu_solo_list[5].text="◀ "+chrlist[chara[3]]
               }
               }
-            if(mouseX >510 && mouseX <560 && mouseY >310 && mouseY <340){
+            if(stage.mouseX >510 && stage.mouseX <560 && stage.mouseY >310 && stage.mouseY <340){
               if(chara[0]==1){
               se3.play();
               if(chara[4]==0){chara[4]=HiddenChara}else{chara[4]-=1}
@@ -3660,7 +3671,7 @@ function NameChange(){
         break;
         case 2:
           //オプション画面
-          if(mouseX >600 && mouseX <700 && mouseY >450 && mouseY <490){
+          if(stage.mouseX >600 && stage.mouseX <700 && stage.mouseY >450 && stage.mouseY <490){
             if(musicnum!==0){
             musicnum=0;
             Bgm.fade(0.05*vBar, 0, 500);
@@ -3675,7 +3686,7 @@ function NameChange(){
             save_Local();
             Menu();
           }
-          if(mouseX >400 && mouseX <580 && mouseY >450 && mouseY <490){
+          if(stage.mouseX >400 && stage.mouseX <580 && stage.mouseY >450 && stage.mouseY <490){
             //デフォルトに戻す
             tumoConfig=0;
             Ponrate=0.4;
@@ -3684,37 +3695,37 @@ function NameChange(){
               se3.play();
               musicset=[0,0,0];
           }
-          if(mouseX >250 && mouseX <290 && mouseY >370 && mouseY <410){
+          if(stage.mouseX >250 && stage.mouseX <290 && stage.mouseY >370 && stage.mouseY <410){
             if(dahaiSE!==1){
             dahaiSE=1;
             se4.play();
             }
           }
-          if(mouseX >290 && mouseX <330 && mouseY >370 && mouseY <410){
+          if(stage.mouseX >290 && stage.mouseX <330 && stage.mouseY >370 && stage.mouseY <410){
             if(dahaiSE!==2){
             dahaiSE=2;
             se16.play();
             }
           }
-          if(mouseX >80 && mouseX <160 && mouseY >310 && mouseY <350){
+          if(stage.mouseX >80 && stage.mouseX <160 && stage.mouseY >310 && stage.mouseY <350){
             if(mpVelocity!==1){
             mpVelocity=1;
             se3.play();
             }
           }
-          if(mouseX >170 && mouseX <260 && mouseY >310 && mouseY <350){
+          if(stage.mouseX >170 && stage.mouseX <260 && stage.mouseY >310 && stage.mouseY <350){
             if(mpVelocity!==1.5){
             mpVelocity=1.5;
             se3.play();
             }
           }
-          if(mouseX >260 && mouseX <340 && mouseY >310 && mouseY <350){
+          if(stage.mouseX >260 && stage.mouseX <340 && stage.mouseY >310 && stage.mouseY <350){
             if(mpVelocity!==2){
             mpVelocity=2;
             se3.play();
             }
           }
-          if(mouseX >80 && mouseX <360 && mouseY >100 && mouseY <170){
+          if(stage.mouseX >80 && stage.mouseX <360 && stage.mouseY >100 && stage.mouseY <170){
             se3.play();
             if(tumoConfig==0){
               tumoConfig=-1;
@@ -3722,43 +3733,43 @@ function NameChange(){
                 tumoConfig=0
               }
           }
-          if(mouseX >110 && mouseX <150 && mouseY >230 && mouseY <270){
+          if(stage.mouseX >110 && stage.mouseX <150 && stage.mouseY >230 && stage.mouseY <270){
             //ponrate
             se3.play();
             Ponrate+=0.2;
             if(Ponrate>1){Ponrate=1};
           }
-          if(mouseX >250 && mouseX <300 && mouseY >230 && mouseY <270){
+          if(stage.mouseX >250 && stage.mouseX <300 && stage.mouseY >230 && stage.mouseY <270){
             se3.play();
             Ponrate-=0.2;
             if(Ponrate<0){Ponrate=0};
           }
-            if(mouseX >370 && mouseX <430 && mouseY >240 && mouseY <270){
+            if(stage.mouseX >370 && stage.mouseX <430 && stage.mouseY >240 && stage.mouseY <270){
               //bgm
               se3.play();
               if(musicset[0]==0){musicset[0]=musiclist.length-1}else{musicset[0]-=1}
             }
-            if(mouseX >370 && mouseX <430 && mouseY >310 && mouseY <340){
+            if(stage.mouseX >370 && stage.mouseX <430 && stage.mouseY >310 && stage.mouseY <340){
               se3.play();
               if(musicset[1]==0){musicset[1]=musiclist.length-1}else{musicset[1]-=1}
             }
-            if(mouseX >370 && mouseX <430 && mouseY >380 && mouseY <410){
+            if(stage.mouseX >370 && stage.mouseX <430 && stage.mouseY >380 && stage.mouseY <410){
               se3.play();
               if(musicset[2]==0){musicset[2]=musiclist.length-1}else{musicset[2]-=1}
             }
-            if(mouseX >690 && mouseX <750 && mouseY >240 && mouseY <270){
+            if(stage.mouseX >690 && stage.mouseX <750 && stage.mouseY >240 && stage.mouseY <270){
               se3.play();
               if(musicset[0]==musiclist.length-1){musicset[0]=0}else{musicset[0]+=1}
             }
-            if(mouseX >690 && mouseX <750 && mouseY >310 && mouseY <340){
+            if(stage.mouseX >690 && stage.mouseX <750 && stage.mouseY >310 && stage.mouseY <340){
               se3.play();
               if(musicset[1]==musiclist.length-1){musicset[1]=0}else{musicset[1]+=1}
             }
-            if(mouseX >690 && mouseX <750 && mouseY >380 && mouseY <410){
+            if(stage.mouseX >690 && stage.mouseX <750 && stage.mouseY >380 && stage.mouseY <410){
               se3.play();
               if(musicset[2]==musiclist.length-1){musicset[2]=0}else{musicset[2]+=1}
             }
-          if(mouseX >690 && mouseX <750 && mouseY >200 && mouseY <240){
+          if(stage.mouseX >690 && stage.mouseX <750 && stage.mouseY >200 && stage.mouseY <240){
             //通常play
             if(musicnum==musicset[0]){
               musicnum=0;
@@ -3769,7 +3780,7 @@ function NameChange(){
               musicStart(musicnum);
             }      
           }
-          if(mouseX >690 && mouseX <750 && mouseY >270 && mouseY <310){
+          if(stage.mouseX >690 && stage.mouseX <750 && stage.mouseY >270 && stage.mouseY <310){
             //リーチplay
             if(musicnum==musicset[1]){
               musicnum=0;
@@ -3780,7 +3791,7 @@ function NameChange(){
               musicStart(musicnum);
             }      
           }
-          if(mouseX >690 && mouseX <750 && mouseY >340 && mouseY <380){
+          if(stage.mouseX >690 && stage.mouseX <750 && stage.mouseY >340 && stage.mouseY <380){
             //オーラスplay
             if(musicnum==musicset[2]){
               musicnum=0;
@@ -3798,19 +3809,19 @@ function NameChange(){
             //ガイド　シナジーのスクロールのみこちらで対応
             switch(msgstate){
                 case 5:
-                  if(mouseX >80 && mouseY > 100 && mouseX <640 && mouseY <200){
+                  if(stage.mouseX >80 && stage.mouseY > 100 && stage.mouseX <640 && stage.mouseY <200){
                     Yakucheck(180);
                     return false;
                     }
-                  if(mouseX >80 && mouseY > 200 && mouseX <640 && mouseY <300){
+                  if(stage.mouseX >80 && stage.mouseY > 200 && stage.mouseX <640 && stage.mouseY <300){
                     Yakucheck(90);
                     return false;
                     }
-                    if(mouseX >80 && mouseY > 300 && mouseX <640 && mouseY <400){
+                    if(stage.mouseX >80 && stage.mouseY > 300 && stage.mouseX <640 && stage.mouseY <400){
                     Yakucheck(-90);
                     return false;
                     }
-                    if(mouseX >80 && mouseY > 400 && mouseX <640 && mouseY <480){
+                    if(stage.mouseX >80 && stage.mouseY > 400 && stage.mouseX <640 && stage.mouseY <480){
                     Yakucheck(-180);
                     return false;
                     }
@@ -3827,7 +3838,7 @@ function NameChange(){
             break;
           case 5:
               //実績
-            if(mouseX >700 && mouseX <750 && mouseY >50 && mouseY <100){
+            if(stage.mouseX >700 && stage.mouseX <750 && stage.mouseY >50 && stage.mouseY <100){
               if(msgstate !==-1){
               pagestate=0;
               msgstate=0;
@@ -3837,25 +3848,25 @@ function NameChange(){
               }
               return false;
             }
-            if(mouseX >60 && mouseX <190 && mouseY >80 && mouseY <125){
+            if(stage.mouseX >60 && stage.mouseX <190 && stage.mouseY >80 && stage.mouseY <125){
               if(msgstate>0){
               msgstate=0;
               se4.play();
               }
             }
-            if(mouseX >60 && mouseX <190 && mouseY >125 && mouseY <170){
+            if(stage.mouseX >60 && stage.mouseX <190 && stage.mouseY >125 && stage.mouseY <170){
               if(msgstate!==1 && msgstate !==-1){
               msgstate=1;
               se4.play();
               }
             }
-            if(mouseX >60 && mouseX <190 && mouseY >170 && mouseY <215){
+            if(stage.mouseX >60 && stage.mouseX <190 && stage.mouseY >170 && stage.mouseY <215){
               if(msgstate!==2 && msgstate !==-1){
               msgstate=2;
               se4.play();
               }
             }
-            if(mouseX >60 && mouseX <190 && mouseY >215 && mouseY <260){
+            if(stage.mouseX >60 && stage.mouseX <190 && stage.mouseY >215 && stage.mouseY <260){
               if(msgstate!==3 && msgstate !==-1){
               msgstate=3;
               se4.play();
@@ -3863,16 +3874,16 @@ function NameChange(){
             }
             switch(msgstate){
               case 0:
-                if(mouseX >530 && mouseX <730 && mouseY >400 && mouseY <450){
+                if(stage.mouseX >530 && stage.mouseX <730 && stage.mouseY >400 && stage.mouseY <450){
                   se3.play();
-                  chara[1]=Math.floor((mouseX-530)/50);
+                  chara[1]=Math.floor((stage.mouseX-530)/50);
                 }
-                if(mouseX >530 && mouseX <730 && mouseY >450 && mouseY <500){
+                if(stage.mouseX >530 && stage.mouseX <730 && stage.mouseY >450 && stage.mouseY <500){
                   //下段はHiddenCharaに応じてアレしてください
-                  var M=4+Math.floor((mouseX-530)/50);
+                  var M=4+Math.floor((stage.mouseX-530)/50);
                   console.log(M,HiddenChara);
                   if(M<=HiddenChara){
-                  chara[1]=4+Math.floor((mouseX-530)/50);
+                  chara[1]=4+Math.floor((stage.mouseX-530)/50);
                   se3.play();
                   }else{
                   se2.play();
@@ -3884,8 +3895,8 @@ function NameChange(){
                 }
               break;
             case 1:
-              if(mouseX >195 && mouseX <380 && mouseY >95 && mouseY <515){
-                var I=Math.floor((mouseY-95)/20);
+              if(stage.mouseX >195 && stage.mouseX <380 && stage.mouseY >95 && stage.mouseY <515){
+                var I=Math.floor((stage.mouseY-95)/20);
                 cx3.strokeRect(190,92+I*20,240,20);
                 if(achieveA[I].cleared>0 && Usercrest!==achieveA[I].name){
                   se3.play();
@@ -3894,8 +3905,8 @@ function NameChange(){
                   Usercrest="称号なし";
                 };
               }
-              if(mouseX >475 && mouseX <660 && mouseY >95 && mouseY <515){
-                var I=Math.floor((mouseY-95)/20)+21;
+              if(stage.mouseX >475 && stage.mouseX <660 && stage.mouseY >95 && stage.mouseY <515){
+                var I=Math.floor((stage.mouseY-95)/20)+21;
                 if(I>=achieveA.length){
                   return false;
                 }
@@ -3912,7 +3923,7 @@ function NameChange(){
             break;
           case 6:
             //たいせん画面
-            if(mouseX >700 && mouseX <750 && mouseY >50 && mouseY <100){
+            if(stage.mouseX >700 && stage.mouseX <750 && stage.mouseY >50 && stage.mouseY <100){
               pagestate=0;
               msgstate=0;
               se2.play();
@@ -3925,7 +3936,7 @@ function NameChange(){
                 //room_config
                 //LP_PVP={Length:[1,"東風","半荘",],LP:[1,75000,150000,300000],Block:[1,"満貫あり","満貫なし"],Rule:[1,"サドンデス","デスマッチ"]};
                 if(IsHost(IAM.room)){
-                if(mouseX >610 && mouseX <680 && mouseY >110 && mouseY <160){
+                if(stage.mouseX >610 && stage.mouseX <680 && stage.mouseY >110 && stage.mouseY <160){
                   LP_PVP.Rule[0]-=1;
                   if(LP_PVP.Rule[0]<=0){LP_PVP.Rule[0]=LP_PVP.Rule.length-1;}
                   se3.play();
@@ -3933,7 +3944,7 @@ function NameChange(){
                   msgstate=1;
                   socket.emit('room_config',{token: IAM.token,room:RoomName[IAM.room],config:LP_PVP});
                 }
-                if(mouseX >720 && mouseX <790 && mouseY >110 && mouseY <160){
+                if(stage.mouseX >720 && stage.mouseX <790 && stage.mouseY >110 && stage.mouseY <160){
                   LP_PVP.Rule[0]+=1;
                   if(LP_PVP.Rule[0]>=LP_PVP.Rule.length){LP_PVP.Rule[0]=1;}
                   se3.play();
@@ -3941,49 +3952,49 @@ function NameChange(){
                   msgstate=1;
                   socket.emit('room_config',{token: IAM.token,room:RoomName[IAM.room],config:LP_PVP});
                 }
-                if(mouseX >610 && mouseX <680 && mouseY >180 && mouseY <230){
+                if(stage.mouseX >610 && stage.mouseX <680 && stage.mouseY >180 && stage.mouseY <230){
                   msgstate=1;
                   LP_PVP.LP[0]-=1;
                   if(LP_PVP.LP[0]<=0){LP_PVP.LP[0]=LP_PVP.LP.length-1;}
                   se3.play();
                   socket.emit('room_config',{token: IAM.token,room:RoomName[IAM.room],config:LP_PVP});
                 }
-                if(mouseX >720 && mouseX <790 && mouseY >180 && mouseY <230){
+                if(stage.mouseX >720 && stage.mouseX <790 && stage.mouseY >180 && stage.mouseY <230){
                   msgstate=1;
                   LP_PVP.LP[0]+=1;
                   if(LP_PVP.LP[0]>=LP_PVP.LP.length){LP_PVP.LP[0]=1;}
                   se3.play();
                   socket.emit('room_config',{token: IAM.token,room:RoomName[IAM.room],config:LP_PVP});
                 }
-                if(mouseX >610 && mouseX <680 && mouseY >250 && mouseY <300){
+                if(stage.mouseX >610 && stage.mouseX <680 && stage.mouseY >250 && stage.mouseY <300){
                   msgstate=1;
                   LP_PVP.Length[0]-=1;
                   if(LP_PVP.Length[0]<=0){LP_PVP.Length[0]=LP_PVP.Length.length-1;}
                   se3.play();
                   socket.emit('room_config',{token: IAM.token,room:RoomName[IAM.room],config:LP_PVP});
                 }
-                if(mouseX >720 && mouseX <790 && mouseY >250 && mouseY <300){
+                if(stage.mouseX >720 && stage.mouseX <790 && stage.mouseY >250 && stage.mouseY <300){
                   msgstate=1;
                   LP_PVP.Length[0]+=1;
                   if(LP_PVP.Length[0]>=LP_PVP.Length.length){LP_PVP.Length[0]=1;}
                   se3.play();
                   socket.emit('room_config',{token: IAM.token,room:RoomName[IAM.room],config:LP_PVP});
                 }
-                if(mouseX >610 && mouseX <680 && mouseY >320 && mouseY <370){
+                if(stage.mouseX >610 && stage.mouseX <680 && stage.mouseY >320 && stage.mouseY <370){
                   msgstate=1;
                   LP_PVP.Block[0]-=1;
                   if(LP_PVP.Block[0]<=0){LP_PVP.Block[0]=LP_PVP.Block.length-1;}
                   se3.play();
                   socket.emit('room_config',{token: IAM.token,room:RoomName[IAM.room],config:LP_PVP});
                 }
-                if(mouseX >720 && mouseX <790 && mouseY >320 && mouseY <370){
+                if(stage.mouseX >720 && stage.mouseX <790 && stage.mouseY >320 && stage.mouseY <370){
                   msgstate=1;
                   LP_PVP.Block[0]+=1;
                   if(LP_PVP.Block[0]>=LP_PVP.Block.length){LP_PVP.Block[0]=1;}
                   se3.play();
                   socket.emit('room_config',{token: IAM.token,room:RoomName[IAM.room],config:LP_PVP});
                 }
-                if(mouseX >610 && mouseX <680 && mouseY >390 && mouseY <440){
+                if(stage.mouseX >610 && stage.mouseX <680 && stage.mouseY >390 && stage.mouseY <440){
                   LP_PVP.Skill[0]-=1;
                   if(LP_PVP.Skill[0]<=0){LP_PVP.Skill[0]=LP_PVP.Skill.length-1;}
                   se3.play();
@@ -3991,7 +4002,7 @@ function NameChange(){
                   msgstate=1;
                   socket.emit('room_config',{token: IAM.token,room:RoomName[IAM.room],config:LP_PVP});
                 }
-                if(mouseX >720 && mouseX <790 && mouseY >390 && mouseY <440){
+                if(stage.mouseX >720 && stage.mouseX <790 && stage.mouseY >390 && stage.mouseY <440){
                   LP_PVP.Skill[0]+=1;
                   if(LP_PVP.Skill[0]>=LP_PVP.Skill.length){LP_PVP.Skill[0]=1;}
                   se3.play();
@@ -10993,34 +11004,34 @@ if(opLock==0 && gamestate ==1){
         switch(pagestate){
           case 1:
             //usercrest
-              if(mouseX >40 && mouseX <400 && mouseY >90 && mouseY < 205){
+              if(stage.mouseX >40 && stage.mouseX <400 && stage.mouseY >90 && stage.mouseY < 205){
                 Textlist[0].text="あなたのプロフィールです。";
                 Textlist[1].text="クリックすると実績画面に移動します。";
               }
-              if(mouseX >40 && mouseX <220 && mouseY >300 && mouseY < 390){
+              if(stage.mouseX >40 && stage.mouseX <220 && stage.mouseY >300 && stage.mouseY < 390){
                 Textlist[0].text="読んでもよく分からないマニュアル。";
                 Textlist[1].text="エルコレドンジャラのルール説明です。";        
               }
-            if(mouseX >40 && mouseX <220 && mouseY >210 && mouseY < 300){
+            if(stage.mouseX >40 && stage.mouseX <220 && stage.mouseY >210 && stage.mouseY < 300){
               Textlist[0].text="CPU3人と自由対局を行うフリーバトルモードです。";
               Textlist[1].text="基本的に半荘戦（全員が親を2回行うと終了）です。";  
             }
-            if(mouseX >220 && mouseX <400 && mouseY >210 && mouseY < 300){
+            if(stage.mouseX >220 && stage.mouseX <400 && stage.mouseY >210 && stage.mouseY < 300){
               Textlist[0].text="対戦ルームで友達とドンジャラができます。";
               Textlist[1].text="クリック後、対戦ルームのロビーに移動します。";  
             }
-            if(mouseX >220 && mouseX <400 && mouseY >300 && mouseY < 390){
+            if(stage.mouseX >220 && stage.mouseX <400 && stage.mouseY >300 && stage.mouseY < 390){
               Textlist[0].text="対局の設定や音楽の設定などができます。";
               Textlist[1].text="セーブデータの外部出力や初期化もこちら。";  
             }
           break;
           case 3:
             //フリーバトル
-          if(mouseX >470 && mouseX <640 && mouseY >410 && mouseY <470){
+          if(stage.mouseX >470 && stage.mouseX <640 && stage.mouseY >410 && stage.mouseY <470){
             Textlist[0].text="現在の設定で対局を開始します！";
             Textlist[1].text="　";  
           }
-        if(mouseX >510 && mouseX <705 && mouseY >80 && mouseY <110){
+        if(stage.mouseX >510 && stage.mouseX <705 && stage.mouseY >80 && stage.mouseY <110){
           //通常テキスト
           cx2.clearRect(80,530,670,70)
           switch(LP[0]){
@@ -11046,53 +11057,53 @@ if(opLock==0 && gamestate ==1){
               break;
           }
         }
-        if(mouseX >520 && mouseX <650 && mouseY >175 && mouseY <205){
+        if(stage.mouseX >520 && stage.mouseX <650 && stage.mouseY >175 && stage.mouseY <205){
           Textlist[0].text="CPUのキャラクターを設定します。";
           Textlist[1].text="おまかせにするとランダムに決定されます。";  
         }
-        if(mouseX >520 && mouseX <650 && mouseY >345 && mouseY <375){
+        if(stage.mouseX >520 && stage.mouseX <650 && stage.mouseY >345 && stage.mouseY <375){
           Textlist[0].text="キャラごとのパッシブ・アクティブスキルの設定です。";
           Textlist[1].text="「プレイヤーのみ」では、CPUのパッシブスキルは適用されます。";  
         }
             break;
           case 2:
             //オプション
-            if(mouseX >380 && mouseX <750 && mouseY >200 && mouseY <260){
+            if(stage.mouseX >380 && stage.mouseX <750 && stage.mouseY >200 && stage.mouseY <260){
               //通常テキスト
               Textlist[0].text="通常対局時に流れるBGMを変更できます。";
               Textlist[1].text=musiclistDT[musicset[0]].title+", "+musiclistDT[musicset[0]].elia+", "+musiclistDT[musicset[0]].nod;  
             }
-            if(mouseX >380 && mouseX <750 && mouseY >270 && mouseY <330){
+            if(stage.mouseX >380 && stage.mouseX <750 && stage.mouseY >270 && stage.mouseY <330){
               //リーチテキスト
               Textlist[0].text="オーラスを除くリーチ時に流れるBGMを変更できます。";
               Textlist[1].text=musiclistDT[musicset[1]].title+", "+musiclistDT[musicset[1]].elia+", "+musiclistDT[musicset[1]].nod;
             }
-            if(mouseX >380 && mouseX <750 && mouseY >340 && mouseY <400){
+            if(stage.mouseX >380 && stage.mouseX <750 && stage.mouseY >340 && stage.mouseY <400){
               //オーラステキスト
               Textlist[0].text="オーラス時に流れるBGMを変更できます。";
               Textlist[1].text=musiclistDT[musicset[2]].title+", "+musiclistDT[musicset[2]].elia+", "+musiclistDT[musicset[2]].nod;
             }
-            if(mouseX >50 && mouseX <360 && mouseY >100 && mouseY <170){
+            if(stage.mouseX >50 && stage.mouseX <360 && stage.mouseY >100 && stage.mouseY <170){
               Textlist[0].text="対局中に右クリックした時にツモ切りする";
               Textlist[1].text="ショートカット機能の使用設定です。"
             }
-            if(mouseX >50 && mouseX <300 && mouseY >200 && mouseY <260){
+            if(stage.mouseX >50 && stage.mouseX <300 && stage.mouseY >200 && stage.mouseY <260){
               Textlist[0].text="CPUのポンのしやすさを調節します。";
               Textlist[1].text="右に行くほどCPUがポンしやすくなるようです。"
             }
-            if(mouseX >50 && mouseX <350 && mouseY >260 && mouseY <350){
+            if(stage.mouseX >50 && stage.mouseX <350 && stage.mouseY >260 && stage.mouseY <350){
               Textlist[0].text="パイを切った時にMPが溜まる速度です。";
               Textlist[1].text="MPはスキルやマナブレイクに使用します。"
             }
-            if(mouseX >50 && mouseX <350 && mouseY >350 && mouseY <400){
+            if(stage.mouseX >50 && stage.mouseX <350 && stage.mouseY >350 && stage.mouseY <400){
               Textlist[0].text="パイを切った時に鳴る効果音です。";
               Textlist[1].text="A：トランプっぽい音　B：麻雀牌っぽい音"
             }
-            if(mouseX >600 && mouseX <700 && mouseY >450 && mouseY <490){
+            if(stage.mouseX >600 && stage.mouseX <700 && stage.mouseY >450 && stage.mouseY <490){
               Textlist[0].text="現在の設定を反映して戻ります。";
               Textlist[1].text="　"
             }
-            if(mouseX >400 && mouseX <580 && mouseY >450 && mouseY <490){
+            if(stage.mouseX >400 && stage.mouseX <580 && stage.mouseY >450 && stage.mouseY <490){
               Textlist[0].text="オプションを初回起動時の設定に戻します。";
               Textlist[1].text="※『音量設定』のみ初期化されません。"
             }
@@ -11101,60 +11112,60 @@ if(opLock==0 && gamestate ==1){
             //プレイガイド
             switch(msgstate){
               case 0:
-                if(mouseX >700 && mouseX <750 && mouseY >50 && mouseY <90){
+                if(stage.mouseX >700 && stage.mouseX <750 && stage.mouseY >50 && stage.mouseY <90){
                   cx3.strokeRect(710,55,30,30)
                 }
-                if(mouseX >50 && mouseX <250 && mouseY >70 && mouseY <110){
+                if(stage.mouseX >50 && stage.mouseX <250 && stage.mouseY >70 && stage.mouseY <110){
                   cx3.strokeRect(52,70,200,40)
                 }
-                if(mouseX >50 && mouseX <250 && mouseY >110 && mouseY <150){
+                if(stage.mouseX >50 && stage.mouseX <250 && stage.mouseY >110 && stage.mouseY <150){
                   cx3.strokeRect(52,110,200,40)
                 }
-                if(mouseX >50 && mouseX <250 && mouseY >150 && mouseY <190){
+                if(stage.mouseX >50 && stage.mouseX <250 && stage.mouseY >150 && stage.mouseY <190){
                   cx3.strokeRect(52,150,200,40)
                 }
-                if(mouseX >50 && mouseX <250 && mouseY >190 && mouseY <230){
+                if(stage.mouseX >50 && stage.mouseX <250 && stage.mouseY >190 && stage.mouseY <230){
                   cx3.strokeRect(52,190,200,40)
                 }
-                if(mouseX >50 && mouseX <250 && mouseY >230 && mouseY <270){
+                if(stage.mouseX >50 && stage.mouseX <250 && stage.mouseY >230 && stage.mouseY <270){
                   cx3.strokeRect(52,230,200,40)
                 }
-                if(mouseX >50 && mouseX <250 && mouseY >270 && mouseY <310){
+                if(stage.mouseX >50 && stage.mouseX <250 && stage.mouseY >270 && stage.mouseY <310){
                   cx3.strokeRect(52,270,200,40)
                 }
-                if(mouseX >50 && mouseX <250 && mouseY >310 && mouseY <350){
+                if(stage.mouseX >50 && stage.mouseX <250 && stage.mouseY >310 && stage.mouseY <350){
                   cx3.strokeRect(52,310,200,40)
                 }
-                if(mouseX >50 && mouseX <250 && mouseY >350 && mouseY <390){
+                if(stage.mouseX >50 && stage.mouseX <250 && stage.mouseY >350 && stage.mouseY <390){
                   cx3.strokeRect(52,350,200,40)
                 }
                 break;
               case 1:
-                if(mouseX >90 && mouseX <200 && mouseY >60 && mouseY <100){
+                if(stage.mouseX >90 && stage.mouseX <200 && stage.mouseY >60 && stage.mouseY <100){
               Textlist[0].text="ここにはドラパイが表示されます。";
               Textlist[1].text="ドラと同じパイを持っていると、いいことが……？"
                 }
-                if(mouseX >85 && mouseX <200 && mouseY >120 && mouseY <420){
+                if(stage.mouseX >85 && stage.mouseX <200 && stage.mouseY >120 && stage.mouseY <420){
               Textlist[0].text="この数字は各プレイヤーの戦闘力（持ち点）です。";
               Textlist[1].text="0を下回ると戦意喪失状態になってしまいます。";
                 }
-                if(mouseX >160 && mouseX <670 && mouseY >420 && mouseY <505){
+                if(stage.mouseX >160 && stage.mouseX <670 && stage.mouseY >420 && stage.mouseY <505){
                   Textlist[0].text="これは何でしょう？　そう、あなたの手札のパイです！";
                   Textlist[1].text="自分の番になったらこの中から1枚選んで捨てましょう。";
                 }
-                if(mouseX >200 && mouseX <370 && mouseY >120 && mouseY <420){
+                if(stage.mouseX >200 && stage.mouseX <370 && stage.mouseY >120 && stage.mouseY <420){
                   Textlist[0].text="ここは川。各プレイヤーが捨てたパイが沈んでいます。";
                   Textlist[1].text="山札にどんなパイが眠っているのか想像してみてください。";
                 }
-                if(mouseX >560 && mouseX <690 && mouseY >350 && mouseY <420){
+                if(stage.mouseX >560 && stage.mouseX <690 && stage.mouseY >350 && stage.mouseY <420){
                   Textlist[0].text="ゲーム中に使用するポン、リーチなどのボタンです。";
                   Textlist[1].text="あと1つで役が揃うならリーチ！　リーチ！";
                 }
-                if(mouseX >560 && mouseX <690 && mouseY >60 && mouseY <330){
+                if(stage.mouseX >560 && stage.mouseX <690 && stage.mouseY >60 && stage.mouseY <330){
                   Textlist[0].text="右側の情報欄には、選択中のパイやプレイヤーに";
                   Textlist[1].text="関する内容が表示されます。";
                 }
-                if(mouseX >390 && mouseX <560 && mouseY >60 && mouseY <100){
+                if(stage.mouseX >390 && stage.mouseX <560 && stage.mouseY >60 && stage.mouseY <100){
                   Textlist[0].text="山札の残りのパイがなくなったら、";
                   Textlist[1].text="その局は流局（引き分け）です！";
                 }
@@ -11165,15 +11176,15 @@ if(opLock==0 && gamestate ==1){
             //実績
             switch(msgstate){
               case 1:
-              if(mouseX >195 && mouseX <380 && mouseY >95 && mouseY <515){
-                var I=Math.floor((mouseY-95)/20);
+              if(stage.mouseX >195 && stage.mouseX <380 && stage.mouseY >95 && stage.mouseY <515){
+                var I=Math.floor((stage.mouseY-95)/20);
                 if(achieveA[I].cleared>0){
                 Textlist[0].text=achieveA[I].name;
                 Textlist[1].text=achieveA[I].sub;
                 }
               }
-              if(mouseX >475 && mouseX <660 && mouseY >95 && mouseY <515){
-                var I=Math.floor((mouseY-95)/20);
+              if(stage.mouseX >475 && stage.mouseX <660 && stage.mouseY >95 && stage.mouseY <515){
+                var I=Math.floor((stage.mouseY-95)/20);
                 if(I>=achieveA.length){
                   return false;
                 }
@@ -11200,7 +11211,7 @@ if(opLock==0 && gamestate ==1){
                   {name:"満貫打ち止め　満貫ブロックの有無の設定です。",sub:"「なし」にすると高得点が出やすくなります。"},
                   {name:"スキル　キャラごとのパッシブ/アクティブスキルの設定です。",sub:"スキルありにすると、無法地帯になりやすくなります。"},
                 ];
-                if(mouseX >160 && mouseX <330 && mouseY >0 && mouseY <45){
+                if(stage.mouseX >160 && stage.mouseX <330 && stage.mouseY >0 && stage.mouseY <45){
                   if(LP_PVP.Rule[0]==1){
                   Textlist[0].text=elskunn[0].name
                   Textlist[1].text=elskunn[0].sub
@@ -11212,24 +11223,24 @@ if(opLock==0 && gamestate ==1){
                   Textlist[1].text=elskunn[2].sub
                   }                  
                 }
-                if(mouseX >340 && mouseX <460 && mouseY >0 && mouseY <45){
+                if(stage.mouseX >340 && stage.mouseX <460 && stage.mouseY >0 && stage.mouseY <45){
                   Textlist[0].text=elskunn[4].name
                   Textlist[1].text=elskunn[4].sub
                 }
-                if(mouseX >160 && mouseX <360 && mouseY >45 && mouseY <80){
+                if(stage.mouseX >160 && stage.mouseX <360 && stage.mouseY >45 && stage.mouseY <80){
                   Textlist[0].text=elskunn[3].name
                   Textlist[1].text=elskunn[3].sub
                 }
-                if(mouseX >360 && mouseX <530 && mouseY >45 && mouseY <80){
+                if(stage.mouseX >360 && stage.mouseX <530 && stage.mouseY >45 && stage.mouseY <80){
                   Textlist[0].text=elskunn[5].name
                   Textlist[1].text=elskunn[5].sub
                 }
-                if(mouseX >530 && mouseX <660 && mouseY >45 && mouseY <80){
+                if(stage.mouseX >530 && stage.mouseX <660 && stage.mouseY >45 && stage.mouseY <80){
                   Textlist[0].text=elskunn[6].name
                   Textlist[1].text=elskunn[6].sub
                 }
                 if(IsHost(IAM.room)){
-                  if(mouseX >610 && mouseX <790 && mouseY >80 && mouseY <150){
+                  if(stage.mouseX >610 && stage.mouseX <790 && stage.mouseY >80 && stage.mouseY <150){
                     cx2.clearRect(10,521,400,70)
                     if(LP_PVP.Rule[0]==1){
                       Textlist[0].text=elskunn[0].name
@@ -11242,19 +11253,19 @@ if(opLock==0 && gamestate ==1){
                       Textlist[1].text=elskunn[2].sub
                     }
                   }
-                  if(mouseX >610 && mouseX <790 && mouseY >160 && mouseY <220){
+                  if(stage.mouseX >610 && stage.mouseX <790 && stage.mouseY >160 && stage.mouseY <220){
                     Textlist[0].text=elskunn[3].name
                     Textlist[1].text=elskunn[3].sub
                   }
-                  if(mouseX >610 && mouseX <790 && mouseY >230 && mouseY <290){
+                  if(stage.mouseX >610 && stage.mouseX <790 && stage.mouseY >230 && stage.mouseY <290){
                     Textlist[0].text=elskunn[4].name
                     Textlist[1].text=elskunn[4].sub
                   }
-                  if(mouseX >610 && mouseX <790 && mouseY >300 && mouseY <360){
+                  if(stage.mouseX >610 && stage.mouseX <790 && stage.mouseY >300 && stage.mouseY <360){
                     Textlist[0].text=elskunn[5].name
                     Textlist[1].text=elskunn[5].sub
                   }
-                  if(mouseX >610 && mouseX <790 && mouseY >370 && mouseY <430){
+                  if(stage.mouseX >610 && stage.mouseX <790 && stage.mouseY >370 && stage.mouseY <430){
                     Textlist[0].text=elskunn[6].name
                     Textlist[1].text=elskunn[6].sub
                   }
@@ -11267,26 +11278,26 @@ if(opLock==0 && gamestate ==1){
       if(cLock >0 && gamestate !==10){//カーソル
         if(cLock==2){
           //スキル対象選択プレイヤー編
-          if(mouseX>10 && mouseX<140){
-            if(mouseY>100 && mouseY<200){
+          if(stage.mouseX>10 && stage.mouseX<140){
+            if(stage.mouseY>100 && stage.mouseY<200){
               cx3.clearRect(10,100,130,400);
               cx3.strokeStyle ='yellow'
               cx3.lineWidth = 2;
               cx3.strokeRect(12,102,126,96);
             }
-            if(mouseY>200 && mouseY<300){
+            if(stage.mouseY>200 && stage.mouseY<300){
               cx3.clearRect(10,100,130,400);
               cx3.strokeStyle ='yellow'
               cx3.lineWidth = 2;
               cx3.strokeRect(12,202,126,96);
             }
-            if(mouseY>300 && mouseY<400){
+            if(stage.mouseY>300 && stage.mouseY<400){
               cx3.clearRect(10,100,130,400);
               cx3.strokeStyle ='yellow'
               cx3.lineWidth = 2;
               cx3.strokeRect(12,302,126,96);
             }
-            if(mouseY>400 && mouseY<500){
+            if(stage.mouseY>400 && stage.mouseY<500){
               cx3.clearRect(10,100,130,400);
               cx3.strokeStyle ='yellow'
               cx3.lineWidth = 2;
@@ -11298,17 +11309,17 @@ if(opLock==0 && gamestate ==1){
       }
       if(gamestate ==1){
       //スキルは右下に移動
-        if(mouseX >0 && mouseX< 100){
+        if(stage.mouseX >0 && stage.mouseX< 100){
           if(skillswitch[0]==-2){
-            if(mouseY >100 && mouseY<200){Skillname(2,1);}
-            if(mouseY >200 && mouseY<300){Skillname(3,1);}
-            if(mouseY >300 && mouseY<400){Skillname(4,1);}
-            if(mouseY >400 && mouseY<480){Skillname(1,1);}
+            if(stage.mouseY >100 && stage.mouseY<200){Skillname(2,1);}
+            if(stage.mouseY >200 && stage.mouseY<300){Skillname(3,1);}
+            if(stage.mouseY >300 && stage.mouseY<400){Skillname(4,1);}
+            if(stage.mouseY >400 && stage.mouseY<480){Skillname(1,1);}
           }else{
-          if(mouseY >100 && mouseY<200){Skillname(2,navisw);}
-          if(mouseY >200 && mouseY<300){Skillname(3,navisw);}
-          if(mouseY >300 && mouseY<400){Skillname(4,navisw);}
-          if(mouseY >400 && mouseY<480){Skillname(1,navisw);}
+          if(stage.mouseY >100 && stage.mouseY<200){Skillname(2,navisw);}
+          if(stage.mouseY >200 && stage.mouseY<300){Skillname(3,navisw);}
+          if(stage.mouseY >300 && stage.mouseY<400){Skillname(4,navisw);}
+          if(stage.mouseY >400 && stage.mouseY<480){Skillname(1,navisw);}
           }
         }
       }
