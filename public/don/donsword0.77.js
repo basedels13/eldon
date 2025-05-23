@@ -1307,8 +1307,6 @@ function updateParticles() {
       //カーソル
      corsor();
     }
-    canvas5.addEventListener("mousedown", mouseDownHandler, false);
-    canvas5.addEventListener("mouseup", mouseUpHandler, false);
     canvas5.addEventListener(`contextmenu`, contextHandler, false);
     canvas5.addEventListener("click", clickHandler, false);
   function contextHandler(e=-1){
