@@ -1115,7 +1115,7 @@ function handleComplete() {
   loadtitle()
 }
 canvas5.onmousedown = mouseDownListener;
-function mouseDownListener(e) {
+function mouseDownListener(e=-1) {
   createjs.Ticker.addEventListener("tick", MouseCircle);
   if(gamestate ==1 && cLock==1 && opLock>=0 && opLock !==2){
     mpC=-2;
@@ -1123,7 +1123,7 @@ function mouseDownListener(e) {
   }
 };
 canvas5.onmouseup = mouseUpListener;
-function mouseUpListener(e) {
+function mouseUpListener(e=-1) {
   if(mpmoving){
     mpmoving=false;
     DPlist[0].scaleX=0;
@@ -1303,7 +1303,7 @@ function updateParticles() {
   };
   
     canvas5.onmousemove = mouseMoveListener;
-    function mouseMoveListener(e) {
+    function mouseMoveListener(e=-1) {
       //カーソル
      corsor();
     }
@@ -1311,7 +1311,7 @@ function updateParticles() {
     canvas5.addEventListener("mouseup", mouseUpHandler, false);
     canvas5.addEventListener(`contextmenu`, contextHandler, false);
     canvas5.addEventListener("click", clickHandler, false);
-  function contextHandler(e){
+  function contextHandler(e=-1){
     //右クリック無効、右クリックでツモ切り
       e.preventDefault();
       if(tumoConfig==0){
@@ -1323,17 +1323,6 @@ function updateParticles() {
         }
           }}
       }
-    };
-    
-    function mouseDownHandler(e) {
-      if(debugmode){
-      console.log("X座標：" + stage.mouseX,"Y座標：" + stage.mouseY);
-      }
-    };
-    function mouseUpHandler(e) {
-      if(debugmode){
-        console.log("mouseup");
-        }
     };
     function LoadtoMenu(){
       for(var i=0; i<12 ; i++){
@@ -1350,7 +1339,7 @@ function updateParticles() {
       Menu();
       soundmap.alpha=1;
     }
-    function clickHandler(e) {
+    function clickHandler(e=-1) {
       if(debugmode){console.log('click!',cLock,"pagestate",pagestate,"msgstate",msgstate,"gamestate",gamestate)};  
       if(gamestate ==10){
         //メニュー画面
