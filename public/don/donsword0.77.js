@@ -1120,6 +1120,8 @@ function UpdateParticles(event){
 function MouseCircle(event){
   //クリックした場所を教える
   //プレイ中はマナブレも
+  mouseX = stage.mouseX;
+  mouseY = stage.mouseY;
   if(mpmoving){
   mpC+=0.4;
   if(mpC>DP[1]){mpC=DP[1]};
