@@ -7,7 +7,7 @@ window.onload = function(){
   };
   
   function draw(){
-  var titletext="v1.003/Click to START";
+  var titletext="v1.004/Click to START";
   var debugmode=false;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にfalseに
   var today = new Date();
   var fool=false;
