@@ -1,15 +1,14 @@
-// var1.005　season2 テスト リザルト中にパイが切れてしまう時がある？
+// var1.01　season2 テスト レスポンシブ対応
 // npm run dev
-// 対戦中のスキルテスト中
 // 対戦中のカンでドラの数がズレる？
-// 魔界血戦後にclockされてしまう場合がある？
+// 魔界血戦後に操作不能？
 window.onload = function(){
   draw();
   };
   
   function draw(){
   var titletext="v1.01/Click to START";
-  var debugmode=true;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にfalseに
+  var debugmode=false;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にfalseに
   if(debugmode){titletext+="　でばっぐも～ど"};
   var today = new Date();
   var fool=false;
@@ -30,7 +29,7 @@ window.onload = function(){
       // タイマーのリセット
       clearTimeout(timer);
       // コマンドの確認
-      if (standby && ev.keyCode === command[index]) {
+      if (standby && ev.code === command[index]) {
         index++;
         if (index >= length) {
           // すべてのコマンドを入力した！
@@ -199,7 +198,6 @@ window.onload = function(){
 
     var backyard = new createjs.Container();//背景の緑芝
     stage.addChild(backyard);
-    //backyard.addEventListener("click", {handleEvent:clickHandler})
     var field = new createjs.Container();//タイトル、メイン画面
     stage.addChild(field);
     var textmap = new createjs.Container();//メッセージ
@@ -1309,7 +1307,7 @@ function updateParticles() {
      corsor();
     }
     canvas5.addEventListener(`contextmenu`, contextHandler, false);
-    canvas5.addEventListener("click", clickHandler, false);
+    //canvas5.addEventListener("click", clickHandler, false);
   function contextHandler(e=-1){
     //右クリック無効、右クリックでツモ切り
       e.preventDefault();
@@ -1338,13 +1336,10 @@ function updateParticles() {
       Menu();
       soundmap.alpha=1;
     }
-    function clickHandler(e=-1) {
+    function clickInGame() {
+      //canvas5のaddeventでは上手く実装できなかったためその都度イベントを追加
+      //Menuから飛ぶ
       if(debugmode){console.log('click!',cLock,"pagestate",pagestate,"msgstate",msgstate,"gamestate",gamestate)};  
-      if(gamestate ==10){
-        //メニュー画面
-        Menu();
-      }
-
   socket.on("game-ready", (data)=>{
     if(IsHost(IAM.room)){
     var N=MEMBER.findIndex(value=>value.id==data.who);
@@ -1495,7 +1490,6 @@ function updateParticles() {
             break;
             case 4:
     //魔界ルール
-    //console.log(raidscore);
     if(raidscore[0]==1){
       if(pvpmode==1){
         if(LP_PVP.Length[0]==1){
@@ -1563,6 +1557,7 @@ function updateParticles() {
         };
             musicnum=17;
             gamestate=10;
+            opLock=0;
             pagestate=6;
             msgstate=2;
             cx2.clearRect(0,0,800,600);
@@ -1578,6 +1573,7 @@ function updateParticles() {
             return false;
       }
       if(pvpmode==0){
+    opLock==0;
     pagestate =0;
     gamestate=10;
       }
@@ -1727,7 +1723,7 @@ function updateParticles() {
     ctl[1]=0
     }
     }//gamestate
-      }
+  }
   //画面を描画したものを用意しておく
   var Cbt=canvas2.toDataURL();
   var Cbutton = new createjs.Bitmap(Cbt);
@@ -1750,6 +1746,7 @@ function menuMap(p=0){
         .beginFill("rgba(20,20,20,0.7)")
         .drawRect(0, 0, 800, 510);
       menu_solo.addChild(rect);
+      rect.addEventListener("click", {handleEvent:Menu}); 
       var solo = new createjs.Bitmap(queue.getResult(win_src[0]));
       solo.x=0;
       solo.y=0;
@@ -1878,11 +1875,13 @@ function menuMap(p=0){
       e.y=30;
       e.scale=1.1;
       menu_setting.addChild(e);
+      e.addEventListener("click", {handleEvent:Menu}); 
       var e = new createjs.Bitmap(queue.getResult(epic_src[0]));
       e.x=400;
       e.y=30;
       e.scale=1.1;
       menu_setting.addChild(e);   
+      e.addEventListener("click", {handleEvent:Menu}); 
       if(musicnum==musicset[0] || musicset[0]==0){
         drawbuttom(690,200,"Play",1,60,40)
         }else{
@@ -2032,7 +2031,7 @@ function menuMap(p=0){
                 shape.graphics.beginFill("#0080ff");
                 shape.graphics.beginStroke("#68ceed");
                 shape.graphics.setStrokeStyle(3);
-                shape.graphics.drawRect(310, 175, 180*vBar, 30);
+                shape.graphics.drawRect(500, 110, 90*vBar, 25);
                 menu_setting.addChild(shape);
                 menu_setting.removeChild(B);
                 Barlist[0]=shape;
@@ -2046,7 +2045,7 @@ function menuMap(p=0){
               shape.graphics.beginFill("#0080ff");
               shape.graphics.beginStroke("#68ceed");
               shape.graphics.setStrokeStyle(3);
-              shape.graphics.drawRect(310, 175, 180*vBar, 30);
+              shape.graphics.drawRect(500, 110, 90*vBar, 25);
               menu_setting.addChild(shape);
               menu_setting.removeChild(B);
               Barlist[0]=shape;
@@ -2060,7 +2059,7 @@ function menuMap(p=0){
                 shape.graphics.beginFill("#0080ff");
                 shape.graphics.beginStroke("#68ceed");
                 shape.graphics.setStrokeStyle(3);
-                shape.graphics.drawRect(310, 225, 180*sBar, 30);
+                shape.graphics.drawRect(500, 140, 90*sBar, 25);
                 menu_setting.addChild(shape);
                 menu_setting.removeChild(B);
                 Barlist[1]=shape;
@@ -2074,7 +2073,7 @@ function menuMap(p=0){
               shape.graphics.beginFill("0080ff");
               shape.graphics.beginStroke("#68ceed");
               shape.graphics.setStrokeStyle(3);
-              shape.graphics.drawRect(310, 225, 180*sBar, 30);
+              shape.graphics.drawRect(500, 140, 90*sBar, 25);
               menu_setting.addChild(shape);
               menu_setting.removeChild(B);
               Barlist[1]=shape;
@@ -2108,11 +2107,13 @@ function menuMap(p=0){
           e.y=50;
           e.scale=1.1;
           menu_main.addChild(e);
+          e.addEventListener("click", {handleEvent:Menu}); 
           var e = new createjs.Bitmap(queue.getResult(epic_src[0]));
           e.x=400;
           e.y=50;
           e.scale=1.1;
           menu_main.addChild(e);
+          e.addEventListener("click", {handleEvent:Menu}); 
           cx2.font = "32px 'Century Gothic'";
           cx2.fillStyle = "black";
           cx2.fillText("　×",680,80)
@@ -2440,7 +2441,7 @@ function menuMap(p=0){
         btn1.x = 60;
         btn1.y = 260;
         menu_guide.addChild(btn1);
-        btn1.addEventListener("click", {card:-5,handleEvent:HowtoBt});
+        btn1.addEventListener("click", {card:5,handleEvent:HowtoBt});
         var btn1 = createButton("ポン", 130, 40);
         btn1.x = 60;
         btn1.y = 300;
@@ -2926,6 +2927,7 @@ var rect = new createjs.Shape();
     s.graphics.beginFill("rgba(107, 218, 203, 0.7)");
     s.graphics.drawRoundRect(620,100,170,380,10,10,);
     menu_duel.addChild(s);
+    s.addEventListener("click", {handleEvent:Menu}); 
     for(var i=0;i<4;i++){
     var t = new createjs.Text('CPU', "bold 30px Arial", "white");
     t.x=50+150*i;
@@ -3132,7 +3134,7 @@ function NameChange(){
     }
   }
   function Menubutton(){
-    if(debugmode){console.log('Menubutton',this.card)};
+    if(debugmode){console.log('Menubutton',this.card,cLock,opLock,pagestate)};
   if(opLock==0 && pagestate==1){
     //メイン画面を開いている間のみ受付
     switch(this.card){
@@ -3175,7 +3177,8 @@ function NameChange(){
   }
   };
   function Menu(){
-    //console.log('Menu',pagestate);
+    if(debugmode){console.log('Menu',pagestate)};
+    if(gamestate!==10){clickInGame();return false;};
     switch(pagestate){
       case 0:
         musicnum=0;
@@ -4322,6 +4325,7 @@ if(opLock==0 && gamestate ==1){
   Cbt=canvas4.toDataURL();
   Cbutton = new createjs.Bitmap(Cbt);
   Configmap.addChild(Cbutton);
+  Cbutton.addEventListener("click", {handleEvent:Menu}); 
  }
       }else{
         //対局を止める
@@ -4352,10 +4356,12 @@ if(opLock==0 && gamestate ==1){
         Cbt=canvas4.toDataURL();
         Cbutton = new createjs.Bitmap(Cbt);
         Configmap.addChild(Cbutton);
+        Cbutton.addEventListener("click", {handleEvent:Menu}); 
         }}
       }
       }
   var yakumapYmax;
+  var yakubar;
   //シナジー改変後
   function Yakucheck(move=0){
     if(debugmode)(console.log('Yakucheck',move,shiagytemp));
@@ -4366,6 +4372,8 @@ if(opLock==0 && gamestate ==1){
         if(yakumapY>0){yakumapY=-yakumapYmax+60;}
         createjs.Tween.get(yakumapMask, {override: true})
         .to({y: yakumapY}, 200, createjs.Ease.cubicInOut);
+        createjs.Tween.get(yakubar, {override: true})
+        .to({y: (-yakumapY/yakumapYmax)*(390-390*390/yakumapYmax)}, 200, createjs.Ease.cubicInOut);
         return false;
       }
         //一覧表示
@@ -4376,18 +4384,24 @@ if(opLock==0 && gamestate ==1){
         yakumapMask.y=0;
         cx2.clearRect(0,0,800,600);
         if(shiagytemp==0){
-          drawbuttom2(300,55,"一覧",0,100,44,1);    
+          var btn1 = createButton("一覧", 100, 45);
+          btn1.x = 300;
+          btn1.y = 55;
+          yakumap.addChild(btn1);
+          btn1.addEventListener("click", {handleEvent:Menu});     
         }else{ 
-          drawbuttom2(300,55,"所持パイ",0,100,44,1);
+          var btn1 = createButton("所持パイ", 100, 45,"#ffbb4d","#ff7b00","#372d23","#5e5e5e");
+          btn1.x = 300;
+          btn1.y = 55;
+          yakumap.addChild(btn1);
+          btn1.addEventListener("click", {handleEvent:Menu});     
         }
-        var C=canvas2.toDataURL();
-        var Cb = new createjs.Bitmap(C);
-        yakumap.addChild(Cb);
         var rect = new createjs.Shape();
         rect.graphics
                 .beginFill("rgba(20,20,20,0.7)")
                 .drawRect(40, 100, 660, 3300);
         yakumapMask.addChild(rect);
+          rect.addEventListener("click", {handleEvent:Menu}); 
         var shapeMask = new createjs.Shape();
       shapeMask.graphics
               .beginFill("gold")
@@ -4456,6 +4470,13 @@ if(opLock==0 && gamestate ==1){
       };
       if(shiagytemp==1){yakumapYmax=Y-330}else{yakumapYmax=2560};
       yakumapMask.addChild(t);
+      //つーるばー
+      yakubar = new createjs.Shape();
+        yakubar.graphics.beginFill("#0080ff");
+        yakubar.graphics.beginStroke("#68ceed");
+        yakubar.graphics.setStrokeStyle(3);
+        yakubar.graphics.drawRect(675, 105, 20,390*390/yakumapYmax);// 390/(n/390)
+        yakumap.addChild(yakubar);
       // マスクを適用する
       yakumapMask.mask = shapeMask;
       }
@@ -4564,10 +4585,12 @@ if(opLock==0 && gamestate ==1){
         btn1.x = 300;
         btn1.y = 10;
         field.addChild(btn1);
+        btn1.addEventListener("click", {handleEvent:Menu}); 
     var btn1 = createButton("残パイリスト", 130, 45);
         btn1.x = 400;
         btn1.y = 10;
         field.addChild(btn1);
+        btn1.addEventListener("click", {handleEvent:Menu}); 
   }
   function compareFunc(a,b){return a-b;}
   function compareFuncID(a,b){return(a.id - b.id);}  
@@ -4622,6 +4645,7 @@ if(opLock==0 && gamestate ==1){
                         .drawRect(10, 60, 135, 34)
                         .drawRect(530, 10, 90, 44);
         field.addChild(rect);
+        rect.addEventListener("click", {handleEvent:Menu}); 
         field.addChild(Csquare);
         var t = new createjs.Text("ドラ", "24px 'Century Gothic'", "white");
         t.x=10;
@@ -8203,6 +8227,7 @@ if(opLock==0 && gamestate ==1){
         s.graphics.drawRect(10, 100, 780, 400);
         s.x=raidscore[1]*800
       fieldmap.addChild(s);
+        s.addEventListener("click", {handleEvent:Menu}); 
         for (var i=1;i<vichand.length;i++){
         var drawcard=new createjs.Bitmap(queue.getResult(eltear_src[vichand[i]]));
         drawcard.x=15+size*(i-1)+raidscore[1]*800;
@@ -8382,6 +8407,7 @@ if(opLock==0 && gamestate ==1){
        s.graphics.drawRect(10, 100, 780, 400);
        s.x=0
      field.addChild(s);
+      s.addEventListener("click", {handleEvent:Menu}); 
       //handmap.alpha=1; 
       var drawcard;
       var drawcardlist=[];
@@ -10526,8 +10552,9 @@ if(opLock==0 && gamestate ==1){
     se10.play();
     var s = new createjs.Shape();
               s.graphics.beginFill("rgba(20,20,20,0.5)");
-              s.graphics.drawRect(10, 100, 700, 400);
+              s.graphics.drawRect(10, 100, 680, 400);
               field.addChild(s);
+              s.addEventListener("click", {handleEvent:Menu}); 
     var t = new createjs.Text("流局", "36px 'Century Gothic'", "white");
     t.x=390;
     t.y=300;
@@ -12518,6 +12545,7 @@ if(opLock==0 && gamestate ==1){
     s.graphics.beginFill("#001c0d");
     s.graphics.drawRect(0, 0, 800, 600);
     field.addChild(s);
+    s.addEventListener("click", {handleEvent:Menu}); 
     if(fool){
      var e10 = new createjs.Bitmap(queue.getResult(chrimgR_src[LPresult[3].chara]));          
     }else{
