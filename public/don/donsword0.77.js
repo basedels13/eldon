@@ -9,7 +9,8 @@ window.onload = function(){
   
   function draw(){
   var titletext="v1.01/Click to START";
-  var debugmode=false;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にfalseに
+  var debugmode=true;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にfalseに
+  if(debugmode){titletext+="　でばっぐも～ど"};
   var today = new Date();
   var fool=false;
   if((today.getMonth()+1==4)&&(today.getDate()==1)){
@@ -192,7 +193,7 @@ window.onload = function(){
     var stage = new createjs.Stage("canvas5");//Stage
     if (createjs.Touch.isSupported() == true) {
       createjs.Touch.enable(stage);
-      //タップに対応するがcanvas.addeventlistenerが効かなくなる？→stage.mouseXの修正で解決
+      //タップに対応するがcanvas.addeventlistenerが効かなくなる？→stage.mouseXの修正で一部解決
       }
     stage.enableMouseOver();//onmouseイベントに対応
 
