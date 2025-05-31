@@ -2341,13 +2341,14 @@ function menuMap(p=0){
                   cx2.fillStyle = "#8c8c8c";
                   cx2.font = "18px 'Century Gothic'";
                   cx2.fillText(achieveC[i].name,X,Y);
-                  cx2.fillText(achieveC[i].count+"/"+achieveC[i].max,X+150,Y);
+                  //cx2.fillText(achieveC[i].count+"/"+achieveC[i].max,X+150,Y);
                 }else{
                   cx2.fillStyle = "black"; 
                   cx2.font = "bold 18px 'Century Gothic'";
                   cx2.fillText(achieveC[i].name,X,Y);
                   cx2.font = "18px 'Century Gothic'";
-                  cx2.fillText(achieveC[i].count+"/"+achieveC[i].max+" ("+achieveC[i].cleared+")",X+150,Y);
+                  //cx2.fillText(achieveC[i].count+"/"+achieveC[i].max+" ("+achieveC[i].cleared+")",X+150,Y);
+                  cx2.fillText(" ("+achieveC[i].cleared+")",X+150,Y);
                 }
                 Y+=20;
                 if(Y>=500){
@@ -5124,7 +5125,7 @@ if(opLock==0 && gamestate ==1){
         hand3.sort(compareFunc);
         hand4.sort(compareFunc);
         //積み込み
-        //if(debugmode){hand1=[60,61,62,63,64,66,67,68]};
+        if(debugmode){hand1=[60,61,62,63,64,66,67,68]};
         //if(debugmode){hand1=[0,1,2,3,24,26,27,28]};
         //1番目の配列は上がり判定に使用
         hand1.unshift(-1)
@@ -11196,6 +11197,9 @@ if(opLock==0 && gamestate ==1){
                 if(achieveA[I].cleared>0){
                 Textlist[0].text=achieveA[I].name;
                 Textlist[1].text=achieveA[I].sub;
+                }else{
+                  Textlist[0].text="？？？";
+                  Textlist[1].text=achieveA[I].sub;
                 }
               }
               if(stage.mouseX >475 && stage.mouseX <660 && stage.mouseY >95 && stage.mouseY <515){
@@ -11203,8 +11207,11 @@ if(opLock==0 && gamestate ==1){
                 if(I>=achieveA.length){
                   return false;
                 }
-                if(achieveA[I+20].cleared>0){
+                if(achieveA[I+21].cleared>0){
                   Textlist[0].text=achieveA[I+21].name;
+                  Textlist[1].text=achieveA[I+21].sub;
+                }else{
+                  Textlist[0].text="？？？";
                   Textlist[1].text=achieveA[I+21].sub;
                 }
               }
