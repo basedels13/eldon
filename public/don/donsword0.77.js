@@ -1,13 +1,15 @@
-// var1.01　season2 テスト レスポンシブ対応
+// var1.01　season2 エリシス、エド
 // npm run dev
 // 対戦中のカンでドラの数がズレる？
 // 魔界血戦後に操作不能？
+// reverse時のポンの色
+// 魔界で自分ツモ後もターンが回ってくる、実績画面で一度クリックしないと反応しない？
 window.onload = function(){
   draw();
   };
   
   function draw(){
-  var titletext="v1.01/Click to START";
+  var titletext="v1.1/Click to START";
   var debugmode=false;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にfalseに
   if(debugmode){titletext+="　でばっぐも～ど"};
   var today = new Date();
@@ -19,8 +21,8 @@ window.onload = function(){
   (function () {
     var wait = 1500,
       standby = true,
-      // コマンドのキーコード
-      command = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65],
+      command = ["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","b","a"],
+      //command = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65],
       length = command.length,
       index = 0,
       timer = null;  
@@ -29,13 +31,13 @@ window.onload = function(){
       // タイマーのリセット
       clearTimeout(timer);
       // コマンドの確認
-      if (standby && ev.code === command[index]) {
+      if (standby && ev.key === command[index]) {
         index++;
         if (index >= length) {
-          // すべてのコマンドを入力した！
           standby = false;  // 処理中にコマンドを受け付けないようにする
           index = 0;  // コマンドリセット
           if(!fool){fool=true;}else{fool=false}
+          if(fool){titletext="v1.01/Click to START　えいぷりるふ～る"}else{titletext="v1.01/Click to START"};
           se17.play();
           handleComplete();
           standby = true;
@@ -353,6 +355,7 @@ window.onload = function(){
   var chara =new Array(0,0,0,0,0)
   //mpmove
   var Fever =-1;//fever->未使用
+  var Reverse = false;//回転巡
   var HiddenChara =3;//chrlist管理
   //ルーム設定
   var LP_PVP={Length:[1,"東風","半荘",],LP:[1,75000,150000,300000],Block:[1,"満貫あり","満貫なし"],Rule:[1,"サバイバル","デスマッチ","魔界血戦"],Skill:[1,"スキル禁止","スキルあり"]};
@@ -388,9 +391,9 @@ window.onload = function(){
   //データベース
   var LPlist=new Array("一般","ヘル","デスマッチ","∞","魔界血戦")
   var musiclist=new Array("ランダム","盲目のアストライア","Nine Jack","The Evil Sacrifice Archenemies","ロベリア","夜の迷宮の入口","決闘のテーマ","エルの樹の麓","リーチっぽい音楽","竜の道","ウォーリーの城メドレー","歎きの塔Phase3","狂乱のコンサート","リーチっぽい音楽R")
-  var chrlist=new Array("名無しさん","エルス","アイシャ","レナ","レイヴン","イヴ","ラシェ","アラ")//"エド","ラビィ")
-  var chrimg_src= new Array("don/Don_chara0.png","don/Don_chara1.png","don/Don_chara2.png","don/Don_chara3.png","don/Don_chara4.png","don/Don_chara5.png","don/Don_chara6.png","don/Don_chara7.png");
-  var chrimgR_src= new Array("don/Don_chara0.png","don/Don_chara1R.png","don/Don_chara2R.png","don/Don_chara3R.png","don/Don_chara4R.png","don/Don_chara5R.png","don/Don_chara6R.png","don/Don_chara7R.png");
+  var chrlist=new Array("名無しさん","エルス","アイシャ","レナ","レイヴン","イヴ","ラシェ","アラ","エリシス","エド")//"ラビィ"
+  var chrimg_src= new Array("don/Don_chara0.png","don/Don_chara1.png","don/Don_chara2.png","don/Don_chara3.png","don/Don_chara4.png","don/Don_chara5.png","don/Don_chara6.png","don/Don_chara7.png","don/Don_chara8.png","don/Don_chara9.png");
+  var chrimgR_src= new Array("don/Don_chara0.png","don/Don_chara1R.png","don/Don_chara2R.png","don/Don_chara3R.png","don/Don_chara4R.png","don/Don_chara5R.png","don/Don_chara6R.png","don/Don_chara7R.png","don/Don_chara8.png","don/Don_chara9R.png");
   //説明用
   var epic_src =new Array("don/elstudio_bg1.png","don/Don_epic1.png","don/Don_epic2.png","don/Don_epic3.png","don/Don_epic6.png","don/Don_ss11.png","don/Don_epic4.png","don/Don_epic5.png");
   //パイの裏
@@ -434,6 +437,8 @@ window.onload = function(){
   {fir:"クイーンズスローン",sec:"QUEEN'S THRONE",thr:"0"},
   {fir:"ルナティックフューリー",sec:"LINATIC FURY",thr:"0"},
   {fir:"龍牙爆砕",sec:"DRAGON ARTS 'BLAST'",thr:"0"},
+  {fir:"克己-強",sec:"Iron Body - Strong",thr:"0"},
+  {fir:"リバースサークル",sec:"Reverse Circle",thr:"0"},
   ]
   //name->キャラsub->職、役判定で使用　line->ライン役判定に使用 0->all　color->1234567陽水風月土火E 0->all
   var donpai=[
@@ -2140,11 +2145,11 @@ function menuMap(p=0){
             var k=Math.floor(i/4);
             if(i>HiddenChara){
               var rect = new createjs.Shape();
-              rect.graphics.beginFill("rgba(0,0,0,0.8)").drawRect(530+50*j, 400+50*k, 50, 50);
+              rect.graphics.beginFill("rgba(0,0,0,0.8)").drawRect(530+50*j, 350+50*k, 50, 50);
               menu_main.addChild(rect);
               var t = new createjs.Text("？", "26px 'Century Gothic'", "rgba(240,240,240,0.6)");
               t.x=540+50*j;
-              t.y=410+50*k;
+              t.y=360+50*k;
               menu_main.addChild(t);
             }else{
               if(fool){
@@ -2154,7 +2159,7 @@ function menuMap(p=0){
               }
             e11.sourceRect={x:AryX[i],y:AryY[i],width:200,height:200}
             e11.x=530+50*j;
-            e11.y=400+50*k;
+            e11.y=350+50*k;
             e11.scale=1/4;
             menu_main.addChild(e11);
             }
@@ -2164,7 +2169,7 @@ function menuMap(p=0){
               .beginFill("rgba(0, 35, 133, 0.7)")
               .drawRect(0, 0, 50, 50);
           rect.x=530+50*(chara[1]%4)
-          rect.y=400+50*Math.floor(chara[1]/4)
+          rect.y=350+50*Math.floor(chara[1]/4)
           menu_main.addChild(rect);
           menu_main_list.push(rect);
           if(fool){
@@ -2172,7 +2177,7 @@ function menuMap(p=0){
           }else{
             e10 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[1]]));
           }
-          e10.sourceRect={x:400,y:0,width:350,height:490}
+          e10.sourceRect={x:400,y:0,width:350,height:400}
           e10.x=530;
           e10.y=120;
           e10.scale=20/35;
@@ -3178,7 +3183,7 @@ function NameChange(){
   }
   };
   function Menu(){
-    if(debugmode){console.log('Menu',pagestate)};
+    if(debugmode){console.log('Menu',pagestate,gamestate)};
     if(gamestate!==10){clickInGame();return false;};
     switch(pagestate){
       case 0:
@@ -3333,6 +3338,23 @@ function NameChange(){
         var D=achieveB.findIndex(value=>value.name=="交感の足取り");
         var E=achieveB.findIndex(value=>value.name=="カン");
         if(achieveB[A].cleared>0 && achieveB[B].cleared>0 && achieveB[C].cleared>0 && achieveB[D].cleared>0 && achieveB[E].cleared>=10 && scoretemp[0]>0){
+          CharaUnlock(HiddenChara);
+        }
+        break;
+      case 7:
+      var A=achieveA.findIndex(value=>value.name=="突き抜ける快感");
+        if(winrank[4][0]>=8 && achieveA[A].cleared>0 && scoretemp[0]>0){
+          CharaUnlock(HiddenChara);
+        }
+        break;
+      case 8:
+      var A=achieveA.findIndex(value=>value.name=="YOUならやれるポン");
+      var B=achieveB.findIndex(value=>value.name="クレストオブガイア");
+      var C=0;
+      for(var i=0;i<7;i++){
+        C+=achieveB[B+i].cleared;
+      }
+        if(C>0 && achieveA[A].cleared>0 && scoretemp[0]>0){
           CharaUnlock(HiddenChara);
         }
         break;
@@ -3866,21 +3888,26 @@ function NameChange(){
             }
             switch(msgstate){
               case 0:
-                if(stage.mouseX >530 && stage.mouseX <730 && stage.mouseY >400 && stage.mouseY <450){
+                if(stage.mouseX >530 && stage.mouseX <730 && stage.mouseY >350 && stage.mouseY <400){
                   se3.play();
                   chara[1]=Math.floor((stage.mouseX-530)/50);
                 }
-                if(stage.mouseX >530 && stage.mouseX <730 && stage.mouseY >450 && stage.mouseY <500){
+                if(stage.mouseX >530 && stage.mouseX <730 && stage.mouseY >400 && stage.mouseY <500){
                   //下段はHiddenCharaに応じてアレしてください
+                  if(stage.mouseY >400 && stage.mouseY <450){
                   var M=4+Math.floor((stage.mouseX-530)/50);
+                  }
+                  if(stage.mouseY >450 && stage.mouseY <500){
+                  var M=8+Math.floor((stage.mouseX-530)/50);
+                  }
                   console.log(M,HiddenChara);
                   if(M<=HiddenChara){
-                  chara[1]=4+Math.floor((stage.mouseX-530)/50);
+                  chara[1]=M;
                   se3.play();
                   }else{
                   se2.play();
-                  var Ary=["①「殴り合い」達成　②3連荘する","①「ナソード研究」達成　②一度も放銃せずに勝利","①3回以上放銃する　②一発ツモ5回達成","①「足取り」シナジー4つ達成　②10回以上カンをする"];
-                  Textlist[0].text="？？？（特定の条件を満たすとキャラ開放）";
+                  var Ary=["①「殴り合い」達成　②3連荘する","①「ナソード研究」達成　②一度も放銃せずに勝利","①半荘戦で3回以上放銃する　②一発ツモ5回達成","①「足取り」シナジー4つ達成　②10回以上カンをする","①「魔界血戦」1位8回達成　②ライン通貫10回達成","①100回ポンをする　②いずれかのクレスト役を和了する"];
+                  Textlist[0].text="？？？（開放条件を満たすと開放）";
                   Textlist[1].text="NEXT："+Ary[HiddenChara-3];
                   return false;
                   }
@@ -4750,8 +4777,8 @@ if(opLock==0 && gamestate ==1){
       field.addChild(t);
       };
         parentY =400
-        var Ary=[500,500,500,500,500,500,500,400];
-        var Ary2=[0,50,0,0,60,0,60,0];
+        var Ary=[500,500,500,500,500,500,500,400,500,500];
+        var Ary2=[0,50,0,0,60,0,60,0,80,50];
         if(fool){
           e11 = new createjs.Bitmap(queue.getResult(chrimgR_src[chara[1]]));          
         }else{
@@ -4945,6 +4972,7 @@ if(opLock==0 && gamestate ==1){
         c1=0
         opLock=0;
         raidscore=[0,0,0,0,0];
+        Reverse = false;
         //ポンポポン
         ponsw=[0,0,0,0,0]
         poncpu=[0,Ponrate,Ponrate,Ponrate,Ponrate]
@@ -5106,6 +5134,50 @@ if(opLock==0 && gamestate ==1){
           }
           }
         }
+        if(chara[1]==8 && skillusage2[1]>0){
+          console.log("ELE 1")
+          for(var i=0;i<skillusage2[1]+2;i++){
+          var R=Math.floor(Math.random()*4);
+          var A=deck.findIndex(value=>(value%4==R))
+          if(R!==-1){
+            hand1.push(deck[A]);
+            deck.splice(A,1);
+          }
+          }
+        }
+        if(chara[2]==8 && skillusage2[2]>0){
+          console.log("ELE 2")
+          for(var i=0;i<skillusage2[2]+2;i++){
+          var R=Math.floor(Math.random()*4);
+          var A=deck.findIndex(value=>(value%4==R))
+          if(R!==-1){
+            hand2.push(deck[A]);
+            deck.splice(A,1);
+          }
+          }
+        }
+        if(chara[3]==8 && skillusage2[3]>0){
+          console.log("ELE 3")
+          for(var i=0;i<skillusage2[3]+2;i++){
+          var R=Math.floor(Math.random()*4);
+          var A=deck.findIndex(value=>(value%4==R))
+          if(R!==-1){
+            hand1.push(deck[A]);
+            deck.splice(A,1);
+          }
+          }
+        }
+        if(chara[4]==8 && skillusage2[4]>0){
+          console.log("ELE 4")
+          for(var i=0;i<skillusage2[4]+2;i++){
+          var R=Math.floor(Math.random()*4);
+          var A=deck.findIndex(value=>(value%4==R))
+          if(R!==-1){
+            hand1.push(deck[A]);
+            deck.splice(A,1);
+          }
+          }
+        }
         king =[];
         for (var i = 0; i < 10; i++) {
           king.push(Math.floor(Math.random() * 67));
@@ -5125,8 +5197,8 @@ if(opLock==0 && gamestate ==1){
         hand3.sort(compareFunc);
         hand4.sort(compareFunc);
         //積み込み
-        if(debugmode){hand1=[60,61,62,63,64,66,67,68]};
-        //if(debugmode){hand1=[0,1,2,3,24,26,27,28]};
+        //if(debugmode){hand1=[60,61,62,63,64,66,67,68]};
+        if(debugmode){Reverse=true};
         //1番目の配列は上がり判定に使用
         hand1.unshift(-1)
         hand2.unshift(-1)
@@ -5272,7 +5344,6 @@ if(opLock==0 && gamestate ==1){
     Bgm.volume(N*vBar);
   }
       function Buffdraw(){
-      //if(debugmode){console.log('Buffdraw')}
      //バフアイコンを描画する
      var x=[0,120,120,120,120];
      var y=[0,400,100,200,300];
@@ -5696,172 +5767,36 @@ if(opLock==0 && gamestate ==1){
             return false;
           }
           //次の人のポンへ
-          if(turn==0 && ponsw[0]==0 && Fr2==-1 && Flame2==-1 && LP[2]>=0 && ManaBreak==0){
+          if(turn==0 && ponsw[0]==0 && ManaBreak==0){
           //可能な限りポン->ライン揃えに行く場合はポンしない
-          if(Kan(2)){
-            if(pvpmode==1){
-                if(MEMBER[1].pc==1){
-                console.log('player waiting');
-                return false;
-              }else if(IsHost(IAM.room)){
-                var R=Math.random();
-                if(R>poncpu[2]){
-                  Kan(2,tumotemp);
-                    socket.emit("nuki", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[1].id,pai:tumotemp,status:true});
-                return false;
-              }else{
-                  socket.emit("nuki", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[1].id,pai:tumotemp,status:false});
-                //kansw[4]=kan4.length;
-              }}else{
-              return false;
-              }
-            }else{
-              var R=Math.random();
-              if(R>poncpu[2]){
-              Kan(2,tumotemp);
-              return false;
-              }else{
-              //kansw[4]=kan4.length;
-            }
-          }
-          }
-            if(Pon(2)){
-              if(pvpmode==1){
-                if(MEMBER[1].pc==1){
-                console.log('player waiting');
-                return false;
-              }else if(IsHost(IAM.room)){
-                var R=Math.random();
-                if(R>poncpu[2]){
-                    socket.emit("pon", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[1].id,pai:tumotemp,status:true});
-                    Pon(2,tumotemp);
-                return false;
-              }else{
-                  socket.emit("pon", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[1].id,pai:tumotemp,status:false});
-                ponsw[2]=pon2.length;
-              }}else{
-                return false;
-              }
-            }else{
-              var R=Math.random();
-              if(R>poncpu[2]){
-              Pon(2,tumotemp);
-              return false;
-            }else{
-              ponsw[2]=pon2.length;
-            }
-          }}
+          if(Reverse){
+            if(!PonKanChecker(4)){return false;}
+          }else{
+            if(!PonKanChecker(2)){return false;}};
           };
-          if(turn==1 && ponsw[0]==0 && Fr3==-1 && Flame3==-1 && LP[3]>=0 && ManaBreak==0){
-            if(Kan(3)){
-              if(pvpmode==1){
-                  if(MEMBER[2].pc==1){
-                  console.log('player waiting');
-                  return false;
-                }else if(IsHost(IAM.room)){
-                  var R=Math.random();
-                  if(R>poncpu[3]){
-                    Kan(3,tumotemp);
-                      socket.emit("nuki", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[2].id,pai:tumotemp,status:true});
-                  return false;
-                }else{
-                    socket.emit("nuki", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[2].id,pai:tumotemp,status:false});
-                }}else{
-                return false;
-                }
-              }else{
-                var R=Math.random();
-                if(R>poncpu[3]){
-                Kan(3,tumotemp);
-                return false;
-                }else{
-                //kansw[4]=kan4.length;
-              }
-            }
-            }
-            if(Pon(3)){
-              if(pvpmode==1){
-                if(MEMBER[2].pc==1){
-                console.log('player waiting');
-                return false;
-              }else if(IsHost(IAM.room)){
-                var R=Math.random();
-                if(R>poncpu[3]){
-                  Pon(3,tumotemp);
-                    socket.emit("pon", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[2].id,pai:tumotemp,status:true});
-                return false;
-              }else{
-                  socket.emit("pon", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[2].id,pai:tumotemp,status:false});
-                ponsw[3]=pon3.length;
-              }}else{
-              return false;
-              }
-              }else{
-              var R=Math.random();
-              if(R>poncpu[3]){
-              Pon(3,tumotemp);
-              return false;
+          if(turn==1 && ponsw[0]==0 && ManaBreak==0){
+          if(Reverse){
+            if(!PonKanChecker(1)){return false;}
             }else{
-              ponsw[3]=pon3.length;
-            }
-            }}
+            if(!PonKanChecker(3)){return false;}};
           }
-          if(turn==2 && ponsw[0]==0 && Fr4==-1 && Flame4==-1 && LP[4]>=0 && ManaBreak==0){
-            if(Kan(4)){
-              if(pvpmode==1){
-                  if(MEMBER[3].pc==1){
-                  console.log('player waiting');
-                  return false;
-                }else if(IsHost(IAM.room)){
-                  var R=Math.random();
-                  if(R>poncpu[4]){
-                    Kan(4,tumotemp);
-                      socket.emit("nuki", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[3].id,pai:tumotemp,status:true});
-                  return false;
-                }else{
-                    socket.emit("nuki", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[3].id,pai:tumotemp,status:false});
-                  //kansw[4]=kan4.length;
-                }}else{
-                return false;
-                }
-              }else{
-                var R=Math.random();
-                if(R>poncpu[4]){
-                Kan(4,tumotemp);
-                return false;
-                }else{
-                //kansw[4]=kan4.length;
-              }
-            }
-            }
-            if(Pon(4)){
-              if(pvpmode==1){
-                if(MEMBER[3].pc==1){
-                console.log('player waiting');
-                return false;
-              }else if(IsHost(IAM.room)){
-                var R=Math.random();
-                if(R>poncpu[4]){
-                  Pon(4,tumotemp);
-                    socket.emit("pon", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[3].id,status:true});
-                return false;
-              }else{
-                  socket.emit("pon", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[3].id,status:false});
-                ponsw[4]=pon4.length;
-              }}else{
-              return false;
-              }
-              }else{
-              var R=Math.random();
-              if(R>poncpu[4]){
-              Pon(4,tumotemp);
-              return false;
+          if(turn==2 && ponsw[0]==0 && ManaBreak==0){
+          if(Reverse){
+             if(!PonKanChecker(2)){return false;};
+          }else{
+            if(!PonKanChecker(4)){return false;}};
+          }
+          if(turn==3 && ponsw[0]==0 && ManaBreak==0){
+          if(Reverse){
+            if(!PonKanChecker(3)){return false;}
             }else{
-              ponsw[4]=pon4.length;
-            }
-            }}
+            if(!PonKanChecker(1)){return false;}};
           }
-          if(turn==3 && ponsw[0]==0 && Fr1==-1 && Flame1==-1 && LP[1]>=0 && ManaBreak==0){
+        function PonKanChecker(p){
+        //default-> 2-4を想定
+        switch(p){
+          case 1:
+          if(LP[1]<0 || Fr1!==-1 || Flame1!==-1){return true}
             if(Kan(1)){
               //カンができるということはポンもできる
               se5.play();
@@ -5907,8 +5842,73 @@ if(opLock==0 && gamestate ==1){
             corsor();
             console.log('操作可',cLock);
             return false;
+          }
+          break;
+          default:
+          if(p==2){if(LP[2]<0 || Fr2!==-1 || Flame2!==-1){return true}};
+          if(p==3){if(LP[3]<0 || Fr3!==-1 || Flame3!==-1){return true}};
+          if(p==4){if(LP[4]<0 || Fr4!==-1 || Flame4!==-1){return true}};
+          if(Kan(p)){
+            if(pvpmode==1){
+                if(MEMBER[p-1].pc==1){
+                console.log('player waiting');
+                return false;
+              }else if(IsHost(IAM.room)){
+                var R=Math.random();
+                if(R>poncpu[p-1]){
+                  Kan(p,tumotemp);
+                    socket.emit("nuki", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[p-1].id,pai:tumotemp,status:true});
+                return false;
+              }else{
+                  socket.emit("nuki", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[p-1].id,pai:tumotemp,status:false});
+              }}else{
+              return false;
+              }
+            }else{
+              var R=Math.random();
+              if(R>poncpu[p]){
+              Kan(p,tumotemp);
+              return false;
+            }
+          }
+          }
+            if(Pon(p)){
+              if(pvpmode==1){
+                if(MEMBER[p-1].pc==1){
+                console.log('player waiting');
+                return false;
+              }else if(IsHost(IAM.room)){
+                var R=Math.random();
+                if(R>poncpu[p]){
+                    socket.emit("pon", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[p-1].id,pai:tumotemp,status:true});
+                    Pon(p,tumotemp);
+                return false;
+              }else{
+                  socket.emit("pon", {Token:IAM.token,room:RoomName[IAM.room],who:MEMBER[p-1].id,pai:tumotemp,status:false});
+              if(p==2){ponsw[p]=pon2.length};
+              if(p==3){ponsw[p]=pon3.length};
+              if(p==4){ponsw[p]=pon4.length};
+              }}else{
+                return false;
+              }
+            }else{
+              var R=Math.random();
+              if(R>poncpu[p]){
+              Pon(p,tumotemp);
+              return false;
+            }else{
+              if(p==2){ponsw[p]=pon2.length};
+              if(p==3){ponsw[p]=pon3.length};
+              if(p==4){ponsw[p]=pon4.length};
+            }
           }}
-          //ターンを回す
+          break;
+        }
+        console.log('end of ponkanchecker');
+        return true;
+      };
+        //ターンを回す
+        console.log('turnchecker_5901')
         if(deck.length <= 0 && ponsw[1]!==1 &&ponsw[2]!==1 && ponsw[3]!==1 && ponsw[4]!==1){
           if(pvpmode==1){
           if(IsHost(IAM.room)){
@@ -5920,7 +5920,7 @@ if(opLock==0 && gamestate ==1){
       }
         }else{
         //飛んだ人を飛ばす
-        turn +=1;
+        if(Reverse){turn -=1;}else{turn +=1};
         if(ManaBreak>0){
           ManaBreak=0};
         switch(turn){
@@ -5931,21 +5931,21 @@ if(opLock==0 && gamestate ==1){
               if(F!==-1){
               Buff[2].splice(F,1)
               }
-              turn+=1;ctl[3]=0;
+              if(Reverse){turn -=1;}else{turn +=1;ctl[3]=0;};
               Freeze=Buff[3].filter(value=>value==6 || value==11)
               if(Freeze.length>0 || LP[3]<0){
                 var F=Buff[3].findIndex(value=>value==6)
                 if(F!==-1){
                 Buff[3].splice(F,1)
                 }
-                turn+=1;ctl[4]=0;
+                if(Reverse){turn -=1;ctl[2]=0;}else{turn +=1;ctl[4]=0;};
                 Freeze=Buff[4].filter(value=>value==6 || value==11)
                 if(Freeze.length>0 || LP[4]<0){
                   var F=Buff[4].findIndex(value=>value==6)
                   if(F!==-1){
                   Buff[4].splice(F,1)
                   }
-                  turn=0
+                  if(Reverse){turn -=1;ctl[3]=0;}else{turn +=1};
                 }
               }}
               if(rorder[2]==1){rorder[2]=0}
@@ -5959,21 +5959,21 @@ if(opLock==0 && gamestate ==1){
               if(F!==-1){
               Buff[3].splice(F,1)
               }
-              turn+=1;ctl[4]=0;
+              if(Reverse){turn -=1;ctl[2]=0;}else{turn +=1;ctl[4]=0;};
               Freeze=Buff[4].filter(value=>value==6 || value==11)
               if(Freeze.length>0 || LP[4]<0){
                 var F=Buff[4].findIndex(value=>value==6)
                 if(F!==-1){
                 Buff[4].splice(F,1)
                 }
-                turn=0
+                if(Reverse){turn -=1;ctl[3]=0;}else{turn +=1};
               Freeze=Buff[1].filter(value=>value==6 || value==11)
               if(Freeze.length>0 || LP[1]<0){
                 var F=Buff[1].findIndex(value=>value==6)
                 if(F!==-1){
                 Buff[1].splice(F,1)
                 }
-                turn+=1;ctl[2]=0;
+                if(Reverse){turn -=1;ctl[4]=0;}else{turn +=1;ctl[2]=0;};
                 }
               }}
               if(rorder[1]==1){rorder[1]=0}
@@ -5994,14 +5994,14 @@ if(opLock==0 && gamestate ==1){
                 if(F!==-1){
                 Buff[1].splice(F,1)
                 }
-                turn+=1;ctl[2]=0;
+                if(Reverse){turn -=1;ctl[3]=0;}else{turn +=1;ctl[2]=0;};
                 Freeze=Buff[2].filter(value=>value==6 || value==11)
             if(Freeze.length>0 || LP[2]<0){
               var F=Buff[2].findIndex(value=>value==6)
               if(F!==-1){
               Buff[2].splice(F,1)
               }
-              turn+=1;ctl[3]=0;
+              if(Reverse){turn -=1;}else{turn +=1;ctl[3]=0;};
                 }
               }}
               if(rorder[1]==1){rorder[1]=0}
@@ -6009,28 +6009,28 @@ if(opLock==0 && gamestate ==1){
               if(rorder[4]==1){rorder[4]=0}
             break;
           case 4:
-              turn=0;
+              if(Reverse){turn -=1;}else{turn +=1};
               var Freeze=Buff[1].filter(value=>value==6 || value==11)
               if(Freeze.length>0 || LP[1]<0){
                 var F=Buff[1].findIndex(value=>value==6)
                 if(F!==-1){
                 Buff[1].splice(F,1)
                 }
-                turn+=1;ctl[2]=0;
+                if(Reverse){turn -=1;ctl[3]=0;}else{turn +=1;ctl[2]=0;};
                 Freeze=Buff[2].filter(value=>value==6 || value==11)
             if(Freeze.length>0 || LP[2]<0){
               var F=Buff[2].findIndex(value=>value==6)
               if(F!==-1){
               Buff[2].splice(F,1)
               }
-              turn+=1;ctl[3]=0;
+              if(Reverse){turn -=1;ctl[1]=0;}else{turn +=1;ctl[3]=0;};
               Freeze=Buff[3].filter(value=>value==6 || value==11)
             if(Freeze.length>0 || LP[3]<0){
               var F=Buff[3].findIndex(value=>value==6)
               if(F!==-1){
               Buff[3].splice(F,1)
               }
-              turn+=1;ctl[4]=0;
+              if(Reverse){turn -=1;ctl[2]=0;}else{turn +=1;ctl[4]=0;};
               }
             }}
               if(rorder[1]==1){rorder[1]=0}
@@ -6041,6 +6041,8 @@ if(opLock==0 && gamestate ==1){
             console.log(turn,"turnchecker error!")
             break;
         }
+        if(turn>=4){turn=0};
+        if(turn<0){turn=3};
         if(pvpmode==1){
           for(var i=0;i<MEMBER.length;i++){
             MEMBER[i].turnflag=0;
@@ -6128,6 +6130,7 @@ if(opLock==0 && gamestate ==1){
                 nuki=data.Nuki.concat();
                 break;
           }
+          Reverse=data.R;
         };
         var N=1+MEMBER.findIndex(value=>value.id==data.who)
         tumotemp=data.Tumotemp;
@@ -6325,6 +6328,15 @@ if(opLock==0 && gamestate ==1){
           if(skillswitch[0] !==-2 && i!==player && chara[i]==5 && skillusage[i]==0){
             skillusage[i]=player;
           }
+        }
+        //姉
+        if(skillswitch[0] !==-2 && skillusage[player]==0 && chara[player]==8){
+          if(DP[player]>=20){
+          DP[player]-=20
+          drawDP(player);
+          skillusage[player]=1;
+          skillswitch[player]=0;
+          };
         }
         ReachAnimation(player);
     }else{//通常
@@ -6560,7 +6572,10 @@ if(opLock==0 && gamestate ==1){
     if(chara[0]==0){
       for(var i=2;i<chara.length;i++){
         var R=Math.floor(Math.random()*(1+HiddenChara))
-        chara[i]=R
+        chara[i]=R;
+        if(debugmode){
+          chara[1]=9;
+          };
       }
     }
     //parent=0;//for debug
@@ -6700,7 +6715,7 @@ if(opLock==0 && gamestate ==1){
     hand1.sort(compareFunc3) 
     hand1=hand1.concat(Hlast)
   }
-  ctl[2]=0
+  if(Reverse){ctl[4]=0;}else{ctl[2]=0;}
   handgraph(0,1)  
   //ボタンとカーソルを消す
   cx2.clearRect(630,440,160,80)
@@ -6718,7 +6733,7 @@ if(opLock==0 && gamestate ==1){
   }
   if(pvpmode==1){
     //必要な情報をポイする
-    socket.emit("throwed_pai",{Num:1,Player:1,who:MEMBER[0].id,Token:IAM.token,room:RoomName[IAM.room],Tumotemp:tumotemp,Reach:reach,Ippatu:ippatu,Nuki:nuki,Dp:DP,mb:ManaBreak,Hand:{hand1,hand2,hand3,hand4}});
+    socket.emit("throwed_pai",{Num:1,Player:1,who:MEMBER[0].id,Token:IAM.token,room:RoomName[IAM.room],Tumotemp:tumotemp,Reach:reach,Ippatu:ippatu,Nuki:nuki,Dp:DP,mb:ManaBreak,Hand:{hand1,hand2,hand3,hand4},R:Reverse});
   }else{
         //manabreak
         if(ManaBreak>0){
@@ -6762,7 +6777,10 @@ if(opLock==0 && gamestate ==1){
         case 3:
           Csquare.y=100*turn;
           if(MEMBER[turn].pc==0 && IsHost(IAM.room)){
-            ctl[turn+1]=0;
+            if(Reverse){
+              if(turn==0){ctl[4]=0}else{ctl[turn-1]=0};
+            }else{
+              ctl[turn+1]=0;};
             var Cpu =setTimeout(function(){
               cpu(turn+1);
               if(ctl[turn+1]>=1){clearTimeout(Cpu)};
@@ -6897,6 +6915,7 @@ if(opLock==0 && gamestate ==1){
       if(skillswitch[1]==1){
         switch(chara[1]){
           case 1:
+          case 9:
         if(DP[1]>=10){
           skillswitch[1]=0       
         }
@@ -6916,6 +6935,11 @@ if(opLock==0 && gamestate ==1){
           if(DP[1]>=30){
             skillswitch[1]=0       
           }
+          break;
+        case 8:
+        if(DP[1]>=20 && reach[1] ==1){
+          skillswitch[1]=0       
+        }
           break;
         default:
           break;
@@ -7105,7 +7129,6 @@ if(opLock==0 && gamestate ==1){
         switch(chara[chr]){
           case 1://エ
                     //ponしてればLP25000加算 リーチで50000加算 LPでヘイト
-                    var ary=[0,0,0,0];
                     var LPrank=[
                       {chara:1, elia:LP[1], pon:ponsw[1], reach:reach[1]},
                       {chara:2, elia:LP[2], pon:ponsw[2], reach:reach[2]},
@@ -7199,18 +7222,19 @@ if(opLock==0 && gamestate ==1){
         if(chr==2){
           hand2=Cpuhandtemp.concat();
         if(ponsw[chr]==1){ponsw[chr]=pon2.length;}
-        ctl[3]=0;
+        if(!Reverse){ctl[3]=0;}
         }else if(chr==3){
           hand3=Cpuhandtemp.concat();
         if(ponsw[chr]==1){ponsw[chr]=pon3.length;}
-        ctl[4]=0;
+        if(Reverse){ctl[2]=0;}else{ctl[4]=0;}
         }else if(chr==4){
           hand4=Cpuhandtemp.concat();
           if(ponsw[chr]==1){ponsw[chr]=pon4.length;}
+        if(Reverse){ctl[3]=0;}
         }
         if(pvpmode==1){
           //必要な情報をポイする
-          socket.emit("throwed_pai",{Num:r4,Player:chr,who:MEMBER[chr-1].id,Token:IAM.token,room:RoomName[IAM.room],Tumotemp:tumotemp,Reach:reach,Ippatu:ippatu,Nuki:nuki,Dp:DP,mb:ManaBreak,Hand:{hand1,hand2,hand3,hand4}});
+          socket.emit("throwed_pai",{Num:r4,Player:chr,who:MEMBER[chr-1].id,Token:IAM.token,room:RoomName[IAM.room],Tumotemp:tumotemp,Reach:reach,Ippatu:ippatu,Nuki:nuki,Dp:DP,mb:ManaBreak,Hand:{hand1,hand2,hand3,hand4},R:Reverse});
         }else{
         handgraph(r4,chr)
         }
@@ -7229,6 +7253,7 @@ if(opLock==0 && gamestate ==1){
     var end=0;
     for(var i=1; i<handtemp.length;i++){
       var C=donpai.findIndex(value=>value.id==handtemp[i])
+      console.log(C,handtemp[i]);
       var elm=donpai[C].name;
       var elm2=donpai[C].line
       var elm3=donpai[C].color;
@@ -8054,7 +8079,9 @@ if(opLock==0 && gamestate ==1){
       if(ippatu[player]==1){han[player] +=1}
       if(counter[player] ==0 && num==0){han[player] +=12}//天和 12翻
       if(deck.length ==0){han[player] +=1};//海底
-      if(ponsw[player] >0){han[player] -=2};//鳴き
+      if(ponsw[player] >0){
+        if(chara[player]==9){han[player] -=1}else{han[player] -=2}
+      };//鳴き
       var doracheck =Doracheck(player);
       function Doracheck(player){
         var result =0
@@ -8150,7 +8177,11 @@ if(opLock==0 && gamestate ==1){
         Resultary.push('ドラ '+doracheck+'翻')
         }
       if(ponsw[player] >0){
+        if(chara[player]==9){
+          Resultary.push('鳴き -1翻')          
+        }else{
           Resultary.push('鳴き -2翻')
+        }
       }
       //実績
       if(player==1){
@@ -8610,6 +8641,10 @@ if(opLock==0 && gamestate ==1){
       if(LP[0]!==4 && LP[0]!==2){
         skillusage2[0]-=1;
         skillusage2[5]+=1
+        if(chara[player]==8){
+          skillusage2[player]+=1;
+          if(skillusage2[player]>4){skillusage2[player]=4};
+        }
         if(player==1){
           if(skillusage2[5]>scoretemp[1]){
             scoretemp[1]+=1;
@@ -8617,6 +8652,16 @@ if(opLock==0 && gamestate ==1){
         if(parent ==0){parent =3}else{parent -=1}
       }
       }else{
+      for(var i=1;i<5;i++){
+        if(chara[i]==8){
+          if(player==i || skillusage[i]==1){
+            skillusage2[i]+=1;
+            if(skillusage2[player]>4){skillusage2[player]=4};
+          }else{
+            skillusage2[i]=0;
+          };
+        }
+      }
       score=rootscore
       skillusage2[5]=0
       }
@@ -12413,8 +12458,9 @@ if(opLock==0 && gamestate ==1){
         se5.play()
         var s = new createjs.Shape();
           s.graphics.beginFill("rgba(20,20,20,0.3)");
-          s.graphics.drawRect(0, 0, 630, 600)
+          s.graphics.drawRect(150, 100, 480, 390)
           ponkanmap.addChild(s);
+          s.addEventListener("click", {handleEvent:Menu}); 
           var CKey = new createjs.Shape();
           CKey.graphics.beginStroke("#0088f0").setStrokeStyle(5).drawRoundRect(150,100,480,390,10,10)
           ponkanmap.addChild(CKey);
@@ -12451,6 +12497,38 @@ if(opLock==0 && gamestate ==1){
         DP[player]-=10;
         drawDP(player);
         handgraph(1,player);
+    }
+    if(p==9){//エド
+        if(target==1){
+              //スキル演出中
+              DP[player]-=10;
+              drawDP(player);
+              ponkanmap.removeAllChildren();
+              if(Reverse){Reverse=false}else{Reverse=true};
+              cLock=1;
+              console.log('操作可能')
+          }else{
+            se5.play()
+            var s = new createjs.Shape();
+              s.graphics.beginFill("rgba(20,20,20,0.3)");
+              s.graphics.drawRect(150, 100, 480, 390)
+              ponkanmap.addChild(s);
+              s.addEventListener("click", {handleEvent:Menu}); 
+              var CKey = new createjs.Shape();
+              CKey.graphics.beginStroke("#0088f0").setStrokeStyle(5).drawRoundRect(150,100,480,390,10,10)
+              ponkanmap.addChild(CKey);
+              var tweeNcor;
+              tweeNcor=createjs.Tween.get(CKey, {loop: true})
+              .to({alpha:1},200)
+              .to({alpha:0.2},400)
+              .to({alpha:1},200);
+              var btn1 = createButton("キャンセル", 80, 40);
+                btn1.x = 710;
+                btn1.y = 440;
+                ponkanmap.addChild(btn1)
+                btn1.addEventListener("click",{card:1,handleEvent:SkillBt});
+              cLock=4;
+            }
     }
     }
     };//specialskill
@@ -12959,6 +13037,38 @@ if(opLock==0 && gamestate ==1){
       cx2.fillText("非リーチ時はドラを,", 635, 310);
       cx2.fillText("ランダムにドローする.", 635, 330);
     }else if(p==8){
+      cx2.font = "bold 15px Arial";
+      cx2.fillText("ウォープレリュード", 635, 130);
+      cx2.font = "14px Arial";
+      cx2.fillText("連続で和了するほど,", 635, 150);
+      cx2.fillText("初手で同じラインの", 635, 170);
+      cx2.fillText("パイが入りやすくなる.", 635, 190);
+      cx2.fillText("(他の人が和了すると,", 635, 210);
+      cx2.fillText("効果はリセットされる)", 635, 230);
+      cx2.font = "bold 15px Arial";
+      cx2.fillText("克己-強", 635, 250);
+      cx2.font = "14px Arial";
+      cx2.fillText("MP消費:2ゲージ", 635, 270);
+      cx2.fillText("リーチ時にMPを消費し", 635, 290);
+      cx2.fillText("自動的に発動する.", 635, 310);
+      cx2.fillText("ウォープレリュードの", 635, 330);
+      cx2.fillText("効果を延長する.", 635, 350);
+      }else if(p==9){
+      cx2.font = "bold 15px Arial";
+      cx2.fillText("量子化", 635, 130);
+      cx2.font = "14px Arial";
+      cx2.fillText("常時, ポンをした際の", 635, 150);
+      cx2.fillText("食い下がりが", 635, 170);
+      cx2.fillText("2翻から1翻に減る.", 635, 190);
+      cx2.font = "bold 15px Arial";
+      cx2.fillText("リバースサークル", 635, 210);
+      cx2.font = "14px Arial";
+      cx2.fillText("MP消費:1ゲージ", 635, 230);
+      cx2.fillText("逆転の空間を作り出し", 635, 250);
+      cx2.fillText("その局の間,", 635, 270);
+      cx2.fillText("パイを切る順序が", 635, 290);
+      cx2.fillText("逆向きになる.", 635, 310);
+    }else if(p==10){
       cx2.font = "bold 15px Arial";
       cx2.fillText("万能ニーシャ", 635, 130);
       cx2.font = "14px Arial";
