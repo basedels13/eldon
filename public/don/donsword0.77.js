@@ -53,6 +53,41 @@ window.onload = function(){
     });
   })();
   //
+    (function () {
+    var wait = 1500,
+      standby = true,
+      command = ["d","e","b","u","g","ArrowUp","ArrowUp"],
+      length = command.length,
+      index = 0,
+      timer = null;  
+    document.addEventListener('keydown', function (ev) {
+      if(gamestate==10 && pagestate==-1){
+      // タイマーのリセット
+      clearTimeout(timer);
+      // コマンドの確認
+      if (standby && ev.key === command[index]) {
+        index++;
+        if (index >= length) {
+          standby = false;  // 処理中にコマンドを受け付けないようにする
+          index = 0;  // コマンドリセット
+          if(!debugmode){debugmode=true;}else{debugmode=false}
+          if(debugmode){titletext="v1.01/Click to START　でばっぐも～ど"}else{titletext="v1.01/Click to START"};
+          se17.play();
+          handleComplete();
+          standby = true;
+        } else {
+          // 一定時間入力がなかったらリセット
+          timer = setTimeout(function () {
+            index = 0;
+          }, wait);
+        }
+      } else {
+        // コマンドが間違っていたらリセット
+        index = 0;
+      }
+    }
+    });
+  })();
   //自分自身の情報を入れる箱
   var IAM = {
     token: null,    // 戸別管理用のトークン
@@ -324,8 +359,9 @@ window.onload = function(){
   .to({alpha:1},200);
   tweeNcor.paused=true;
   CorsorKey.alpha=0;
-  var Clvup = new createjs.Bitmap("don/Don_fever.png");
+  var Clvup = new createjs.Bitmap("don/Don_Fight.png");
   Clvup.alpha=0;
+  Clvup.scale=3;
   stage.addChild(Clvup);
   var Dlvup = new createjs.Bitmap("don/Don_aurus.png");
   Dlvup.alpha=0;
@@ -386,6 +422,7 @@ window.onload = function(){
   var Bufflist =new Array(0,[],[],[],[])
   var mode=0
   var musicnum=0
+  var musictemp=0;//ランダム再生時
   var musicset=new Array(0,0,0);
   //通常時、自分の立直時、オーラス時
   var musicrandom=[[1,2,5,6,7],[3,8,9,11],[4,10,12]];
@@ -944,7 +981,7 @@ window.onload = function(){
   //src:"don/tukkomi1.mp3",
   var se18 = new Howl({
     src:"don/Impact09-1.mp3",
-    volume: 0.4,
+    volume: 0.7,
     });
   var se19 = new Howl({
     src:"don/Single_Accent04-3.mp3",
@@ -3174,7 +3211,7 @@ function NameChange(){
         break;
       case 2:
         //フリーバトル
-          pagestate=-3;
+          pagestate=3;
           se5.play();
           field.addChild(menu_solo);
         break;
@@ -4748,6 +4785,37 @@ if(opLock==0 && gamestate ==1){
           .to({scale:1,x:0,y:0,alpha:1},150,createjs.Ease.backOut)
           .wait(1000)
           .to({scale:1.5,x:-200,y:-150,alpha:0},250,createjs.Ease.backOut);
+        }else if(skillusage2[5]==0){
+          var ty=new createjs.Text("第"+(skillusage2[0])+"局",  "32px 'bold Century Gothic'", "#fff0f6");
+          ty.x=360;
+          ty.y=340;
+          ty.outline=5;
+          field.addChild(t);
+          var tx=new createjs.Text("第"+(skillusage2[0])+"局",  "32px 'bold Century Gothic'", "#e32753");
+          tx.x=360;
+          tx.y=340;
+          stage.addChild(ty);
+          stage.addChild(tx);
+          createjs.Tween.get(ty)
+          .to({x:360,alpha:0.8},50,createjs.Ease.backOut)
+          .wait(700)
+          .to({x:380,alpha:0},500,createjs.Ease.backOut)
+          createjs.Tween.get(tx)
+          .to({x:360,alpha:1},50,createjs.Ease.backOut)
+          .wait(700)
+          .to({x:380,alpha:0},500,createjs.Ease.backOut)
+          .call(next);
+          Clvup.alpha=0;
+          Clvup.x=160;
+          Clvup.y=100;
+          createjs.Tween.get(Clvup)
+          .to({x:180,alpha:1},160,createjs.Ease.backOut)
+          .wait(700)
+          .to({x:210,alpha:0},300,createjs.Ease.backOut);
+          function next(){
+            stage.removeChild(tx);
+            stage.removeChild(ty);
+          }
         }
         field.addChild(t);
         //music
@@ -4758,7 +4826,9 @@ if(opLock==0 && gamestate ==1){
           }else{
             musicnum=musicset[0]
           }
-          musicStart(musicnum);
+          if(musicnum!==musictemp){
+            musicStart(musicnum);
+          }
         }else if(auras==1 && musicset[2]!==musicnum){
           if(musicset[2]==0){
             //曲の抽選は最初だけ
@@ -4989,6 +5059,7 @@ if(opLock==0 && gamestate ==1){
         opLock=0;
         raidscore=[0,0,0,0,0];
         Reverse = false;
+        if(debugmode){Reverse = true;}
         //ポンポポン
         ponsw=[0,0,0,0,0]
         poncpu=[0,Ponrate,Ponrate,Ponrate,Ponrate]
@@ -5152,7 +5223,8 @@ if(opLock==0 && gamestate ==1){
         }
         if(chara[1]==8 && skillusage2[1]>0){
           console.log("ELE 1")
-          for(var i=0;i<skillusage2[1]+2;i++){
+          for(var i=0;i<skillusage2[1]+1;i++){
+            if(i>=7){break};
           var R=Math.floor(Math.random()*4);
           var A=deck.findIndex(value=>(value%4==R))
           if(R!==-1){
@@ -5163,7 +5235,8 @@ if(opLock==0 && gamestate ==1){
         }
         if(chara[2]==8 && skillusage2[2]>0){
           console.log("ELE 2")
-          for(var i=0;i<skillusage2[2]+2;i++){
+          for(var i=0;i<skillusage2[2]+1;i++){
+            if(i>=7){break};
           var R=Math.floor(Math.random()*4);
           var A=deck.findIndex(value=>(value%4==R))
           if(R!==-1){
@@ -5174,7 +5247,8 @@ if(opLock==0 && gamestate ==1){
         }
         if(chara[3]==8 && skillusage2[3]>0){
           console.log("ELE 3")
-          for(var i=0;i<skillusage2[3]+2;i++){
+          for(var i=0;i<skillusage2[3]+1;i++){
+            if(i>=7){break};
           var R=Math.floor(Math.random()*4);
           var A=deck.findIndex(value=>(value%4==R))
           if(R!==-1){
@@ -5185,7 +5259,8 @@ if(opLock==0 && gamestate ==1){
         }
         if(chara[4]==8 && skillusage2[4]>0){
           console.log("ELE 4")
-          for(var i=0;i<skillusage2[4]+2;i++){
+          for(var i=0;i<skillusage2[4]+1;i++){
+            if(i>=7){break};
           var R=Math.floor(Math.random()*4);
           var A=deck.findIndex(value=>(value%4==R))
           if(R!==-1){
@@ -5214,7 +5289,6 @@ if(opLock==0 && gamestate ==1){
         hand4.sort(compareFunc);
         //積み込み
         //if(debugmode){hand1=[60,61,62,63,64,66,67,68]};
-        if(debugmode){Reverse=true};
         //1番目の配列は上がり判定に使用
         hand1.unshift(-1)
         hand2.unshift(-1)
@@ -5248,6 +5322,7 @@ if(opLock==0 && gamestate ==1){
   };
   function musicStart(num){
     if(debugmode){console.log('musicStart',num,mute)}
+    musictemp=musicnum;
     if( mute=="ON" ){
       Bgm.stop();
     switch (num){
@@ -5939,151 +6014,34 @@ if(opLock==0 && gamestate ==1){
           ManaBreak=0};
         //一般化
         //turn 0 1 2 3 <-> 1 2 3 4
+        if(rorder[1]==1 && turn !==1){rorder[1]=0}
+        if(rorder[2]==1 && turn !==2){rorder[2]=0}
+        if(rorder[3]==1 && turn !==3){rorder[3]=0}
+        if(rorder[4]==1 && turn !==4){rorder[4]=0}
         for(var i=0;i<3;i++){
           if(Reverse){turn -=1;}else{turn +=1};
           if(turn>=4){turn=0};
           if(turn<0){turn=3};
-          var Freeze=Buff[turn+1].filter(value=>value==6);
+          if(debugmode){console.log(turn)};
+          var Flame=Buff[turn+1].findIndex(value=>value==5);
+          if(Flame>=0){Buff[turn+1].splice(Flame,1)}
+          var Freeze=Buff[turn+1].findIndex(value=>value==6);
           var Ended=Buff[turn+1].filter(value=>value==11);
-          if(Freeze.length>0 || Ended.length>0 || LP[turn+1]<0){
-            if(Freeze.length>0){Buff[turn+1].splice(F,1)}
-            ctl[turn]=0;
+          if(Freeze>=0 || Ended.length>0 || LP[turn+1]<0){
+            if(Freeze>=0){Buff[turn+1].splice(Freeze,1)}
+            ctl[turn+1]=0;
           }else{
+            ctl[turn+1]=0;
             break;
           }
         }
-        if(rorder[1]==1){rorder[1]=0}
-        if(rorder[2]==1){rorder[2]=0}
-        if(rorder[3]==1){rorder[3]=0}
-        if(rorder[4]==1){rorder[4]=0}
-      function Old(){
-        switch(turn){
-          case 1:
-            var Freeze=Buff[2].filter(value=>value==6 || value==11)
-            if(Freeze.length>0 || LP[2]<0){
-              var F=Buff[2].findIndex(value=>value==6)
-              if(F!==-1){
-              Buff[2].splice(F,1)
-              }
-              if(Reverse){turn -=1;}else{turn +=1;ctl[3]=0;};
-              Freeze=Buff[3].filter(value=>value==6 || value==11)
-              if(Freeze.length>0 || LP[3]<0){
-                var F=Buff[3].findIndex(value=>value==6)
-                if(F!==-1){
-                Buff[3].splice(F,1)
-                }
-                if(Reverse){turn -=1;ctl[2]=0;}else{turn +=1;ctl[4]=0;};
-                Freeze=Buff[4].filter(value=>value==6 || value==11)
-                if(Freeze.length>0 || LP[4]<0){
-                  var F=Buff[4].findIndex(value=>value==6)
-                  if(F!==-1){
-                  Buff[4].splice(F,1)
-                  }
-                  if(Reverse){turn -=1;ctl[3]=0;}else{turn +=1};
-                }
-              }}
-              if(rorder[2]==1){rorder[2]=0}
-              if(rorder[3]==1){rorder[3]=0}
-              if(rorder[4]==1){rorder[4]=0}
-            break;
-          case 2:
-            var Freeze=Buff[3].filter(value=>value==6 || value==11)
-            if(Freeze.length>0 || LP[3]<0){
-              var F=Buff[3].findIndex(value=>value==6)
-              if(F!==-1){
-              Buff[3].splice(F,1)
-              }
-              if(Reverse){turn -=1;ctl[2]=0;}else{turn +=1;ctl[4]=0;};
-              Freeze=Buff[4].filter(value=>value==6 || value==11)
-              if(Freeze.length>0 || LP[4]<0){
-                var F=Buff[4].findIndex(value=>value==6)
-                if(F!==-1){
-                Buff[4].splice(F,1)
-                }
-                if(Reverse){turn -=1;ctl[3]=0;}else{turn +=1};
-              Freeze=Buff[1].filter(value=>value==6 || value==11)
-              if(Freeze.length>0 || LP[1]<0){
-                var F=Buff[1].findIndex(value=>value==6)
-                if(F!==-1){
-                Buff[1].splice(F,1)
-                }
-                if(Reverse){turn -=1;ctl[4]=0;}else{turn +=1;ctl[2]=0;};
-                }
-              }}
-              if(rorder[1]==1){rorder[1]=0}
-              if(rorder[3]==1){rorder[3]=0}
-              if(rorder[4]==1){rorder[4]=0}
-            break;
-          case 3:
-            var Freeze=Buff[4].filter(value=>value==6 || value==11)
-            if(Freeze.length>0 || LP[4]<0){
-              var F=Buff[4].findIndex(value=>value==6)
-              if(F!==-1){
-              Buff[4].splice(F,1)
-              }
-              turn=0;
-              Freeze=Buff[1].filter(value=>value==6 || value==11)
-              if(Freeze.length>0 || LP[1]<0){
-                var F=Buff[1].findIndex(value=>value==6)
-                if(F!==-1){
-                Buff[1].splice(F,1)
-                }
-                if(Reverse){turn -=1;ctl[3]=0;}else{turn +=1;ctl[2]=0;};
-                Freeze=Buff[2].filter(value=>value==6 || value==11)
-            if(Freeze.length>0 || LP[2]<0){
-              var F=Buff[2].findIndex(value=>value==6)
-              if(F!==-1){
-              Buff[2].splice(F,1)
-              }
-              if(Reverse){turn -=1;}else{turn +=1;ctl[3]=0;};
-                }
-              }}
-              if(rorder[1]==1){rorder[1]=0}
-              if(rorder[2]==1){rorder[2]=0}
-              if(rorder[4]==1){rorder[4]=0}
-            break;
-          case 4:
-              if(Reverse){turn -=1;}else{turn =0};
-              var Freeze=Buff[1].filter(value=>value==6 || value==11)
-              if(Freeze.length>0 || LP[1]<0){
-                var F=Buff[1].findIndex(value=>value==6)
-                if(F!==-1){
-                Buff[1].splice(F,1)
-                }
-                if(Reverse){turn -=1;ctl[3]=0;}else{turn +=1;ctl[2]=0;};
-                Freeze=Buff[2].filter(value=>value==6 || value==11)
-            if(Freeze.length>0 || LP[2]<0){
-              var F=Buff[2].findIndex(value=>value==6)
-              if(F!==-1){
-              Buff[2].splice(F,1)
-              }
-              if(Reverse){turn -=1;ctl[1]=0;}else{turn +=1;ctl[3]=0;};
-              Freeze=Buff[3].filter(value=>value==6 || value==11)
-            if(Freeze.length>0 || LP[3]<0){
-              var F=Buff[3].findIndex(value=>value==6)
-              if(F!==-1){
-              Buff[3].splice(F,1)
-              }
-              if(Reverse){turn -=1;ctl[2]=0;}else{turn +=1;ctl[4]=0;};
-              }
-            }}
-              if(rorder[1]==1){rorder[1]=0}
-              if(rorder[3]==1){rorder[3]=0}
-              if(rorder[2]==1){rorder[2]=0}
-            break;
-          default:
-            console.log(turn,"turnchecker error!")
-            break;
-        }
-        if(turn>=4){turn=0};
-        if(turn<0){turn=3};
         if(pvpmode==1){
           for(var i=0;i<MEMBER.length;i++){
             MEMBER[i].turnflag=0;
           }
           MEMBER[turn].turnflag=1;
         }
-      };
+
         console.log(turn,Ronturn)
         Buffdraw();
         turnrole();
@@ -6371,6 +6329,7 @@ if(opLock==0 && gamestate ==1){
           drawDP(player);
           skillusage[player]=1;
           skillswitch[player]=0;
+          skillusage2[player]+=1;
           };
         }
         ReachAnimation(player);
@@ -11916,6 +11875,7 @@ if(opLock==0 && gamestate ==1){
               s.graphics.beginFill("rgba(20,20,20,0.5)");
               s.graphics.drawRect(10, 100, 700, 400);
               field.addChild(s);
+              s.addEventListener("click", {handleEvent:Menu});
               var t = new createjs.Text("TIME UP", "36px 'Century Gothic'", "white");
               t.x=320;
               t.y=300;
@@ -12298,21 +12258,30 @@ if(opLock==0 && gamestate ==1){
         }
     if(chara[p]==6){
       C.sourceRect={x:0,y:0,width:400,height:600};
+      C.x=-200
+      C.y=0;
+      C.scaleX=14/8;
+      C.scaleY=2;
+      Container.addChild(C);
+      createjs.Tween.get(C)
+      .to({x:400, scaleX:1, scaleY:1},200, createjs.Ease.cubicInOut)
+      .wait(760)
+      .to({x:-400, scaleX:1.1, scaleY:1.1,alpha:0.5},150);
     }else{
-      C.sourceRect={x:400,y:0,width:400,height:600}
+      C.sourceRect={x:0,y:0,width:800,height:600}
+      C.x=-600
+      C.y=0;
+      C.scaleX=14/8;
+      C.scaleY=2;
+      Container.addChild(C);
+      createjs.Tween.get(C)
+      .to({x:0, scaleX:1, scaleY:1},200, createjs.Ease.cubicInOut)
+      .wait(760)
+      .to({x:-800, scaleX:1.1, scaleY:1.1,alpha:0.5},150);
     }
-    C.x=-200
-    C.y=0;
-    C.scaleX=14/8;
-    C.scaleY=2;
-    Container.addChild(C);
-    createjs.Tween.get(C)
-    .to({x:400, scaleX:1, scaleY:1},200, createjs.Ease.cubicInOut)
-    .wait(800)
-    .to({x:-400, scaleX:1.1, scaleY:1.1,alpha:0.5},150);
     createjs.Tween.get(Container)
     .to({alpha: 1},60)
-    .wait(800)
+    .wait(820)
     .to({alpha: 0},100)
     .call(next);
     var t = new createjs.Text(skilltext1, "32px 'Century Gothic'", "#05ff9b");
@@ -12803,8 +12772,8 @@ if(opLock==0 && gamestate ==1){
     .to({x: 120,alpha:1}, 200, createjs.Ease.cubicInOut)
       }
     field.addChild(e10);
-    var Ary=[500,500,500,500,480,500,500,400];
-    var Ary2=[50,120,50,50,70,50,70,50];
+    var Ary=[500,500,500,500,480,500,500,400,500,500];
+    var Ary2=[50,120,50,50,70,50,70,50,80,50];
     for(var i=0;i<3;i++){
     if(fool){
       var e10 = new createjs.Bitmap(queue.getResult(chrimgR_src[LPresult[2-i].chara]));          
@@ -13626,7 +13595,7 @@ if(opLock==0 && gamestate ==1){
       se15.volume(0.3*sBar);
       se16.volume(0.3*sBar);
       se17.volume(0.3*sBar);
-      se18.volume(0.4*sBar);
+      se18.volume(0.7*sBar);
       se19.volume(0.6*sBar);
       jingle.volume(0.3*sBar);
       jingle2.volume(0.3*sBar);
