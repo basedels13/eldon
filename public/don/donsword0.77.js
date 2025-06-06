@@ -1129,7 +1129,15 @@ function handleComplete() {
   field.removeAllChildren();
   loadtitle()
 }
-canvas5.onmousedown = mouseDownListener;
+//mousedown, mouseup
+if(typeof window.ontouchstart === "undefined"){
+  canvas5.onmousedown = mouseDownListener;
+  canvas5.onmouseup = mouseUpListener;
+}else{
+  canvas5.ontouchstart = mouseDownListener;
+  canvas5.ontouchend = mouseUpListener;
+}
+//canvas5.onmousedown = mouseDownListener;
 function mouseDownListener(e=-1) {
   createjs.Ticker.addEventListener("tick", MouseCircle);
   if(gamestate ==1 && cLock==1 && opLock>=0 && opLock !==2){
@@ -1137,7 +1145,7 @@ function mouseDownListener(e=-1) {
     mpmoving=true;
   }
 };
-canvas5.onmouseup = mouseUpListener;
+//canvas5.onmouseup = mouseUpListener;
 function mouseUpListener(e=-1) {
   if(mpmoving){
     mpmoving=false;
@@ -1801,7 +1809,7 @@ function menuMap(p=0){
       t.y=180;
       menu_solo.addChild(t);
       if(chara[0]==0){
-        var t = new createjs.Text("?おまかせ", "26px 'Century Gothic'", "black");
+        var t = new createjs.Text("✓おまかせ", "26px 'Century Gothic'", "black");
         }else{
         var t = new createjs.Text("　おまかせ", "26px 'Century Gothic'", "black");
       }
@@ -1809,29 +1817,29 @@ function menuMap(p=0){
       t.y=180;
       menu_solo.addChild(t);
       menu_solo_list.push(t);
-      var t = new createjs.Text("? "+LPlist[LP[0]], "24px 'Century Gothic'", "black");
+      var t = new createjs.Text("◀ "+LPlist[LP[0]], "24px 'Century Gothic'", "black");
       t.x=520;
       t.y=80;
       menu_solo.addChild(t);
       menu_solo_list.push(t);
-      var t = new createjs.Text("? "+chrlist[chara[1]], "24px 'Century Gothic'", "black");
+      var t = new createjs.Text("◀ "+chrlist[chara[1]], "24px 'Century Gothic'", "black");
       t.x=520;
       t.y=130;
       menu_solo.addChild(t);
       menu_solo_list.push(t);
-      var t = new createjs.Text(" ?", "24px 'Century Gothic'", "black");
+      var t = new createjs.Text(" ▶", "24px 'Century Gothic'", "black");
       t.x=670;
       t.y=80;
       menu_solo.addChild(t);
-      var t = new createjs.Text(" ?", "24px 'Century Gothic'", "black");
+      var t = new createjs.Text(" ▶", "24px 'Century Gothic'", "black");
       t.x=670;
       t.y=130;
       menu_solo.addChild(t);
-      var t = new createjs.Text(" ?", "24px 'Century Gothic'", "black");
+      var t = new createjs.Text(" ▶", "24px 'Century Gothic'", "black");
       t.x=670;
       t.y=350;
       menu_solo.addChild(t);
-      var Ary=[["ＣＰＵ１","ＣＰＵ２","ＣＰＵ３"],["? "+chrlist[chara[2]],"? "+chrlist[chara[3]],"? "+chrlist[chara[4]]],[" ?"," ?"," ?"]]
+      var Ary=[["ＣＰＵ１","ＣＰＵ２","ＣＰＵ３"],["◀ "+chrlist[chara[2]],"◀ "+chrlist[chara[3]],"◀ "+chrlist[chara[4]]],[" ▶"," ▶"," ▶"]]
      for(var i=0;i<Ary.length;i++){
       var t = new createjs.Text(Ary[0][i], "24px 'Century Gothic'", "black");
       t.x=390;
@@ -1854,7 +1862,7 @@ function menuMap(p=0){
       t.x=390;
       t.y=350;
       menu_solo.addChild(t);
-      var Ary=["　?禁止しない","　?プレイヤーのみ","　?全て禁止"]
+      var Ary=["　◀禁止しない","　◀プレイヤーのみ","　◀全て禁止"]
       //-1のときは禁止
       var t = new createjs.Text(Ary[-skillswitch[0]], "24px 'Century Gothic'", "black");
       t.x=460;
@@ -1956,8 +1964,8 @@ function menuMap(p=0){
       cx2.fillText("右クリック　何もしない",90,130);
       }
       cx2.fillText("CPUのポン頻度",100,230);
-      cx2.fillText("?",120,260)
-      cx2.fillText("?",260,260)
+      cx2.fillText("◀",120,260)
+      cx2.fillText("▶",260,260)
       var A=(1-Ponrate)*5;
       for (var i=0;i<A;i++){
         cx2.fillText("■",140+i*24,260);
@@ -2106,12 +2114,12 @@ function menuMap(p=0){
       cx2.fillText(musiclist[musicset[1]],560,330)
       cx2.fillText(musiclist[musicset[2]],560,400)
       cx2.textAlign = "start";
-      cx2.fillText("? ",380,260)
-      cx2.fillText("? ",380,330)
-      cx2.fillText("? ",380,400)
-      cx2.fillText(" ?",720,260)
-      cx2.fillText(" ?",720,330)
-      cx2.fillText(" ?",720,400)         
+      cx2.fillText("◀ ",380,260)
+      cx2.fillText("◀ ",380,330)
+      cx2.fillText("◀ ",380,400)
+      cx2.fillText(" ▶",720,260)
+      cx2.fillText(" ▶",720,330)
+      cx2.fillText(" ▶",720,400)         
       Cbt=canvas2.toDataURL();
       Cbutton = new createjs.Bitmap(Cbt);
       menu_setting.addChild(Cbutton);
@@ -2973,7 +2981,7 @@ var rect = new createjs.Shape();
       t.y=10;
       menu_duel.addChild(t);
       if(IsHost(IAM.room)){
-        var Ary=["ルール","?"+LP_PVP.Rule[LP_PVP.Rule[0]]+"?",'持ち点',"?"+LP_PVP.LP[LP_PVP.LP[0]]+"?",'東風/半荘',"?"+LP_PVP.Length[LP_PVP.Length[0]]+"?",'満貫打ち止め',"?"+LP_PVP.Block[LP_PVP.Block[0]]+"?",'スキル',"?"+LP_PVP.Skill[LP_PVP.Skill[0]]+"?"]
+        var Ary=["ルール","◀"+LP_PVP.Rule[LP_PVP.Rule[0]]+"▶",'持ち点',"◀"+LP_PVP.LP[LP_PVP.LP[0]]+"▶",'東風/半荘',"◀"+LP_PVP.Length[LP_PVP.Length[0]]+"▶",'満貫打ち止め',"◀"+LP_PVP.Block[LP_PVP.Block[0]]+"▶",'スキル',"◀"+LP_PVP.Skill[LP_PVP.Skill[0]]+"▶"]
       }else{
         var Ary=["ルール",LP_PVP.Rule[LP_PVP.Rule[0]],'持ち点',LP_PVP.LP[LP_PVP.LP[0]],'東風/半荘',LP_PVP.Length[LP_PVP.Length[0]],'満貫打ち止め',LP_PVP.Block[LP_PVP.Block[0]],'スキル',LP_PVP.Skill[LP_PVP.Skill[0]]]
       }
@@ -3587,17 +3595,17 @@ function NameChange(){
           if(mouseX >510 && mouseX <560 && mouseY >80 && mouseY <110){
           se3.play();
           if(LP[0]==0){LP[0]=LPlist.length-1}else{LP[0]-=1}
-          menu_solo_list[1].text="? "+LPlist[LP[0]]
+          menu_solo_list[1].text="◀ "+LPlist[LP[0]]
           }
           if(mouseX >670 && mouseX <705 && mouseY >80 && mouseY <110){
             se3.play();
             if(LP[0]==LPlist.length-1){LP[0]=0}else{LP[0]+=1}
-            menu_solo_list[1].text="? "+LPlist[LP[0]]
+            menu_solo_list[1].text="◀ "+LPlist[LP[0]]
             }
           if(mouseX >510 && mouseX <560 && mouseY >130 && mouseY <160){
             se3.play();
             if(chara[1]==0){chara[1]=HiddenChara}else{chara[1]-=1}
-            menu_solo_list[2].text="? "+chrlist[chara[1]]
+            menu_solo_list[2].text="◀ "+chrlist[chara[1]]
             menu_solo.removeChild(menu_solo_list[menu_solo_list.length-1]);
             menu_solo_list.pop();
             if(fool){
@@ -3615,7 +3623,7 @@ function NameChange(){
           if(mouseX >670 && mouseX <705 && mouseY >130 && mouseY <160){
             se3.play();
             if(chara[1]==HiddenChara){chara[1]=0}else{chara[1]+=1}
-            menu_solo_list[2].text="? "+chrlist[chara[1]]
+            menu_solo_list[2].text="◀ "+chrlist[chara[1]]
             menu_solo.removeChild(menu_solo_list[menu_solo_list.length-1]);
             menu_solo_list.pop();
             if(fool){
@@ -3634,7 +3642,7 @@ function NameChange(){
             se3.play();
             if(chara[0]==0){chara[0]=1}else{chara[0]=0};
             if(chara[0]==0){
-              menu_solo_list[0].text="?おまかせ"
+              menu_solo_list[0].text="✓おまかせ"
               for(var i=0;i<6;i++){menu_solo_list[i+3].alpha=0.4};
               }else{
               menu_solo_list[0].text="　おまかせ"
@@ -3644,49 +3652,49 @@ function NameChange(){
           if(mouseX >400 && mouseX <705 && mouseY >345 && mouseY <375){
             se3.play();
             if(skillswitch[0]==0){skillswitch[0]=-2}else{skillswitch[0]+=1};
-            var Ary=["　?禁止しない","　?プレイヤーのみ","　?全て禁止"]
+            var Ary=["　◀禁止しない","　◀プレイヤーのみ","　◀全て禁止"]
             menu_solo_list[9].text=Ary[-skillswitch[0]]
             }
           if(mouseX >670 && mouseX <705 && mouseY >230 && mouseY <260){
             if(chara[0]==1){
             se3.play();
             if(chara[2]==HiddenChara){chara[2]=0}else{chara[2]+=1}
-            menu_solo_list[3].text="? "+chrlist[chara[2]]
+            menu_solo_list[3].text="◀ "+chrlist[chara[2]]
             }
             }
           if(mouseX >670 && mouseX <705 && mouseY >270 && mouseY <300){
             if(chara[0]==1){
             se3.play();
             if(chara[3]==HiddenChara){chara[3]=0}else{chara[3]+=1}
-            menu_solo_list[5].text="? "+chrlist[chara[3]]
+            menu_solo_list[5].text="◀ "+chrlist[chara[3]]
             }
             }
           if(mouseX >670 && mouseX <705 && mouseY >310 && mouseY <340){
             if(chara[0]==1){
             se3.play();
             if(chara[4]==HiddenChara){chara[4]=0}else{chara[4]+=1}
-            menu_solo_list[7].text="? "+chrlist[chara[4]]
+            menu_solo_list[7].text="◀ "+chrlist[chara[4]]
             }
             }
             if(mouseX >510 && mouseX <560 && mouseY >230 && mouseY <260){
               if(chara[0]==1){
               se3.play();
               if(chara[2]==0){chara[2]=HiddenChara}else{chara[2]-=1}
-              menu_solo_list[3].text="? "+chrlist[chara[2]]
+              menu_solo_list[3].text="◀ "+chrlist[chara[2]]
               }
               }
             if(mouseX >510 && mouseX <560 && mouseY >270 && mouseY <300){
               if(chara[0]==1){
               se3.play();
               if(chara[3]==0){chara[3]=HiddenChara}else{chara[3]-=1}
-              menu_solo_list[5].text="? "+chrlist[chara[3]]
+              menu_solo_list[5].text="◀ "+chrlist[chara[3]]
               }
               }
             if(mouseX >510 && mouseX <560 && mouseY >310 && mouseY <340){
               if(chara[0]==1){
               se3.play();
               if(chara[4]==0){chara[4]=HiddenChara}else{chara[4]-=1}
-              menu_solo_list[7].text="? "+chrlist[chara[4]]
+              menu_solo_list[7].text="◀ "+chrlist[chara[4]]
               }
               }
         corsor();
@@ -4147,7 +4155,7 @@ function NameChange(){
         }
       }
       if(IsHost(IAM.room)){
-        var Ary=[LP_PVP.Rule[LP_PVP.Rule[0]]+"　"+LP_PVP.Length[LP_PVP.Length[0]]+"戦","持ち点 "+LP_PVP.LP[LP_PVP.LP[0]]+"　"+LP_PVP.Block[LP_PVP.Block[0]]+"　"+LP_PVP.Skill[LP_PVP.Skill[0]],"?"+LP_PVP.Rule[LP_PVP.Rule[0]]+"?","?"+LP_PVP.LP[LP_PVP.LP[0]]+"?","?"+LP_PVP.Length[LP_PVP.Length[0]]+"?","?"+LP_PVP.Block[LP_PVP.Block[0]]+"?","?"+LP_PVP.Skill[LP_PVP.Skill[0]]+"?"]
+        var Ary=[LP_PVP.Rule[LP_PVP.Rule[0]]+"　"+LP_PVP.Length[LP_PVP.Length[0]]+"戦","持ち点 "+LP_PVP.LP[LP_PVP.LP[0]]+"　"+LP_PVP.Block[LP_PVP.Block[0]]+"　"+LP_PVP.Skill[LP_PVP.Skill[0]],"◀"+LP_PVP.Rule[LP_PVP.Rule[0]]+"▶","◀"+LP_PVP.LP[LP_PVP.LP[0]]+"▶","◀"+LP_PVP.Length[LP_PVP.Length[0]]+"▶","◀"+LP_PVP.Block[LP_PVP.Block[0]]+"▶","◀"+LP_PVP.Skill[LP_PVP.Skill[0]]+"▶"]
       }else{
         var Ary=[LP_PVP.Rule[LP_PVP.Rule[0]]+"　"+LP_PVP.Length[LP_PVP.Length[0]]+"戦","持ち点 "+LP_PVP.LP[LP_PVP.LP[0]]+"　"+LP_PVP.Block[LP_PVP.Block[0]]+"　"+LP_PVP.Skill[LP_PVP.Skill[0]],LP_PVP.Rule[LP_PVP.Rule[0]],LP_PVP.LP[LP_PVP.LP[0]],LP_PVP.Length[LP_PVP.Length[0]],LP_PVP.Block[LP_PVP.Block[0]],LP_PVP.Skill[LP_PVP.Skill[0]]]
       }
@@ -10799,6 +10807,8 @@ if(opLock==0 && gamestate ==1){
     }
     function paiCut(){
     //クリックしてから捨て牌を描写してturnroleに繋げるところまで
+    mouseX=stage.mouseX*(1/stage.scaleX);
+    mouseY=stage.mouseY*(1/stage.scaleY);
     if(cLock==1){
       ///switch(this.card)
       ctl[1]=0
@@ -13486,7 +13496,7 @@ if(opLock==0 && gamestate ==1){
         var file=file_list[0];
         if(!file) return; // ファイルが無い場合
         if(pagestate!==1){
-          alert("?　セーブデータはメイン画面の状態で読み込んでください");
+          alert("❌　セーブデータはメインメニュー画面の状態で読み込んでください");
           button_read.value = "";
           return;
         }
@@ -13563,14 +13573,14 @@ if(opLock==0 && gamestate ==1){
     SEbuffer();
       jingle.seek(1);
       jingle.play();
-      PopAnm("?「"+Username+"」さんの　セーブデータを読み込みました",1200,500,35,30,55);
+      PopAnm("✅「"+Username+"」さんの　セーブデータを読み込みました",1200,500,35,30,55);
     console.log(Username,musicset);
     save_Local();
     pagestate=0;
     Menu();
     }  
     else{
-        alert("?　ファイルが異なります。");
+        alert("❌　ファイルが異なります。");
         button_read.value = "";
     }}});
     }
