@@ -440,7 +440,7 @@ window.onload = function(){
   var musiclist=new Array("ランダム","盲目のアストライア","Nine Jack","The Evil Sacrifice Archenemies","ロベリア","夜の迷宮の入口","決闘のテーマ","エルの樹の麓","リーチっぽい音楽","竜の道","ウォーリーの城メドレー","歎きの塔Phase3","狂乱のコンサート","リーチっぽい音楽R")
   var chrlist=new Array("名無しさん","エルス","アイシャ","レナ","レイヴン","イヴ","ラシェ","アラ","エリシス","エド")//"ラビィ"
   var chrimg_src= new Array("don/Don_chara0.png","don/Don_chara1.png","don/Don_chara2.png","don/Don_chara3.png","don/Don_chara4.png","don/Don_chara5.png","don/Don_chara6.png","don/Don_chara7.png","don/Don_chara8.png","don/Don_chara9.png");
-  var chrimgR_src= new Array("don/Don_chara0.png","don/Don_chara1R.png","don/Don_chara2R.png","don/Don_chara3R.png","don/Don_chara4R.png","don/Don_chara5R.png","don/Don_chara6R.png","don/Don_chara7R.png","don/Don_chara8.png","don/Don_chara9R.png");
+  var chrimgR_src= new Array("don/Don_chara0.png","don/Don_chara1R.png","don/Don_chara2R.png","don/Don_chara3R.png","don/Don_chara4R.png","don/Don_chara5R.png","don/Don_chara6R.png","don/Don_chara7R.png","don/Don_chara8R.png","don/Don_chara9R.png");
   //説明用
   var epic_src =new Array("don/elstudio_bg1.png","don/Don_epic1.png","don/Don_epic2.png","don/Don_epic3.png","don/Don_epic6.png","don/Don_ss11.png","don/Don_epic4.png","don/Don_epic5.png");
   //パイの裏
@@ -986,6 +986,10 @@ window.onload = function(){
   var se19 = new Howl({
     src:"don/Single_Accent04-3.mp3",
     volume: 0.6,
+    });
+  var se20 = new Howl({
+    src:"don/slash1.mp3",
+    volume: 0.25,
     });
   const jingle =new Howl({
       src: "don/Don_jingle.mp3",
@@ -3554,7 +3558,7 @@ function NameChange(){
     .beginFill("rgba(20,20,20,0.7)")
     .drawRect(410, 210, 350, 240);
     field.addChild(rect);
-    var Ary=[500,500,500,500,500,500,500,400,500,500];
+    var Ary=[500,500,500,500,500,500,500,400,430,460];
     var Ary2=[0,50,0,0,60,0,60,0,80,50];
         e10.sourceRect={x:Ary[chara[1]],y:Ary2[chara[1]]+45,width:300,height:215}
     e10.x=40;
@@ -4700,6 +4704,120 @@ if(opLock==0 && gamestate ==1){
         }
       }
     }
+    function opening(){
+      //vs表示する
+        cx2.clearRect(0,0,800,600);
+        field.removeAllChildren();
+      var rect = new createjs.Shape();
+        rect.graphics
+      .beginFill("rgb(15, 37, 24)").drawRect(0, 0, 800, 600);
+    field.addChild(rect);
+    var ContainerA = new createjs.Container();
+    field.addChild(ContainerA);
+    var ContainerB = new createjs.Container();
+    field.addChild(ContainerB);
+      var rect = new createjs.Shape();
+        rect.graphics
+      .beginFill("rgb(241, 241, 241)").drawRect(198, 0, 4, 600).drawRect(398, 0, 4, 600).drawRect(598, 0, 4, 600);
+    field.addChild(rect);
+      var rect = new createjs.Shape();
+        rect.graphics
+      .beginRadialGradientFill(["rgba(235, 33, 33, 0.7)", "rgba(92, 14, 14, 0.73)"], [0,  1], 50, 100, 0, 50, 100, 200)
+      .drawRect(0, 0, 200, 600);
+    ContainerA.addChild(rect);
+      var rect = new createjs.Shape();
+        rect.graphics
+      .beginRadialGradientFill(["rgba(50, 77, 226,0.7)", "rgba(27, 43, 134, 0.8)"], [0,  1], 250, 160, 0, 250, 160, 200)
+      .beginFill().drawRect(200, 0, 200, 600);
+    ContainerB.addChild(rect);
+      var rect = new createjs.Shape();
+        rect.graphics
+      .beginRadialGradientFill(["rgba(36, 202, 105,0.7)", "rgba(17, 128, 63, 0.75)"], [0,  1], 450, 380, 0, 450, 380, 200)
+      .drawRect(400, 0, 200, 600);
+    ContainerA.addChild(rect);
+        var rect = new createjs.Shape();
+        rect.graphics
+      .beginRadialGradientFill(["rgba(224, 194, 60,0.7)", "rgba(177, 102, 33, 0.7)"], [0,  1], 650, 440, 0, 650, 440, 200)
+      .drawRect(600, 0, 200, 600);
+    ContainerB.addChild(rect);
+    //
+    if(pvpmode==1){
+        var Ary=[0,Username,MEMBER[1].name,MEMBER[2].name,MEMBER[3].name]          
+        }else{
+        var Ary=[0,Username,"CPU1","CPU2","CPU3"]
+        }
+    for(var i=1;i<5;i++){
+      var e1;
+    if(fool){
+        e1 = new createjs.Bitmap(queue.getResult(chrimgR_src[chara[i]]));          
+        }else{
+        e1 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[i]]));
+        }
+        e1.sourceRect={x:500,y:0,width:200,height:600}
+        e1.x=200*(i-1);
+        var t1 = new createjs.Text(Ary[i], "32px 'Century Gothic'", "black");
+          t1.x=40+200*(i-1);
+          t1.y=500;
+          t1.outline=6;
+          t1.rotation=6;
+        var t = new createjs.Text(Ary[i], "32px 'Century Gothic'", "white");
+          t.x=40+200*(i-1);
+          t.y=500;
+          t.outline=2;
+          t.rotation=6;
+      if(i%2==1){
+        ContainerA.addChild(e1);
+        ContainerA.addChild(t1);
+        ContainerA.addChild(t);
+      }else{
+        ContainerB.addChild(e1);
+        ContainerB.addChild(t1);
+        ContainerB.addChild(t);
+      }
+    }
+        var ty=new createjs.Text("対局開始",  "46px 'bold Century Gothic'", "#c5faeb");
+          ty.x=300;
+          ty.y=280;
+          ty.outline=7;
+          ty.scale=1.2
+        var tx=new createjs.Text("対局開始",  "46px 'bold Century Gothic'", "#2763e3");
+          tx.x=300;
+          tx.y=280;
+          tx.scale=1.2
+          field.addChild(ty);
+          field.addChild(tx);
+          createjs.Tween.get(ty)
+          .to({scale:1,x:300,alpha:0.7},250,createjs.Ease.backOut)
+          .wait(1200)
+          .to({scale:1.1,x:360,alpha:0},500,createjs.Ease.backOut)
+          createjs.Tween.get(tx)
+          .to({scale:1,x:300,alpha:1},250,createjs.Ease.backOut)
+          .wait(1200)
+          .to({scale:1.1,x:280,alpha:0},500,createjs.Ease.backOut)
+    ContainerA.y=-600;
+    ContainerB.y=600;
+    createjs.Tween.get(ContainerA)
+        .to({y:0, alpha: 1},250, createjs.Ease.cubicInOut) 
+        .wait(1800)
+    createjs.Tween.get(ContainerB)
+        .to({y:0, alpha: 1},250, createjs.Ease.cubicInOut) 
+        .wait(1800)
+        .call(TodeckHandler);
+    se20.play();
+    createjs.Tween.get(rect)
+    .wait(300)
+    .call(SE);
+    function SE(){se17.play();}
+    function TodeckHandler(){
+      if(pvpmode==0){
+        deckHandler();
+      }else if(pvpmode==1){
+        if(IsHost(IAM.room)){
+          deckHandler();
+        }
+      }
+    }
+    }
       function deckHandler(){
         //ゲームスタート時の配牌と画面
         console.log('deckhandler')
@@ -4790,7 +4908,6 @@ if(opLock==0 && gamestate ==1){
           ty.x=360;
           ty.y=340;
           ty.outline=5;
-          field.addChild(t);
           var tx=new createjs.Text("第"+(skillusage2[0])+"局",  "32px 'bold Century Gothic'", "#e32753");
           tx.x=360;
           tx.y=340;
@@ -4863,7 +4980,7 @@ if(opLock==0 && gamestate ==1){
       field.addChild(t);
       };
         parentY =400
-        var Ary=[500,500,500,500,500,500,500,400,500,500];
+        var Ary=[500,500,500,500,500,500,500,400,430,460];
         var Ary2=[0,50,0,0,60,0,60,0,80,50];
         if(fool){
           e11 = new createjs.Bitmap(queue.getResult(chrimgR_src[chara[1]]));          
@@ -6568,17 +6685,15 @@ if(opLock==0 && gamestate ==1){
         var R=Math.floor(Math.random()*(1+HiddenChara))
         chara[i]=R;
         if(debugmode){
-          chara[1]=8;
+          chara[1]=9;
           };
       }
     }
     //parent=0;//for debug
     gamestate =1
-    if( mute=="ON" ){
-      Bgm.playMusic();
-        }
     console.log('setup',timevalue)
-    deckHandler();
+    opening();
+    //deckHandler();
     };
     socket.on("member",(data)=>{
       //メンバーをコピー
@@ -6604,13 +6719,10 @@ if(opLock==0 && gamestate ==1){
       console.log(chara);
       parent=MEMBER.findIndex(value=>value.turnflag==1);
       gamestate =1
-      if( mute=="ON" ){
-        Bgm.playMusic();
-        }
-    if(IsHost(IAM.room)){
+    //if(IsHost(IAM.room)){
       console.log('setup for pvp')
-      deckHandler();
-    }
+      opening();
+      //deckHandler();
     });
     socket.on("deck-handler", (data)=>{
       if(!IsHost(IAM.room)){
@@ -6662,6 +6774,7 @@ if(opLock==0 && gamestate ==1){
       console.log(hand3);
       console.log(hand4);
       }
+      //opening();
       deckHandler();
       }
         })
@@ -11653,7 +11766,6 @@ if(opLock==0 && gamestate ==1){
       var bgUp = new createjs.Shape();
       bgUp.graphics
       .beginRadialGradientFill([keyColorB, keyColorA, "rgba(255, 255, 255, 0)"], [0, 0.8, 1], width/2, width/2, 0, width/2, width/2, width)
-      //
       .drawCircle(width/2, width/2, width)
       button.addChild(bgUp);
       bgUp.visible = true; // 表示する
@@ -12772,7 +12884,7 @@ if(opLock==0 && gamestate ==1){
     .to({x: 120,alpha:1}, 200, createjs.Ease.cubicInOut)
       }
     field.addChild(e10);
-    var Ary=[500,500,500,500,480,500,500,400,500,500];
+    var Ary=[500,500,500,500,480,500,500,400,430,460];
     var Ary2=[50,120,50,50,70,50,70,50,80,50];
     for(var i=0;i<3;i++){
     if(fool){
@@ -13574,6 +13686,7 @@ if(opLock==0 && gamestate ==1){
         se17.volume(0);
         se18.volume(0);
         se19.volume(0);
+        se20.volume(0);
         jingle.volume(0);
         jingle2.volume(0);
         jingle3.volume(0);
@@ -13597,6 +13710,7 @@ if(opLock==0 && gamestate ==1){
       se17.volume(0.3*sBar);
       se18.volume(0.7*sBar);
       se19.volume(0.6*sBar);
+      se20.volume(0.25*sBar);
       jingle.volume(0.3*sBar);
       jingle2.volume(0.3*sBar);
       jingle3.volume(0.3*sBar);
