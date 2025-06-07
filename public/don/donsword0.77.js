@@ -1,7 +1,7 @@
 // var1.01　season2 エリシス、エド
 // npm run dev
 // 対戦中のカンでドラの数がズレる？
-// 魔界血戦後に操作不能？
+// 魔界血戦後に操作不能になる？
 window.onload = function(){
   draw();
   };
@@ -1404,8 +1404,7 @@ function updateParticles() {
     }
     function clickInGame() {
       //canvas5のaddeventでは上手く実装できなかったためその都度イベントを追加
-      //Menuから飛ぶ
-      if(debugmode){console.log('click!',cLock,"pagestate",pagestate,"msgstate",msgstate,"gamestate",gamestate)};  
+      //Menuから飛ぶ 
   socket.on("game-ready", (data)=>{
     if(IsHost(IAM.room)){
     var N=MEMBER.findIndex(value=>value.id==data.who);
@@ -1744,36 +1743,7 @@ function updateParticles() {
         if(mouseY >400 && mouseY<480){Skillname(1,navisw);}
         }
     }}
-    if(cLock==3){
-      //スキルで自分のパイ選択画面 手札
-    if(mouseY >490 && mouseY < 590 && mouseX >100 && mouseX <760){
-        var SX=Math.floor((mouseX+size-100)/size);
-          if(mouseX >100 && mouseX <660){
-            if(hand1.length>SX+1){
-              if(hand1[SX] ==69 || hand1[SX] ==70){
-                cLock=1;
-                return false;
-              }
-              PlayertoCpu(SX);
-            }
-            if(ponsw[1]==1 && hand1.length==SX+1){
-              if(hand1[SX] ==69 || hand1[SX] ==70){
-                cLock=1;
-                return false;
-              }
-              PlayertoCpu(SX);
-            }
-          }else if(mouseX >690 && mouseX <690+size){
-            if(turn==0){
-              if(hand1[hand1.length-1] ==43 || hand1[hand1.length-1] ==44){
-                cLock=1;
-                return false;
-              }
-              PlayertoCpu(hand1.length-1);
-            }
-          }
-    }
-  }else if(cLock==2){//スキル対象選択画面 キャラ
+  if(cLock==2){//スキル対象選択画面 キャラ
     if(mouseX >0 && mouseX <150 && mouseY >100){
     if(mouseY >100 && mouseY <200){SkillAnimation(1,2);
     }else if(mouseY >200 && mouseY <300){SkillAnimation(1,3);
@@ -3246,7 +3216,7 @@ function NameChange(){
   function Menu(){
     mouseX=stage.mouseX*(1/stage.scaleX);
     mouseY=stage.mouseY*(1/stage.scaleY);
-    if(debugmode){console.log('Menu',mouseX,mouseY,pagestate,gamestate)};
+    if(debugmode){console.log('click!',cLock,"pagestate",pagestate,"msgstate",msgstate,"gamestate",gamestate)}; 
     if(gamestate!==10){clickInGame();return false;};
     switch(pagestate){
       case 0:
@@ -3533,6 +3503,7 @@ function NameChange(){
               if(this.card==-1){
                 se3.play();
                 handmap.removeAllChildren();
+                save_Local();
                 return true;
               }
             }
@@ -4728,7 +4699,7 @@ if(opLock==0 && gamestate ==1){
       var rect = new createjs.Shape();
         rect.graphics
       .beginRadialGradientFill(["rgba(50, 77, 226,0.7)", "rgba(27, 43, 134, 0.8)"], [0,  1], 250, 160, 0, 250, 160, 200)
-      .beginFill().drawRect(200, 0, 200, 600);
+      .drawRect(200, 0, 200, 600);
     ContainerB.addChild(rect);
       var rect = new createjs.Shape();
         rect.graphics
@@ -4740,7 +4711,6 @@ if(opLock==0 && gamestate ==1){
       .beginRadialGradientFill(["rgba(224, 194, 60,0.7)", "rgba(177, 102, 33, 0.7)"], [0,  1], 650, 440, 0, 650, 440, 200)
       .drawRect(600, 0, 200, 600);
     ContainerB.addChild(rect);
-    //
     if(pvpmode==1){
         var Ary=[0,Username,MEMBER[1].name,MEMBER[2].name,MEMBER[3].name]          
         }else{
@@ -5405,7 +5375,7 @@ if(opLock==0 && gamestate ==1){
         hand3.sort(compareFunc);
         hand4.sort(compareFunc);
         //積み込み
-        //if(debugmode){hand1=[60,61,62,63,64,66,67,68]};
+        if(debugmode){hand1=[60,61,62,63,64,66,67,68]};
         //1番目の配列は上がり判定に使用
         hand1.unshift(-1)
         hand2.unshift(-1)
@@ -6684,12 +6654,9 @@ if(opLock==0 && gamestate ==1){
       for(var i=2;i<chara.length;i++){
         var R=Math.floor(Math.random()*(1+HiddenChara))
         chara[i]=R;
-        if(debugmode){
-          chara[1]=9;
-          };
       }
     }
-    //parent=0;//for debug
+    //if(debugmode){chara[1]=9};
     gamestate =1
     console.log('setup',timevalue)
     opening();
@@ -6780,13 +6747,13 @@ if(opLock==0 && gamestate ==1){
         })
   
   function PlayertoCpu(num){
-    console.log('player to cpu',reach)
+    console.log('player to cpu',cLock,reach)
     //ノーテンリーチ禁止
   if(reach[1]==2 && reach[0]==1){
     return false;
   }
   if(cLock==3){
-    if(chara[1]==1){SkillAnimation(1,num)};
+    if(chara[1]==2){SkillAnimation(1,num)};
     return false;
   };
   if(mpC>=10){
@@ -9039,19 +9006,22 @@ if(opLock==0 && gamestate ==1){
                 }
                 break;
           };
-            //国士無双:エピックラインのみ、かつ同パイを含まない
+            //国士無双
             var Kokushi=[60,61,62,63,64,65,66,67,68,69]
             var Kreach=0;
             var KKreach=0;
             for(var k=1;k<handtemp.length;k++){
             var A=Kokushi.findIndex(value=>value==handtemp[k])
             if(A!==-1){
+              //kokushi以外を含まない
               var B=handtemp.filter(value=>value==handtemp[k])
-            KKreach+=B.length-1;
-          }else{Kreach+=1}
-            if(Kreach>2){break;}
+            KKreach+=B.length-1;//60-67でのダブリは1枚まで
+            }else{
+              Kreach+=1;
+              break;
             }
-            if(Kreach==0 && KKreach==2){
+          }
+            if(KKreach==0 || KKreach==2){
                 //アガリ
                 console.log('kokushi tumo')
                 result="国士無双"
@@ -9726,7 +9696,7 @@ if(opLock==0 && gamestate ==1){
             }
           break;
         }
-        //国士無双:エピックラインのみ、かつ同パイを含まない
+        //国士無双
         var Kokushi=[60,61,62,63,64,65,66,67,68,69]
         var KokushiM=[60,61,62,63,64,65,66,67]
         var resultF=KokushiM.concat();
@@ -10881,7 +10851,18 @@ if(opLock==0 && gamestate ==1){
     //クリックしてから捨て牌を描写してturnroleに繋げるところまで
     mouseX=stage.mouseX*(1/stage.scaleX);
     mouseY=stage.mouseY*(1/stage.scaleY);
-    if(cLock==1){
+    if(cLock==3){
+      //スキルで自分のパイ選択画面 手札
+    if(mouseY >490 && mouseY < 590){
+        if(hand1[this.card] ==69 || hand1[this.card] ==70){
+        cLock=1;
+        return false;
+        }
+        PlayertoCpu(this.card);
+        return true;
+      }
+    };
+    if(cLock==1 && opLock>=0 && opLock !==2){
       ///switch(this.card)
       ctl[1]=0
       if(turn ==0){
@@ -12818,28 +12799,16 @@ if(opLock==0 && gamestate ==1){
     }else{
      var e10 = new createjs.Bitmap(queue.getResult(chrimg_src[LPresult[3].chara]));
     }
-    if(LPresult[3].chara==6){
       e10.sourceRect={x:400,y:0,width:400,height:600}
-    }else{
-      e10.sourceRect={x:0,y:0,width:800,height:600}
-    }
       e10.y=50;
       e10.scale=1.2;
       e10.alpha=0;
       field.addChild(e10);
-    if(LPresult[3].chara==6){
       e10.x=200;
       createjs.Tween.get(e10)
       .wait(1800)
       .to({alpha:1,x:400,scale:3/4}, 200, createjs.Ease.cubicInOut)
       .call(next);
-    }else{
-      e10.x=-200;
-      createjs.Tween.get(e10)
-      .wait(1800)
-      .to({alpha:1,x:100,scale:3/4}, 200, createjs.Ease.cubicInOut)
-      .call(next);
-    }
     //字幕
     var D= new createjs.Text("終　局", "bold 45px Arial", "white");
     D.x=350;
@@ -12953,7 +12922,6 @@ if(opLock==0 && gamestate ==1){
       D.y=530;    
       field.addChild(D);
     }
-    //
       if(scoretemp[0]>=0){
         var A;
         if(pvpmode==1){
