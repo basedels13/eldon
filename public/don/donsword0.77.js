@@ -2169,8 +2169,8 @@ function menuMap(p=0){
           UsernameText.x=532;
           UsernameText.y=98;
           menu_main.addChild(UsernameText);
-          var AryX=[500,500,500,530,480,520,490,400]
-          var AryY=[50,100,80,50,130,60,100,100]
+          var AryX=[500,500,500,530,480,520,490,400,430,460]
+          var AryY=[50,100,80,50,130,60,100,100,80,50]
           for(var i=0;i<chrimg_src.length;i++){
             var j=i%4;
             var k=Math.floor(i/4);
@@ -3344,7 +3344,7 @@ function NameChange(){
     //キャラクター解放
     switch(HiddenChara){
       case 3:
-        var A=achieveA.findIndex(value=>value.name=="もう一度かかってこい");
+        var A=achieveA.findIndex(value=>value.name=="まだだ");
         var B=achieveB.findIndex(value=>value.name=="殴り合い");
         if(achieveA[A].cleared>0 && achieveB[B].cleared>0 && scoretemp[0]>0){
           CharaUnlock(HiddenChara);
@@ -3376,13 +3376,13 @@ function NameChange(){
         break;
       case 7:
       var A=achieveA.findIndex(value=>value.name=="突き抜ける快感");
-        if(winrank[4][0]>=8 && achieveA[A].cleared>0 && scoretemp[0]>0){
+        if(winrank[4][0]>=3 && achieveA[A].cleared>0 && scoretemp[0]>0){
           CharaUnlock(HiddenChara);
         }
         break;
       case 8:
       var A=achieveA.findIndex(value=>value.name=="YOUならやれるポン");
-      var B=achieveB.findIndex(value=>value.name="クレストオブガイア");
+      var B=achieveB.findIndex(value=>value.name=="クレストオブガイア");
       var C=0;
       for(var i=0;i<7;i++){
         C+=achieveB[B+i].cleared;
@@ -3934,7 +3934,7 @@ function NameChange(){
                   se3.play();
                   }else{
                   se2.play();
-                  var Ary=["①「殴り合い」達成　②3連荘する","①「ナソード研究」達成　②一度も放銃せずに勝利","①半荘戦で3回以上放銃する　②一発ツモ5回達成","①「足取り」シナジー4つ達成　②10回以上カンをする","①「魔界血戦」1位8回達成　②ライン通貫10回達成","①100回ポンをする　②いずれかのクレスト役を和了する"];
+                  var Ary=["①「殴り合い」達成　②2連荘する","①「ナソード研究」達成　②一度も放銃せずに勝利","①半荘戦で3回以上放銃する　②一発ツモ5回達成","①「足取り」シナジー4つ達成　②10回以上カンをする","①「魔界血戦」1位3回達成　②ライン通貫10回達成","①100回ポンをする　②いずれかのクレスト役を和了する"];
                   Textlist[0].text="？？？（開放条件を満たすと開放）";
                   Textlist[1].text="NEXT："+Ary[HiddenChara-3];
                   return false;
@@ -4718,12 +4718,13 @@ if(opLock==0 && gamestate ==1){
         }
     for(var i=1;i<5;i++){
       var e1;
+      var Ary=[500,500,500,500,500,520,500,400,500,500];
     if(fool){
         e1 = new createjs.Bitmap(queue.getResult(chrimgR_src[chara[i]]));          
         }else{
         e1 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[i]]));
         }
-        e1.sourceRect={x:500,y:0,width:200,height:600}
+        e1.sourceRect={x:Ary[chara[i]],y:0,width:200,height:600}
         e1.x=200*(i-1);
         var t1 = new createjs.Text(Ary[i], "32px 'Century Gothic'", "black");
           t1.x=40+200*(i-1);
@@ -5375,7 +5376,7 @@ if(opLock==0 && gamestate ==1){
         hand3.sort(compareFunc);
         hand4.sort(compareFunc);
         //積み込み
-        if(debugmode){hand1=[60,61,62,63,64,66,67,68]};
+        //if(debugmode){hand1=[60,61,62,63,64,66,67,68]};
         //1番目の配列は上がり判定に使用
         hand1.unshift(-1)
         hand2.unshift(-1)
@@ -6656,7 +6657,7 @@ if(opLock==0 && gamestate ==1){
         chara[i]=R;
       }
     }
-    //if(debugmode){chara[1]=9};
+    //if(debugmode){chara[1]=4;chara[2]=3;chara[3]=2};
     gamestate =1
     console.log('setup',timevalue)
     opening();
