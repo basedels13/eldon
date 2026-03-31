@@ -1,7 +1,7 @@
 // var1.21　season2 UI
 // npm run dev
 // 対戦中のカンでドラの数がズレる？
-// 魔界血戦後に操作不能になる？
+// 魔界血戦後に操作不能になる
 window.onload = function(){
   draw();
   };
