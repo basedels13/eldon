@@ -1,6 +1,6 @@
 // var1.21　season2 UI
 // npm run dev
-// 対戦中のカンでドラの数がズレる？
+// 国士無双で信仰不能？
 // 魔界血戦後に操作不能になる
 window.onload = function(){
   draw();
@@ -8,7 +8,7 @@ window.onload = function(){
   
   function draw(){
   var titletext="v1.2/Click to START";
-  var debugmode=false;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にfalseに
+  var debugmode=true;  //コンソールログの表示の切り替え/テストプレイ用　リリース時にfalseに
   if(debugmode){titletext+="　でばっぐも～ど"};
   var today = new Date();
   var fool=false;
@@ -334,7 +334,7 @@ window.onload = function(){
   tweeNstar=createjs.Tween.get(Cstar, {loop: true})
   .to({rotation:360},1200);
   var Csquare= new createjs.Shape();
-  Csquare.graphics.beginFill("rgba(28, 134, 255, 0.7)").drawRect(0,0,145,100);
+  Csquare.graphics.beginFill("rgba(255, 255, 255, 0.7)").drawRect(0,0,145,100);
   Csquare.x=0;
   Csquare.y=0;
   var tweeNsquare;
@@ -913,11 +913,11 @@ window.onload = function(){
   volume: 0.25,
   });
   var se2 = new Howl({
-    src:"don/cancel3.mp3",
+    src:"don/Liquid_Suction.wav",
         volume: 0.3,
       });
   var se3 = new Howl({
-    src:"don/decision32.mp3",
+    src:"don/Sensu-Put.mp3",
         volume: 0.3,
       });
   var se4 = new Howl({
@@ -976,10 +976,9 @@ window.onload = function(){
     src:"don/suzu.mp3",
     volume: 0.3,
     });
-  //src:"don/tukkomi1.mp3",
   var se18 = new Howl({
-    src:"don/Impact09-1.mp3",
-    volume: 0.7,
+    src:"don/WoodBlock.wav",
+    volume: 0.18,
     });
   var se19 = new Howl({
     src:"don/Single_Accent04-3.mp3",
@@ -1704,7 +1703,7 @@ function updateParticles() {
         paiviewer.alpha=0;
         opLock=0;
         //drawbuttom(400,10,"残パイリスト",0,130,44);
-        se2.play();
+        se4.play();
         return false;
       }
       if(mouseX >290 && mouseY > 10 && mouseX <400 && mouseY <55){
@@ -4788,13 +4787,13 @@ if(opLock==0 && gamestate ==1){
         }
     for(var i=1;i<5;i++){
       var e1;
-      var Ary=[500,500,500,500,500,520,500,400,500,500];
+      var AryX=[500,500,500,500,500,520,500,400,500,500];
     if(fool){
         e1 = new createjs.Bitmap(queue.getResult(chrimgR_src[chara[i]]));          
         }else{
         e1 = new createjs.Bitmap(queue.getResult(chrimg_src[chara[i]]));
         }
-        e1.sourceRect={x:Ary[chara[i]],y:0,width:200,height:600}
+        e1.sourceRect={x:AryX[chara[i]],y:0,width:200,height:600}
         e1.x=200*(i-1);
         var t1 = new createjs.Text(Ary[i], "32px 'Century Gothic'", "black");
           t1.x=40+200*(i-1);
@@ -4880,10 +4879,17 @@ if(opLock==0 && gamestate ==1){
                         .drawRect(630, 400, 160, 80)
                         .drawRect(630, 10, 160, 350)
                         .drawRect(630, 365, 160, 30)
-                        .drawRect(10, 100, 135, 400)
                         .drawRect(10, 10, 220, 44)
                         .drawRect(10, 60, 135, 34)
-                        .drawRect(530, 10, 90, 44);
+                        .drawRect(530, 10, 90, 44)
+                        .beginFill("rgba(15, 46, 104, 0.6)")
+                        .drawRect(5, 100, 140, 100)
+                        .beginFill("rgba(17, 110, 56, 0.6)")
+                        .drawRect(5, 200, 140, 100)
+                        .beginFill("rgba(114, 116, 16, 0.6)")
+                        .drawRect(5, 300, 140, 100)
+                        .beginFill("rgba(112, 15, 15, 0.6)")
+                        .drawRect(5, 400, 140, 100);
         field.addChild(rect);
         rect.addEventListener("click", {handleEvent:Menu}); 
         field.addChild(Csquare);
@@ -5812,7 +5818,7 @@ if(opLock==0 && gamestate ==1){
         var N=1+MEMBER.findIndex(value=>value.id==data.who);
         if(debugmode){console.log('kan-pai',N,data.status);}
       if(data.status){
-        nuki[0]=N;
+        //nuki[0]=N;
         if(data.pai==100){
           console.log(data.handtest);
         switch(N){
@@ -6693,7 +6699,6 @@ if(opLock==0 && gamestate ==1){
         parent= Math.floor(Math.random()*4);
         MEMBER=[];
         //メンバーに追加
-        //Room1.push({id:0,token:data.token,name:data.name, chr:data.chr, ready:false});
         for(var i=0; i<memberlist.length; i++){
           chara[i+1]=memberlist[i].chr
           MEMBER.push({id:memberlist[i].id,token:memberlist[i].token,name:memberlist[i].name,chr:memberlist[i].chr,score:LP[i+1],turnflag:0,pc:1});
@@ -6727,7 +6732,6 @@ if(opLock==0 && gamestate ==1){
         chara[i]=R;
       }
     }
-    //if(debugmode){chara[1]=4;chara[2]=3;chara[3]=2};
     gamestate =1
     console.log('setup',timevalue)
     opening();
@@ -13731,7 +13735,7 @@ if(opLock==0 && gamestate ==1){
       se15.volume(0.3*sBar);
       se16.volume(0.3*sBar);
       se17.volume(0.3*sBar);
-      se18.volume(0.7*sBar);
+      se18.volume(0.18*sBar);
       se19.volume(0.6*sBar);
       se20.volume(0.15*sBar);
       jingle.volume(0.3*sBar);
